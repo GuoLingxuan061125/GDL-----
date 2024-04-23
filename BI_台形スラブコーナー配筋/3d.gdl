@@ -1,0 +1,162 @@
+!====================================================台形スラブコーナー
+if slabVertLine=1 then rotz 0
+if slabVertLine=2 then rotz 90
+if slabVertLine=3 then rotz 180
+if slabVertLine=4 then rotz 270
+
+    !hotspot
+    hotspot 0         ,0         ,0      
+    hotspot slabBotLen,0         ,0      
+    hotspot slabBotLen,slabBotLen,0      
+    hotspot 0         ,slabBotLen,0      
+    hotspot 0         ,0         ,slabThi
+    hotspot slabTopLen,0         ,slabThi
+    hotspot slabTopLen,slabTopLen,slabThi
+    hotspot 0         ,slabTopLen,slabThi
+
+    hotspot -slabOffsetWid,0         ,0      
+    hotspot -slabOffsetWid,slabBotLen,0      
+    hotspot -slabOffsetWid,slabTopLen,slabThi
+    hotspot -slabOffsetWid,0         ,slabThi
+
+    hotspot 0         ,-slabOffsetWid,0      
+    hotspot slabBotLen,-slabOffsetWid,0      
+    hotspot slabTopLen,-slabOffsetWid,slabThi
+    hotspot 0         ,-slabOffsetWid,slabThi
+
+    !body
+    group "slabCorner"
+        material slabMat
+
+        ruledsegmented 4,1+2+4+8+16+32,
+            0         ,0         ,0      ,0,
+            slabBotLen,0         ,0      ,0,
+            slabBotLen,slabBotLen,0      ,0,
+            0         ,slabBotLen,0      ,0,
+            0         ,0         ,slabThi,
+            slabTopLen,0         ,slabThi,
+            slabTopLen,slabTopLen,slabThi,
+            0         ,slabTopLen,slabThi
+
+        ruledsegmented 4,1+2+4+8+16+32,
+            0             ,0         ,0      ,0,
+            -slabOffsetWid,0         ,0      ,0,
+            -slabOffsetWid,slabBotLen,0      ,0,
+            0             ,slabBotLen,0      ,0,
+            0             ,0         ,slabThi,
+            -slabOffsetWid,0         ,slabThi,
+            -slabOffsetWid,slabTopLen,slabThi,
+            0             ,slabTopLen,slabThi
+
+        ruledsegmented 4,1+2+4+8+16+32,
+            0         ,0             ,0      ,0,
+            slabBotLen,0             ,0      ,0,
+            slabTopLen,0             ,slabThi,0,
+            0         ,0             ,slabThi,0,
+            0         ,-slabOffsetWid,0      ,
+            slabBotLen,-slabOffsetWid,0      ,
+            slabTopLen,-slabOffsetWid,slabThi,
+            0         ,-slabOffsetWid,slabThi
+    endgroup
+
+    if slabDis then
+        placegroup "slabCorner"
+    endif
+
+del 1
+
+
+!====================================================鉄筋
+if verDisplay and verNum>0 then
+    for i=1 to verNum
+        !ホットスポット
+        if disPOINT then
+            for j=1 to verVtxNum[i]
+                hotspot verVtxPos[i][3*j-2],verVtxPos[i][3*j-1],verVtxPos[i][3*j]
+            next j
+        endif
+
+        !中心線
+        pen rebarPen
+
+        if disCL then
+            for j=1 to verVtxNum[i]-1
+                lin_ verVtxPos[i][3*j-2],verVtxPos[i][3*j-1],verVtxPos[i][3*j],verVtxPos[i][3*j+1],verVtxPos[i][3*j+2],verVtxPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋
+        material rebarMat
+
+        if disSD then
+            !tube断面
+            tube_r=rebarRad
+            gosub "tube断面"
+            
+            !tubeパス
+            put 2*verVtxPos[i][1]-verVtxPos[i][4],2*verVtxPos[i][2]-verVtxPos[i][5],2*verVtxPos[i][3]-verVtxPos[i][6],0
+            for j=1 to verVtxNum[i]
+                put verVtxPos[i][3*j-2],verVtxPos[i][3*j-1],verVtxPos[i][3*j],0
+            next j
+            put 2*verVtxPos[i][3*verVtxNum[i]-2]-verVtxPos[i][3*verVtxNum[i]-5],2*verVtxPos[i][3*verVtxNum[i]-1]-\
+                verVtxPos[i][3*verVtxNum[i]-4],2*verVtxPos[i][3*verVtxNum[i]]-verVtxPos[i][3*verVtxNum[i]-3],0
+            
+            tube SDresol+1,verVtxNum[i]+2,1+2+16+32+64,
+                get ((SDresol+1)*3),
+                get ((verVtxNum[i]+2)*4)
+        endif
+    next i
+endif
+
+
+!====================================================横筋
+if horDisplay and horNum>0 then
+    for i=1 to horNum
+        !ホットスポット
+        if disPOINT then
+            for j=1 to horVtxNum[i]
+                hotspot horVtxPos[i][3*j-2],horVtxPos[i][3*j-1],horVtxPos[i][3*j]
+            next j
+        endif
+
+        !中心線
+        pen rebarPen
+
+        if disCL then
+            for j=1 to horVtxNum[i]-1
+                lin_ horVtxPos[i][3*j-2],horVtxPos[i][3*j-1],horVtxPos[i][3*j],horVtxPos[i][3*j+1],horVtxPos[i][3*j+2],horVtxPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋
+        material rebarMat
+
+        if disSD then
+            !tube断面
+            tube_r=rebarRad
+            gosub "tube断面"
+            
+            !tubeパス
+            put 2*horVtxPos[i][1]-horVtxPos[i][4],2*horVtxPos[i][2]-horVtxPos[i][5],2*horVtxPos[i][3]-horVtxPos[i][6],0
+            for j=1 to horVtxNum[i]
+                put horVtxPos[i][3*j-2],horVtxPos[i][3*j-1],horVtxPos[i][3*j],0
+            next j
+            put 2*horVtxPos[i][3*horVtxNum[i]-2]-horVtxPos[i][3*horVtxNum[i]-5],2*horVtxPos[i][3*horVtxNum[i]-1]-\
+                horVtxPos[i][3*horVtxNum[i]-4],2*horVtxPos[i][3*horVtxNum[i]]-horVtxPos[i][3*horVtxNum[i]-3],0
+            
+            tube SDresol+1,horVtxNum[i]+2,1+2+16+32+64,
+                get ((SDresol+1)*3),
+                get ((horVtxNum[i]+2)*4)
+        endif
+    next i
+endif
+
+
+end
+
+"tube断面":
+    for j=1 to SDresol
+        put tube_r*cos((1-j)*360/SDresol),tube_r*sin((1-j)*360/SDresol),0
+    next j
+    put tube_r,0,0
+return

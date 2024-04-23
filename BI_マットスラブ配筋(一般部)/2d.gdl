@@ -1,0 +1,54 @@
+project2{3} 3,270,1,1+2+4+8+16+32,parameters disSD=0
+
+
+hotspot2 0,0,code,slabMinusOffset[1][1],1+128:code=code+1
+hotspot2 slabMinusOffset[1][1],0,code,slabMinusOffset[1][1],2:code=code+1
+hotspot2 -1,0,code,slabMinusOffset[1][1],3:code=code+1
+
+hotspot2 0,0,code,slabMinusOffset[1][2],1+128:code=code+1
+hotspot2 0,slabMinusOffset[1][2],code,slabMinusOffset[1][2],2:code=code+1
+hotspot2 0,-1,code,slabMinusOffset[1][2],3:code=code+1
+
+hotspot2 slabX,0,code,slabMinusOffset[2][1],1+128:code=code+1
+hotspot2 slabX-slabMinusOffset[2][1],0,code,slabMinusOffset[2][1],2:code=code+1
+hotspot2 slabX+1,0,code,slabMinusOffset[2][1],3:code=code+1
+
+hotspot2 slabX,0,code,slabMinusOffset[2][2],1+128:code=code+1
+hotspot2 slabX,slabMinusOffset[2][2],code,slabMinusOffset[2][2],2:code=code+1
+hotspot2 slabX,-1,code,slabMinusOffset[2][2],3:code=code+1
+
+hotspot2 slabX,slabY,code,slabMinusOffset[3][1],1+128:code=code+1
+hotspot2 slabX-slabMinusOffset[3][1],slabY,code,slabMinusOffset[3][1],2:code=code+1
+hotspot2 slabX+1,slabY,code,slabMinusOffset[3][1],3:code=code+1
+
+hotspot2 slabX,slabY,code,slabMinusOffset[3][2],1+128:code=code+1
+hotspot2 slabX,slabY-slabMinusOffset[3][2],code,slabMinusOffset[3][2],2:code=code+1
+hotspot2 slabX,slabY+1,code,slabMinusOffset[3][2],3:code=code+1
+
+hotspot2 0,slabY,code,slabMinusOffset[4][1],1+128:code=code+1
+hotspot2 slabMinusOffset[4][1],slabY,code,slabMinusOffset[4][1],2:code=code+1
+hotspot2 -1,slabY,code,slabMinusOffset[4][1],3:code=code+1
+
+hotspot2 0,slabY,code,slabMinusOffset[4][2],1+128:code=code+1
+hotspot2 0,slabY-slabMinusOffset[4][2],code,slabMinusOffset[4][2],2:code=code+1
+hotspot2 0,slabY+1,code,slabMinusOffset[4][2],3:code=code+1
+
+set fill slabFill
+
+poly2 12,1+2+4,
+0,slabMinusOffset[1][2],
+slabMinusOffset[1][1],slabMinusOffset[1][2],
+slabMinusOffset[1][1],0,
+slabX-slabMinusOffset[2][1],0,
+slabX-slabMinusOffset[2][1],slabMinusOffset[2][2],
+slabX,slabMinusOffset[2][2],
+slabX,slabY-slabMinusOffset[3][2],
+slabX-slabMinusOffset[3][1],slabY-slabMinusOffset[3][2],
+slabX-slabMinusOffset[3][1],slabY,
+slabMinusOffset[4][1],slabY,
+slabMinusOffset[4][1],slabY-slabMinusOffset[4][2],
+0,slabY-slabMinusOffset[4][2]
+
+
+
+

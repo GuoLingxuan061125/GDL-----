@@ -1,0 +1,1471 @@
+if switch_turn then
+	rotz 180
+endif
+
+if step_dir=2 then 
+	mul 1,-1,1
+endif
+
+if switch_floor=0 then
+	for i=1 to floor_num-1
+	addz floor_hei
+		if i<floor_num-1 then
+			hotspot min(0,standard_x)-floor_1,0,0
+			hotspot min(0,standard_x)-floor_1,step_wid1,0
+			hotspot min(0,standard_x)-floor_1,0,-floor_thi
+			hotspot min(0,standard_x)-floor_1,step_wid1,-floor_thi
+		endif
+
+		hotspot min(0,standard_x)-floor_1,step_wid1+handrail_wid,0
+		hotspot min(0,standard_x)-floor_1,step_wid1+handrail_wid+step_wid2,0
+		hotspot min(0,standard_x)-floor_1,step_wid1+handrail_wid,-floor_thi
+		hotspot min(0,standard_x)-floor_1,step_wid1+handrail_wid+step_wid2,-floor_thi
+	
+		if switch_hr1 then
+			if i<floor_num-1 then
+				hotspot min(0,standard_x)-floor_1,0,hr_hei
+				hotspot min(0,standard_x)-floor_1,hr_wid,hr_hei
+			endif
+
+			hotspot min(0,standard_x)-floor_1,step_wid1+handrail_wid+step_wid2,hr_hei
+			hotspot min(0,standard_x)-floor_1,step_wid1+handrail_wid+step_wid2-hr_wid,hr_hei
+		endif
+	next i
+	del floor_num-1
+endif
+
+
+!======================================================================立上り開口
+group "handrail_hide"
+	material m_step
+
+	if switch_floor and hr_hide=1 then !フロア踊り場側
+		add min(standard_x,0)-floor_1-floor_dep-0.001,hr_wid+hr_hide_start,-gl_num*step_riser
+		block hr_wid2+0.002,step_wid1+handrail_wid+step_wid2-2*hr_wid-hr_hide_start-hr_hide_end,gl_num*step_riser+(floor_num-1)*floor_hei+max_hr_hei+0.001
+		del 1
+	endif
+	
+	if hr_hide=2 then !下部階段側
+		if switch_floor then
+			add min(standard_x,0)-floor_1-floor_dep+hr_wid2+hr_hide_start,-0.001,-gl_num*step_riser
+			block floor_dep+floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-2*hr_wid2-hr_hide_start-hr_hide_end,hr_wid+0.002,gl_num*step_riser+(floor_num-1)*floor_hei+max_hr_hei+0.001
+			del 1
+		else
+			add min(standard_x,0)-floor_1+hr_hide_start,-0.001,-gl_num*step_riser
+			block floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2-hr_hide_start-hr_hide_end,hr_wid+0.002,gl_num*step_riser+(floor_num-1)*floor_hei+max_hr_hei+0.001
+			del 1
+		endif
+	endif
+	
+	if hr_hide=3 then !上部階段側
+		if switch_floor then
+			add min(standard_x,0)-floor_1-floor_dep+hr_wid2+hr_hide_start,step_wid1+handrail_wid+step_wid2-hr_wid-0.001,-gl_num*step_riser
+			block floor_dep+floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-2*hr_wid2-hr_hide_start-hr_hide_end,hr_wid+0.002,gl_num*step_riser+(floor_num-1)*floor_hei+max_hr_hei+0.001
+			del 1
+		else
+			add min(standard_x,0)-floor_1+hr_hide_start,step_wid1+handrail_wid+step_wid2-hr_wid-0.001,-gl_num*step_riser
+			block floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2-hr_hide_start-hr_hide_end,hr_wid+0.002,gl_num*step_riser+(floor_num-1)*floor_hei+max_hr_hei+0.001
+			del 1
+		endif
+	endif
+endgroup
+
+
+group "handrail_hide2"
+	material m_step
+
+	if switch_hr1 then
+		if switch_floor and hr_hide=1 then !フロア踊り場側
+			add min(standard_x,0)-floor_1-floor_dep-0.001,hr_wid+hr_hide_start,-gl_num*step_riser
+			block 0.002,step_wid1+handrail_wid+step_wid2-2*hr_wid-hr_hide_start-hr_hide_end,gl_num*step_riser+(floor_num-1)*floor_hei+hr_hei+0.001
+			del 1
+		endif
+		
+		if hr_hide=2 then !下部階段側
+			if switch_floor then
+				add min(standard_x,0)-floor_1-floor_dep+hr_wid2+hr_hide_start,-0.001,-gl_num*step_riser
+				block floor_dep+floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-2*hr_wid2-hr_hide_start-hr_hide_end,0.002,gl_num*step_riser+(floor_num-1)*floor_hei+hr_hei+0.001
+				del 1
+			else
+				add min(standard_x,0)-floor_1+hr_hide_start,-0.001,-gl_num*step_riser
+				block floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2-hr_hide_start-hr_hide_end,0.002,gl_num*step_riser+(floor_num-1)*floor_hei+hr_hei+0.001
+				del 1
+			endif
+		endif
+		
+		if hr_hide=3 then !上部階段側
+			if switch_floor then
+				add min(standard_x,0)-floor_1-floor_dep+hr_wid2+hr_hide_start,step_wid1+handrail_wid+step_wid2-0.001,-gl_num*step_riser
+				block floor_dep+floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-2*hr_wid2-hr_hide_start-hr_hide_end,0.002,gl_num*step_riser+(floor_num-1)*floor_hei+hr_hei+0.001
+				del 1
+			else
+				add min(standard_x,0)-floor_1+hr_hide_start,step_wid1+handrail_wid+step_wid2-0.001,-gl_num*step_riser
+				block floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2-hr_hide_start-hr_hide_end,0.002,gl_num*step_riser+(floor_num-1)*floor_hei+hr_hei+0.001
+				del 1
+			endif
+		endif
+	endif
+endgroup
+
+
+!======================================================================フロア踊り場非表示
+group "hide_floor_landing"
+	material m_step
+
+	if switch_floor=0 then
+		add min(0,standard_x)-floor_1-floor_dep-0.002,-0.001,-gl_num*step_riser-0.001
+		block floor_dep+0.002,step_wid1+handrail_wid+step_wid2+0.002,gl_num*step_riser+(floor_num-1)*floor_hei+max_hr_hei+0.002
+		del 1
+	endif
+endgroup
+
+
+group "hide_floor_landing2"
+	material m_step
+
+	if switch_floor=0 then
+		add min(0,standard_x)-floor_1-floor_dep-0.001,-0.001,(floor_num-1)*floor_hei-floor_thi
+		block floor_dep+0.002,step_wid1+handrail_wid+step_wid2+0.002,floor_thi+max_hr_hei
+		del 1
+	endif
+endgroup
+
+
+!======================================================================下部階段
+group "step_down"
+	material m_step
+
+	for j=1 to floor_num-1
+
+		if switch_gl or j>1 then
+			ruledsegmented 4,1+2+4+16+32+64,
+			0,0,0,0,
+			min(standard_x,0)-floor_1,0,0,0,
+			min(standard_x,0)-floor_1,0,-floor_thi,0,
+			0,0,0,0,
+			0,step_wid1,0,
+			min(standard_x,0)-floor_1,step_wid1,0,
+			min(standard_x,0)-floor_1,step_wid1,-floor_thi,
+			0,step_wid1,0
+		endif
+	
+		for i=1 to step_num_down-1
+			ruledsegmented 4,1+2+4+16+32+64,
+			0,0,0,0,
+			step_tread,0,step_riser,0,
+			-step_nosing,0,step_riser-step_rat,0,
+			0,0,0,0,
+			0,step_wid1,0,
+			step_tread,step_wid1,step_riser,
+			-step_nosing,step_wid1,step_riser-step_rat,
+			0,step_wid1,0
+	
+			add step_tread,0,step_riser
+		next i
+		del step_num_down-1
+	
+		ruledsegmented 6,1+2+4+16+32+64,
+		(step_num_down-1)*step_tread,0,(step_num_down-1)*step_riser,0,
+		(step_num_down-1)*step_tread-step_nosing,0,step_num_down*step_riser-step_rat,0,
+		step_num_down*step_tread,0,step_num_down*step_riser,0,
+		(step_num_down-1)*step_tread+landing_1,0,step_num_down*step_riser,0,
+		(step_num_down-1)*step_tread+landing_1,0,step_num_down*step_riser-landing_thi,0,
+		(step_num_down-1)*step_tread,0,(step_num_down-1)*step_riser,0,
+		(step_num_down-1)*step_tread,step_wid1,(step_num_down-1)*step_riser,
+		(step_num_down-1)*step_tread-step_nosing,step_wid1,step_num_down*step_riser-step_rat,
+		step_num_down*step_tread,step_wid1,step_num_down*step_riser,
+		(step_num_down-1)*step_tread+landing_1,step_wid1,step_num_down*step_riser,
+		(step_num_down-1)*step_tread+landing_1,step_wid1,step_num_down*step_riser-landing_thi,
+		(step_num_down-1)*step_tread,step_wid1,(step_num_down-1)*step_riser
+	
+		hotspot 0,0,0
+		hotspot 0,step_wid1,0
+		
+		hotspot -step_nosing,0,step_riser-step_rat
+		hotspot -step_nosing,step_wid1,step_riser-step_rat
+		
+		hotspot step_num_down*step_tread-step_tread-step_nosing,0,step_num_down*step_riser-step_rat
+		hotspot step_num_down*step_tread-step_tread-step_nosing,step_wid1,step_num_down*step_riser-step_rat
+	
+	addz floor_hei
+	next j
+	del floor_num-1
+endgroup
+
+
+group "step_yuka_down"
+	material m_step
+
+	for j=1 to floor_num-1
+
+		if switch_gl=0 and j=1 then
+			ruledsegmented 6,1+2+4+16+32+64,
+			0,0,0,0,
+			(step_thi/cos(step_angle))/tan(step_angle),0,0,0,
+			(step_riser*step_num_down-landing_thi+step_thi/cos(step_angle))/tan(step_angle),0,step_riser*step_num_down-landing_thi,0,
+			(step_num_down-1)*step_tread+landing_1,0,step_num_down*step_riser-landing_thi,0,
+			(step_num_down-1)*step_tread,0,(step_num_down-1)*step_riser,0,
+			0,0,0,0,
+			0,step_wid1,0,
+			(step_thi/cos(step_angle))/tan(step_angle),step_wid1,0,
+			(step_riser*step_num_down-landing_thi+step_thi/cos(step_angle))/tan(step_angle),step_wid1,step_riser*step_num_down-landing_thi,
+			(step_num_down-1)*step_tread+landing_1,step_wid1,step_num_down*step_riser-landing_thi,
+			(step_num_down-1)*step_tread,step_wid1,(step_num_down-1)*step_riser,
+			0,step_wid1,0
+		else	
+			ruledsegmented 7,1+2+4+16+32+64,
+			0,0,0,0,
+			min(standard_x,0)-floor_1,0,-floor_thi,0,
+			(step_thi/cos(step_angle)-floor_thi)/tan(step_angle),0,-floor_thi,0,
+			(step_riser*step_num_down-landing_thi+step_thi/cos(step_angle))/tan(step_angle),0,step_riser*step_num_down-landing_thi,0,
+			(step_num_down-1)*step_tread+landing_1,0,step_num_down*step_riser-landing_thi,0,
+			(step_num_down-1)*step_tread,0,(step_num_down-1)*step_riser,0,
+			0,0,0,0,
+			0,step_wid1,0,
+			min(standard_x,0)-floor_1,step_wid1,-floor_thi,
+			(step_thi/cos(step_angle)-floor_thi)/tan(step_angle),step_wid1,-floor_thi,
+			(step_riser*step_num_down-landing_thi+step_thi/cos(step_angle))/tan(step_angle),step_wid1,step_riser*step_num_down-landing_thi,
+			(step_num_down-1)*step_tread+landing_1,step_wid1,step_num_down*step_riser-landing_thi,
+			(step_num_down-1)*step_tread,step_wid1,(step_num_down-1)*step_riser,
+			0,step_wid1,0
+		endif
+
+	addz floor_hei
+	next j
+	del floor_num-1
+endgroup
+
+step_down=addgroup("step_down","step_yuka_down")
+
+
+!======================================================================中間踊り場
+group "landing"
+	material m_step
+
+	for j=1 to floor_num-1
+		add step_num_down*step_tread-step_tread+landing_1,0,step_num_down*step_riser-landing_thi
+			ruledsegmented 5,1+2+4+16+64,
+			landing_dep,0,0,0,
+			landing_dep,0,landing_thi-landing_dep*landing_rat/100,0,
+			landing_dep,step_wid1+handrail_wid+step_wid2,landing_thi-landing_dep*landing_rat/100,0,
+			landing_dep,step_wid1+handrail_wid+step_wid2,0,0,
+			landing_dep,0,0,0,
+			0,0,0,
+			0,0,landing_thi,
+			0,step_wid1+handrail_wid+step_wid2,landing_thi,
+			0,step_wid1+handrail_wid+step_wid2,0,
+			0,0,0
+			
+			hotspot landing_dep,0,0
+			hotspot landing_dep,step_wid1+handrail_wid+step_wid2,0
+	
+			hotspot landing_dep,0,landing_thi-landing_dep*landing_rat/100
+			hotspot landing_dep,step_wid1+handrail_wid+step_wid2,landing_thi-landing_dep*landing_rat/100
+		del 1
+	addz floor_hei
+	next j
+	del floor_num-1
+endgroup
+
+hotspot step_num_down*step_tread-step_tread,step_wid1/2,step_num_down*step_riser,code,landing_1,1+128:code=code+1
+hotspot step_num_down*step_tread-step_tread-1,step_wid1/2,step_num_down*step_riser,code,landing_1,3:code=code+1
+hotspot step_num_down*step_tread-step_tread+landing_1,step_wid1/2,step_num_down*step_riser,code,landing_1,2:code=code+1
+
+hotspot step_num_down*step_tread+landing_1-step_tread,step_wid1+handrail_wid/2,step_num_down*step_riser,code,landing_dep,1+128:code=code+1
+hotspot step_num_down*step_tread+landing_1-step_tread-1,step_wid1+handrail_wid/2,step_num_down*step_riser,code,landing_dep,3:code=code+1
+hotspot step_num_down*step_tread+landing_1-step_tread+landing_dep,step_wid1+handrail_wid/2,step_num_down*step_riser-landing_dep*landing_rat/100,code,landing_dep,2:code=code+1
+
+hotspot step_num_down*step_tread-step_tread+landing_1,step_wid1+handrail_wid+step_wid2/2,step_num_down*step_riser,code,landing_2,1+128:code=code+1
+hotspot step_num_down*step_tread-step_tread+landing_1+1,step_wid1+handrail_wid+step_wid2/2,step_num_down*step_riser,code,landing_2,3:code=code+1
+hotspot step_num_down*step_tread-step_tread+landing_1-landing_2,step_wid1+handrail_wid+step_wid2/2,step_num_down*step_riser,code,landing_2,2:code=code+1
+
+
+!======================================================================上部階段
+group "step_up"
+	material m_step
+
+	for j=1 to floor_num-1
+		add (step_num_down-1)*step_tread+landing_1-landing_2,step_wid1+handrail_wid,step_num_down*step_riser
+			ruledsegmented 5,1+2+4+16+32+64,
+			0,0,0,0,
+			landing_2,0,0,0,
+			landing_2,0,-landing_thi,0,
+			(landing_thi-step_thi/cos(step_angle))/tan(step_angle),0,-landing_thi,0,
+			0,0,0,0,
+			0,step_wid2,0,
+			landing_2,step_wid2,0,
+			landing_2,step_wid2,-landing_thi,
+			(landing_thi-step_thi/cos(step_angle))/tan(step_angle),step_wid2,-landing_thi,
+			0,step_wid2,0
+		
+			for i=1 to step_num_up-1
+				ruledsegmented 4,1+2+4+16+32+64,
+				0,0,0,0,
+				-step_tread,0,step_riser,0,
+				step_nosing,0,step_riser-step_rat,0,
+				0,0,0,0,
+				0,step_wid1,0,
+				-step_tread,step_wid1,step_riser,
+				step_nosing,step_wid1,step_riser-step_rat,
+				0,step_wid1,0
+		
+				add -step_tread,0,step_riser
+			next i
+			del step_num_up-1
+		
+			ruledsegmented 6,1+2+4+16+32+64,
+			-(step_num_up-1)*step_tread,0,(step_num_up-1)*step_riser,0,
+			-(step_num_up-1)*step_tread+step_nosing,0,step_num_up*step_riser-step_rat,0,
+			-step_num_up*step_tread,0,step_num_up*step_riser,0,
+			-(step_num_up-1)*step_tread-max(standard_x,0)-floor_1,0,step_num_up*step_riser,0,
+			-(step_num_up-1)*step_tread-max(standard_x,0)-floor_1,0,step_num_up*step_riser-floor_thi,0,
+			-(step_num_up-1)*step_tread,0,(step_num_up-1)*step_riser,0,
+			-(step_num_up-1)*step_tread,step_wid2,(step_num_up-1)*step_riser,
+			-(step_num_up-1)*step_tread+step_nosing,step_wid2,step_num_up*step_riser-step_rat,
+			-step_num_up*step_tread,step_wid2,step_num_up*step_riser,
+			-(step_num_up-1)*step_tread-max(standard_x,0)-floor_1,step_wid2,step_num_up*step_riser,
+			-(step_num_up-1)*step_tread-max(standard_x,0)-floor_1,step_wid2,step_num_up*step_riser-floor_thi,
+			-(step_num_up-1)*step_tread,step_wid2,(step_num_up-1)*step_riser
+		
+			hotspot 0,0,0
+			hotspot 0,step_wid2,0
+			
+			hotspot step_nosing,0,step_riser-step_rat
+			hotspot step_nosing,step_wid2,step_riser-step_rat
+	
+			hotspot -(step_num_up-1)*step_tread+step_nosing,0,step_num_up*step_riser-step_rat
+			hotspot -(step_num_up-1)*step_tread+step_nosing,step_wid2,step_num_up*step_riser-step_rat
+		del 1
+	addz floor_hei
+	next j
+	del floor_num-1
+endgroup
+
+group "step_yuka_up"
+	material m_step
+	
+	for j=1 to floor_num-1
+		add (step_num_down-1)*step_tread+landing_1-landing_2,step_wid1+handrail_wid,step_num_down*step_riser
+			ruledsegmented 6,1+2+4+16+32+64,
+			0,0,0,0,
+			-(step_num_up-1)*step_tread,0,(step_num_up-1)*step_riser,0,
+			-(step_num_up-1)*step_tread-max(standard_x,0)-floor_1,0,step_num_up*step_riser-floor_thi,0,
+			-(step_thi/cos(step_angle)+step_num_up*step_riser-floor_thi)/tan(step_angle),0,step_num_up*step_riser-floor_thi,0,
+			(landing_thi-step_thi/cos(step_angle))/tan(step_angle),0,-landing_thi,0,
+			0,0,0,0,
+			0,step_wid2,0,
+			-(step_num_up-1)*step_tread,step_wid2,(step_num_up-1)*step_riser,
+			-(step_num_up-1)*step_tread-max(standard_x,0)-floor_1,step_wid2,step_num_up*step_riser-floor_thi,
+			-(step_thi/cos(step_angle)+step_num_up*step_riser-floor_thi)/tan(step_angle),step_wid2,step_num_up*step_riser-floor_thi,
+			(landing_thi-step_thi/cos(step_angle))/tan(step_angle),step_wid2,-landing_thi,
+			0,step_wid2,0
+		del 1
+	addz floor_hei
+	next j
+	del floor_num-1
+endgroup
+
+step_up=addgroup("step_up","step_yuka_up")
+
+
+!======================================================================フロア踊り場
+group "floor_landing"
+	material m_step
+
+	add min(standard_x,0)-floor_1-floor_dep,0,(floor_num-1)*floor_hei-floor_thi
+		for j=1 to z_1
+			ruledsegmented 5,1+2+4+16+64,
+			0,0,0,0,
+			0,step_wid1+handrail_wid+step_wid2,0,0,
+			0,step_wid1+handrail_wid+step_wid2,floor_thi-floor_dep*floor_rat/100,0,
+			0,0,floor_thi-floor_dep*floor_rat/100,0,
+			0,0,0,0,
+			floor_dep,0,0,
+			floor_dep,step_wid1+handrail_wid+step_wid2,0,
+			floor_dep,step_wid1+handrail_wid+step_wid2,floor_thi,
+			floor_dep,0,floor_thi,
+			floor_dep,0,0
+		
+			if switch_floor then
+				hotspot 0,0,0
+				hotspot 0,step_wid1+handrail_wid+step_wid2,0
+			
+				hotspot 0,0,floor_thi-floor_dep*floor_rat/100
+				hotspot 0,step_wid1+handrail_wid+step_wid2,floor_thi-floor_dep*floor_rat/100
+				
+			endif
+		addz -floor_hei
+		next j
+		del z_1
+	del 1
+endgroup
+
+
+!======================================================================1階下がり
+group "1f_gl"
+	material m_step
+
+	if switch_gl then
+		add standard_x,step_wid1+handrail_wid,-step_riser
+			ruledsegmented 6,1+2+4+16+32+64,
+			0,0,0,0,
+			step_nosing,0,step_riser-step_rat,0,
+			-step_tread,0,step_riser,0,
+			-max(standard_x,0)-floor_1,0,step_riser,0,
+			-max(standard_x,0)-floor_1,0,step_riser-floor_thi,0,
+			0,0,0,0,
+			0,step_wid2,0,
+			step_nosing,step_wid2,step_riser-step_rat,
+			-step_tread,step_wid2,step_riser,
+			-max(standard_x,0)-floor_1,step_wid2,step_riser,
+			-max(standard_x,0)-floor_1,step_wid2,step_riser-floor_thi,
+			0,step_wid2,0
+	
+			if gl_num>=2 then
+				for i=1 to gl_num-1
+					ruledsegmented 4,1+2+4+16+32+64,
+					0,0,0,0,
+					step_tread+step_nosing,0,-step_rat,0,
+					step_tread,0,-step_riser,0,
+					0,0,0,0,
+					0,step_wid2,0,
+					step_tread+step_nosing,step_wid2,-step_rat,
+					step_tread,step_wid2,-step_riser,
+					0,step_wid2,0
+				add step_tread,0,-step_riser
+				next i
+				del gl_num-1
+			endif
+	
+			hotspot step_nosing,0,step_riser-step_rat
+			hotspot step_nosing,step_wid2,step_riser-step_rat
+	
+			hotspot step_nosing+(gl_num-1)*step_tread,0,step_riser-(gl_num-1)*step_riser-step_rat
+			hotspot step_nosing+(gl_num-1)*step_tread,step_wid2,step_riser-(gl_num-1)*step_riser-step_rat
+	
+			hotspot (gl_num-1)*step_tread,0,step_riser-gl_num*step_riser
+			hotspot (gl_num-1)*step_tread,step_wid2,step_riser-gl_num*step_riser
+		del 1
+	endif
+endgroup
+
+
+group "1f_gl_yuka"
+	material m_step
+
+	if switch_gl then
+		add -floor_1+min(standard_x,0),step_wid1+handrail_wid,-floor_thi
+			ruledsegmented 6,1+2+4+16+32+64,
+			0,0,0,0,
+			floor_1+max(standard_x,0),0,floor_thi-step_riser,0,
+			floor_1+max(standard_x,0)+(gl_num-1)*step_tread,0,floor_thi-step_riser-(gl_num-1)*step_riser,0,
+			floor_1+max(standard_x,0)+(gl_num-1)*step_tread-step_thi/sin(step_angle),0,floor_thi-step_riser-(gl_num-1)*step_riser,0,
+			floor_1+max(standard_x,0)+(floor_thi-step_riser-step_thi/cos(step_angle))/tan(step_angle),0,0,0,
+			0,0,0,0,
+			0,step_wid2,0,
+			floor_1+max(standard_x,0),step_wid2,floor_thi-step_riser,
+			floor_1+max(standard_x,0)+(gl_num-1)*step_tread,step_wid2,floor_thi-step_riser-(gl_num-1)*step_riser,
+			floor_1+max(standard_x,0)+(gl_num-1)*step_tread-step_thi/sin(step_angle),step_wid2,floor_thi-step_riser-(gl_num-1)*step_riser,
+			floor_1+max(standard_x,0)+(floor_thi-step_riser-step_thi/cos(step_angle))/tan(step_angle),step_wid2,0,
+			0,step_wid2,0
+		del 1
+	endif
+endgroup
+
+
+gl=addgroup("1f_gl","1f_gl_yuka")
+
+
+step1=addgroup(step_down,"landing")
+step2=addgroup(step1,step_up)
+step3=addgroup(step2,"floor_landing")
+step4=addgroup(step3,gl)
+step5=subgroup(step4,"handrail_hide2")
+step6=subgroup(step5,"hide_floor_landing")
+
+if dis_stair then
+	placegroup step6
+endif
+
+
+
+!======================================================================立上り(外側)
+group "handrail_step_1"
+	material m_step
+
+	for j=1 to floor_num-1
+		if switch_hr1 then
+			if j=1 and switch_gl=0 then
+				ruledsegmented 7,1+2+4+16+32+64,
+				-step_tread,0,0,0,
+				0,0,0,0,
+				(step_num_down-1)*step_tread,0,(step_num_down-1)*step_riser,0,
+				(step_num_down-1)*step_tread+(landing_hr_hei-hr_hei)/tan(step_angle),0,(step_num_down-1)*step_riser,0,
+				(step_num_down-1)*step_tread+(landing_hr_hei-hr_hei)/tan(step_angle),0,step_num_down*step_riser+landing_hr_hei,0,
+				-step_tread,0,hr_hei,0,
+				-step_tread,0,0,0,
+				-step_tread,hr_wid,0,
+				0,hr_wid,0,
+				(step_num_down-1)*step_tread,hr_wid,(step_num_down-1)*step_riser,
+				(step_num_down-1)*step_tread+(landing_hr_hei-hr_hei)/tan(step_angle),hr_wid,(step_num_down-1)*step_riser,
+				(step_num_down-1)*step_tread+(landing_hr_hei-hr_hei)/tan(step_angle),hr_wid,step_num_down*step_riser+landing_hr_hei,
+				-step_tread,hr_wid,hr_hei,
+				-step_tread,hr_wid,0
+			else
+				ruledsegmented 6,1+2+4+16+32+64,
+				-step_tread+(floor_hr_hei-hr_hei)/tan(step_angle),0,-step_riser+(floor_hr_hei-hr_hei),0,
+				(step_num_down-1)*step_tread,0,(step_num_down-1)*step_riser,0,
+				(step_num_down-1)*step_tread+(landing_hr_hei-hr_hei)/tan(step_angle),0,(step_num_down-1)*step_riser,0,
+				(step_num_down-1)*step_tread+(landing_hr_hei-hr_hei)/tan(step_angle),0,step_num_down*step_riser+landing_hr_hei,0,
+				-step_tread+(floor_hr_hei-hr_hei)/tan(step_angle),0,floor_hr_hei,0,
+				-step_tread+(floor_hr_hei-hr_hei)/tan(step_angle),0,-step_riser+(floor_hr_hei-hr_hei),0,
+				-step_tread+(floor_hr_hei-hr_hei)/tan(step_angle),hr_wid,-step_riser+(floor_hr_hei-hr_hei),
+				(step_num_down-1)*step_tread,hr_wid,(step_num_down-1)*step_riser,
+				(step_num_down-1)*step_tread+(landing_hr_hei-hr_hei)/tan(step_angle),hr_wid,(step_num_down-1)*step_riser,
+				(step_num_down-1)*step_tread+(landing_hr_hei-hr_hei)/tan(step_angle),hr_wid,step_num_down*step_riser+landing_hr_hei,
+				-step_tread+(floor_hr_hei-hr_hei)/tan(step_angle),hr_wid,floor_hr_hei,
+				-step_tread+(floor_hr_hei-hr_hei)/tan(step_angle),hr_wid,-step_riser+(floor_hr_hei-hr_hei)
+			endif
+
+			add (step_num_down-1)*step_tread+landing_1-landing_2,step_wid1+handrail_wid+step_wid2,step_num_down*step_riser
+				ruledsegmented 6,1+2+4+16+32+64,
+				step_tread-(landing_hr_hei-hr_hei)/tan(step_angle),0,(landing_hr_hei-hr_hei)-step_riser,0,
+				-(step_num_up-1)*step_tread,0,(step_num_up-1)*step_riser,0,
+				-(step_num_up-1)*step_tread-(floor_hr_hei-hr_hei)/tan(step_angle),0,(step_num_up-1)*step_riser,0,
+				-(step_num_up-1)*step_tread-(floor_hr_hei-hr_hei)/tan(step_angle),0,step_num_up*step_riser+floor_hr_hei,0,
+				step_tread-(landing_hr_hei-hr_hei)/tan(step_angle),0,landing_hr_hei,0,
+				step_tread-(landing_hr_hei-hr_hei)/tan(step_angle),0,(landing_hr_hei-hr_hei)-step_riser,0,
+				step_tread-(landing_hr_hei-hr_hei)/tan(step_angle),-hr_wid,(landing_hr_hei-hr_hei)-step_riser,
+				-(step_num_up-1)*step_tread,-hr_wid,(step_num_up-1)*step_riser,
+				-(step_num_up-1)*step_tread-(floor_hr_hei-hr_hei)/tan(step_angle),-hr_wid,(step_num_up-1)*step_riser,
+				-(step_num_up-1)*step_tread-(floor_hr_hei-hr_hei)/tan(step_angle),-hr_wid,step_num_up*step_riser+floor_hr_hei,
+				step_tread-(landing_hr_hei-hr_hei)/tan(step_angle),-hr_wid,landing_hr_hei,
+				step_tread-(landing_hr_hei-hr_hei)/tan(step_angle),-hr_wid,(landing_hr_hei-hr_hei)-step_riser
+			del 1
+		endif
+	addz floor_hei
+	next j
+	del floor_num-1
+endgroup
+
+
+group "handrail_landing_1"
+	material m_step
+
+	for j=1 to floor_num-1
+		add (step_num_down-1)*step_tread,0,step_num_down*step_riser-landing_dep*landing_rat/100
+			ruledsegmented 7,1+2+4+16+32+64,
+			(landing_hr_hei-hr_hei)/tan(step_angle),0,0,0,
+			landing_1+landing_dep,0,0,0,
+			landing_1+landing_dep,step_wid1+handrail_wid+step_wid2-hr_wid,0,0,
+			landing_1+landing_dep-hr_wid2,step_wid1+handrail_wid+step_wid2-hr_wid,0,0,
+			landing_1+landing_dep-hr_wid2,hr_wid,0,0,
+			(landing_hr_hei-hr_hei)/tan(step_angle),hr_wid,0,0,
+			(landing_hr_hei-hr_hei)/tan(step_angle),0,0,0,
+			(landing_hr_hei-hr_hei)/tan(step_angle),0,landing_dep*landing_rat/100+landing_hr_hei,
+			landing_1+landing_dep,0,landing_dep*landing_rat/100+landing_hr_hei,
+			landing_1+landing_dep,step_wid1+handrail_wid+step_wid2-hr_wid,landing_dep*landing_rat/100+landing_hr_hei,
+			landing_1+landing_dep-hr_wid2,step_wid1+handrail_wid+step_wid2-hr_wid,landing_dep*landing_rat/100+landing_hr_hei,
+			landing_1+landing_dep-hr_wid2,hr_wid,landing_dep*landing_rat/100+landing_hr_hei,
+			(landing_hr_hei-hr_hei)/tan(step_angle),hr_wid,landing_dep*landing_rat/100+landing_hr_hei,
+			(landing_hr_hei-hr_hei)/tan(step_angle),0,landing_dep*landing_rat/100+landing_hr_hei
+		del 1
+
+		add (step_num_down-1)*step_tread+landing_1-landing_2,step_wid1+handrail_wid+step_wid2,step_num_down*step_riser
+			ruledsegmented 6,1+2+4+16+32+64,
+			step_tread-(landing_hr_hei-hr_hei)/tan(step_angle),0,(landing_hr_hei-hr_hei)-step_riser,0,
+			0,0,-landing_dep*landing_rat/100,0,
+			landing_2+landing_dep,0,-landing_dep*landing_rat/100,0,
+			landing_2+landing_dep,0,landing_hr_hei,0,
+			step_tread-(landing_hr_hei-hr_hei)/tan(step_angle),0,landing_hr_hei,0,
+			step_tread-(landing_hr_hei-hr_hei)/tan(step_angle),0,(landing_hr_hei-hr_hei)-step_riser,0,
+			step_tread-(landing_hr_hei-hr_hei)/tan(step_angle),-hr_wid,(landing_hr_hei-hr_hei)-step_riser,
+			0,-hr_wid,-landing_dep*landing_rat/100,
+			landing_2+landing_dep,-hr_wid,-landing_dep*landing_rat/100,
+			landing_2+landing_dep,-hr_wid,landing_hr_hei,
+			step_tread-(landing_hr_hei-hr_hei)/tan(step_angle),-hr_wid,landing_hr_hei,
+			step_tread-(landing_hr_hei-hr_hei)/tan(step_angle),-hr_wid,(landing_hr_hei-hr_hei)-step_riser
+		del 1
+	addz floor_hei
+	next j
+	del floor_num-1
+
+	for j=1 to floor_num-2+switch_gl
+		addz floor_hei-floor_dep*floor_rat/100+(floor_num-3)*floor_hei
+			ruledsegmented 7,1+2+4+16+32+64,
+			standard_x-(floor_hr_hei-hr_hei)/tan(step_angle),step_wid1+handrail_wid+step_wid2,0,0,
+			min(standard_x,0)-floor_1-floor_dep,step_wid1+handrail_wid+step_wid2,0,0,
+			min(standard_x,0)-floor_1-floor_dep,hr_wid,0,0,
+			min(standard_x,0)-floor_1-floor_dep+hr_wid2,hr_wid,0,0,
+			min(standard_x,0)-floor_1-floor_dep+hr_wid2,step_wid1+handrail_wid+step_wid2-hr_wid,0,0,
+			standard_x-(floor_hr_hei-hr_hei)/tan(step_angle),step_wid1+handrail_wid+step_wid2-hr_wid,0,0,
+			standard_x-(floor_hr_hei-hr_hei)/tan(step_angle),step_wid1+handrail_wid+step_wid2,0,0,
+			standard_x-(floor_hr_hei-hr_hei)/tan(step_angle),step_wid1+handrail_wid+step_wid2,floor_dep*floor_rat/100+floor_hr_hei,
+			min(standard_x,0)-floor_1-floor_dep,step_wid1+handrail_wid+step_wid2,floor_dep*floor_rat/100+floor_hr_hei,
+			min(standard_x,0)-floor_1-floor_dep,hr_wid,floor_dep*floor_rat/100+floor_hr_hei,
+			min(standard_x,0)-floor_1-floor_dep+hr_wid2,hr_wid,floor_dep*floor_rat/100+floor_hr_hei,
+			min(standard_x,0)-floor_1-floor_dep+hr_wid2,step_wid1+handrail_wid+step_wid2-hr_wid,floor_dep*floor_rat/100+floor_hr_hei,
+			standard_x-(floor_hr_hei-hr_hei)/tan(step_angle),step_wid1+handrail_wid+step_wid2-hr_wid,floor_dep*floor_rat/100+floor_hr_hei,
+			standard_x-(floor_hr_hei-hr_hei)/tan(step_angle),step_wid1+handrail_wid+step_wid2,floor_dep*floor_rat/100+floor_hr_hei
+		del 1
+		
+		addz (floor_num-2)*floor_hei
+			ruledsegmented 6,1+2+4+16+32+64,
+			-step_tread+(floor_hr_hei-hr_hei)/tan(step_angle),0,-step_riser+(floor_hr_hei-hr_hei),0,
+			0,0,0,0,
+			min(standard_x,0)-floor_1-floor_dep,0,-floor_dep*floor_rat/100,0,
+			min(standard_x,0)-floor_1-floor_dep,0,floor_hr_hei,0,
+			-step_tread+(floor_hr_hei-hr_hei)/tan(step_angle),0,floor_hr_hei,0,
+			-step_tread+(floor_hr_hei-hr_hei)/tan(step_angle),0,-step_riser+(floor_hr_hei-hr_hei),0,
+			-step_tread+(floor_hr_hei-hr_hei)/tan(step_angle),hr_wid,-step_riser+(floor_hr_hei-hr_hei),
+			0,hr_wid,0,
+			min(standard_x,0)-floor_1-floor_dep,hr_wid,-floor_dep*floor_rat/100,
+			min(standard_x,0)-floor_1-floor_dep,hr_wid,floor_hr_hei,
+			-step_tread+(floor_hr_hei-hr_hei)/tan(step_angle),hr_wid,floor_hr_hei,
+			-step_tread+(floor_hr_hei-hr_hei)/tan(step_angle),hr_wid,-step_riser+(floor_hr_hei-hr_hei)
+		del 1
+	addz -floor_hei
+	next j
+	del floor_num-2+switch_gl
+
+	addz (floor_num-1)*floor_hei-floor_dep*floor_rat/100
+		ruledsegmented 9,1+2+4+8+16+32+64,
+		standard_x-(floor_hr_hei-hr_hei)/tan(step_angle),step_wid1+handrail_wid+step_wid2,0,0,
+		min(standard_x,0)-floor_1-floor_dep,step_wid1+handrail_wid+step_wid2,0,0,
+		min(standard_x,0)-floor_1-floor_dep,0,0,0,
+		min(standard_x,0)-floor_1,0,0,0,
+		min(standard_x,0)-floor_1,hr_wid,0,0,
+		min(standard_x,0)-floor_1-floor_dep+hr_wid2,hr_wid,0,0,
+		min(standard_x,0)-floor_1-floor_dep+hr_wid2,step_wid1+handrail_wid+step_wid2-hr_wid,0,0,
+		standard_x-(floor_hr_hei-hr_hei)/tan(step_angle),step_wid1+handrail_wid+step_wid2-hr_wid,0,0,
+		standard_x-(floor_hr_hei-hr_hei)/tan(step_angle),step_wid1+handrail_wid+step_wid2,0,0,
+		standard_x-(floor_hr_hei-hr_hei)/tan(step_angle),step_wid1+handrail_wid+step_wid2,floor_dep*floor_rat/100+floor_hr_hei,
+		min(standard_x,0)-floor_1-floor_dep,step_wid1+handrail_wid+step_wid2,floor_dep*floor_rat/100+floor_hr_hei,
+		min(standard_x,0)-floor_1-floor_dep,0,floor_dep*floor_rat/100+floor_hr_hei,
+		min(standard_x,0)-floor_1,0,floor_dep*floor_rat/100+floor_hr_hei,
+		min(standard_x,0)-floor_1,hr_wid,floor_dep*floor_rat/100+floor_hr_hei,
+		min(standard_x,0)-floor_1-floor_dep+hr_wid2,hr_wid,floor_dep*floor_rat/100+floor_hr_hei,
+		min(standard_x,0)-floor_1-floor_dep+hr_wid2,step_wid1+handrail_wid+step_wid2-hr_wid,floor_dep*floor_rat/100+floor_hr_hei,
+		standard_x-(floor_hr_hei-hr_hei)/tan(step_angle),step_wid1+handrail_wid+step_wid2-hr_wid,floor_dep*floor_rat/100+floor_hr_hei,
+		standard_x-(floor_hr_hei-hr_hei)/tan(step_angle),step_wid1+handrail_wid+step_wid2,floor_dep*floor_rat/100+floor_hr_hei
+	del 1
+endgroup
+
+
+group "handrail_rf"
+	addz (floor_num-1)*floor_hei-floor_thi
+		if switch_hr1_top then
+			ruledsegmented 5,1+2+4+8+16+32+64,
+			min(standard_x,0)-floor_1,0,0,0,
+			min(standard_x,0)-floor_1,step_wid1+handrail_wid,0,0,
+			min(standard_x,0)-floor_1+hr_wid,step_wid1+handrail_wid,0,0,
+			min(standard_x,0)-floor_1+hr_wid,0,0,0,
+			min(standard_x,0)-floor_1,0,0,0,
+			min(standard_x,0)-floor_1,0,floor_thi+floor_hr_hei,
+			min(standard_x,0)-floor_1,step_wid1+handrail_wid,floor_thi+floor_hr_hei,
+			min(standard_x,0)-floor_1+hr_wid,step_wid1+handrail_wid,floor_thi+floor_hr_hei,
+			min(standard_x,0)-floor_1+hr_wid,0,floor_thi+floor_hr_hei,
+			min(standard_x,0)-floor_1,0,floor_thi+floor_hr_hei
+		endif
+	del 1
+endgroup
+
+
+group "handrail_gl_step_1"
+	material m_step
+
+	if switch_gl then
+		ruledsegmented 7,1+2+4+16+32+64,
+		standard_x-(floor_hr_hei-hr_hei)/tan(step_angle),step_wid1+handrail_wid+step_wid2,floor_hr_hei,0,
+		standard_x-(floor_hr_hei-hr_hei)/tan(step_angle),step_wid1+handrail_wid+step_wid2,-step_riser,0,
+		standard_x,step_wid1+handrail_wid+step_wid2,-step_riser,0,
+		standard_x+(gl_num-1)*step_tread,step_wid1+handrail_wid+step_wid2,-gl_num*step_riser,0,
+		standard_x+gl_num*step_tread,step_wid1+handrail_wid+step_wid2,-gl_num*step_riser,0,
+		standard_x+gl_num*step_tread,step_wid1+handrail_wid+step_wid2,-gl_num*step_riser+hr_hei,0,
+		standard_x-(floor_hr_hei-hr_hei)/tan(step_angle),step_wid1+handrail_wid+step_wid2,floor_hr_hei,0,
+		standard_x-(floor_hr_hei-hr_hei)/tan(step_angle),step_wid1+handrail_wid+step_wid2-hr_wid,floor_hr_hei,
+		standard_x-(floor_hr_hei-hr_hei)/tan(step_angle),step_wid1+handrail_wid+step_wid2-hr_wid,-step_riser,
+		standard_x,step_wid1+handrail_wid+step_wid2-hr_wid,-step_riser,
+		standard_x+(gl_num-1)*step_tread,step_wid1+handrail_wid+step_wid2-hr_wid,-gl_num*step_riser,
+		standard_x+gl_num*step_tread,step_wid1+handrail_wid+step_wid2-hr_wid,-gl_num*step_riser,
+		standard_x+gl_num*step_tread,step_wid1+handrail_wid+step_wid2-hr_wid,-gl_num*step_riser+hr_hei,
+		standard_x-(floor_hr_hei-hr_hei)/tan(step_angle),step_wid1+handrail_wid+step_wid2-hr_wid,floor_hr_hei
+	endif
+endgroup
+
+handrail_1_1=addgroup("handrail_step_1","handrail_landing_1")
+handrail_1_2=addgroup(handrail_1_1,"handrail_gl_step_1")
+handrail_1_3=subgroup(handrail_1_2,step4)
+handrail_1_4=subgroup(handrail_1_3,"handrail_hide")
+
+group "handrail_soto"
+	if switch_hr1 then
+		placegroup handrail_1_4
+	endif
+endgroup
+
+
+!======================================================================立上り(内側)
+group "handrail_step_2"
+	material m_step
+
+	for i=1 to floor_num-1
+		!下部階段
+		ruledsegmented 6,1+2+4+16+32+64,
+		0,step_wid1,0,0,
+		(step_num_down-1)*step_tread,step_wid1,(step_num_down-1)*step_riser,0,
+		(step_num_down-1)*step_tread,step_wid1,step_num_down*step_riser+hr2_hei,0,
+		max(-step_tread,min(standard_x,0)-floor_1-hr2_wid),step_wid1,tan(step_angle)*(max(-step_tread,min(standard_x,0)-floor_1-hr2_wid))+step_riser+hr2_hei,0,
+		max(-step_tread,min(standard_x,0)-floor_1-hr2_wid),step_wid1,0,0,
+		0,step_wid1,0,0,
+		0,step_wid1-hr2_wid,0,
+		(step_num_down-1)*step_tread,step_wid1-hr2_wid,(step_num_down-1)*step_riser,
+		(step_num_down-1)*step_tread,step_wid1-hr2_wid,step_num_down*step_riser+hr2_hei,
+		max(-step_tread,min(standard_x,0)-floor_1-hr2_wid),step_wid1-hr2_wid,tan(step_angle)*(max(-step_tread,min(standard_x,0)-floor_1-hr2_wid))+step_riser+hr2_hei,
+		max(-step_tread,min(standard_x,0)-floor_1-hr2_wid),step_wid1-hr2_wid,0,
+		0,step_wid1-hr2_wid,0
+
+		!上部階段
+		if standard_x+step_num_up*step_tread<=(step_num_down-1)*step_tread+landing_1+hr2_wid then
+			ruledsegmented 6,1+2+4+16+32+64,
+			standard_x,step_wid1+handrail_wid,floor_hei-step_riser,0,
+			standard_x+(step_num_up-1)*step_tread,step_wid1+handrail_wid,floor_hei-step_num_up*step_riser,0,
+			standard_x+step_num_up*step_tread,step_wid1+handrail_wid,floor_hei-step_num_up*step_riser,0,
+			standard_x+step_num_up*step_tread,step_wid1+handrail_wid,floor_hei-step_num_up*step_riser+hr2_hei,0,
+			standard_x,step_wid1+handrail_wid,floor_hei+hr2_hei,0,
+			standard_x,step_wid1+handrail_wid,floor_hei-step_riser,0,
+			standard_x,step_wid1+handrail_wid+hr2_wid,floor_hei-step_riser,
+			standard_x+(step_num_up-1)*step_tread,step_wid1+handrail_wid+hr2_wid,floor_hei-step_num_up*step_riser,
+			standard_x+step_num_up*step_tread,step_wid1+handrail_wid+hr2_wid,floor_hei-step_num_up*step_riser,
+			standard_x+step_num_up*step_tread,step_wid1+handrail_wid+hr2_wid,floor_hei-step_num_up*step_riser+hr2_hei,
+			standard_x,step_wid1+handrail_wid+hr2_wid,floor_hei+hr2_hei,
+			standard_x,step_wid1+handrail_wid+hr2_wid,floor_hei-step_riser
+		else
+			ruledsegmented 6,1+2+4+16+32+64,
+			standard_x,step_wid1+handrail_wid,floor_hei-step_riser,0,
+			standard_x+(step_num_up-1)*step_tread,step_wid1+handrail_wid,floor_hei-step_num_up*step_riser,0,
+			(step_num_down-1)*step_tread+landing_1+hr2_wid,step_wid1+handrail_wid,floor_hei-step_num_up*step_riser,0,
+			(step_num_down-1)*step_tread+landing_1+hr2_wid,step_wid1+handrail_wid,floor_hei-step_num_up*step_riser+hr2_hei+(step_tread-landing_2-hr2_wid)*tan(step_angle),0,
+			standard_x,step_wid1+handrail_wid,floor_hei+hr2_hei,0,
+			standard_x,step_wid1+handrail_wid,floor_hei-step_riser,0,
+			standard_x,step_wid1+handrail_wid+hr2_wid,floor_hei-step_riser,
+			standard_x+(step_num_up-1)*step_tread,step_wid1+handrail_wid+hr2_wid,floor_hei-step_num_up*step_riser,
+			(step_num_down-1)*step_tread+landing_1+hr2_wid,step_wid1+handrail_wid+hr2_wid,floor_hei-step_num_up*step_riser,
+			(step_num_down-1)*step_tread+landing_1+hr2_wid,step_wid1+handrail_wid+hr2_wid,floor_hei-step_num_up*step_riser+hr2_hei+(step_tread-landing_2-hr2_wid)*tan(step_angle),
+			standard_x,step_wid1+handrail_wid+hr2_wid,floor_hei+hr2_hei,
+			standard_x,step_wid1+handrail_wid+hr2_wid,floor_hei-step_riser
+		endif
+	addz floor_hei
+	next i
+	del floor_num-1
+endgroup
+
+group "handrail_landing_2"
+	material m_step
+
+	for i=1 to floor_num-1
+		ruledsegmented 9,1+2+4+16+32+64,
+		(step_num_down-1)*step_tread,step_wid1,step_num_down*step_riser-landing_dep*landing_rat/100,0,
+		(step_num_down-1)*step_tread+landing_1,step_wid1,step_num_down*step_riser-landing_dep*landing_rat/100,0,
+		(step_num_down-1)*step_tread+landing_1,step_wid1+handrail_wid,step_num_down*step_riser-landing_dep*landing_rat/100,0,
+		(step_num_down-1)*step_tread+landing_1-landing_2,step_wid1+handrail_wid,step_num_down*step_riser-landing_dep*landing_rat/100,0,
+		(step_num_down-1)*step_tread+landing_1-landing_2,step_wid1+handrail_wid+hr2_wid,step_num_down*step_riser-landing_dep*landing_rat/100,0,
+		(step_num_down-1)*step_tread+landing_1+hr2_wid,step_wid1+handrail_wid+hr2_wid,step_num_down*step_riser-landing_dep*landing_rat/100,0,
+		(step_num_down-1)*step_tread+landing_1+hr2_wid,step_wid1-hr2_wid,step_num_down*step_riser-landing_dep*landing_rat/100,0,
+		(step_num_down-1)*step_tread,step_wid1-hr2_wid,step_num_down*step_riser-landing_dep*landing_rat/100,0,
+		(step_num_down-1)*step_tread,step_wid1,step_num_down*step_riser-landing_dep*landing_rat/100,0,
+		(step_num_down-1)*step_tread,step_wid1,step_num_down*step_riser+hr2_hei,
+		(step_num_down-1)*step_tread+landing_1,step_wid1,step_num_down*step_riser+hr2_hei,
+		(step_num_down-1)*step_tread+landing_1,step_wid1+handrail_wid,step_num_down*step_riser+hr2_hei,
+		(step_num_down-1)*step_tread+landing_1-landing_2,step_wid1+handrail_wid,step_num_down*step_riser+hr2_hei,
+		(step_num_down-1)*step_tread+landing_1-landing_2,step_wid1+handrail_wid+hr2_wid,step_num_down*step_riser+hr2_hei,
+		(step_num_down-1)*step_tread+landing_1+hr2_wid,step_wid1+handrail_wid+hr2_wid,step_num_down*step_riser+hr2_hei,
+		(step_num_down-1)*step_tread+landing_1+hr2_wid,step_wid1-hr2_wid,step_num_down*step_riser+hr2_hei,
+		(step_num_down-1)*step_tread,step_wid1-hr2_wid,step_num_down*step_riser+hr2_hei,
+		(step_num_down-1)*step_tread,step_wid1,step_num_down*step_riser+hr2_hei
+	addz floor_hei
+	next i
+	del floor_num-1
+
+	if floor_num>2 then
+		for i=1 to floor_num-2
+			ruledsegmented 9,1+2+4+16+32+64,
+			0,step_wid1,floor_hei-floor_dep*floor_rat/100,0,
+			min(standard_x,0)-floor_1,step_wid1,floor_hei-floor_dep*floor_rat/100,0,
+			min(standard_x,0)-floor_1,step_wid1+handrail_wid,floor_hei-floor_dep*floor_rat/100,0,
+			standard_x,step_wid1+handrail_wid,floor_hei-floor_dep*floor_rat/100,0,
+			standard_x,step_wid1+handrail_wid+hr2_wid,floor_hei-floor_dep*floor_rat/100,0,
+			min(standard_x,0)-floor_1-hr2_wid,step_wid1+handrail_wid+hr2_wid,floor_hei-floor_dep*floor_rat/100,0,
+			min(standard_x,0)-floor_1-hr2_wid,step_wid1-hr2_wid,floor_hei-floor_dep*floor_rat/100,0,
+			0,step_wid1-hr2_wid,floor_hei-floor_dep*floor_rat/100,0,
+			0,step_wid1,floor_hei-floor_dep*floor_rat/100,0,
+			0,step_wid1,floor_hei+hr2_hei,
+			min(standard_x,0)-floor_1,step_wid1,floor_hei+hr2_hei,
+			min(standard_x,0)-floor_1,step_wid1+handrail_wid,floor_hei+hr2_hei,
+			standard_x,step_wid1+handrail_wid,floor_hei+hr2_hei,
+			standard_x,step_wid1+handrail_wid+hr2_wid,floor_hei+hr2_hei,
+			min(standard_x,0)-floor_1-hr2_wid,step_wid1+handrail_wid+hr2_wid,floor_hei+hr2_hei,
+			min(standard_x,0)-floor_1-hr2_wid,step_wid1-hr2_wid,floor_hei+hr2_hei,
+			0,step_wid1-hr2_wid,floor_hei+hr2_hei,
+			0,step_wid1,floor_hei+hr2_hei
+		addz floor_hei
+		next i
+		del floor_num-2
+	endif
+
+	addz (floor_num-2)*floor_hei
+		if switch_floor then
+			temporary_x=max(standard_x-(floor_hr_hei-hr2_hei)/tan(step_angle),min(standard_x,0)-floor_1)
+		
+			ruledsegmented 6,1+2+4+16+32+64,
+			standard_x,step_wid1+handrail_wid,floor_hei-floor_dep*floor_rat/100,0,
+			standard_x,step_wid1+handrail_wid,floor_hei+hr2_hei,0,
+			temporary_x,step_wid1+handrail_wid,floor_hei+hr2_hei+(standard_x-temporary_x)*tan(step_angle),0,
+			min(standard_x,0)-floor_1,step_wid1+handrail_wid,floor_hei+hr2_hei+(standard_x-temporary_x)*tan(step_angle),0,
+			min(standard_x,0)-floor_1,step_wid1+handrail_wid,floor_hei-floor_dep*floor_rat/100,0,
+			standard_x,step_wid1+handrail_wid,floor_hei-floor_dep*floor_rat/100,0,
+			standard_x,step_wid1+handrail_wid+hr2_wid,floor_hei-floor_dep*floor_rat/100,
+			standard_x,step_wid1+handrail_wid+hr2_wid,floor_hei+hr2_hei,
+			temporary_x,step_wid1+handrail_wid+hr2_wid,floor_hei+hr2_hei+(standard_x-temporary_x)*tan(step_angle),
+			min(standard_x,0)-floor_1,step_wid1+handrail_wid+hr2_wid,floor_hei+hr2_hei+(standard_x-temporary_x)*tan(step_angle),
+			min(standard_x,0)-floor_1,step_wid1+handrail_wid+hr2_wid,floor_hei-floor_dep*floor_rat/100,
+			standard_x,step_wid1+handrail_wid+hr2_wid,floor_hei-floor_dep*floor_rat/100
+		else
+			ruledsegmented 6,1+2+4+16+32+64,
+			standard_x,step_wid1+handrail_wid,floor_hei-floor_dep*floor_rat/100,0,
+			standard_x,step_wid1+handrail_wid,floor_hei+hr2_hei,0,
+			standard_x-(floor_hr_hei-hr2_hei)/tan(step_angle),step_wid1+handrail_wid,floor_hei+floor_hr_hei,0,
+			min(standard_x,0)-floor_1,step_wid1+handrail_wid,floor_hei+floor_hr_hei,0,
+			min(standard_x,0)-floor_1,step_wid1+handrail_wid,floor_hei-floor_dep*floor_rat/100,0,
+			standard_x,step_wid1+handrail_wid,floor_hei-floor_dep*floor_rat/100,0,
+			standard_x,step_wid1+handrail_wid+hr2_wid,floor_hei-floor_dep*floor_rat/100,
+			standard_x,step_wid1+handrail_wid+hr2_wid,floor_hei+hr2_hei,
+			standard_x-(floor_hr_hei-hr2_hei)/tan(step_angle),step_wid1+handrail_wid+hr2_wid,floor_hei+floor_hr_hei,
+			min(standard_x,0)-floor_1,step_wid1+handrail_wid+hr2_wid,floor_hei+floor_hr_hei,
+			min(standard_x,0)-floor_1,step_wid1+handrail_wid+hr2_wid,floor_hei-floor_dep*floor_rat/100,
+			standard_x,step_wid1+handrail_wid+hr2_wid,floor_hei-floor_dep*floor_rat/100
+		endif
+	del 1
+endgroup
+
+
+group "handrail_gl_landing_2"
+	material m_step
+
+	if switch_gl then
+		addz -floor_hei
+			ruledsegmented 9,1+2+4+16+32+64,
+			0,step_wid1,floor_hei-floor_dep*floor_rat/100,0,
+			min(standard_x,0)-floor_1,step_wid1,floor_hei-floor_dep*floor_rat/100,0,
+			min(standard_x,0)-floor_1,step_wid1+handrail_wid,floor_hei-floor_dep*floor_rat/100,0,
+			standard_x,step_wid1+handrail_wid,floor_hei-floor_dep*floor_rat/100,0,
+			standard_x,step_wid1+handrail_wid+hr2_wid,floor_hei-floor_dep*floor_rat/100,0,
+			min(standard_x,0)-floor_1-hr2_wid,step_wid1+handrail_wid+hr2_wid,floor_hei-floor_dep*floor_rat/100,0,
+			min(standard_x,0)-floor_1-hr2_wid,step_wid1-hr2_wid,floor_hei-floor_dep*floor_rat/100,0,
+			0,step_wid1-hr2_wid,floor_hei-floor_dep*floor_rat/100,0,
+			0,step_wid1,floor_hei-floor_dep*floor_rat/100,0,
+			0,step_wid1,floor_hei+hr2_hei,
+			min(standard_x,0)-floor_1,step_wid1,floor_hei+hr2_hei,
+			min(standard_x,0)-floor_1,step_wid1+handrail_wid,floor_hei+hr2_hei,
+			standard_x,step_wid1+handrail_wid,floor_hei+hr2_hei,
+			standard_x,step_wid1+handrail_wid+hr2_wid,floor_hei+hr2_hei,
+			min(standard_x,0)-floor_1-hr2_wid,step_wid1+handrail_wid+hr2_wid,floor_hei+hr2_hei,
+			min(standard_x,0)-floor_1-hr2_wid,step_wid1-hr2_wid,floor_hei+hr2_hei,
+			0,step_wid1-hr2_wid,floor_hei+hr2_hei,
+			0,step_wid1,floor_hei+hr2_hei
+		del 1
+	endif
+endgroup
+
+group "handrail_gl_step_2"
+	material m_step
+
+	if switch_gl then
+		addy -step_wid2+hr2_wid
+			ruledsegmented 6,1+2+4+16+32+64,
+			standard_x,step_wid1+handrail_wid+step_wid2,hr2_hei,0,
+			standard_x,step_wid1+handrail_wid+step_wid2,-step_riser,0,
+			standard_x+(gl_num-1)*step_tread,step_wid1+handrail_wid+step_wid2,-gl_num*step_riser,0,
+			standard_x+gl_num*step_tread,step_wid1+handrail_wid+step_wid2,-gl_num*step_riser,0,
+			standard_x+gl_num*step_tread,step_wid1+handrail_wid+step_wid2,-gl_num*step_riser+hr2_hei,0,
+			standard_x,step_wid1+handrail_wid+step_wid2,hr2_hei,0,
+			standard_x,step_wid1+handrail_wid+step_wid2-hr2_wid,hr2_hei,
+			standard_x,step_wid1+handrail_wid+step_wid2-hr2_wid,-step_riser,
+			standard_x+(gl_num-1)*step_tread,step_wid1+handrail_wid+step_wid2-hr2_wid,-gl_num*step_riser,
+			standard_x+gl_num*step_tread,step_wid1+handrail_wid+step_wid2-hr2_wid,-gl_num*step_riser,
+			standard_x+gl_num*step_tread,step_wid1+handrail_wid+step_wid2-hr2_wid,-gl_num*step_riser+hr2_hei,
+			standard_x,step_wid1+handrail_wid+step_wid2-hr2_wid,hr2_hei
+		del 1
+	endif
+endgroup
+
+
+handrail_2_1=addgroup("handrail_step_2","handrail_landing_2")
+handrail_2_2=addgroup(handrail_2_1,"handrail_gl_landing_2")
+handrail_2_3=addgroup(handrail_2_2,"handrail_gl_step_2")
+handrail_2_5=subgroup(handrail_2_3,step4)
+
+
+group "handrail_type2_1"
+	material m_step
+
+	addy step_wid1
+		if switch_gl=0 then
+			base_z=0
+		else
+			base_z=-gl_num*step_riser
+		endif
+
+		temporary_x1=min(standard_x+step_num_up*step_tread,(step_num_down-1)*step_tread+landing_1)
+		temporary_x2=max(standard_x-(floor_hr_hei-hr2_hei)/tan(step_angle),min(standard_x,0)-floor_1)
+	
+		ruledsegmented 7,1+2+4+16+32+64,
+		min(standard_x,0)-floor_1,0,base_z,0,
+		(step_num_down-1)*step_tread+landing_1,0,base_z,0,
+		(step_num_down-1)*step_tread+landing_1,0,(floor_num-1)*floor_hei+hr2_hei-step_num_up*step_riser,0,
+		temporary_x1,0,(floor_num-1)*floor_hei+hr2_hei-(temporary_x1-standard_x)*tan(step_angle),0,
+		temporary_x2,0,(floor_num-1)*floor_hei+hr2_hei-(temporary_x2-standard_x)*tan(step_angle),0,
+		min(standard_x,0)-floor_1,0,(floor_num-1)*floor_hei+hr2_hei-(temporary_x2-standard_x)*tan(step_angle),0,
+		min(standard_x,0)-floor_1,0,base_z,0,
+		min(standard_x,0)-floor_1,handrail_wid,base_z,
+		(step_num_down-1)*step_tread+landing_1,handrail_wid,base_z,
+		(step_num_down-1)*step_tread+landing_1,handrail_wid,(floor_num-1)*floor_hei+hr2_hei-step_num_up*step_riser,
+		temporary_x1,handrail_wid,(floor_num-1)*floor_hei+hr2_hei-(temporary_x1-standard_x)*tan(step_angle),
+		temporary_x2,handrail_wid,(floor_num-1)*floor_hei+hr2_hei-(temporary_x2-standard_x)*tan(step_angle),
+		min(standard_x,0)-floor_1,handrail_wid,(floor_num-1)*floor_hei+hr2_hei-(temporary_x2-standard_x)*tan(step_angle),
+		min(standard_x,0)-floor_1,handrail_wid,base_z
+	del 1
+endgroup
+
+handrail_type2_1=subgroup("handrail_type2_1",step4)
+
+group "handrail_uchi"
+	if switch_hr2 then
+		if hr2_type=1 then
+			placegroup handrail_2_5
+		else
+			placegroup handrail_type2_1
+		endif
+	endif
+endgroup
+
+handrail_soto=subgroup("handrail_soto","hide_floor_landing")
+handrail_uchi=subgroup("handrail_uchi","hide_floor_landing2")
+handrail1=addgroup(handrail_soto,handrail_uchi)
+handrail2=subgroup(handrail1,"handrail_hide2")
+
+if dis_stair then
+	placegroup handrail2
+	placegroup "handrail_rf"
+endif
+
+
+
+!=======================================================================鉄筋
+!=====================================流し筋
+if ngs_num>0 then
+	for i=1 to ngs_num
+		!頂点
+		if disPOINT then
+			for j=1 to ngs_point[i]
+				hotspot ngs_pos[i][3*j-2],ngs_pos[i][3*j-1],ngs_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and ngs_point[i]>1 then
+			pen ngs_pen
+	
+			for j=1 to ngs_point[i]-1
+				lin_ ngs_pos[i][3*j-2],ngs_pos[i][3*j-1],ngs_pos[i][3*j],ngs_pos[i][3*(j+1)-2],ngs_pos[i][3*(j+1)-1],ngs_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and ngs_point[i]>1 then
+			material ngs_mat
+	
+			tube_r=ngs_r
+			gosub "鉄筋断面計算sub"
+	
+			put 2*ngs_pos[i][1]-ngs_pos[i][4],2*ngs_pos[i][2]-ngs_pos[i][5],2*ngs_pos[i][3]-ngs_pos[i][6],0
+			for j=1 to ngs_point[i]
+				put ngs_pos[i][3*j-2],ngs_pos[i][3*j-1],ngs_pos[i][3*j],0
+			next j
+			put 2*ngs_pos[i][3*ngs_point[i]-2]-ngs_pos[i][3*ngs_point[i]-5],2*ngs_pos[i][3*ngs_point[i]-1]-\
+				ngs_pos[i][3*ngs_point[i]-4],2*ngs_pos[i][3*ngs_point[i]]-ngs_pos[i][3*ngs_point[i]-3],0
+	
+			tube SDresol+1,ngs_point[i]+2,1+2+16+32+64,
+			get (nsp)
+		endif
+	next i
+endif
+
+
+!=====================================稲妻筋
+if inzm_num>0 then
+	for i=1 to inzm_num
+		!頂点
+		if disPOINT then
+			for j=1 to inzm_point[i]
+				hotspot inzm_pos[i][3*j-2],inzm_pos[i][3*j-1],inzm_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and inzm_point[i]>1 then
+			pen inzm_pen
+	
+			for j=1 to inzm_point[i]-1
+				lin_ inzm_pos[i][3*j-2],inzm_pos[i][3*j-1],inzm_pos[i][3*j],inzm_pos[i][3*(j+1)-2],inzm_pos[i][3*(j+1)-1],inzm_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and inzm_point[i]>1 then
+			material inzm_mat
+	
+			tube_r=inzm_r
+			gosub "鉄筋断面計算sub"
+	
+			put 2*inzm_pos[i][1]-inzm_pos[i][4],2*inzm_pos[i][2]-inzm_pos[i][5],2*inzm_pos[i][3]-inzm_pos[i][6],0
+			for j=1 to inzm_point[i]
+				put inzm_pos[i][3*j-2],inzm_pos[i][3*j-1],inzm_pos[i][3*j],0
+			next j
+			put 2*inzm_pos[i][3*inzm_point[i]-2]-inzm_pos[i][3*inzm_point[i]-5],2*inzm_pos[i][3*inzm_point[i]-1]-\
+				inzm_pos[i][3*inzm_point[i]-4],2*inzm_pos[i][3*inzm_point[i]]-inzm_pos[i][3*inzm_point[i]-3],0
+	
+			tube SDresol+1,inzm_point[i]+2,1+2+16+32+64,
+			get (nsp)
+		endif
+	next i
+endif
+
+
+!=====================================段押え筋
+if dose_num>0 then
+	for i=1 to dose_num
+		!頂点
+		if disPOINT then
+			for j=1 to dose_point[i]
+				hotspot dose_pos[i][3*j-2],dose_pos[i][3*j-1],dose_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and dose_point[i]>1 then
+			pen dose_pen
+	
+			for j=1 to dose_point[i]-1
+				lin_ dose_pos[i][3*j-2],dose_pos[i][3*j-1],dose_pos[i][3*j],dose_pos[i][3*(j+1)-2],dose_pos[i][3*(j+1)-1],dose_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and dose_point[i]>1 then
+			material dose_mat
+	
+			tube_r=dose_r
+			gosub "鉄筋断面計算sub"
+	
+			put 2*dose_pos[i][1]-dose_pos[i][4],2*dose_pos[i][2]-dose_pos[i][5],2*dose_pos[i][3]-dose_pos[i][6],0
+			for j=1 to dose_point[i]
+				put dose_pos[i][3*j-2],dose_pos[i][3*j-1],dose_pos[i][3*j],0
+			next j
+			put 2*dose_pos[i][3*dose_point[i]-2]-dose_pos[i][3*dose_point[i]-5],2*dose_pos[i][3*dose_point[i]-1]-\
+				dose_pos[i][3*dose_point[i]-4],2*dose_pos[i][3*dose_point[i]]-dose_pos[i][3*dose_point[i]-3],0
+	
+			tube SDresol+1,dose_point[i]+2,1+2+16+32+64,
+			get (nsp)
+		endif
+	next i
+endif
+
+
+!=====================================段鼻筋
+if dbn_num>0 then
+	for i=1 to dbn_num
+		!頂点
+		if disPOINT then
+			for j=1 to dbn_point[i]
+				hotspot dbn_pos[i][3*j-2],dbn_pos[i][3*j-1],dbn_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and dbn_point[i]>1 then
+			pen dbn_pen
+	
+			for j=1 to dbn_point[i]-1
+				lin_ dbn_pos[i][3*j-2],dbn_pos[i][3*j-1],dbn_pos[i][3*j],dbn_pos[i][3*(j+1)-2],dbn_pos[i][3*(j+1)-1],dbn_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and dbn_point[i]>1 then
+			material dbn_mat
+	
+			tube_r=dbn_r
+			gosub "鉄筋断面計算sub"
+	
+			put 2*dbn_pos[i][1]-dbn_pos[i][4],2*dbn_pos[i][2]-dbn_pos[i][5],2*dbn_pos[i][3]-dbn_pos[i][6],0
+			for j=1 to dbn_point[i]
+				put dbn_pos[i][3*j-2],dbn_pos[i][3*j-1],dbn_pos[i][3*j],0
+			next j
+			put 2*dbn_pos[i][3*dbn_point[i]-2]-dbn_pos[i][3*dbn_point[i]-5],2*dbn_pos[i][3*dbn_point[i]-1]-\
+				dbn_pos[i][3*dbn_point[i]-4],2*dbn_pos[i][3*dbn_point[i]]-dbn_pos[i][3*dbn_point[i]-3],0
+	
+			tube SDresol+1,dbn_point[i]+2,1+2+16+32+64,
+			get (nsp)
+		endif
+	next i
+endif
+
+
+!=====================================中間踊り場縦筋
+if lver_num>0 then
+	for i=1 to lver_num
+		!頂点
+		if disPOINT then
+			for j=1 to lver_point[i]
+				hotspot lver_pos[i][3*j-2],lver_pos[i][3*j-1],lver_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and lver_point[i]>1 then
+			pen lver_pen[i]
+	
+			for j=1 to lver_point[i]-1
+				lin_ lver_pos[i][3*j-2],lver_pos[i][3*j-1],lver_pos[i][3*j],lver_pos[i][3*(j+1)-2],lver_pos[i][3*(j+1)-1],lver_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and lver_point[i]>1 then
+			material lver_mat[i]
+	
+			tube_r=lver_r[i]
+			gosub "鉄筋断面計算sub"
+	
+			put 2*lver_pos[i][1]-lver_pos[i][4],2*lver_pos[i][2]-lver_pos[i][5],2*lver_pos[i][3]-lver_pos[i][6],0
+			for j=1 to lver_point[i]
+				put lver_pos[i][3*j-2],lver_pos[i][3*j-1],lver_pos[i][3*j],0
+			next j
+			put 2*lver_pos[i][3*lver_point[i]-2]-lver_pos[i][3*lver_point[i]-5],2*lver_pos[i][3*lver_point[i]-1]-\
+				lver_pos[i][3*lver_point[i]-4],2*lver_pos[i][3*lver_point[i]]-lver_pos[i][3*lver_point[i]-3],0
+	
+			tube SDresol+1,lver_point[i]+2,1+2+16+32+64,
+			get (nsp)
+		endif
+	next i
+endif
+
+
+!=====================================中間踊り場横筋
+if lhor_num>0 then
+	for i=1 to lhor_num
+		!頂点
+		if disPOINT then
+			for j=1 to lhor_point[i]
+				hotspot lhor_pos[i][3*j-2],lhor_pos[i][3*j-1],lhor_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and lhor_point[i]>1 then
+			pen lhor_pen
+	
+			for j=1 to lhor_point[i]-1
+				lin_ lhor_pos[i][3*j-2],lhor_pos[i][3*j-1],lhor_pos[i][3*j],lhor_pos[i][3*(j+1)-2],lhor_pos[i][3*(j+1)-1],lhor_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and lhor_point[i]>1 then
+			material lhor_mat
+	
+			tube_r=lhor_r
+			gosub "鉄筋断面計算sub"
+	
+			put 2*lhor_pos[i][1]-lhor_pos[i][4],2*lhor_pos[i][2]-lhor_pos[i][5],2*lhor_pos[i][3]-lhor_pos[i][6],0
+			for j=1 to lhor_point[i]
+				put lhor_pos[i][3*j-2],lhor_pos[i][3*j-1],lhor_pos[i][3*j],0
+			next j
+			put 2*lhor_pos[i][3*lhor_point[i]-2]-lhor_pos[i][3*lhor_point[i]-5],2*lhor_pos[i][3*lhor_point[i]-1]-\
+				lhor_pos[i][3*lhor_point[i]-4],2*lhor_pos[i][3*lhor_point[i]]-lhor_pos[i][3*lhor_point[i]-3],0
+	
+			tube SDresol+1,lhor_point[i]+2,1+2+16+32+64,
+			get (nsp)
+		endif
+	next i
+endif
+
+
+!=====================================フロア踊り場縦筋
+if fver_num>0 then
+	for i=1 to fver_num
+		!頂点
+		if disPOINT then
+			for j=1 to fver_point[i]
+				hotspot fver_pos[i][3*j-2],fver_pos[i][3*j-1],fver_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and fver_point[i]>1 then
+			pen fver_pen[i]
+	
+			for j=1 to fver_point[i]-1
+				lin_ fver_pos[i][3*j-2],fver_pos[i][3*j-1],fver_pos[i][3*j],fver_pos[i][3*(j+1)-2],fver_pos[i][3*(j+1)-1],fver_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and fver_point[i]>1 then
+			material fver_mat[i]
+	
+			tube_r=fver_r[i]
+			gosub "鉄筋断面計算sub"
+	
+			put 2*fver_pos[i][1]-fver_pos[i][4],2*fver_pos[i][2]-fver_pos[i][5],2*fver_pos[i][3]-fver_pos[i][6],0
+			for j=1 to fver_point[i]
+				put fver_pos[i][3*j-2],fver_pos[i][3*j-1],fver_pos[i][3*j],0
+			next j
+			put 2*fver_pos[i][3*fver_point[i]-2]-fver_pos[i][3*fver_point[i]-5],2*fver_pos[i][3*fver_point[i]-1]-\
+				fver_pos[i][3*fver_point[i]-4],2*fver_pos[i][3*fver_point[i]]-fver_pos[i][3*fver_point[i]-3],0
+	
+			tube SDresol+1,fver_point[i]+2,1+2+16+32+64,
+			get (nsp)
+		endif
+	next i
+endif
+
+
+!=====================================フロア踊り場横筋
+if fhor_num>0 then
+	for i=1 to fhor_num
+		!頂点
+		if disPOINT then
+			for j=1 to fhor_point[i]
+				hotspot fhor_pos[i][3*j-2],fhor_pos[i][3*j-1],fhor_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and fhor_point[i]>1 then
+			pen fhor_pen
+	
+			for j=1 to fhor_point[i]-1
+				lin_ fhor_pos[i][3*j-2],fhor_pos[i][3*j-1],fhor_pos[i][3*j],fhor_pos[i][3*(j+1)-2],fhor_pos[i][3*(j+1)-1],fhor_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and fhor_point[i]>1 then
+			material fhor_mat
+	
+			tube_r=fhor_r
+			gosub "鉄筋断面計算sub"
+	
+			put 2*fhor_pos[i][1]-fhor_pos[i][4],2*fhor_pos[i][2]-fhor_pos[i][5],2*fhor_pos[i][3]-fhor_pos[i][6],0
+			for j=1 to fhor_point[i]
+				put fhor_pos[i][3*j-2],fhor_pos[i][3*j-1],fhor_pos[i][3*j],0
+			next j
+			put 2*fhor_pos[i][3*fhor_point[i]-2]-fhor_pos[i][3*fhor_point[i]-5],2*fhor_pos[i][3*fhor_point[i]-1]-\
+				fhor_pos[i][3*fhor_point[i]-4],2*fhor_pos[i][3*fhor_point[i]]-fhor_pos[i][3*fhor_point[i]-3],0
+	
+			tube SDresol+1,fhor_point[i]+2,1+2+16+32+64,
+			get (nsp)
+		endif
+	next i
+endif
+
+
+!=====================================立上り縦筋
+if pver_num>0 then
+	for i=1 to pver_num
+		!頂点
+		if disPOINT then
+			for j=1 to pver_point[i]
+				hotspot pver_pos[i][3*j-2],pver_pos[i][3*j-1],pver_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and pver_point[i]>1 then
+			pen pver_pen
+	
+			for j=1 to pver_point[i]-1
+				lin_ pver_pos[i][3*j-2],pver_pos[i][3*j-1],pver_pos[i][3*j],pver_pos[i][3*(j+1)-2],pver_pos[i][3*(j+1)-1],pver_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and pver_point[i]>1 then
+			material pver_mat
+	
+			tube_r=pver_r
+
+			gosub "鉄筋断面計算sub"
+	
+			put 2*pver_pos[i][1]-pver_pos[i][4],2*pver_pos[i][2]-pver_pos[i][5],2*pver_pos[i][3]-pver_pos[i][6],0
+			for j=1 to pver_point[i]
+				put pver_pos[i][3*j-2],pver_pos[i][3*j-1],pver_pos[i][3*j],0
+			next j
+			put 2*pver_pos[i][3*pver_point[i]-2]-pver_pos[i][3*pver_point[i]-5],2*pver_pos[i][3*pver_point[i]-1]-\
+				pver_pos[i][3*pver_point[i]-4],2*pver_pos[i][3*pver_point[i]]-pver_pos[i][3*pver_point[i]-3],0
+	
+			tube SDresol+1,pver_point[i]+2,1+2+16+32+64,
+			get (nsp)
+
+		endif
+	next i
+endif
+
+
+!=====================================立上り横筋
+if phor_num>0 then
+	for i=1 to phor_num
+		!頂点
+		if disPOINT then
+			for j=1 to phor_point[i]
+				hotspot phor_pos[i][3*j-2],phor_pos[i][3*j-1],phor_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and phor_point[i]>1 then
+			pen phor_pen[i]
+	
+			for j=1 to phor_point[i]-1
+				lin_ phor_pos[i][3*j-2],phor_pos[i][3*j-1],phor_pos[i][3*j],phor_pos[i][3*(j+1)-2],phor_pos[i][3*(j+1)-1],phor_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and phor_point[i]>1 then
+			material phor_mat[i]
+	
+			tube_r=phor_r[i]
+
+			gosub "鉄筋断面計算sub"
+	
+			put 2*phor_pos[i][1]-phor_pos[i][4],2*phor_pos[i][2]-phor_pos[i][5],2*phor_pos[i][3]-phor_pos[i][6],0
+			for j=1 to phor_point[i]
+				put phor_pos[i][3*j-2],phor_pos[i][3*j-1],phor_pos[i][3*j],0
+			next j
+			put 2*phor_pos[i][3*phor_point[i]-2]-phor_pos[i][3*phor_point[i]-5],2*phor_pos[i][3*phor_point[i]-1]-\
+				phor_pos[i][3*phor_point[i]-4],2*phor_pos[i][3*phor_point[i]]-phor_pos[i][3*phor_point[i]-3],0
+	
+			tube SDresol+1,phor_point[i]+2,1+2+16+32+64,
+			get (nsp)
+
+		endif
+	next i
+endif
+
+
+!=====================================中心壁縦筋
+if wver_num>0 then
+	for i=1 to wver_num
+		!頂点
+		if disPOINT then
+			for j=1 to wver_point[i]
+				hotspot wver_pos[i][3*j-2],wver_pos[i][3*j-1],wver_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and wver_point[i]>1 then
+			pen wver_pen
+	
+			for j=1 to wver_point[i]-1
+				lin_ wver_pos[i][3*j-2],wver_pos[i][3*j-1],wver_pos[i][3*j],wver_pos[i][3*(j+1)-2],wver_pos[i][3*(j+1)-1],wver_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and wver_point[i]>1 then
+			material wver_mat
+	
+			tube_r=wver_r
+
+			gosub "鉄筋断面計算sub"
+	
+			put 2*wver_pos[i][1]-wver_pos[i][4],2*wver_pos[i][2]-wver_pos[i][5],2*wver_pos[i][3]-wver_pos[i][6],0
+			for j=1 to wver_point[i]
+				put wver_pos[i][3*j-2],wver_pos[i][3*j-1],wver_pos[i][3*j],0
+			next j
+			put 2*wver_pos[i][3*wver_point[i]-2]-wver_pos[i][3*wver_point[i]-5],2*wver_pos[i][3*wver_point[i]-1]-\
+				wver_pos[i][3*wver_point[i]-4],2*wver_pos[i][3*wver_point[i]]-wver_pos[i][3*wver_point[i]-3],0
+	
+			tube SDresol+1,wver_point[i]+2,1+2+16+32+64,
+			get (nsp)
+
+		endif
+	next i
+endif
+
+
+!=====================================中心壁横筋
+if whor_num>0 then
+	for i=1 to whor_num
+		!頂点
+		if disPOINT then
+			for j=1 to whor_point[i]
+				hotspot whor_pos[i][3*j-2],whor_pos[i][3*j-1],whor_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and whor_point[i]>1 then
+			pen whor_pen[i]
+	
+			for j=1 to whor_point[i]-1
+				lin_ whor_pos[i][3*j-2],whor_pos[i][3*j-1],whor_pos[i][3*j],whor_pos[i][3*(j+1)-2],whor_pos[i][3*(j+1)-1],whor_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and whor_point[i]>1 then
+			material whor_mat[i]
+	
+			tube_r=whor_r[i]
+
+			gosub "鉄筋断面計算sub"
+	
+			put 2*whor_pos[i][1]-whor_pos[i][4],2*whor_pos[i][2]-whor_pos[i][5],2*whor_pos[i][3]-whor_pos[i][6],0
+			for j=1 to whor_point[i]
+				put whor_pos[i][3*j-2],whor_pos[i][3*j-1],whor_pos[i][3*j],0
+			next j
+			put 2*whor_pos[i][3*whor_point[i]-2]-whor_pos[i][3*whor_point[i]-5],2*whor_pos[i][3*whor_point[i]-1]-\
+				whor_pos[i][3*whor_point[i]-4],2*whor_pos[i][3*whor_point[i]]-whor_pos[i][3*whor_point[i]-3],0
+	
+			tube SDresol+1,whor_point[i]+2,1+2+16+32+64,
+			get (nsp)
+
+		endif
+	next i
+endif
+
+
+
+
+
+
+end
+
+
+
+
+!==========================================鉄筋断面座標リスト
+"鉄筋断面計算sub":
+
+	for t=1 to SDresol
+		put tube_r*cos((1-t)*360/SDresol),tube_r*sin((1-t)*360/SDresol),0
+	next t
+	
+	put tube_r,0,0
+
+return

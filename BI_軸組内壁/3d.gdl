@@ -1,0 +1,1952 @@
+!=============================================================================壁ホットスポット
+hotspot coo_start[1],coo_start[2],0
+hotspot coo_end[1],coo_end[2],0
+
+hotspot coo_start[1],coo_start[2],0,code,hei,1+128:code=code+1
+hotspot coo_start[1],coo_start[2],-1,code,hei,3:code=code+1
+hotspot coo_start[1],coo_start[2],hei,code,hei,2:code=code+1
+
+hotspot 0,coo_start[2],0,code,coo_start[1],1+128:code=code+1
+hotspot -1,coo_start[2],0,code,coo_start[1],3:code=code+1
+hotspot coo_start[1],coo_start[2],0,code,coo_start[1],2:code=code+1
+hotspot coo_start[1],0,0,code,coo_start[2],1+128:code=code+1
+hotspot coo_start[1],-1,0,code,coo_start[2],3:code=code+1
+hotspot coo_start[1],coo_start[2],0,code,coo_start[2],2:code=code+1
+
+hotspot 0,coo_end[2],0,code,coo_end[1],1+128:code=code+1
+hotspot -1,coo_end[2],0,code,coo_end[1],3:code=code+1
+hotspot coo_end[1],coo_end[2],0,code,coo_end[1],2:code=code+1
+hotspot coo_end[1],0,0,code,coo_end[2],1+128:code=code+1
+hotspot coo_end[1],-1,0,code,coo_end[2],3:code=code+1
+hotspot coo_end[1],coo_end[2],0,code,coo_end[2],2:code=code+1
+
+absx=len-sqr(coo_end[1]^2+coo_end[2]^2)
+
+add coo_start[1],coo_start[2],0
+rotz angle
+
+hotspot 0,wid_jiku/2,0
+hotspot 0,-wid_jiku/2,0
+hotspot len,wid_jiku/2,0
+hotspot len,-wid_jiku/2,0
+hotspot 0,wid_jiku/2,hei
+hotspot 0,-wid_jiku/2,hei
+hotspot len,wid_jiku/2,hei
+hotspot len,-wid_jiku/2,hei
+
+
+!=============================================================================開口
+group "win1"
+
+	addx absx
+	if switch_op then
+		for i=1 to win_num
+			add win_xz2[i][1]-wid2_jiku,-1,0
+			block win_wid2[i]+2*wid2_jiku,2,hei
+			del 1
+		next i
+	endif
+	del 1
+
+endgroup
+
+
+group "win2"
+
+	addx absx
+	if switch_op then
+		for i=1 to win_num
+			add win_xz2[i][1],-1,win_xz2[i][2]
+			block win_wid2[i],2,win_hei2[i]
+			del 1
+		next i
+
+		for i=1 to win_num
+			add win_xz2[i][1],-wid_jiku/2,win_xz2[i][2]-wid2_jiku
+			block win_wid2[i],wid_jiku,win_hei2[i]+2*wid2_jiku
+			del 1
+		next i
+	endif
+	del 1
+
+endgroup
+
+
+group "win3"
+
+	addx absx
+	if switch_op then
+		for i=1 to win_num
+			if win_type[i]=1 then
+				add win_xz2[i][1]+offset_win,-1,win_xz2[i][2]
+				block win_wid2[i]-2*offset_win,2,win_hei2[i]-offset_win2
+				del 1
+			endif
+			if win_type[i]=2 then
+				add win_xz2[i][1]+offset_win,-1,win_xz2[i][2]+offset_win3
+				block win_wid2[i]-2*offset_win,2,win_hei2[i]-offset_win2-offset_win3
+				del 1
+			endif
+		next i
+	endif
+	del 1
+
+endgroup
+
+
+group "win4"
+
+	addx absx
+	if switch_op then
+		for i=1 to win_num
+			add win_xz2[i][1],-1,win_xz2[i][2]-wid2_jiku
+			block win_wid2[i],2,win_hei2[i]+2*wid2_jiku
+			del 1
+		next i
+	endif
+	del 1
+
+endgroup
+
+
+if switch_op then
+	addx absx
+	for i=1 to win_num
+		hotspot 0,0,win_xz[i][2],code,win_xz[i][1],1+128:code=code+1
+		hotspot -1,0,win_xz[i][2],code,win_xz[i][1],3:code=code+1
+		hotspot win_xz[i][1],0,win_xz[i][2],code,win_xz[i][1],2:code=code+1
+		hotspot win_xz[i][1],0,0,code,win_xz[i][2],1+128:code=code+1
+		hotspot win_xz[i][1],0,-1,code,win_xz[i][2],3:code=code+1
+		hotspot win_xz[i][1],0,win_xz[i][2],code,win_xz[i][2],2:code=code+1
+	
+		hotspot win_xz[i][1],0,win_xz[i][2]+win_hei[i]/2,code,win_wid[i],1+128:code=code+1
+		hotspot win_xz[i][1]-1,0,win_xz[i][2]+win_hei[i]/2,code,win_wid[i],3:code=code+1
+		hotspot win_xz[i][1]+win_wid[i],0,win_xz[i][2]+win_hei[i]/2,code,win_wid[i],2:code=code+1
+	
+		hotspot win_xz[i][1]+win_wid[i]/2,0,win_xz[i][2],code,win_hei[i],1+128:code=code+1
+		hotspot win_xz[i][1]+win_wid[i]/2,0,win_xz[i][2]-1,code,win_hei[i],3:code=code+1
+		hotspot win_xz[i][1]+win_wid[i]/2,0,win_xz[i][2]+win_hei[i],code,win_hei[i],2:code=code+1
+	next i
+	del 1
+endif
+
+!=============================================================================開口補助線(内法寸法)
+group "sub_win"
+	if switch_op then
+	
+		addx absx
+
+		for i=1 to win_num
+		
+			loopx=int((win_wid[i]+0.02)/0.05)
+			loopz=int((win_hei[i]+0.02)/0.05)
+		
+			if loopx>0 and loopz>0 then
+
+				add win_xz[i][1],0,win_xz[i][2]+win_hei[i]
+				for j=1 to loopx
+					lin_ 0,0,0,0.03,0,0
+					addx 0.05
+				next j
+				del loopx+1
+			
+				add win_xz[i][1],0,win_xz[i][2]
+				for j=1 to loopx
+					lin_ 0,0,0,0.03,0,0
+					addx 0.05
+				next j
+				del loopx+1
+
+				add win_xz[i][1],0,win_xz[i][2]
+				for j=1 to loopz
+					lin_ 0,0,0,0,0,0.03
+					addz 0.05
+				next j
+				del loopz+1
+			
+				add win_xz[i][1]+win_wid[i],0,win_xz[i][2]
+				for j=1 to loopz
+					lin_ 0,0,0,0,0,0.03
+					addz 0.05
+				next j
+				del loopz+1
+
+				hotspot win_xz[i][1],0,win_xz[i][2]
+				hotspot win_xz[i][1]+win_wid[i],0,win_xz[i][2]
+				hotspot win_xz[i][1],0,win_xz[i][2]+win_hei[i]
+				hotspot win_xz[i][1]+win_wid[i],0,win_xz[i][2]+win_hei[i]
+
+			endif
+
+		next i
+	
+		del 1
+
+	endif
+endgroup
+
+placegroup "sub_win"
+
+
+!==========================================================================梁開口
+group "beam_op1"
+
+	addx absx
+	if switch_beam then
+		for i=1 to beam_num
+			add beam_x[i],-1,hei-beam_hei[i]
+			block beam_wid[i],2,10
+			del 1
+		next i
+
+		for i=1 to beam_num
+			add beam_x[i],-wid_jiku/2,hei-beam_hei[i]-wid2_jiku
+			block beam_wid[i],wid_jiku,wid2_jiku
+			del 1
+		next i
+	endif
+	del 1
+
+endgroup
+
+
+group "beam_op2"
+
+	addx absx
+	if switch_beam then
+		for i=1 to beam_num
+			add beam_x[i]-0.001,-1,hei-beam_hei[i]-0.001
+			block beam_wid[i]+0.002,2,10
+			del 1
+		next i
+	endif
+	del 1
+
+endgroup
+
+
+if switch_beam then
+	addx absx
+	for i=1 to beam_num
+		hotspot 0,0,hei,code,beam_x[i],1+128:code=code+1
+		hotspot -1,0,hei,code,beam_x[i],3:code=code+1
+		hotspot beam_x[i],0,hei,code,beam_x[i],2:code=code+1
+	
+		hotspot beam_x[i],0,hei-beam_hei[i]/2,code,beam_wid[i],1+128:code=code+1
+		hotspot beam_x[i]-1,0,hei-beam_hei[i]/2,code,beam_wid[i],3:code=code+1
+		hotspot beam_x[i]+beam_wid[i],0,hei-beam_hei[i]/2,code,beam_wid[i],2:code=code+1
+	
+		hotspot beam_x[i]+beam_wid[i]/2,0,hei,code,beam_hei[i],1+128:code=code+1
+		hotspot beam_x[i]+beam_wid[i]/2,0,hei+1,code,beam_hei[i],3:code=code+1
+		hotspot beam_x[i]+beam_wid[i]/2,0,hei-beam_hei[i],code,beam_hei[i],2:code=code+1
+	next i
+	del 1
+endif
+
+
+!==========================================================================段差開口
+group "floor_op"
+
+	addx absx
+	if switch_floor then
+		for i=1 to floor_num
+			add floor_x[i],-1,0
+			block floor_wid[i],2,floor_hei[i]
+			del 1
+		next i
+
+		for i=1 to floor_num
+			add floor_x[i],-wid_jiku/2,floor_hei[i]
+			block floor_wid[i],wid_jiku,wid2_jiku
+			del 1
+		next i
+	endif
+	del 1
+endgroup
+
+
+group "floor_op2"
+
+	addx absx
+	if switch_floor then
+		for i=1 to floor_num
+			add floor_x[i]-0.001,-1,-0.001
+			block floor_wid[i]+0.002,2,floor_hei[i]+0.002
+			del 1
+		next i
+	endif
+	del 1
+
+endgroup
+
+
+if switch_floor then
+	addx absx
+	for i=1 to floor_num
+		hotspot 0,0,0,code,floor_x[i],1+128:code=code+1
+		hotspot -1,0,0,code,floor_x[i],3:code=code+1
+		hotspot floor_x[i],0,0,code,floor_x[i],2:code=code+1
+
+		hotspot floor_x[i],0,floor_hei[i]/2,code,floor_wid[i],1+128:code=code+1
+		hotspot floor_x[i]-1,0,floor_hei[i]/2,code,floor_wid[i],3:code=code+1
+		hotspot floor_x[i]+floor_wid[i],0,floor_hei[i]/2,code,floor_wid[i],2:code=code+1
+
+		hotspot floor_x[i]+floor_wid[i]/2,0,0,code,floor_hei[i],1+128:code=code+1
+		hotspot floor_x[i]+floor_wid[i]/2,0,-1,code,floor_hei[i],3:code=code+1
+		hotspot floor_x[i]+floor_wid[i]/2,0,floor_hei[i],code,floor_hei[i],2:code=code+1
+	next i
+	del 1
+endif
+
+
+!==========================================================================上端傾斜
+group "sloping"
+
+	if roof_cut then
+	
+		ruledsegmented 6,1+2+4+16+32,
+		0,-10,hei,0,
+		cut_xzL[1][1],-10,hei,0,
+		0,-10,hei-cut_xzL[1][2],0,
+		-10,-10,hei-cut_xzL[1][2],0,
+		-10,-10,hei,0,
+		0,-10,hei,0,
+		0,10,hei,
+		cut_xzL[1][1],10,hei,
+		0,10,hei-cut_xzL[1][2],
+		-10,10,hei-cut_xzL[1][2],
+		-10,10,hei,
+		0,10,hei
+		
+		ruledsegmented 6,1+2+4+16+32,
+		len,-10,hei,0,
+		len-cut_xzR[1][1],-10,hei,0,
+		len,-10,hei-cut_xzR[1][2],0,
+		len+10,-10,hei-cut_xzR[1][2],0,
+		len+10,-10,hei,0,
+		len,-10,hei,0,
+		len,10,hei,
+		len-cut_xzR[1][1],10,hei,
+		len,10,hei-cut_xzR[1][2],
+		len+10,10,hei-cut_xzR[1][2],
+		len+10,10,hei,
+		len,10,hei
+	
+	endif
+
+endgroup
+
+if roof_cut then
+	hotspot 0,0,hei,code,cut_xzL[1][1],1+128:code=code+1
+	hotspot -1,0,hei,code,cut_xzL[1][1],3:code=code+1
+	hotspot cut_xzL[1][1],0,hei,code,cut_xzL[1][1],2:code=code+1
+	hotspot 0,0,hei,code,cut_xzL[1][2],1+128:code=code+1
+	hotspot 0,0,hei+1,code,cut_xzL[1][2],3:code=code+1
+	hotspot 0,0,hei-cut_xzL[1][2],code,cut_xzL[1][2],2:code=code+1
+	
+	hotspot len,0,hei,code,cut_xzR[1][1],1+128:code=code+1
+	hotspot len+1,0,hei,code,cut_xzR[1][1],3:code=code+1
+	hotspot len-cut_xzR[1][1],0,hei,code,cut_xzR[1][1],2:code=code+1
+	hotspot len,0,hei,code,cut_xzR[1][2],1+128:code=code+1
+	hotspot len,0,hei+1,code,cut_xzR[1][2],3:code=code+1
+	hotspot len,0,hei-cut_xzR[1][2],code,cut_xzR[1][2],2:code=code+1
+endif
+
+
+!=============================================================================壁フレーム
+group "wall_frame" !上下
+	material m_jiku
+
+	addy -wid_jiku/2
+	block len,wid_jiku,wid2_jiku
+	del 1
+
+	if roof_cut=0 then
+		add 0,-wid_jiku/2,hei-wid2_jiku
+		block len,wid_jiku,wid2_jiku
+		del 1
+	else
+		tube 4,6,1+2+16+32,
+		-wid_jiku/2,0,0,
+		wid_jiku/2,0,0,
+		wid_jiku/2,-wid2_jiku,0,
+		-wid_jiku/2,-wid2_jiku,0,
+		-10,0,hei,0,
+		0,0,hei-cut_xzL[1][2],0,
+		cut_xzL[1][1],0,hei,0,
+		len-cut_xzR[1][1],0,hei,0,
+		len,0,hei-cut_xzR[1][2],0,
+		len+10,0,hei,0
+	endif
+
+endgroup
+
+wall_frame1=subgroup{2}("wall_frame","win2",m_jiku,m_jiku,m_jiku)
+wall_frame2=subgroup{2}(wall_frame1,"sloping",m_jiku,m_jiku,m_jiku)
+wall_frame3=subgroup{2}(wall_frame2,"beam_op1",m_jiku,m_jiku,m_jiku)
+wall_frame4=subgroup{2}(wall_frame3,"floor_op",m_jiku,m_jiku,m_jiku)
+
+placegroup wall_frame4
+
+
+group "wall_jiku" !縦さん
+	material m_jiku
+
+    !始点軸
+    if start_type=1 then
+        add 0,-wid_jiku/2,wid2_jiku
+            block wid_jiku,wid_jiku,hei-2*wid2_jiku
+        del 1
+    endif
+
+    if start_type=2 then
+        add 0,-wid_jiku/2,wid2_jiku
+            block wid_jiku,wid_jiku,hei-2*wid2_jiku
+        addx wid_jiku
+            block wid2_jiku,wid_jiku,hei-2*wid2_jiku
+        del 2
+    endif
+
+    if start_type=3 then
+        add 0,-wid_jiku/2,wid2_jiku
+            block wid_jiku,wid_jiku,hei-2*wid2_jiku
+        addx wid_jiku
+            block wid2_jiku,wid_side,hei-2*wid2_jiku
+        del 2
+    endif
+
+    if start_type=4 then
+        add 0,-wid_jiku/2,wid2_jiku
+            block wid_jiku,wid_jiku,hei-2*wid2_jiku
+        add wid_jiku,wid_jiku-wid_side,0
+            block wid2_jiku,wid_side,hei-2*wid2_jiku
+        del 2
+    endif
+
+    if start_type=5 then
+        add 0,-wid_jiku/2,wid2_jiku
+            block wid2_jiku,wid_jiku,hei-2*wid2_jiku
+        del 1
+    endif
+
+    if start_type=6 then
+        add 0,-wid_jiku/2,wid2_jiku
+            block wid2_jiku,wid_jiku,hei-2*wid2_jiku
+        addx wid2_jiku
+            block wid2_jiku,wid_jiku,hei-2*wid2_jiku
+        addx wid2_jiku
+            block wid2_jiku,wid_jiku,hei-2*wid2_jiku
+        del 3
+    endif
+
+    !間柱
+	add 0,-wid_jiku/2,wid2_jiku
+	for i=1 to num_jiku
+		addx coo_jiku[i]-wid2_jiku/2
+		block wid2_jiku,wid_jiku,hei-2*wid2_jiku
+		del 1
+	next i
+	del 1
+
+    !終点軸
+    if end_type=1 then
+        add len-wid_jiku,-wid_jiku/2,wid2_jiku
+            block wid_jiku,wid_jiku,hei-2*wid2_jiku
+        del 1
+    endif
+
+    if end_type=2 then
+        add len-wid_jiku,-wid_jiku/2,wid2_jiku
+            block wid_jiku,wid_jiku,hei-2*wid2_jiku
+        addx -wid2_jiku
+            block wid2_jiku,wid_jiku,hei-2*wid2_jiku
+        del 2
+    endif
+
+    if end_type=3 then
+        add len-wid_jiku,-wid_jiku/2,wid2_jiku
+            block wid_jiku,wid_jiku,hei-2*wid2_jiku
+        addx -wid2_jiku
+            block wid2_jiku,wid_side,hei-2*wid2_jiku
+        del 2
+    endif
+
+    if end_type=4 then
+        add len-wid_jiku,-wid_jiku/2,wid2_jiku
+            block wid_jiku,wid_jiku,hei-2*wid2_jiku
+        add -wid2_jiku,wid_jiku-wid_side,0
+            block wid2_jiku,wid_side,hei-2*wid2_jiku
+        del 2
+    endif
+
+    if end_type=5 then
+        add len-wid2_jiku,-wid_jiku/2,wid2_jiku
+            block wid2_jiku,wid_jiku,hei-2*wid2_jiku
+        del 1
+    endif
+
+    if end_type=6 then
+        add len-wid2_jiku,-wid_jiku/2,wid2_jiku
+            block wid2_jiku,wid_jiku,hei-2*wid2_jiku
+        addx wid2_jiku
+            block wid2_jiku,wid_jiku,hei-2*wid2_jiku
+        addx wid2_jiku
+            block wid2_jiku,wid_jiku,hei-2*wid2_jiku
+        del 3
+    endif
+endgroup
+
+wall_jiku1=subgroup{2}("wall_jiku","win2",m_jiku,m_jiku,m_jiku)
+wall_jiku2=subgroup{2}(wall_jiku1,"sloping",m_jiku,m_jiku,m_jiku)
+wall_jiku3=subgroup{2}(wall_jiku2,"wall_frame",m_jiku,m_jiku,m_jiku)
+wall_jiku4=subgroup{2}(wall_jiku3,"beam_op1",m_jiku,m_jiku,m_jiku)
+wall_jiku5=subgroup{2}(wall_jiku4,"floor_op",m_jiku,m_jiku,m_jiku)
+
+placegroup wall_jiku5
+
+
+group "wall_san" !横さん
+	material m_jiku
+
+	roopz=ceil((hei-wid2_jiku*2)/pitch_san)-1
+	
+	addy -wid_jiku/2
+	for i=1 to roopz
+		addz pitch_san
+		block len,wid_jiku,wid2_jiku
+	next i
+	del roopz+1
+endgroup
+
+wall_san1=subgroup{2}("wall_san","win1",m_jiku,m_jiku,m_jiku)
+wall_san2=subgroup{2}(wall_san1,"sloping",m_jiku,m_jiku,m_jiku)
+wall_san3=subgroup{2}(wall_san2,"beam_op1",m_jiku,m_jiku,m_jiku)
+wall_san4=subgroup{2}(wall_san3,"floor_op",m_jiku,m_jiku,m_jiku)
+
+if switch_san then
+	placegroup wall_san4
+endif
+
+
+if switch_jiku then !縦さん自由調整
+	for j=1 to 2
+		for i=1 to num_jiku
+			hotspot 0,0,0,code,coo_jiku[i],1+128:code=code+1
+			hotspot -1,0,0,code,coo_jiku[i],3:code=code+1
+			hotspot coo_jiku[i],0,0,code,coo_jiku[i],2:code=code+1
+		next i
+		addz hei
+	next j
+	del 2
+endif
+
+
+!=============================================================================開口補強
+group "ref"
+	material m_jiku
+
+	addx absx
+	if switch_op then
+	
+		for i=1 to win_num
+		
+			add win_xz2[i][1]-wid2_jiku,-wid_jiku/2,wid2_jiku
+			block wid2_jiku,wid_jiku,hei-2*wid2_jiku
+			del 1
+			
+			add win_xz2[i][1]+win_wid2[i],-wid_jiku/2,wid2_jiku
+			block wid2_jiku,wid_jiku,hei-2*wid2_jiku
+			del 1
+			
+			if win_type[i]=2 then
+				add win_xz2[i][1],-wid_jiku/2,win_xz2[i][2]-wid2_jiku
+				block win_wid2[i],wid_jiku,wid2_jiku
+				del 1
+			endif
+			
+			if win_ref[i]=1 then
+				add win_xz2[i][1],-wid_jiku/2,win_xz2[i][2]+win_hei2[i]
+				block win_wid2[i],wid_jiku,wid2_jiku
+				del 1
+			endif
+
+		next i
+	
+	endif
+	del 1
+endgroup
+
+ref1=subgroup{2}("ref","sloping",m_jiku,m_jiku,m_jiku)
+ref2=subgroup{2}(ref1,"wall_frame",m_jiku,m_jiku,m_jiku)
+ref3=subgroup{2}(ref2,"beam_op1",m_jiku,m_jiku,m_jiku)
+ref4=subgroup{2}(ref3,"floor_op",m_jiku,m_jiku,m_jiku)
+
+placegroup ref4
+
+
+!=============================================================================梁開口補強
+group　"beam_ref"
+
+	material m_jiku 
+
+	addx absx
+	if switch_beam then
+	
+		for i=1 to beam_num
+
+			add beam_x[i],-wid_jiku/2,hei-beam_hei[i]-wid2_jiku
+			block beam_wid[i],wid_jiku,wid2_jiku
+			del 1
+
+			if beam_ref[i][1]=1 then
+				add beam_x[i]-wid2_jiku,-wid_jiku/2,0
+				block wid2_jiku,wid_jiku,hei
+				del 1
+			endif
+			
+			if beam_ref[i][2]=1 then
+				add beam_x[i]+beam_wid[i],-wid_jiku/2,0
+				block wid2_jiku,wid_jiku,hei
+				del 1
+			endif
+
+		next i
+	
+	endif
+	del 1
+endgroup
+
+beam_ref1=subgroup{2}("beam_ref","win2",m_jiku,m_jiku,m_jiku)
+beam_ref2=subgroup{2}(beam_ref1,"sloping",m_jiku,m_jiku,m_jiku)
+beam_ref3=subgroup{2}(beam_ref2,"wall_frame",m_jiku,m_jiku,m_jiku)
+beam_ref4=subgroup{2}(beam_ref3,"floor_op",m_jiku,m_jiku,m_jiku)
+
+placegroup beam_ref4
+
+
+!=============================================================================段差開口枠
+group "floor_ref"
+
+	material m_jiku 
+
+	addx absx
+	if switch_floor then
+
+		for i=1 to floor_num
+		
+			add floor_x[i],-wid_jiku/2,floor_hei[i]
+			block floor_wid[i],wid_jiku,wid2_jiku
+			del 1
+		
+		if floor_x[i]+absx>wid2_jiku then
+			add floor_x[i]-wid2_jiku,-wid_jiku/2,wid2_jiku
+			block wid2_jiku,wid_jiku,floor_hei[i]
+			del 1
+		endif
+
+		if floor_x[i]+floor_wid[i]+absx<len-wid2_jiku then
+			add floor_x[i]+floor_wid[i],-wid_jiku/2,wid2_jiku
+			block wid2_jiku,wid_jiku,floor_hei[i]
+			del 1
+		endif
+
+		next i
+
+	endif
+	del 1
+endgroup
+
+floor_ref1=subgroup{2}("floor_ref","win2",m_jiku,m_jiku,m_jiku)
+floor_ref2=subgroup{2}(floor_ref1,"beam_op1",m_jiku,m_jiku,m_jiku)
+
+placegroup floor_ref2
+
+
+
+!==========================================================================ボード
+group "board_front"
+	for n=1 to num_board
+
+		if type_board[n]=1 then material m_board1
+		if type_board[n]=2 then material m_board2
+		if type_board[n]=3 then material m_board3
+		if type_board[n]=4 then material m_board4
+		if type_board[n]=5 then material m_board5
+		if type_board[n]>5 then material m_board1
+
+		x_bo=ceil((offset_start[n]+offset_end[n]+len)/wid_bo)+1
+		y_bo=ceil((hei+offset_up[n]-offset_down[n])/hei_bo)
+
+		if fra(n/2)=0 then
+			add -offset_start[n]-pitch,-wid_jiku/2-thi_board[n],offset_down[n]
+		else
+			add -offset_start[n],-wid_jiku/2-thi_board[n],offset_down[n]
+		endif
+
+		for i=1 to y_bo
+			for j=1 to x_bo
+				block wid_bo-0.001,thi_board[n],hei_bo-0.001
+				addx wid_bo
+			next j
+			del x_bo
+			addz hei_bo
+		next i
+		del y_bo
+		del 1
+	
+		addy -thi_board[n]-0.0001
+	next n
+	del num_board
+endgroup
+
+group "board_back"
+	for n=1 to num_board2
+
+		if type_board2[n]=1 then material m_board1
+		if type_board2[n]=2 then material m_board2
+		if type_board2[n]=3 then material m_board3
+		if type_board2[n]=4 then material m_board4
+		if type_board2[n]=5 then material m_board5
+		if type_board2[n]>5 then material m_board1
+	
+		x_bo=ceil((offset_start2[n]+offset_end2[n]+len)/wid_bo2)+1
+		y_bo=ceil((hei+offset_up2[n]-offset_down2[n])/hei_bo2)
+	
+		if fra(n/2)=0 then
+			add -offset_start2[n]-pitch,wid_jiku/2,offset_down2[n]
+		else
+			add -offset_start2[n],wid_jiku/2,offset_down2[n]
+		endif
+
+		for i=1 to y_bo
+			for j=1 to x_bo
+				block wid_bo2-0.001,thi_board2[n],hei_bo2-0.001
+				addx wid_bo2
+			next j
+			del x_bo
+			addz hei_bo2
+		next i
+		del y_bo
+		del 1
+
+		addy thi_board2[n]+0.0001
+	next n
+	del num_board2
+endgroup
+
+group "frame_board"
+	material m_board1
+
+	for i=1 to num_board
+
+		add -offset_start[i],-wid_jiku/2-thi_board[i],offset_down[i]
+		block offset_start[i]+offset_end[i]+len,thi_board[i],hei+offset_up[i]-offset_down[i]
+		del 1
+
+		addy -thi_board[i]-0.0001
+	next i
+	del num_board
+endgroup
+
+group "frame_board2"
+	material m_board1
+
+	for i=1 to num_board2
+
+		add -offset_start2[i],wid_jiku/2,offset_down2[i]
+		block offset_start2[i]+offset_end2[i]+len,thi_board2[i],hei+offset_up2[i]-offset_down2[i]
+		del 1
+
+		addy thi_board2[i]+0.0001
+	next i
+	del num_board2
+endgroup
+
+
+board_front1=isectgroup("board_front","frame_board")
+board_front2=subgroup{2}(board_front1,"win3",m_board1,m_board1,m_board1)
+board_front3=subgroup{2}(board_front2,"beam_op1",m_board1,m_board1,m_board1)
+board_front4=subgroup{2}(board_front3,"floor_op",m_board1,m_board1,m_board1)
+board_front5=subgroup{2}(board_front4,"sloping",m_board1,m_board1,m_board1)
+
+board_back1=isectgroup("board_back","frame_board2")
+board_back2=subgroup{2}(board_back1,"win3",m_board1,m_board1,m_board1)
+board_back3=subgroup{2}(board_back2,"beam_op1",m_board1,m_board1,m_board1)
+board_back4=subgroup{2}(board_back3,"floor_op",m_board1,m_board1,m_board1)
+board_back5=subgroup{2}(board_back4,"sloping",m_board1,m_board1,m_board1)
+
+if display_board then
+
+	if reverse then muly -1
+
+	if switch_board then
+		placegroup board_front5
+
+		if display_boardspot then
+			for i=1 to num_board
+				hotspot len*i/(num_board+switch_panel+1),-wid_jiku/2-thi_board[i]/2,0,code,offset_down[i],1+128:code=code+1
+				hotspot len*i/(num_board+switch_panel+1),-wid_jiku/2-thi_board[i]/2,-1,code,offset_down[i],3:code=code+1
+				hotspot len*i/(num_board+switch_panel+1),-wid_jiku/2-thi_board[i]/2,offset_down[i],code,offset_down[i],2:code=code+1
+			
+				hotspot len*i/(num_board+switch_panel+1),-wid_jiku/2-thi_board[i]/2,hei,code,offset_up[i],1+128:code=code+1
+				hotspot len*i/(num_board+switch_panel+1),-wid_jiku/2-thi_board[i]/2,hei-1,code,offset_up[i],3:code=code+1
+				hotspot len*i/(num_board+switch_panel+1),-wid_jiku/2-thi_board[i]/2,hei+offset_up[i],code,offset_up[i],2:code=code+1
+				addy -thi_board[i]-0.0001
+			next i
+			del num_board
+		endif
+	endif
+	
+	if switch_board2 then
+		placegroup board_back5
+
+		if display_boardspot then
+			for i=1 to num_board2
+				hotspot len*i/(num_board2+switch_panel2+1),wid_jiku/2+thi_board2[i]/2,0,code,offset_down2[i],1+128:code=code+1
+				hotspot len*i/(num_board2+switch_panel2+1),wid_jiku/2+thi_board2[i]/2,-1,code,offset_down2[i],3:code=code+1
+				hotspot len*i/(num_board2+switch_panel2+1),wid_jiku/2+thi_board2[i]/2,offset_down2[i],code,offset_down2[i],2:code=code+1
+			
+				hotspot len*i/(num_board2+switch_panel2+1),wid_jiku/2+thi_board2[i]/2,hei,code,offset_up2[i],1+128:code=code+1
+				hotspot len*i/(num_board2+switch_panel2+1),wid_jiku/2+thi_board2[i]/2,hei-1,code,offset_up2[i],3:code=code+1
+				hotspot len*i/(num_board2+switch_panel2+1),wid_jiku/2+thi_board2[i]/2,hei+offset_up2[i],code,offset_up2[i],2:code=code+1
+				addy thi_board2[i]+0.0001
+			next i
+			del num_board2
+		endif
+	endif
+
+	if reverse then del 1
+endif
+
+
+!==========================================================================遮音材
+group "sound"
+	material m_sound
+
+	add 0.001,-0.005,0.001
+	block len-0.002,0.01,hei-0.002
+	del 1
+endgroup
+
+sound1=subgroup("sound","win2")
+sound2=subgroup(sound1,"beam_op1")
+sound3=subgroup(sound2,"floor_op")
+sound4=subgroup(sound3,"sloping")
+
+if switch_sound then
+	placegroup sound4
+endif
+
+
+!==========================================================================耐火シール
+group "seal"
+	material m_seal
+
+	if display_board and switch_board then
+
+		seal_y=-wid_jiku/2+0.0001
+		
+		for i=1 to num_seal
+			seal_y=seal_y-thi_board[i]-0.0001
+		next i
+
+		if switch_seal[1][1]=1 then !表左
+			add -offset_start[num_seal],seal_y-0.001,offset_down[num_seal]
+			block 0.01,0.001,hei-offset_down[num_seal]+offset_up[num_seal]
+			del 1
+		endif
+
+		if switch_seal[1][2]=1 then !表右
+			add len+offset_end[num_seal]-0.01,seal_y-0.001,offset_down[num_seal]
+			block 0.01,0.001,hei-offset_down[num_seal]+offset_up[num_seal]
+			del 1
+		endif
+
+		if switch_seal[1][3]=1 then !表上
+			add -offset_start[num_seal],seal_y-0.001,hei+offset_up[num_seal]-0.01
+			block len+offset_start[num_seal]+offset_end[num_seal],0.001,0.01
+			del 1
+
+			if switch_beam then
+				for i=1 to beam_num
+					if beam_x[i]+absx>0.001-offset_start[num_seal] then
+						add beam_x[i]-0.01+absx,seal_y-0.001,hei-beam_hei[i]-0.01
+						block 0.01,0.001,beam_hei[i]+offset_up[num_seal]+0.01
+						del 1
+					endif
+					if beam_x[i]+beam_wid[i]+absx<len-0.001+offset_end[num_seal] then
+						add beam_x[i]+beam_wid[i]+absx,seal_y-0.001,hei-beam_hei[i]-0.01
+						block 0.01,0.001,beam_hei[i]+offset_up[num_seal]+0.01
+						del 1
+					endif
+					add beam_x[i]+absx,seal_y-0.001,hei-beam_hei[i]-0.01
+					block beam_wid[i],0.001,0.01
+					del 1
+				next i
+			endif
+
+			if roof_cut then
+	
+				tube 5,8,1+2+16+32,
+				0,0,0,
+				0.001,0,0,
+				0.001,-0.01,0,
+				0,-0.01,0,
+				0,0,0,
+				-10,seal_y-0.001,hei-cut_xzL[1][2],0,
+				-offset_start[num_seal],seal_y-0.001,hei-cut_xzL[1][2],0,
+				0,seal_y-0.001,hei-cut_xzL[1][2],0,
+				cut_xzL[1][1],seal_y-0.001,hei,0,
+				len-cut_xzR[1][1],seal_y-0.001,hei,0,
+				len,seal_y-0.001,hei-cut_xzR[1][2],0,
+				len+offset_end[num_seal],seal_y-0.001,hei-cut_xzR[1][2],0,
+				len+10,seal_y-0.001,hei-cut_xzR[1][2],0
+
+			endif
+		endif
+
+		if switch_seal[1][4]=1 then !表下
+			add -offset_start[num_seal],seal_y-0.001,offset_down[num_seal]
+			block len+offset_start[num_seal]+offset_end[num_seal],0.001,0.01
+			del 1
+
+			if switch_floor then
+				for i=1 to floor_num
+					if floor_x[i]+absx>0.001-offset_start[num_seal] then
+						add floor_x[i]-0.01+absx,seal_y-0.001,offset_down[num_seal]
+						block 0.01,0.001,floor_hei[i]-offset_down[num_seal]+0.01
+						del 1
+					endif
+					if floor_x[i]+floor_wid[i]+absx<len-0.001+offset_end[num_seal] then
+						add floor_x[i]+floor_wid[i]+absx,seal_y-0.001,offset_down[num_seal]
+						block 0.01,0.001,floor_hei[i]-offset_down[num_seal]+0.01
+						del 1
+					endif
+					add floor_x[i]+absx,seal_y-0.001,floor_hei[i]
+					block floor_wid[i],0.001,0.01
+					del 1
+				next i
+			endif
+		endif
+	endif
+
+	if display_board and switch_board2 then
+
+		seal_y2=wid_jiku/2-0.0001
+
+		for i=1 to num_seal2
+			seal_y2=seal_y2+thi_board2[i]+0.0001
+		next i
+
+		if switch_seal[2][1]=1 then !裏左
+			add -offset_start2[num_seal2],seal_y2,offset_down2[num_seal2]
+			block 0.01,0.001,hei-offset_down2[num_seal2]+offset_up2[num_seal2]
+			del 1
+		endif
+
+		if switch_seal[2][2]=1 then !裏右
+			add len+offset_end2[num_seal2]-0.01,seal_y2,offset_down2[num_seal2]
+			block 0.01,0.001,hei-offset_down2[num_seal2]+offset_up2[num_seal2]
+			del 1
+		endif
+
+		if switch_seal[2][3]=1 then !裏上
+			add -offset_start2[num_seal2],seal_y2,hei+offset_up2[num_seal2]-0.01
+			block len+offset_start2[num_seal2]+offset_end2[num_seal2],0.001,0.01
+			del 1
+
+			if switch_beam then
+				for i=1 to beam_num
+					if beam_x[i]+absx>0.001-offset_start2[num_seal2] then
+						add beam_x[i]-0.01+absx,seal_y2,hei-beam_hei[i]-0.01
+						block 0.01,0.001,beam_hei[i]+offset_up2[num_seal2]+0.01
+						del 1
+					endif
+					if beam_x[i]+beam_wid[i]+absx<len-0.001+offset_end2[num_seal2] then
+						add beam_x[i]+beam_wid[i]+absx,seal_y2,hei-beam_hei[i]-0.01
+						block 0.01,0.001,beam_hei[i]+offset_up2[num_seal2]+0.01
+						del 1
+					endif
+					add beam_x[i]+absx,seal_y2,hei-beam_hei[i]-0.01
+					block beam_wid[i],0.001,0.01
+					del 1
+				next i
+			endif
+
+			if roof_cut then
+		
+				tube 5,8,1+2+16+32,
+				0,0,0,
+				0.001,0,0,
+				0.001,-0.01,0,
+				0,-0.01,0,
+				0,0,0,
+				-10,seal_y2,hei-cut_xzL[1][2],0,
+				-offset_start2[num_seal2],seal_y2,hei-cut_xzL[1][2],0,
+				0,seal_y2,hei-cut_xzL[1][2],0,
+				cut_xzL[1][1],seal_y2,hei,0,
+				len-cut_xzR[1][1],seal_y2,hei,0,
+				len,seal_y2,hei-cut_xzR[1][2],0,
+				len+offset_end2[num_seal2],seal_y2,hei-cut_xzR[1][2],0,
+				len+10,seal_y2,hei-cut_xzR[1][2],0
+		
+			endif
+		endif
+
+		if switch_seal[2][4]=1 then !裏下
+			add -offset_start2[num_seal2],seal_y2,offset_down2[num_seal2]
+			block len+offset_start2[num_seal2]+offset_end2[num_seal2],0.001,0.01
+			del 1
+
+			if switch_floor then
+				for i=1 to floor_num
+					if floor_x[i]+absx>0.001-offset_start2[num_seal2] then
+						add floor_x[i]-0.01+absx,seal_y2,offset_down2[num_seal2]
+						block 0.01,0.001,floor_hei[i]-offset_down2[num_seal2]+0.01
+						del 1
+					endif
+					if floor_x[i]+floor_wid[i]+absx<len-0.001+offset_end2[num_seal2] then
+						add floor_x[i]+floor_wid[i]+absx,seal_y2,offset_down2[num_seal2]
+						block 0.01,0.001,floor_hei[i]-offset_down2[num_seal2]+0.01
+						del 1
+					endif
+					add floor_x[i]+absx,seal_y2,floor_hei[i]
+					block floor_wid[i],0.001,0.01
+					del 1
+				next i
+			endif
+		endif
+	endif    
+
+endgroup
+
+
+group "hideseal"
+	material m_seal
+
+	if display_board and switch_board then
+
+		seal_y=-wid_jiku/2
+		
+		for i=1 to num_seal
+			seal_y=seal_y-thi_board[i]
+		next i
+
+		add -offset_start[num_seal]-10,seal_y-0.001,0
+		block 10,0.001,hei
+		del 1
+
+		add len+offset_end[num_seal],seal_y-0.001,0
+		block 10,0.001,hei
+		del 1
+
+	endif
+
+	if display_board and switch_board2 then
+
+		seal_y2=wid_jiku/2
+
+		for i=1 to num_seal2
+			seal_y2=seal_y2+thi_board2[i]	
+		next i
+
+		add -offset_start2[num_seal2]-10,seal_y2,0
+		block 10,0.001,hei
+		del 1
+
+		add len+offset_end2[num_seal2],seal_y2,0
+		block 10,0.001,hei
+		del 1
+
+	endif
+
+endgroup
+
+
+seal1=subgroup("seal","win3")
+seal2=subgroup(seal1,"beam_op1")
+seal3=subgroup(seal2,"floor_op")
+seal4=subgroup(seal3,"sloping")
+seal5=subgroup(seal4,"hideseal")
+
+if reverse then muly -1
+	placegroup seal5
+if reverse then del 1
+
+
+!==========================================================================遮音シール
+group "soundseal"
+	material m_soundseal
+
+	if display_board and switch_board then
+
+		soundseal_y=-wid_jiku/2+0.0001
+		
+		for i=1 to num_seal
+			soundseal_y=soundseal_y-thi_board[i]-0.0001
+		next i
+
+		if switch_soundseal[1][1]=1 then !表左
+			add -offset_start[num_seal],soundseal_y-0.001,offset_down[num_seal]
+			block 0.02,0.001,hei-offset_down[num_seal]+offset_up[num_seal]
+			del 1
+		endif
+
+		if switch_soundseal[1][2]=1 then !表右
+			add len+offset_end[num_seal]-0.02,soundseal_y-0.001,offset_down[num_seal]
+			block 0.02,0.001,hei-offset_down[num_seal]+offset_up[num_seal]
+			del 1
+		endif
+
+		if switch_soundseal[1][3]=1 then !表上
+			add -offset_start[num_seal],soundseal_y-0.001,hei+offset_up[num_seal]-0.02
+			block len+offset_start[num_seal]+offset_end[num_seal],0.001,0.02
+			del 1
+
+			if switch_beam then
+				for i=1 to beam_num
+					if beam_x[i]+absx>0.001-offset_start[num_seal] then
+						add beam_x[i]-0.02+absx,soundseal_y-0.001,hei-beam_hei[i]-0.02
+						block 0.02,0.001,beam_hei[i]+offset_up[num_seal]+0.02
+						del 1
+					endif
+					if beam_x[i]+beam_wid[i]+absx<len-0.001+offset_end[num_seal] then
+						add beam_x[i]+beam_wid[i]+absx,soundseal_y-0.001,hei-beam_hei[i]-0.02
+						block 0.02,0.001,beam_hei[i]+offset_up[num_seal]+0.02
+						del 1
+					endif
+					add beam_x[i]+absx,soundseal_y-0.001,hei-beam_hei[i]-0.02
+					block beam_wid[i],0.001,0.02
+					del 1
+				next i
+			endif
+
+			if roof_cut then
+	
+				tube 5,8,1+2+16+32,
+				0,0,0,
+				0.001,0,0,
+				0.001,-0.02,0,
+				0,-0.02,0,
+				0,0,0,
+				-10,soundseal_y-0.001,hei-cut_xzL[1][2],0,
+				-offset_start[num_seal],soundseal_y-0.001,hei-cut_xzL[1][2],0,
+				0,soundseal_y-0.001,hei-cut_xzL[1][2],0,
+				cut_xzL[1][1],soundseal_y-0.001,hei,0,
+				len-cut_xzR[1][1],soundseal_y-0.001,hei,0,
+				len,soundseal_y-0.001,hei-cut_xzR[1][2],0,
+				len+offset_end[num_seal],soundseal_y-0.001,hei-cut_xzR[1][2],0,
+				len+10,soundseal_y-0.001,hei-cut_xzR[1][2],0
+
+			endif
+		endif
+
+		if switch_soundseal[1][4]=1 then !表下
+			add -offset_start[num_seal],soundseal_y-0.001,offset_down[num_seal]
+			block len+offset_start[num_seal]+offset_end[num_seal],0.001,0.02
+			del 1
+
+			if switch_floor then
+				for i=1 to floor_num
+					if floor_x[i]+absx>0.001-offset_start[num_seal] then
+						add floor_x[i]-0.02+absx,soundseal_y-0.001,offset_down[num_seal]
+						block 0.02,0.001,floor_hei[i]-offset_down[num_seal]+0.02
+						del 1
+					endif
+					if floor_x[i]+floor_wid[i]+absx<len-0.001+offset_end[num_seal] then
+						add floor_x[i]+floor_wid[i]+absx,soundseal_y-0.001,offset_down[num_seal]
+						block 0.02,0.001,floor_hei[i]-offset_down[num_seal]+0.02
+						del 1
+					endif
+					add floor_x[i]+absx,soundseal_y-0.001,floor_hei[i]
+					block floor_wid[i],0.001,0.02
+					del 1
+				next i
+			endif
+		endif
+	endif
+
+	if display_board and switch_board2 then
+
+		soundseal_y2=wid_jiku/2-0.0001
+
+		for i=1 to num_seal2
+			soundseal_y2=soundseal_y2+thi_board2[i]+0.0001
+		next i
+
+		if switch_soundseal[2][1]=1 then !裏左
+			add -offset_start2[num_seal2],soundseal_y2,offset_down2[num_seal2]
+			block 0.02,0.001,hei-offset_down2[num_seal2]+offset_up2[num_seal2]
+			del 1
+		endif
+
+		if switch_soundseal[2][2]=1 then !裏右
+			add len+offset_end2[num_seal2]-0.02,soundseal_y2,offset_down2[num_seal2]
+			block 0.02,0.001,hei-offset_down2[num_seal2]+offset_up2[num_seal2]
+			del 1
+		endif
+
+		if switch_soundseal[2][3]=1 then !裏上
+			add -offset_start2[num_seal2],soundseal_y2,hei+offset_up2[num_seal2]-0.02
+			block len+offset_start2[num_seal2]+offset_end2[num_seal2],0.001,0.02
+			del 1
+
+			if switch_beam then
+				for i=1 to beam_num
+					if beam_x[i]+absx>0.001-offset_start2[num_seal2] then
+						add beam_x[i]-0.02+absx,soundseal_y2,hei-beam_hei[i]-0.02
+						block 0.02,0.001,beam_hei[i]+offset_up2[num_seal2]+0.02
+						del 1
+					endif
+					if beam_x[i]+beam_wid[i]+absx<len-0.001+offset_end2[num_seal2] then
+						add beam_x[i]+beam_wid[i]+absx,soundseal_y2,hei-beam_hei[i]-0.02
+						block 0.02,0.001,beam_hei[i]+offset_up2[num_seal2]+0.02
+						del 1
+					endif
+					add beam_x[i]+absx,soundseal_y2,hei-beam_hei[i]-0.02
+					block beam_wid[i],0.001,0.02
+					del 1
+				next i
+			endif
+
+			if roof_cut then
+		
+				tube 5,8,1+2+16+32,
+				0,0,0,
+				0.001,0,0,
+				0.001,-0.02,0,
+				0,-0.02,0,
+				0,0,0,
+				-10,soundseal_y2,hei-cut_xzL[1][2],0,
+				-offset_start2[num_seal2],soundseal_y2,hei-cut_xzL[1][2],0,
+				0,soundseal_y2,hei-cut_xzL[1][2],0,
+				cut_xzL[1][1],soundseal_y2,hei,0,
+				len-cut_xzR[1][1],soundseal_y2,hei,0,
+				len,soundseal_y2,hei-cut_xzR[1][2],0,
+				len+offset_end2[num_seal2],soundseal_y2,hei-cut_xzR[1][2],0,
+				len+10,soundseal_y2,hei-cut_xzR[1][2],0
+		
+			endif
+		endif
+
+		if switch_soundseal[2][4]=1 then !裏下
+			add -offset_start2[num_seal2],soundseal_y2,offset_down2[num_seal2]
+			block len+offset_start2[num_seal2]+offset_end2[num_seal2],0.001,0.02
+			del 1
+
+			if switch_floor then
+				for i=1 to floor_num
+					if floor_x[i]+absx>0.001-offset_start2[num_seal2] then
+						add floor_x[i]-0.02+absx,soundseal_y2,offset_down2[num_seal2]
+						block 0.02,0.001,floor_hei[i]-offset_down2[num_seal2]+0.02
+						del 1
+					endif
+					if floor_x[i]+floor_wid[i]+absx<len-0.001+offset_end2[num_seal2] then
+						add floor_x[i]+floor_wid[i]+absx,soundseal_y2,offset_down2[num_seal2]
+						block 0.02,0.001,floor_hei[i]-offset_down2[num_seal2]+0.02
+						del 1
+					endif
+					add floor_x[i]+absx,soundseal_y2,floor_hei[i]
+					block floor_wid[i],0.001,0.02
+					del 1
+				next i
+			endif
+		endif
+	endif    
+
+endgroup
+
+
+group "hidesoundseal"
+	material m_soundseal
+
+	if display_board and switch_board then
+
+		soundseal_y=-wid_jiku/2
+		
+		for i=1 to num_seal
+			soundseal_y=soundseal_y-thi_board[i]
+		next i
+
+		add -offset_start[num_seal]-10,soundseal_y-0.001,0
+		block 10,0.001,hei
+		del 1
+
+		add len+offset_end[num_seal],soundseal_y-0.001,0
+		block 10,0.001,hei
+		del 1
+
+	endif
+
+	if display_board and switch_board2 then
+
+		soundseal_y2=wid_jiku/2
+
+		for i=1 to num_seal2
+			soundseal_y2=soundseal_y2+thi_board2[i]	
+		next i
+
+		add -offset_start2[num_seal2]-10,soundseal_y2,0
+		block 10,0.001,hei
+		del 1
+
+		add len+offset_end2[num_seal2],soundseal_y2,0
+		block 10,0.001,hei
+		del 1
+
+	endif
+
+endgroup
+
+
+soundseal1=subgroup("soundseal","win3")
+soundseal2=subgroup(soundseal1,"beam_op1")
+soundseal3=subgroup(soundseal2,"floor_op")
+soundseal4=subgroup(soundseal3,"sloping")
+soundseal5=subgroup(soundseal4,"hidesoundseal")
+
+if reverse then muly -1
+	placegroup subgroup(soundseal5,seal5)
+if reverse then del 1
+
+
+!==========================================================================化粧板
+group "panel_front"
+
+	if type_panel=1 then material m_panel1
+	if type_panel=2 then material m_panel2
+	if type_panel=3 then material m_panel3
+	if type_panel=4 or type_panel=5 then material m_panel4
+	if type_panel=6 then material m_panel5
+
+	panel_y=-wid_jiku/2
+
+	if switch_board then
+		for i=1 to num_board
+			panel_y=panel_y-thi_board[i]-0.0001
+		next i
+	endif
+
+	x_pa=ceil((len+offset_start_p+offset_end_p)/wid_panel)
+	y_pa=ceil((hei+offset_up_p-offset_down_p)/hei_panel)
+
+	add -offset_start_p,panel_y-thi_panel,offset_down_p
+	for i=1 to x_pa
+		for j=1 to y_pa
+			block wid_panel-0.001,thi_panel,hei_panel-0.001
+			addz hei_panel
+		next j
+		del y_pa
+		addx wid_panel
+	next i
+	del x_pa
+	del 1
+
+endgroup
+
+
+group "panel_back"
+
+	if type_panel2=1 then material m_panel1
+	if type_panel2=2 then material m_panel2
+	if type_panel2=3 then material m_panel3
+	if type_panel2=4 or type_panel2=5 then material m_panel4
+	if type_panel2=6 then material m_panel5
+
+	panel_y2=wid_jiku/2
+
+	if switch_board2 then
+		for i=1 to num_board2
+			panel_y2=panel_y2+thi_board2[i]+0.0001
+		next i
+	endif
+
+	x_pa2=ceil((len+offset_start_p2+offset_end_p2)/wid_panel2)
+	y_pa2=ceil((hei+offset_up_p2-offset_down_p2)/hei_panel2)
+
+	add -offset_start_p2,panel_y2,offset_down_p2
+	for i=1 to x_pa2
+		for j=1 to y_pa2
+			block wid_panel2-0.001,thi_panel2,hei_panel2-0.001
+			addz hei_panel2
+		next j
+		del y_pa2
+		addx wid_panel2
+	next i
+	del x_pa2
+	del 1
+
+endgroup
+
+
+group "panel_frame_front"
+	material m_panel1
+
+	panel_y=-wid_jiku/2
+
+	if switch_board then
+		for i=1 to num_board
+			panel_y=panel_y-thi_board[i]-0.0001
+		next i
+	endif
+
+	add -offset_start_p,panel_y-thi_panel,offset_down_p
+	block len+offset_start_p+offset_end_p,thi_panel,hei-offset_down_p+offset_up_p
+	del 1
+
+endgroup
+
+
+group "panel_frame_back"
+	material m_panel1
+
+	panel_y2=wid_jiku/2
+
+	if switch_board2 then
+		for i=1 to num_board2
+			panel_y2=panel_y2+thi_board2[i]+0.0001
+		next i
+	endif
+
+	add -offset_start_p2,panel_y2,offset_down_p2
+	block len+offset_start_p2+offset_end_p2,thi_panel2,hei-offset_down_p2+offset_up_p2
+	del 1
+
+endgroup
+
+
+panel_front1=isectgroup("panel_front","panel_frame_front")
+panel_front2=subgroup{2}(panel_front1,"win3",m_panel1,m_panel1,m_panel1)
+panel_front3=subgroup{2}(panel_front2,"beam_op1",m_panel1,m_panel1,m_panel1)
+panel_front4=subgroup{2}(panel_front3,"floor_op",m_panel1,m_panel1,m_panel1)
+panel_front5=subgroup{2}(panel_front4,"sloping",m_panel1,m_panel1,m_panel1)
+
+
+if display_panel and switch_panel then
+	if reverse then muly -1
+
+	placegroup panel_front5
+
+	if display_panelspot then
+		hotspot len*(num_board+switch_panel)/(num_board+switch_panel+1),panel_y-thi_panel/2,0,code,offset_down_p,1+128:code=code+1
+		hotspot len*(num_board+switch_panel)/(num_board+switch_panel+1),panel_y-thi_panel/2,-1,code,offset_down_p,3:code=code+1
+		hotspot len*(num_board+switch_panel)/(num_board+switch_panel+1),panel_y-thi_panel/2,offset_down_p,code,offset_down_p,2:code=code+1
+
+		hotspot len*(num_board+switch_panel)/(num_board+switch_panel+1),panel_y-thi_panel/2,hei,code,offset_up_p,1+128:code=code+1
+		hotspot len*(num_board+switch_panel)/(num_board+switch_panel+1),panel_y-thi_panel/2,hei-1,code,offset_up_p,3:code=code+1
+		hotspot len*(num_board+switch_panel)/(num_board+switch_panel+1),panel_y-thi_panel/2,hei+offset_up_p,code,offset_up_p,2:code=code+1
+	endif
+
+	if reverse then del 1
+endif
+
+
+panel_back1=isectgroup("panel_back","panel_frame_back")
+panel_back2=subgroup{2}(panel_back1,"win3",m_panel1,m_panel1,m_panel1)
+panel_back3=subgroup{2}(panel_back2,"beam_op1",m_panel1,m_panel1,m_panel1)
+panel_back4=subgroup{2}(panel_back3,"floor_op",m_panel1,m_panel1,m_panel1)
+panel_back5=subgroup{2}(panel_back4,"sloping",m_panel1,m_panel1,m_panel1)
+
+
+if display_panel and switch_panel2 then
+	if reverse then muly -1
+
+	placegroup panel_back5
+
+	if display_panelspot then
+		hotspot len*(num_board2+switch_panel2)/(num_board2+switch_panel2+1),panel_y2+thi_panel2/2,0,code,offset_down_p2,1+128:code=code+1
+		hotspot len*(num_board2+switch_panel2)/(num_board2+switch_panel2+1),panel_y2+thi_panel2/2,-1,code,offset_down_p2,3:code=code+1
+		hotspot len*(num_board2+switch_panel2)/(num_board2+switch_panel2+1),panel_y2+thi_panel2/2,offset_down_p2,code,offset_down_p2,2:code=code+1
+
+		hotspot len*(num_board2+switch_panel2)/(num_board2+switch_panel2+1),panel_y2+thi_panel2/2,hei,code,offset_up_p2,1+128:code=code+1
+		hotspot len*(num_board2+switch_panel2)/(num_board2+switch_panel2+1),panel_y2+thi_panel2/2,hei-1,code,offset_up_p2,3:code=code+1
+		hotspot len*(num_board2+switch_panel2)/(num_board2+switch_panel2+1),panel_y2+thi_panel2/2,hei+offset_up_p2,code,offset_up_p2,2:code=code+1
+	endif
+
+	if reverse then del 1
+endif
+
+
+!==========================================================================見切り材
+group "molding"
+
+	material m_molding
+
+	if reverse then muly -1
+
+	if display_panel then
+	
+		if switch_panel then
+			panel_y=-wid_jiku/2
+		
+			if switch_board then
+				for i=1 to num_board
+					panel_y=panel_y-thi_board[i]-0.0001
+				next i
+			endif
+
+			if switch_molding[1][1] then !左
+				tube 8,4,1+2+16+32,
+				0,thi_panel/2,0,
+				0.024,thi_panel/2,0,
+				0.024,thi_panel/2+0.001,0,
+				-0.001,thi_panel/2+0.001,0,
+				-0.001,-thi_panel/2-0.001,0,
+				0.024,-thi_panel/2-0.001,0,
+				0.024,-thi_panel/2,0,
+				0,-thi_panel/2,0,
+				-offset_start_p,panel_y-thi_panel/2,2*offset_down_p-(hei+offset_up_p),0,
+				-offset_start_p,panel_y-thi_panel/2,offset_down_p-0.001,0,
+				-offset_start_p,panel_y-thi_panel/2,hei+offset_up_p+0.001,0,
+				-offset_start_p,panel_y-thi_panel/2,2*(hei+offset_up_p)-offset_down_p,0
+			endif
+		
+			if switch_molding[1][2] then !右
+				tube 8,4,1+2+16+32,
+				0,thi_panel/2,0,
+				-0.024,thi_panel/2,0,
+				-0.024,thi_panel/2+0.001,0,
+				0.001,thi_panel/2+0.001,0,
+				0.001,-thi_panel/2-0.001,0,
+				-0.024,-thi_panel/2-0.001,0,
+				-0.024,-thi_panel/2,0,
+				0,-thi_panel/2,0,
+				len+offset_end_p,panel_y-thi_panel/2,2*offset_down_p-(hei+offset_up_p),0,
+				len+offset_end_p,panel_y-thi_panel/2,offset_down_p-0.001,0,
+				len+offset_end_p,panel_y-thi_panel/2,hei+offset_up_p+0.001,0,
+				len+offset_end_p,panel_y-thi_panel/2,2*(hei+offset_up_p)-offset_down_p,0
+			endif
+
+			if switch_molding[1][3] then !上
+				tube 8,4,1+2+16+32,
+				thi_panel/2,0,0,
+				thi_panel/2,-0.024,0,
+				thi_panel/2+0.001,-0.024,0,
+				thi_panel/2+0.001,0.001,0,
+				-thi_panel/2-0.001,0.001,0,
+				-thi_panel/2-0.001,-0.024,0,
+				-thi_panel/2,-0.024,0,
+				-thi_panel/2,0,0,
+				-2*offset_start_p-(len+offset_end_p),panel_y-thi_panel/2,hei+offset_up_p,0,
+				-offset_start_p-0.001,panel_y-thi_panel/2,hei+offset_up_p,0,
+				len+offset_end_p+0.001,panel_y-thi_panel/2,hei+offset_up_p,0,
+				2*(len+offset_end_p)+offset_start_p,panel_y-thi_panel/2,hei+offset_up_p,0
+			endif
+
+			if switch_molding[1][4] then !下
+				tube 8,4,1+2+16+32,
+				thi_panel/2,0,0,
+				thi_panel/2,0.024,0,
+				thi_panel/2+0.001,0.024,0,
+				thi_panel/2+0.001,-0.001,0,
+				-thi_panel/2-0.001,-0.001,0,
+				-thi_panel/2-0.001,0.024,0,
+				-thi_panel/2,0.024,0,
+				-thi_panel/2,0,0,
+				-2*offset_start_p-(len+offset_end_p),panel_y-thi_panel/2,offset_down_p,0,
+				-offset_start_p-0.001,panel_y-thi_panel/2,offset_down_p,0,
+				len+offset_end_p+0.001,panel_y-thi_panel/2,offset_down_p,0,
+				2*(len+offset_end_p)+offset_start_p,panel_y-thi_panel/2,offset_down_p,0
+			endif
+		endif
+	
+		if switch_panel2 then
+			panel_y2=wid_jiku/2
+		
+			if switch_board2 then
+				for i=1 to num_board2
+					panel_y2=panel_y2+thi_board2[i]+0.0001
+				next i
+			endif
+		
+			if switch_molding[2][1] then !左
+				tube 8,4,1+2+16+32,
+				0,thi_panel2/2,0,
+				0.024,thi_panel2/2,0,
+				0.024,thi_panel2/2+0.001,0,
+				-0.001,thi_panel2/2+0.001,0,
+				-0.001,-thi_panel2/2-0.001,0,
+				0.024,-thi_panel2/2-0.001,0,
+				0.024,-thi_panel2/2,0,
+				0,-thi_panel2/2,0,
+				-offset_start_p2,panel_y2+thi_panel2/2,2*offset_down_p2-(hei+offset_up_p2),0,
+				-offset_start_p2,panel_y2+thi_panel2/2,offset_down_p2-0.001,0,
+				-offset_start_p2,panel_y2+thi_panel2/2,hei+offset_up_p2+0.001,0,
+				-offset_start_p2,panel_y2+thi_panel2/2,2*(hei+offset_up_p2)-offset_down_p2,0
+			endif
+		
+			if switch_molding[2][2] then !右
+				tube 8,4,1+2+16+32,
+				0,thi_panel2/2,0,
+				-0.024,thi_panel2/2,0,
+				-0.024,thi_panel2/2+0.001,0,
+				0.001,thi_panel2/2+0.001,0,
+				0.001,-thi_panel2/2-0.001,0,
+				-0.024,-thi_panel2/2-0.001,0,
+				-0.024,-thi_panel2/2,0,
+				0,-thi_panel2/2,0,
+				len+offset_end_p2,panel_y2+thi_panel2/2,2*offset_down_p2-(hei+offset_up_p2),0,
+				len+offset_end_p2,panel_y2+thi_panel2/2,offset_down_p2-0.001,0,
+				len+offset_end_p2,panel_y2+thi_panel2/2,hei+offset_up_p2+0.001,0,
+				len+offset_end_p2,panel_y2+thi_panel2/2,2*(hei+offset_up_p2)-offset_down_p2,0
+			endif
+
+			if switch_molding[2][3] then !上
+				tube 8,4,1+2+16+32,
+				thi_panel2/2,0,0,
+				thi_panel2/2,-0.024,0,
+				thi_panel2/2+0.001,-0.024,0,
+				thi_panel2/2+0.001,0.001,0,
+				-thi_panel2/2-0.001,0.001,0,
+				-thi_panel2/2-0.001,-0.024,0,
+				-thi_panel2/2,-0.024,0,
+				-thi_panel2/2,0,0,
+				-2*offset_start_p2-(len+offset_end_p2),panel_y2+thi_panel2/2,hei+offset_up_p2,0,
+				-offset_start_p2-0.001,panel_y2+thi_panel2/2,hei+offset_up_p2,0,
+				len+offset_end_p2+0.001,panel_y2+thi_panel2/2,hei+offset_up_p2,0,
+				2*(len+offset_end_p2)+offset_start_p2,panel_y2+thi_panel2/2,hei+offset_up_p2,0
+			endif
+
+			if switch_molding[2][4] then !下
+				tube 8,4,1+2+16+32,
+				thi_panel2/2,0,0,
+				thi_panel2/2,0.024,0,
+				thi_panel2/2+0.001,0.024,0,
+				thi_panel2/2+0.001,-0.001,0,
+				-thi_panel2/2-0.001,-0.001,0,
+				-thi_panel2/2-0.001,0.024,0,
+				-thi_panel2/2,0.024,0,
+				-thi_panel2/2,0,0,
+				-2*offset_start_p2-(len+offset_end_p2),panel_y2+thi_panel2/2,offset_down_p2,0,
+				-offset_start_p2-0.001,panel_y2+thi_panel2/2,offset_down_p2,0,
+				len+offset_end_p2+0.001,panel_y2+thi_panel2/2,offset_down_p2,0,
+				2*(len+offset_end_p2)+offset_start_p2,panel_y2+thi_panel2/2,offset_down_p2,0
+			endif
+		endif
+
+	endif
+
+	if reverse then del 1
+
+endgroup
+
+molding1=subgroup{2}("molding","win3",m_molding,m_molding,m_molding)
+molding2=subgroup{2}(molding1,"beam_op1",m_molding,m_molding,m_molding)
+molding3=subgroup{2}(molding2,"floor_op",m_molding,m_molding,m_molding)
+molding4=subgroup{2}(molding3,"sloping",m_molding,m_molding,m_molding)
+
+placegroup molding4
+
+
+!==========================================================================ランナー受金物
+group "channel"
+
+	material m_c
+
+	if c_turn=1 then
+	
+		addx -c_wid/2
+		
+			add 0,-wid_jiku/2,wid2_jiku-c_thi
+			block c_wid,wid_jiku,c_thi
+			del 1
+		
+			addy -wid_jiku/2-c_thi
+			block c_wid,c_thi,wid2_jiku
+			del 1
+		
+			addy wid_jiku/2
+			block c_wid,c_thi,wid2_jiku
+			del 1
+		
+			addy -wid_jiku/2
+			block c_wid,wid_jiku/4-c_thi,c_thi
+			del 1
+	
+			addy wid_jiku/4+c_thi
+			block c_wid,wid_jiku/4-c_thi,c_thi
+			del 1
+	
+			addy -wid_jiku/4-c_thi
+			block c_wid,c_thi,wid2_jiku/3
+			del 1
+	
+			addy wid_jiku/4
+			block c_wid,c_thi,wid2_jiku/3
+			del 1
+	
+		del 1
+	
+	else
+	
+		addx -c_wid/2
+		
+			add 0,-wid_jiku/2-c_thi,wid2_jiku-c_thi
+			block c_wid,wid_jiku+2*c_thi,c_thi
+			del 1
+		
+			addy -wid_jiku/2-c_thi
+			block c_thi,wid_jiku+2*c_thi,wid2_jiku
+			del 1
+		
+			add c_wid-c_thi,-wid_jiku/2-c_thi,0
+			block c_thi,wid_jiku+2*c_thi,wid2_jiku
+			del 1
+		
+			addy -wid_jiku/2-c_thi
+			block c_wid/4,wid_jiku+2*c_thi,c_thi
+			del 1
+		
+			add c_wid*3/4-c_thi,-wid_jiku/2-c_thi,0
+			block c_wid/4,wid_jiku+2*c_thi,c_thi
+			del 1
+		
+			add c_wid/4,-wid_jiku/2-c_thi,0
+			block c_thi,wid_jiku+2*c_thi,wid2_jiku/3
+			del 1
+
+			add c_wid*3/4-2*c_thi,-wid_jiku/2-c_thi,0
+			block c_thi,wid_jiku+2*c_thi,wid2_jiku/3
+			del 1
+
+
+
+		endif
+	
+	endif
+
+endgroup
+
+
+group "place_channel"
+
+	for i=1 to c_num
+	
+		c_hei=hei
+		c_angle=0
+
+		if roof_cut then
+		
+			if c_x[i]<=cut_xzL[1][1] then
+				c_hei=hei-(1-(c_x[i]/cut_xzL[1][1]))*cut_xzL[1][2]
+				c_angle=-atn(cut_xzL[1][2]/cut_xzL[1][1])
+			endif
+
+			if c_x[i]>=len-cut_xzR[1][1] then
+				c_hei=hei-(cut_xzR[1][2]/cut_xzR[1][1])*(c_x[i]-len+cut_xzR[1][1])
+				c_angle=atn(cut_xzR[1][2]/cut_xzR[1][1])
+			endif
+
+		endif
+
+		if switch_beam then
+			for j=1 to beam_num
+				if c_x[i]>=beam_x[j]+absx and c_x[i]<=beam_x[j]+beam_wid[j]+absx then
+					c_hei=hei-beam_hei[j]
+					c_angle=0
+				endif
+			next j
+		endif
+
+		add c_x[i],0,c_hei
+		roty c_angle
+		placegroup "channel"
+		del 2
+
+	next i
+
+endgroup
+
+
+if switch_c then placegroup "place_channel"
+
+
+!==========================================================================デッキ充填
+group "deck"
+
+	material m_deck
+	
+	if switch_deck[1][1] then !左
+		tube 4,4,1+2+16+32,
+		0,-wid_jiku/2,0,
+		0,wid_jiku/2,0,
+		-0.001,wid_jiku/2,0,
+		-0.001,-wid_jiku/2,0,
+		0,0,-hei,0,
+		0,0,0,0,
+		0,0,hei,0,
+		0,0,2*hei,0
+	endif
+	
+	if switch_deck[1][2] then !右
+		tube 4,4,1+2+16+32,
+		0,-wid_jiku/2,0,
+		0,wid_jiku/2,0,
+		0.001,wid_jiku/2,0,
+		0.001,-wid_jiku/2,0,
+		len,0,-hei,0,
+		len,0,0,0,
+		len,0,hei,0,
+		len,0,2*hei,0
+	endif
+	
+	if switch_deck[1][3] then !上
+		if roof_cut=0 then
+			tube 4,4,1+2+16+32,
+			-wid_jiku/2,0,0,
+			wid_jiku/2,0,0,
+			wid_jiku/2,0.001,0,
+			-wid_jiku/2,0.001,0,
+			-len,0,hei,0,
+			0,0,hei,0,
+			len,0,hei,0,
+			2*len,0,hei,0
+		endif
+	endif
+	
+	if switch_deck[1][4] then !下
+		tube 4,4,1+2+16+32,
+		-wid_jiku/2,0,0,
+		wid_jiku/2,0,0,
+		wid_jiku/2,-0.001,0,
+		-wid_jiku/2,-0.001,0,
+		-len,0,hei,0,
+		0,0,0,0,
+		len,0,0,0,
+		2*len,0,0,0
+	endif
+
+endgroup
+
+group "deck_plus"
+
+	material m_deck
+
+	if switch_deck[1][3] then
+
+		if switch_beam then
+
+			for i=1 to beam_num
+
+				add beam_x[i]+absx,-wid_jiku/2,hei-beam_hei[i]
+				block beam_wid[i],wid_jiku,0.001
+				del 1
+
+				if beam_x[i]+absx>0.001 then 
+					add beam_x[i]+absx,-wid_jiku/2,hei-beam_hei[i]
+					block 0.001,wid_jiku,beam_hei[i]
+					del 1
+				endif
+
+				if beam_x[i]+beam_wid[i]+absx<len-0.001 then
+					add beam_x[i]+beam_wid[i]-0.001+absx,-wid_jiku/2,hei-beam_hei[i]
+					block 0.001,wid_jiku,beam_hei[i]
+					del 1
+				endif
+
+			next i
+
+		endif
+
+	endif
+
+	if switch_deck[1][4] then
+
+		if switch_floor then
+
+			for i=1 to floor_num
+
+				add floor_x[i]+absx,-wid_jiku/2,floor_hei[i]-0.002
+				block floor_wid[i],wid_jiku,0.001
+				del 1
+
+				if floor_x[i]+absx>0.001 then 
+					add floor_x[i]+absx,-wid_jiku/2,0
+					block 0.001,wid_jiku,floor_hei[i]
+					del 1
+				endif
+
+				if floor_x[i]+floor_wid[i]+absx<len-0.001 then
+					add floor_x[i]+floor_wid[i]-0.001+absx,-wid_jiku/2,0
+					block 0.001,wid_jiku,floor_hei[i]
+					del 1
+				endif
+
+			next i
+
+		endif
+
+	endif
+
+endgroup
+
+
+group "deck_plus2"
+
+	material m_deck
+
+	if switch_deck[1][3] then
+
+		if roof_cut then
+			tube 4,6,1+2+16+32,
+			-wid_jiku/2,0,0,
+			wid_jiku/2,0,0,
+			wid_jiku/2,0.001,0,
+			-wid_jiku/2,0.001,0,
+			-1,0,hei-cut_xzL[1][2],0,
+			0,0,hei-cut_xzL[1][2],0,
+			cut_xzL[1][1],0,hei,0,
+			len-cut_xzR[1][1],0,hei,0,
+			len,0,hei-cut_xzR[1][2],0,
+			len+1,0,hei-cut_xzR[1][2],0
+		endif
+
+	endif
+
+endgroup
+
+
+deck1=subgroup("deck","win4")
+deck2=subgroup(deck1,"beam_op2")
+deck3=subgroup(deck2,"floor_op2")
+deck4=subgroup(deck3,"sloping")
+
+deck_plus=subgroup("deck_plus","sloping")
+
+placegroup deck4
+placegroup subgroup(deck_plus,"win4")
+placegroup subgroup("deck_plus2","beam_op2")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+del 2

@@ -1,0 +1,767 @@
+gosub "data"
+gosub "hotspot"
+gosub "frame CL"
+gosub "frame work"
+
+end
+!================================main==================================
+    "data":
+        ptRow=0
+        ptCol=0
+    return
+
+    "hotspot":
+        !top slope
+        if topSlope[1][1] then 
+            add 0,0,frameRange[1][2]
+
+            !x_axis
+                hotspot 0                ,0,0   ,unID,slopeOffset[1][1],1+128     :unID=unID+1    !BASE
+                hotspot slopeOffset[1][1],0,0   ,unID,slopeOffset[1][1],2 ,slopeOffset[1][1], "左傾斜(x)"      :unID=unID+1    !MOVE
+                hotspot 0-1              ,0,0   ,unID,slopeOffset[1][1],3         :unID=unID+1    !REF
+
+            !z_axis
+                hotspot 0,0,0                   ,unID,slopeOffset[1][3],1+128     :unID=unID+1    !BASE
+                hotspot 0,0,-slopeOffset[1][3]  ,unID,slopeOffset[1][3],2 ,slopeOffset[1][3], "左傾斜(z)"      :unID=unID+1    !MOVE
+                hotspot 0,0,0+1                 ,unID,slopeOffset[1][3],3         :unID=unID+1    !REF
+            del 1
+        endif
+
+        if topSlope[1][2] then 
+            add frameRange[1][1],0,frameRange[1][2]
+
+            !x_axis
+                hotspot 0                 ,0,0   ,unID,slopeOffset[2][1],1+128     :unID=unID+1    !BASE
+                hotspot -slopeOffset[2][1],0,0   ,unID,slopeOffset[2][1],2,slopeOffset[2][1],"右傾斜(x)"      :unID=unID+1    !MOVE
+                hotspot 0+1               ,0,0   ,unID,slopeOffset[2][1],3         :unID=unID+1    !REF
+
+            !z_axis
+                hotspot 0,0,0                   ,unID,slopeOffset[2][3],1+128     :unID=unID+1    !BASE
+                hotspot 0,0,-slopeOffset[2][3]  ,unID,slopeOffset[2][3],2,slopeOffset[2][3],"右傾斜(z)"         :unID=unID+1    !MOVE
+                hotspot 0,0,0+1                 ,unID,slopeOffset[2][3],3         :unID=unID+1    !REF
+            del 1
+        endif    
+
+        !start point
+            !x_axis
+            hotspot 0               ,0,frameRange[1][2]/2   ,unID,startPos[1][1],1+128     :unID=unID+1    !BASE
+            hotspot startPos[1][1]  ,0,frameRange[1][2]/2   ,unID,startPos[1][1],2         :unID=unID+1    !MOVE
+            hotspot 0-1             ,0,frameRange[1][2]/2   ,unID,startPos[1][1],3         :unID=unID+1    !REF
+
+            !z_axis
+            hotspot frameRange[1][1]/2,0,0                 ,unID,startPos[1][6],1+128     :unID=unID+1    !BASE
+            hotspot frameRange[1][1]/2,0,startPos[1][6]    ,unID,startPos[1][6],2         :unID=unID+1    !MOVE
+            hotspot frameRange[1][1]/2,0,0-1               ,unID,startPos[1][6],3         :unID=unID+1    !REF
+
+        !outframe
+            !x_axis
+            hotspot 0                ,0,frameRange[1][2]    ,unID,frameRange[1][1],1+256     :unID=unID+1    !BASE
+            hotspot frameRange[1][1] ,0,frameRange[1][2]    ,unID,frameRange[1][1],2         :unID=unID+1    !MOVE
+            hotspot 0-1              ,0,frameRange[1][2]    ,unID,frameRange[1][1],3         :unID=unID+1    !REF
+
+            !z_axis
+            hotspot frameRange[1][1],0,0                  ,unID,frameRange[1][2],1+128     :unID=unID+1    !BASE
+            hotspot frameRange[1][1],0,frameRange[1][2]   ,unID,frameRange[1][2],2         :unID=unID+1    !MOVE
+            hotspot frameRange[1][1],0,0-1                ,unID,frameRange[1][2],3         :unID=unID+1    !REF
+
+        !fix column
+            !range
+            ptRow=ptRow+1
+            dim ptList[][]
+
+            ptCol=ptCol+1
+                ptList[ptRow][3*ptCol-2]=0
+                ptList[ptRow][3*ptCol-1]=0
+                ptList[ptRow][3*ptCol-0]=0
+            ptCol=ptCol+1
+                ptList[ptRow][3*ptCol-2]=frameRange[1][1]
+                ptList[ptRow][3*ptCol-1]=0
+                ptList[ptRow][3*ptCol-0]=0
+            ptCol=ptCol+1
+                ptList[ptRow][3*ptCol-2]=frameRange[1][1]
+                ptList[ptRow][3*ptCol-1]=0
+                ptList[ptRow][3*ptCol-0]=frameRange[1][2]          
+            ptCol=ptCol+1
+                ptList[ptRow][3*ptCol-2]=0
+                ptList[ptRow][3*ptCol-1]=0
+                ptList[ptRow][3*ptCol-0]=frameRange[1][2]          
+            ptCol=ptCol+1
+                ptList[ptRow][3*ptCol-2]=0
+                ptList[ptRow][3*ptCol-1]=0
+                ptList[ptRow][3*ptCol-0]=0
+
+        !wido frame
+            for iwido=1 to nwido
+                !wido startpos xz
+                    !x_axis
+                    hotspot 0                 ,0,widoData[iwido][3]   ,unID,widoData[iwido][1],1+128     :unID=unID+1    !BASE
+                    hotspot widoData[iwido][1],0,widoData[iwido][3]   ,unID,widoData[iwido][1],2         :unID=unID+1    !MOVE
+                    hotspot 0-1               ,0,widoData[iwido][3]   ,unID,widoData[iwido][1],3         :unID=unID+1    !REF
+
+                    !z_axis
+                    hotspot widoData[iwido][1],0,0                  ,unID,widoData[iwido][3],1+128     :unID=unID+1    !BASE
+                    hotspot widoData[iwido][1],0,widoData[iwido][3] ,unID,widoData[iwido][3],2         :unID=unID+1    !MOVE
+                    hotspot widoData[iwido][1],0,0-1                ,unID,widoData[iwido][3],3         :unID=unID+1    !REF
+                        
+                !wido B,H
+                    if abs (widoData[iwido][4])<esp then widoData[iwido][4]=600/td
+                    if abs (widoData[iwido][5])<esp then widoData[iwido][5]=600/td
+
+                    add widoData[iwido][1],0,widoData[iwido][3]
+                        !x_axis
+                        hotspot 0                   ,0,widoData[iwido][5]   ,unID,widoData[iwido][4],1+128     :unID=unID+1    !BASE
+                        hotspot widoData[iwido][4]  ,0,widoData[iwido][5]   ,unID,widoData[iwido][4],2         :unID=unID+1    !MOVE
+                        hotspot 0-1                 ,0,widoData[iwido][5]   ,unID,widoData[iwido][4],3         :unID=unID+1    !REF
+
+                        !z_axis
+                        hotspot widoData[iwido][4],0,0                  ,unID,widoData[iwido][5],1+128     :unID=unID+1    !BASE
+                        hotspot widoData[iwido][4],0,widoData[iwido][5] ,unID,widoData[iwido][5],2         :unID=unID+1    !MOVE
+                        hotspot widoData[iwido][4],0,0-1                ,unID,widoData[iwido][5],3         :unID=unID+1    !REF
+
+                        if widoHasTB[iwido] then si=0 else si=128
+
+                        !left exlen    
+                        hotspot 0                          ,0,widoData[iwido][5]/2   ,unID,widoFrameExlen[iwido][1],1+128     :unID=unID+1    !BASE
+                        hotspot -widoFrameExlen[iwido][1]  ,0,widoData[iwido][5]/2   ,unID,widoFrameExlen[iwido][1],2+si      :unID=unID+1    !MOVE
+                        hotspot 0+1                        ,0,widoData[iwido][5]/2   ,unID,widoFrameExlen[iwido][1],3         :unID=unID+1    !REF
+
+                        !right exlen
+                        hotspot widoData[iwido][4]                           ,0,widoData[iwido][5]/2   ,unID,widoFrameExlen[iwido][2],1+128     :unID=unID+1    !BASE
+                        hotspot widoData[iwido][4]+widoFrameExlen[iwido][2]  ,0,widoData[iwido][5]/2   ,unID,widoFrameExlen[iwido][2],2+si      :unID=unID+1    !MOVE
+                        hotspot widoData[iwido][4]-1                         ,0,widoData[iwido][5]/2   ,unID,widoFrameExlen[iwido][2],3         :unID=unID+1    !REF
+                    del 1
+
+                ptRow=ptRow+1
+                ptCol=0
+                dim ptList[][]
+
+                ptCol=ptCol+1
+                    ptList[ptRow][3*ptCol-2]=widoData[iwido][1]
+                    ptList[ptRow][3*ptCol-1]=0
+                    ptList[ptRow][3*ptCol-0]=widoData[iwido][3]
+                ptCol=ptCol+1
+                    ptList[ptRow][3*ptCol-2]=widoData[iwido][1]+widoData[iwido][4]
+                    ptList[ptRow][3*ptCol-1]=0
+                    ptList[ptRow][3*ptCol-0]=widoData[iwido][3]
+                ptCol=ptCol+1
+                    ptList[ptRow][3*ptCol-2]=widoData[iwido][1]+widoData[iwido][4]
+                    ptList[ptRow][3*ptCol-1]=0
+                    ptList[ptRow][3*ptCol-0]=widoData[iwido][3]+widoData[iwido][5]        
+                ptCol=ptCol+1
+                    ptList[ptRow][3*ptCol-2]=widoData[iwido][1]
+                    ptList[ptRow][3*ptCol-1]=0
+                    ptList[ptRow][3*ptCol-0]=widoData[iwido][3]+widoData[iwido][5]         
+                ptCol=ptCol+1
+                    ptList[ptRow][3*ptCol-2]=widoData[iwido][1]
+                    ptList[ptRow][3*ptCol-1]=0
+                    ptList[ptRow][3*ptCol-0]=widoData[iwido][3]
+            next iwido
+    return
+
+    "frame CL":
+        if disCL then 
+          dim posList[][]
+          posList=steelPos
+          gosub "steel route"
+        endif
+    return
+
+    "frame work":
+        for i=1 to vardim1 (furRoute)
+            _spx=furRoute[i][1]
+            _spy=furRoute[i][2]
+            _spz=furRoute[i][3]
+
+            _epx=furRoute[i][4]
+            _epy=furRoute[i][5]
+            _epz=furRoute[i][6]
+
+            lin_ _spx,_spy,_spz,_epx,_epy,_epz
+        next i
+
+
+        dim CLdata[][]
+        _iRow=0
+
+        for iSteel=1 to count_colRoute
+            for jCol=1 to 6/3/2
+                _spx=colRoute[iSteel][6*jCol-5]
+                _spy=colRoute[iSteel][6*jCol-4]
+                _spz=colRoute[iSteel][6*jCol-3]
+
+                _epx=colRoute[iSteel][6*jCol-2]
+                _epy=colRoute[iSteel][6*jCol-1]
+                _epz=colRoute[iSteel][6*jCol-0]
+
+                _vecx=_epx-_spx
+                _vecy=_epy-_spy
+                _vecz=_epz-_spz
+
+                _iRow=iSteel
+                iRtz=3*(jCol-1)+1
+                iRty=3*(jCol-1)+2
+                iLength=3*(jCol-1)+3
+
+                if abs(_vecx+_vecy+_vecz)>esp then 
+                    rotAxisY=0
+                    rotAxisZ=0
+
+                    gosub "CL rotation"
+                    add _spx,_spy,_spz
+                        gosub "steel shape"
+                    del 1
+                endif
+            next jCol
+        next iSteel
+
+
+        for iSteel=steelIndex[1][1]+1 to vardim1 (steelPos)
+            if steelEdit[iSteel][1]=0 then !hide=0
+                for jCol=1 to vardim2 (steelPos)/3/2
+                    _spx=steelPos[iSteel][6*jCol-5]
+                    _spy=steelPos[iSteel][6*jCol-4]
+                    _spz=steelPos[iSteel][6*jCol-3]
+
+                    _epx=steelPos[iSteel][6*jCol-2]
+                    _epy=steelPos[iSteel][6*jCol-1]
+                    _epz=steelPos[iSteel][6*jCol-0]
+
+                    _vecx=_epx-_spx
+                    _vecy=_epy-_spy
+                    _vecz=_epz-_spz
+
+                    _iRow=iSteel
+                    iRtz=3*(jCol-1)+1
+                    iRty=3*(jCol-1)+2
+                    iLength=3*(jCol-1)+3
+
+                    if abs(_vecx+_vecy+_vecz)>esp then 
+                        rotAxisY=0
+                        rotAxisZ=0
+
+                        gosub "CL rotation"
+                        add _spx,_spy,_spz
+                            gosub "steel shape"
+                        del 1
+                    endif
+                next jCol
+            endif
+        next iSteel
+    return
+
+!================================parts======================================
+
+    "steel shape":
+        !column
+            isColumn=0
+            useDefault=0
+            cusCodex=0
+            cusCodey=0
+            fixx=0
+            fixz=0
+            fixPlateZ=0
+            fixPlateLX=0
+            fixPlateRX=0
+            cutz=0
+            _sgn=0
+
+            if (iSteel<=steelIndex[1][1] and steelEdit[iSteel][2]=0) then  !default size 
+                isColumn=1
+                useDefault=1
+            endif
+
+            if steelEdit[iSteel][2]%10=1 then   !custom size
+                cusCodex= int (steelEdit[iSteel][2]/10)
+                cusCodey=1
+                isColumn=1
+                useDefault=0
+            endif 
+
+            if isColumn then 
+                if useDefault then
+                    steelWid=colSize[1][1]
+                    steelHei=colSize[1][2]
+                    webThi  =colSize[1][3]
+                else
+                    num1=0 : txt1="" : num2=0 : txt2="" : num3=0 : txt3="" : num4=0
+                    n = SPLIT (customSizeTXT[cusCodex][cusCodey], "%n%s%n%s%n%s%n", num1,txt1,num2,txt2,num3,txt3,num4)
+                    steelWid=num1/td
+                    steelHei=num2/td
+                    webThi=num3/td
+                endif
+
+                if disCode then 
+                    material matCode
+
+                    add _vecx/2,_vecy/2-(steelHei/2+esp),_vecz/2
+                    mul 9,9,9
+                    rotx 90
+                        TEXT 0, 0, str("%.0m",iSteel)
+                    del 3
+                endif
+
+                roty rotAxisY
+                rotz rotAxisZ
+                
+                if iSteel>steelIndex[1][1] then 
+                    cutz=(steelWid-widoSize[1][3])/2 
+                    mirro=1
+
+                    if _spz<furringSize[1][3]+endSpace then hasStartPlate=0 else hasStartPlate=1
+                    if _epz<furringSize[1][3]+endSpace then hasEndPlate=0 else hasEndPlate=1
+
+                    if steelEdit[iSteel][2]<>0 then 
+                        if iSteel>steelIndex[1][2] then 
+                            tbSi=widoHasTB[iSteel-steelIndex[1][2]]
+                            isWidoChange=1
+                        else 
+                            tbSi=0
+                            isWidoChange=0
+                        endif
+
+                        if abs (_vecz)<=esp then !horizen
+                            if tbSi%2=1 then fixPlateZ=(steelWid-widoSize[1][3])/2 !else fixPlateZ=0
+                            if (tbSi-(tbSi%2))=2 or tbSi=2 then fixPlateZ=(steelWid-widoSize[1][3])/2 !else fixPlateZ=0
+                            if isWidoChange=0 then fixPlateZ=(steelWid-widoSize[1][3])/2
+                        endif
+
+                        if (_vecz)>esp then !upward
+                            fixx=(steelWid-widoSize[1][3])/2
+
+                            if (tbSi-(tbSi%2))=2 or tbSi=2 then !hasbot
+                                fixz=(steelWid-widoSize[1][3])/2 
+                                fixPlateLX=(steelWid-widoSize[1][3])/2
+                            else 
+                                fixz=0
+                                fixPlateLX=0
+                            endif
+
+                            if tbSi%2=1 then !hastop
+                                fixPlateRX=(steelWid-widoSize[1][3])/2 
+                            else
+                                fixPlateRX=0  
+                            endif
+
+                            !fixlength
+                            if abs (steelIndex[1][2]-steelIndex[1][3])>esp and tbSi>esp then 
+                                if tbSi<3 then _sgn=1
+                                if tbSi=3 then _sgn=2
+                            else 
+                                _sgn=0
+                            endif
+                        endif
+
+                        if (_vecz)<-esp then !downward
+                            fixx=(steelWid-widoSize[1][3])/2
+
+                            if tbSi%2=1 then !hastop
+                                fixPlateLX=(steelWid-widoSize[1][3])/2
+                                fixz=(steelWid-widoSize[1][3])/2 
+                            else 
+                                fixPlateLX=0
+                                fixz=0  
+                            endif
+
+                            if (tbSi-(tbSi%2))=2 or tbSi=2 then !hasbot
+                                fixPlateRX=(steelWid-widoSize[1][3])/2 
+                            else 
+                                fixPlateRX=0
+                            endif
+
+                            !fixlength
+                            if abs (steelIndex[1][2]-steelIndex[1][3])>esp and tbSi>esp then 
+                                if tbSi<3 then _sgn=1
+                                if tbSi=3 then _sgn=2
+                            else 
+                                _sgn=0
+                            endif
+                        endif
+                    endif
+
+                    gosub "plate"
+                endif
+
+                material matSteel
+
+                roty 90
+                    add fixx, 0, fixz
+                        extrude 10,0,0,vecLen-_sgn*abs(cutz),55,
+                        -steelWid/2,-steelHei/2, 0,
+                        steelWid/2,-steelHei/2, 0,
+                        steelWid/2, steelHei/2, 0,
+                        -steelWid/2, steelHei/2, 0,
+                        -steelWid/2,-steelHei/2,-1,
+
+                        -steelWid/2+webThi,-steelHei/2+webThi, 0,
+                        steelWid/2-webThi,-steelHei/2+webThi, 0,
+                        steelWid/2-webThi, steelHei/2-webThi, 0,
+                        -steelWid/2+webThi, steelHei/2-webThi, 0,
+                        -steelWid/2+webThi,-steelHei/2+webThi,-1
+                    del 1
+                del 3
+            endif
+
+        if isColumn=0 then 
+            !furring
+            fixPlateX=0
+            isFurring=0
+            useDefault=0
+            cusCodex=0
+            cusCodey=0
+            
+            if (steelIndex[1][1]<iSteel and iSteel<=steelIndex[1][2] and steelEdit[iSteel][2]=0) then  !default size 
+                isFurring=1
+                useDefault=1
+            endif
+
+            if steelIndex[1][1]<iSteel and iSteel<=steelIndex[1][2] and steelEdit[iSteel][2]%10=2 then   !custom size
+                cusCodex= int (steelEdit[iSteel][2]/10)
+                cusCodey=2
+                isFurring=1
+                useDefault=0
+            endif 
+
+            if isFurring then 
+                if useDefault then
+                    webThi  =furringSize[1][1]
+                    steelWid=furringSize[1][2]
+                    steelHei=furringSize[1][3]
+                    Cwid    =furringSize[1][4]
+                else
+                    num1=0 : txt1="" : num2=0 : txt2="" : num3=0 : txt3="" : num4=0
+                    n = SPLIT (customSizeTXT[cusCodex][cusCodey], "%n%s%n%s%n%s%n", num1,txt1,num2,txt2,num3,txt3,num4)
+                    webThi=num1/td
+                    steelWid=num2/td
+                    steelHei=num3/td
+                    Cwid=num4/td
+                endif
+
+                if steelEdit[iSteel][2]<>0 then 
+                    fixPlateZ=(steelHei-furringSize[1][3])/2 
+                else 
+                    fixPlateZ=0
+                endif
+
+                if disCode then 
+                    material matCode
+
+                    add _vecx/2,_vecy/2,_vecz/2+steelHei/2+esp
+                    mul 9,9,9
+                        TEXT 0, 0, str("%.0m",iSteel)
+                    del 2
+                endif
+                        
+                if iSteel=steelIndex[1][2] then mirro=-1 else mirro=1
+
+                if topSlope[1][1]+topSlope[1][2]>esp and iSteel=steelIndex[1][2] and abs(rotAxisY)>esp then rotAxisY=180-rotAxisY
+                    roty rotAxisY
+                    rotz rotAxisZ
+
+                    hasStartPlate=0
+                    hasEndPlate=0
+
+                    for _iColumn=1 to steelIndex[1][1]  
+                        if abs(_spx-tempPos[_iColumn][x])<=colSize[1][1]*0.7+endSpace then hasStartPlate=1 
+                        if abs(_epx-tempPos[_iColumn][x])<=colSize[1][1]*0.7+endSpace then hasEndPlate=1 
+                    next _iColumn       
+
+                    if vardim1 (widoRoute)>2 then 
+                        for iwido=1 to vardim1 (widoRoute)  
+                            if abs(_spx-widoRoute[iwido][x])<=colSize[1][1]*0.5+endSpace then hasStartPlate=1 
+                            if abs(_epx-widoRoute[iwido][x])<=colSize[1][1]*0.5+endSpace then hasEndPlate=1 
+                        next iwido 
+                    endif
+
+                    if steelEdit[iSteel][4] then  !double
+                        material matSteel
+
+                        offset=steelHei/2+agSize[1][3]/2
+
+                        addz offset
+                        roty 90
+                        rotz 90
+                            !C channel
+                            extrude 14,0,0,vecLen,55,
+                                0, -steelHei/2, 0,
+                                steelWid/2, -steelHei/2, 0,
+                                steelWid/2,  steelHei/2, 0,
+                                steelWid/2-Cwid,  steelHei/2, 0,
+                                steelWid/2-Cwid,  steelHei/2-webThi, 0,
+                                steelWid/2-webThi,  steelHei/2-webThi, 0,
+                                steelWid/2-webThi, -steelHei/2+webThi, 0,
+                                -steelWid/2+webThi,-steelHei/2+webThi, 0,
+                                -steelWid/2+webThi, steelHei/2-webThi, 0,
+                                -steelWid/2+Cwid, steelHei/2-webThi, 0,
+                                -steelWid/2+Cwid, steelHei/2, 0,
+                                -steelWid/2, steelHei/2, 0,
+                                -steelWid/2, -steelHei/2, 0,
+                                0, -steelHei/2, -1
+                        del 3
+                    else
+                        offset=0
+                    endif
+
+                    addz offset
+                        if abs(rotAxisY)<esp then gosub "plate"
+                    del 1
+                    
+                    material matSteel
+
+                    addz -offset
+                    roty 90
+                    rotz -90
+                        !C channel
+                        extrude 14,0,0,vecLen,55,
+                            0, -steelHei/2, 0,
+
+                            steelWid/2, -steelHei/2, 0,
+                            steelWid/2,  steelHei/2, 0,
+                            steelWid/2-Cwid,  steelHei/2, 0,
+                            steelWid/2-Cwid,  steelHei/2-webThi, 0,
+
+                            steelWid/2-webThi,  steelHei/2-webThi, 0,
+                            steelWid/2-webThi, -steelHei/2+webThi, 0,
+                            -steelWid/2+webThi,-steelHei/2+webThi, 0,
+                            -steelWid/2+webThi, steelHei/2-webThi, 0,
+
+                            -steelWid/2+Cwid, steelHei/2-webThi, 0,
+                            -steelWid/2+Cwid, steelHei/2, 0,
+                            -steelWid/2, steelHei/2, 0,
+                            -steelWid/2, -steelHei/2, 0,
+
+                            0, -steelHei/2, -1
+                    del 3
+                del 2
+            endif
+
+            !wido
+            isWido=0
+            useDefault=0
+            cusCodex=0
+            cusCodey=0
+            
+            if steelIndex[1][2]<iSteel and iSteel<=steelIndex[1][3] and steelEdit[iSteel][2]=0 then  !default size 
+                isWido=1
+                useDefault=1
+            endif
+
+            if steelIndex[1][2]<iSteel and iSteel<=steelIndex[1][3] and steelEdit[iSteel][2]%10=2 then   !custom size
+                cusCodex= int (steelEdit[iSteel][2]/10)
+                cusCodey=2
+                isWido=1
+                useDefault=0
+            endif 
+
+            if isWido then 
+                if useDefault then
+                    webThi  =widoSize[1][1]
+                    steelWid=widoSize[1][2]
+                    steelHei=widoSize[1][3]
+                    Cwid    =widoSize[1][4]
+                else
+                    num1=0 : txt1="" : num2=0 : txt2="" : num3=0 : txt3="" : num4=0
+                    n = SPLIT (customSizeTXT[cusCodex][cusCodey], "%n%s%n%s%n%s%n", num1,txt1,num2,txt2,num3,txt3,num4)
+                    webThi=num1/td
+                    steelWid=num2/td
+                    steelHei=num3/td
+                    Cwid=num4/td
+                endif
+
+                if disCode then 
+                    material matCode
+
+                    add _vecx/2,_vecy/2-(steelWid/2+esp),_vecz/2
+                    mul 9,9,9
+                    rotx 90
+                        TEXT 0, 0, str("%.0m",iSteel)
+                    del 3
+                endif
+
+                roty rotAxisY
+                rotz rotAxisZ
+
+                mirro=1
+
+                if _spz<furringSize[1][3]+endSpace then hasStartPlate=0 else hasStartPlate=1
+                if _epz<furringSize[1][3]+endSpace then hasEndPlate=0 else hasEndPlate=1
+
+                gosub "plate"
+
+                material matSteel
+                
+                roty 90
+                rotz -90
+                    extrude 14,0,0,vecLen,55,
+                    0, -steelHei/2, 0,
+
+                    steelWid/2, -steelHei/2, 0,
+                    steelWid/2,  steelHei/2, 0,
+                    steelWid/2-Cwid,  steelHei/2, 0,
+                    steelWid/2-Cwid,  steelHei/2-webThi, 0,
+
+                    steelWid/2-webThi,  steelHei/2-webThi, 0,
+                    steelWid/2-webThi, -steelHei/2+webThi, 0,
+                    -steelWid/2+webThi,-steelHei/2+webThi, 0,
+                    -steelWid/2+webThi, steelHei/2-webThi, 0,
+
+                    -steelWid/2+Cwid, steelHei/2-webThi, 0,
+                    -steelWid/2+Cwid, steelHei/2, 0,
+                    -steelWid/2, steelHei/2, 0,
+                    -steelWid/2, -steelHei/2, 0,
+
+                    0, -steelHei/2, -1
+                del 4
+            endif
+        endif
+    return
+
+    "plate":
+        if steelEdit[iSteel][3]=0 then 
+            aglen=agSize[1][1]
+            aghei=agSize[1][2]
+            plateThi=agSize[1][3]
+
+            add aglen-endSpace+fixPlateLX,0,fixPlateZ
+
+            if abs (offset)>esp then _plateSgn=-1 else _plateSgn=1
+
+            material matPlate
+
+            rotx 90
+                if hasStartPlate then 
+                    muly mirro
+                        extrude 7,0,0,furringSize[1][2]/2,55,
+                        0               ,_plateSgn*(0+aghei/2), 0,
+                        -aglen          ,_plateSgn*(0+aghei/2), 0,
+                        -aglen          ,_plateSgn*(aghei+aghei/2), 0,
+                        -aglen+plateThi ,_plateSgn*(aghei+aghei/2), 0,
+                        -aglen+plateThi ,_plateSgn*(plateThi+aghei/2), 0,
+                        0               ,_plateSgn*(plateThi+aghei/2), 0,
+                        0               ,_plateSgn*(0+aghei/2), -1
+
+                        extrude 7,0,0,-furringSize[1][2]/2,55,
+                        0               ,_plateSgn*(0+aghei/2), 0,
+                        -aglen          ,_plateSgn*(0+aghei/2), 0,
+                        -aglen          ,_plateSgn*(aghei+aghei/2), 0,
+                        -aglen+plateThi ,_plateSgn*(aghei+aghei/2), 0,
+                        -aglen+plateThi ,_plateSgn*(plateThi+aghei/2), 0,
+                        0               ,_plateSgn*(plateThi+aghei/2), 0,
+                        0               ,_plateSgn*(0+aghei/2), -1
+                    del 1
+                endif
+            del 2
+
+            add vecLen-(aglen-endSpace+fixPlateRX),0,fixPlateZ
+            mulx -1
+                rotx 90
+                    if hasEndPlate then 
+
+                    muly mirro
+                    extrude 7,0,0,furringSize[1][2]/2,55,
+                    0               ,_plateSgn*(0+aghei/2), 0,
+                    -aglen          ,_plateSgn*(0+aghei/2), 0,
+                    -aglen          ,_plateSgn*(aghei+aghei/2), 0,
+                    -aglen+plateThi ,_plateSgn*(aghei+aghei/2), 0,
+                    -aglen+plateThi ,_plateSgn*(plateThi+aghei/2), 0,
+                    0               ,_plateSgn*(plateThi+aghei/2), 0,
+                    0               ,_plateSgn*(0+aghei/2), -1
+
+                    extrude 7,0,0,-furringSize[1][2]/2,55,
+                    0               ,_plateSgn*(0+aghei/2), 0,
+                    -aglen          ,_plateSgn*(0+aghei/2), 0,
+                    -aglen          ,_plateSgn*(aghei+aghei/2), 0,
+                    -aglen+plateThi ,_plateSgn*(aghei+aghei/2), 0,
+                    -aglen+plateThi ,_plateSgn*(plateThi+aghei/2), 0,
+                    0               ,_plateSgn*(plateThi+aghei/2), 0,
+                    0               ,_plateSgn*(0+aghei/2), -1
+                    del 1
+
+                    endif
+                del 1
+            del 2
+        endif
+    return
+
+!================================functions==================================
+    "hot route":
+        nRow=vardim1 (ptList)
+        nCol=vardim2 (ptList)/3
+
+        for iRow=1 to nRow
+            for jCol=1 to nCol-1
+                !hotspot
+                    hotspot ptList[iRow][3*jCol-2],ptList[iRow][3*jCol-1],ptList[iRow][3*jCol-0]
+                    hotspot ptList[iRow][3*(jCol+1)-2],ptList[iRow][3*(jCol+1)-1],ptList[iRow][3*(jCol+1)-0]
+                !line
+                    lin_ ptList[iRow][3*jCol-2],ptList[iRow][3*jCol-1],ptList[iRow][3*jCol-0],
+                        ptList[iRow][3*(jCol+1)-2],ptList[iRow][3*(jCol+1)-1],ptList[iRow][3*(jCol+1)-0]
+                !hotline
+                    hotline ptList[iRow][3*jCol-2],ptList[iRow][3*jCol-1],ptList[iRow][3*jCol-0],
+                        ptList[iRow][3*(jCol+1)-2],ptList[iRow][3*(jCol+1)-1],ptList[iRow][3*(jCol+1)-0],unID :unID=unID+1
+            next jCol
+        next iRow
+    return
+
+    "steel route":
+        nRow=vardim1 (posList)
+        nCol=vardim2 (posList)/3
+
+        for iRow=1 to nRow
+            for jCol=1 to nCol-1 step 2
+                !hotspot
+                        hotspot posList[iRow][3*jCol-2],posList[iRow][3*jCol-1],posList[iRow][3*jCol-0]
+                        hotspot posList[iRow][3*(jCol+1)-2],posList[iRow][3*(jCol+1)-1],posList[iRow][3*(jCol+1)-0]
+                !line
+                        lin_ posList[iRow][3*jCol-2],posList[iRow][3*jCol-1],posList[iRow][3*jCol-0],
+                            posList[iRow][3*(jCol+1)-2],posList[iRow][3*(jCol+1)-1],posList[iRow][3*(jCol+1)-0]
+                !hotline
+                        hotline posList[iRow][3*jCol-2],posList[iRow][3*jCol-1],posList[iRow][3*jCol-0],
+                            posList[iRow][3*(jCol+1)-2],posList[iRow][3*(jCol+1)-1],posList[iRow][3*(jCol+1)-0],unID :unID=unID+1
+            next jCol
+        next iRow
+    return
+
+    "CL rotation":
+        Veca_x_Vecb=(_vecx)*1
+        lenva_x_lenvb=sqr((_vecx)^2+(_vecy)^2)*1
+        
+        if abs((_epx+_epy)-(_spx+_spy))>esp then
+            if sgn(_vecy)=0 and sgn(_vecx)>=0 then rotAxisZ=0
+            if sgn(_vecy)=0 and sgn(_vecx)<0  then rotAxisZ=180
+
+            if sgn(_vecy)<>0 then
+                if sgn(_vecy)<0  then alpha=360
+                if sgn(_vecy)>0  then alpha=0 
+                rotAxisZ=sgn(_vecy)*acs(Veca_x_Vecb/lenva_x_lenvb)+alpha
+            endif
+
+            XYplaneVecLen=sqr((_vecx)^2+(_vecy)^2)
+        endif
+
+        if abs(_spz-_epz)>esp then 
+            Veca_x_Vecb=_vecx*_vecx+_vecy*_vecy
+            lenva_x_lenvb=max(sqr(_vecx^2+_vecy^2+_vecz^2)*sqr(_vecx^2+_vecy^2),esp)
+            
+            if abs((_epx+_epy)-(_spx+_spy))>-esp then
+
+                if sgn(_vecz)=0 and sgn(_vecx+_vecy)>=0 then rotAxisY=0
+                if sgn(_vecz)=0 and sgn(_vecx+_vecy)<0  then rotAxisY=180
+
+                if sgn(_vecz)<>0 then
+                    if sgn(_vecz)<0 then alpha=-180
+                    if sgn(_vecz)>0 then alpha=180 
+
+                    rotAxisY=sgn(_vecz)*acs(Veca_x_Vecb/lenva_x_lenvb)+alpha
+                endif
+
+                vecLen=sqr(_vecx^2+_vecy^2+_vecz^2)
+            endif
+        else
+            rotAxisY=0
+            vecLen=XYplaneVecLen
+        endif
+
+        CLdata[_iRow][iRtz]   =rotAxisZ
+        CLdata[_iRow][iRty]   =rotAxisY
+        CLdata[_iRow][iLength]=vecLen
+    return

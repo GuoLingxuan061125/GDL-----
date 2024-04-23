@@ -1,0 +1,1287 @@
+code=1
+x=1
+y=2
+z=3
+eps=1e-5
+
+if switchBeamLeft=0 then
+    beamLeftOffset=0
+    switchSidebarLeft=0
+endif
+
+if switchBeamRight=0 then
+    beamRightOffset=0
+    switchSidebarRight=0
+endif
+
+if switchBeamTop=0 then
+    beamTopOffset=0
+    topMbarNum=0
+endif
+
+if switchBeamDown=0 then
+    beamDownOffset=0
+    downMbarNum=0
+endif
+
+
+!==========================================================================参照リスト==========================================================================
+!=======================================継ぎ手定着長さL1
+dim l1_list[][]
+l1_list[1][18]=45
+l1_list[1][21]=40
+l1_list[1][24]=35
+l1_list[1][27]=35
+l1_list[1][30]=35
+l1_list[1][33]=35
+l1_list[1][36]=35
+l1_list[1][39]=30
+l1_list[1][42]=30
+l1_list[1][45]=30
+l1_list[1][48]=30
+l1_list[1][51]=30
+l1_list[1][54]=30
+l1_list[1][57]=30
+l1_list[1][60]=30
+l1_list[2][18]=50
+l1_list[2][21]=45
+l1_list[2][24]=40
+l1_list[2][27]=40
+l1_list[2][30]=35
+l1_list[2][33]=35
+l1_list[2][36]=35
+l1_list[2][39]=35
+l1_list[2][42]=35
+l1_list[2][45]=35
+l1_list[2][48]=30
+l1_list[2][51]=30
+l1_list[2][54]=30
+l1_list[2][57]=30
+l1_list[2][60]=30
+l1_list[3][18]=0
+l1_list[3][21]=50
+l1_list[3][24]=45
+l1_list[3][27]=45
+l1_list[3][30]=40
+l1_list[3][33]=40
+l1_list[3][36]=40
+l1_list[3][39]=40
+l1_list[3][42]=40
+l1_list[3][45]=40
+l1_list[3][48]=35
+l1_list[3][51]=35
+l1_list[3][54]=35
+l1_list[3][57]=35
+l1_list[3][60]=35
+l1_list[4][18]=0
+l1_list[4][21]=0
+l1_list[4][24]=55
+l1_list[4][27]=55
+l1_list[4][30]=50
+l1_list[4][33]=50
+l1_list[4][36]=50
+l1_list[4][39]=45
+l1_list[4][42]=45
+l1_list[4][45]=45
+l1_list[4][48]=40
+l1_list[4][51]=40
+l1_list[4][54]=40
+l1_list[4][57]=40
+l1_list[4][60]=40
+
+!=======================================定着長さL2
+dim l2_list[][]
+l2_list[1][18]=40
+l2_list[1][21]=35
+l2_list[1][24]=30
+l2_list[1][27]=30
+l2_list[1][30]=30
+l2_list[1][33]=30
+l2_list[1][36]=30
+l2_list[1][39]=25
+l2_list[1][42]=25
+l2_list[1][45]=25
+l2_list[1][48]=25
+l2_list[1][51]=25
+l2_list[1][54]=25
+l2_list[1][57]=25
+l2_list[1][60]=25
+l2_list[2][18]=40
+l2_list[2][21]=35
+l2_list[2][24]=35
+l2_list[2][27]=35
+l2_list[2][30]=30
+l2_list[2][33]=30
+l2_list[2][36]=30
+l2_list[2][39]=30
+l2_list[2][42]=30
+l2_list[2][45]=30
+l2_list[2][48]=25
+l2_list[2][51]=25
+l2_list[2][54]=25
+l2_list[2][57]=25
+l2_list[2][60]=25
+l2_list[3][18]=0
+l2_list[3][21]=40
+l2_list[3][24]=40
+l2_list[3][27]=40
+l2_list[3][30]=35
+l2_list[3][33]=35
+l2_list[3][36]=35
+l2_list[3][39]=35
+l2_list[3][42]=35
+l2_list[3][45]=35
+l2_list[3][48]=30
+l2_list[3][51]=30
+l2_list[3][54]=30
+l2_list[3][57]=30
+l2_list[3][60]=30
+l2_list[4][18]=0
+l2_list[4][21]=0
+l2_list[4][24]=45
+l2_list[4][27]=45
+l2_list[4][30]=40
+l2_list[4][33]=40
+l2_list[4][36]=40
+l2_list[4][39]=40
+l2_list[4][42]=40
+l2_list[4][45]=40
+l2_list[4][48]=35
+l2_list[4][51]=35
+l2_list[4][54]=35
+l2_list[4][57]=35
+l2_list[4][60]=35
+
+!=======================================材質・線色コードリスト
+dim scode_list[]
+scode_list[10]=1
+scode_list[13]=2
+scode_list[16]=3
+scode_list[19]=4
+scode_list[22]=5
+scode_list[25]=6
+scode_list[29]=7
+scode_list[32]=8
+scode_list[35]=9
+scode_list[38]=10
+scode_list[41]=11
+
+!=======================================外径リスト
+dim od_list[]
+od_list[10]=0.011 !d10
+od_list[13]=0.014 !d13
+od_list[16]=0.018 !d16
+od_list[19]=0.021 !d19
+od_list[22]=0.025 !d22
+od_list[25]=0.028 !d25
+od_list[29]=0.033 !d29
+od_list[32]=0.036 !d32
+od_list[35]=0.040 !d35
+od_list[38]=0.043 !d38
+od_list[41]=0.046 !d41
+
+
+!====================================================================梁設定
+values{2} "beamMoveMode" 1,"水平移動",2,"垂直移動"
+values "beamWid" range(0,]
+values "beamHei" range(0,]
+values "beamTopOffset" range[0,]
+values "beamDownOffset" range[0,]
+values "beamLeftOffset" range[0,]
+values "beamRightOffset" range[0,]
+
+!梁投影長さ
+beamProjectLen=sqr((beamPos[2][x]-beamPos[1][x])^2+(beamPos[2][y]-beamPos[1][y])^2)
+
+!梁長さ
+beamLen=sqr((beamPos[2][x]-beamPos[1][x])^2+(beamPos[2][y]-beamPos[1][y])^2+(beamPos[2][z]-beamPos[1][z])^2)
+
+!梁回転角
+beamRtz=0
+
+if beamPos[2][y]>beamPos[1][y]+eps then
+    beamRtz=acs((beamPos[2][x]-beamPos[1][x])/beamProjectLen)
+endif
+
+if beamPos[2][y]<=beamPos[1][y]+eps and beamPos[2][y]>=beamPos[1][y]-eps then
+    if beamPos[2][x]>=beamPos[1][x] then
+        beamRtz=0
+    else
+        beamRtz=180
+    endif
+endif
+
+if beamPos[2][y]<beamPos[1][y]-eps then
+    beamRtz=360-acs((beamPos[2][x]-beamPos[1][x])/beamProjectLen)
+endif
+
+!梁仰角
+beamElevation=atn((beamPos[2][z]-beamPos[1][z])/beamProjectLen)
+
+
+!====================================================================配筋設定
+values "SDresol" range[3,]
+
+values{2} "conFc" 18,"18 N/㎟",21,"21 N/㎟",24,"24 N/㎟",27,"27 N/㎟",30,"30 N/㎟",33,"33 N/㎟",36,"36 N/㎟",39,"39 N/㎟",42,"42 N/㎟",45,"45 N/㎟",\
+				  48,"48 N/㎟",51,"51 N/㎟",54,"54 N/㎟",57,"57 N/㎟",60,"60 N/㎟"
+
+if conFc=18 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345"
+if conFc=21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390"
+if conFc>21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390",4,"SD490"
+
+L1=L1_list[sdType][conFc]
+L2=L2_list[sdType][conFc]
+values "L1Plus" range[0,]
+values "L2Plus" range[0,]
+parameters L1=L1,L2=L2
+lock "L1","L2"
+
+values "anchorL" 20,25,30,35,40
+values{2} "startTopAnchor" 1,"直線L2",2,"下アンカー",3,"梁内下アンカー",4,"継手L1/2"
+values{2} "startDownAnchor" 1,"直線L2",2,"上アンカー",4,"継手L1/2"
+values{2} "endTopAnchor" 1,"直線L2",2,"下アンカー",3,"梁内上アンカー",4,"継手L1/2"
+values{2} "endDownAnchor" 1,"直線L2",2,"上アンカー",3,"継手L1/2"
+
+values "startConSize" range[0,]
+values "startConCover" range[0,startConSize/2]
+values "endConSize" range[0,]
+values "endConCover" range[0,endConSize/2]
+
+if startTopAnchor<>2 and startDownAnchor<>2 then
+    hideparameter "startConSize","startConCover"
+endif
+
+if endTopAnchor<>2 and endDownAnchor<>2 then
+    hideparameter "endConSize","endConCover"
+endif
+
+
+!====================================================================呼び径・ピッチ設定
+values{2} "mbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "sidebarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "stpNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+mbarNd=max(mbarNd,10)
+sidebarNd=max(sidebarNd,10)
+stpNd=max(stpNd,10)
+
+values "topMbarNum" range[0,]
+values "downMbarNum" range[0,]
+values "sidebarLines" range[0,]
+values "stpPitch" range[0.1,]
+stpPitch=max(stpPitch,0.1)
+
+
+!====================================================================鉄筋座標
+!初期化用リスト
+dim _tempPoint[],_tempPos[][],_transPos[][]
+_tempPoint[1]=0
+_tempPos[1][1]=0
+_tempPos[1][2]=0
+_transPos[1][1]=0
+_transPos[1][2]=0
+
+dim _resetList[][]
+_resetList[1][1]=0
+_resetList[1][2]=0
+
+
+!====================================STP
+!初期化
+stpNum=0
+stpOd=od_list[stpNd]
+stpPen=SDpen[scode_list[stpNd]]
+stpMat=SDmat[scode_list[stpNd]]
+
+dim _stpPoint[],_stpPos[][]
+_stpPoint[1]=0
+_stpPos[1][1]=0
+_stpPos[1][2]=0
+
+!段数
+stpPairs=max(ceil((beamLen-stpStartPos-stpEndPos)/stpPitch)+1,0)
+stpFactPitch=(beamLen-stpStartPos-stpEndPos)/max(stpPairs-1,1)
+
+for i=1 to stpPairs
+    xpos=stpStartPos+(i-1)*stpFactPitch+stpShift
+
+    !1000
+    if beamLeftOffset>eps and beamRightOffset<eps and beamTopOffset<eps and beamDownOffset<eps then
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=4
+
+        put xpos
+        put beamWid/2-anchorL*stpNd/1000
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos
+        put beamWid/2-anchorL*stpNd/1000
+        put beamTopOffset-topCover-stpOd/2
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+    endif
+
+    !0100
+    if beamLeftOffset<eps and beamRightOffset>eps and beamTopOffset<eps and beamDownOffset<eps then
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=4
+
+        put xpos
+        put -beamWid/2+anchorL*stpNd/1000
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos
+        put -beamWid/2+anchorL*stpNd/1000
+        put beamTopOffset-topCover-stpOd/2
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+    endif
+
+    !0010
+    if beamLeftOffset<eps and beamRightOffset<eps and beamTopOffset>eps and beamDownOffset<eps then
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=4
+
+        put xpos
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -anchorL*stpNd/1000
+
+        put xpos
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -anchorL*stpNd/1000
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+    endif
+
+    !0001
+    if beamLeftOffset<eps and beamRightOffset<eps and beamTopOffset<eps and beamDownOffset>eps then
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=4
+
+        put xpos
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -beamHei+anchorL*stpNd/1000
+
+        put xpos
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -beamHei+anchorL*stpNd/1000
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+    endif
+
+    !1100
+    if beamLeftOffset>eps and beamRightOffset>eps and beamTopOffset<eps and beamDownOffset<eps then
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=4
+
+        put xpos-stpOd/2
+        put beamWid/2-anchorL*stpNd/1000
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos-stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos-stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos-stpOd/2
+        put beamWid/2-anchorL*stpNd/1000
+        put beamTopOffset-topCover-stpOd/2
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=4
+
+        put xpos+stpOd/2
+        put -beamWid/2+anchorL*stpNd/1000
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos+stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos+stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos+stpOd/2
+        put -beamWid/2+anchorL*stpNd/1000
+        put beamTopOffset-topCover-stpOd/2
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+    endif
+
+    !1010
+    if beamLeftOffset>eps and beamRightOffset<eps and beamTopOffset>eps and beamDownOffset<eps then
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=4
+
+        put xpos-stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -anchorL*stpNd/1000
+
+        put xpos-stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos-stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos-stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put (beamTopOffset-topCover-beamHei-beamDownOffset+downCover)/2-L1*stpNd/1000/2
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=3
+
+        put xpos+stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put (beamTopOffset-topCover-beamHei-beamDownOffset+downCover)/2+L1*stpNd/1000/2
+
+        put xpos+stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos+stpOd/2
+        put beamWid/2-anchorL*stpNd/1000
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+    endif
+
+    !1001
+    if beamLeftOffset>eps and beamRightOffset<eps and beamTopOffset<eps and beamDownOffset>eps then
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=3
+
+        put xpos-stpOd/2
+        put beamWid/2-anchorL*stpNd/1000
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos-stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos-stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put (beamTopOffset-topCover-beamHei-beamDownOffset+downCover)/2-L1*stpNd/1000/2
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=4
+
+        put xpos+stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put (beamTopOffset-topCover-beamHei-beamDownOffset+downCover)/2+L1*stpNd/1000/2
+
+        put xpos+stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos+stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos+stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -beamHei+anchorL*stpNd/1000
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+    endif
+
+    !0110
+    if beamLeftOffset<eps and beamRightOffset>eps and beamTopOffset>eps and beamDownOffset<eps then
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=3
+
+        put xpos-stpOd/2
+        put -beamWid/2+anchorL*stpNd/1000
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos-stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos-stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put (beamTopOffset-topCover-beamHei-beamDownOffset+downCover)/2+L1*stpNd/1000/2
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=4
+
+        put xpos+stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put (beamTopOffset-topCover-beamHei-beamDownOffset+downCover)/2-L1*stpNd/1000/2
+
+        put xpos+stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos+stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos+stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -anchorL*stpNd/1000
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+    endif
+
+    !0101
+    if beamLeftOffset<eps and beamRightOffset>eps and beamTopOffset<eps and beamDownOffset>eps then
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=4
+
+        put xpos-stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -beamHei+anchorL*stpNd/1000
+
+        put xpos-stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos-stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos-stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put (beamTopOffset-topCover-beamHei-beamDownOffset+downCover)/2+L1*stpNd/1000/2
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=3
+
+        put xpos+stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put (beamTopOffset-topCover-beamHei-beamDownOffset+downCover)/2-L1*stpNd/1000/2
+
+        put xpos+stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos+stpOd/2
+        put -beamWid/2+anchorL*stpNd/1000
+        put beamTopOffset-topCover-stpOd/2
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+    endif
+
+    !0011
+    if beamLeftOffset<eps and beamRightOffset<eps and beamTopOffset>eps and beamDownOffset>eps then
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=4
+
+        put xpos
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -beamHei+anchorL*stpNd/1000
+
+        put xpos
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -beamHei+anchorL*stpNd/1000
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=4
+
+        put xpos
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -anchorL*stpNd/1000
+
+        put xpos
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -anchorL*stpNd/1000
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+    endif
+
+    !1110
+    if beamLeftOffset>eps and beamRightOffset>eps and beamTopOffset>eps and beamDownOffset<eps then
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=3
+
+        put xpos-stpOd/2
+        put -beamWid/2+anchorL*stpNd/1000
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos-stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos-stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put (beamTopOffset-topCover-beamHei-beamDownOffset+downCover)/2+L1*stpNd/1000/2
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=5
+
+        put xpos+stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put (beamTopOffset-topCover-beamHei-beamDownOffset+downCover)/2-L1*stpNd/1000/2
+
+        put xpos+stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos+stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos+stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos+stpOd/2
+        put beamWid/2-anchorL*stpNd/1000
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+    endif
+
+    !1101
+    if beamLeftOffset>eps and beamRightOffset>eps and beamTopOffset<eps and beamDownOffset>eps then
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=3
+
+        put xpos-stpOd/2
+        put beamWid/2-anchorL*stpNd/1000
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos-stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos-stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put (beamTopOffset-topCover-beamHei-beamDownOffset+downCover)/2-L1*stpNd/1000/2
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=5
+
+        put xpos+stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put (beamTopOffset-topCover-beamHei-beamDownOffset+downCover)/2+L1*stpNd/1000/2
+
+        put xpos+stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos+stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos+stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos+stpOd/2
+        put -beamWid/2+anchorL*stpNd/1000
+        put beamTopOffset-topCover-stpOd/2
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+    endif
+
+    !1011
+    if beamLeftOffset>eps and beamRightOffset<eps and beamTopOffset>eps and beamDownOffset>eps then
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=4
+
+        put xpos-stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -anchorL*stpNd/1000
+
+        put xpos-stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos-stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos-stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put (beamTopOffset-topCover-beamHei-beamDownOffset+downCover)/2-L1*stpNd/1000/2
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=4
+
+        put xpos+stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put (beamTopOffset-topCover-beamHei-beamDownOffset+downCover)/2+L1*stpNd/1000/2
+
+        put xpos+stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos+stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos+stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -beamHei+anchorL*stpNd/1000
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+    endif
+
+    !0111
+    if beamLeftOffset<eps and beamRightOffset>eps and beamTopOffset>eps and beamDownOffset>eps then
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=4
+
+        put xpos-stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -beamHei+anchorL*stpNd/1000
+
+        put xpos-stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos-stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos-stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put (beamTopOffset-topCover-beamHei-beamDownOffset+downCover)/2+L1*stpNd/1000/2
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=4
+
+        put xpos+stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put (beamTopOffset-topCover-beamHei-beamDownOffset+downCover)/2-L1*stpNd/1000/2
+
+        put xpos+stpOd/2
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos+stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos+stpOd/2
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -anchorL*stpNd/1000
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+    endif
+
+    !1111
+    if beamLeftOffset>eps and beamRightOffset>eps and beamTopOffset>eps and beamDownOffset>eps then
+        stpNum=stpNum+1
+        _stpPoint[stpNum]=6
+
+        put xpos
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put (beamTopOffset-topCover-beamHei-beamDownOffset+downCover)/2
+
+        put xpos
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put beamTopOffset-topCover-stpOd/2
+
+        put xpos
+        put -beamWid/2-beamRightOffset+sideCover+stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put -beamHei-beamDownOffset+downCover+stpOd/2
+
+        put xpos
+        put beamWid/2+beamLeftOffset-sideCover-stpOd/2
+        put (beamTopOffset-topCover-beamHei-beamDownOffset+downCover)/2
+
+        for j=1 to 3*_stpPoint[stpNum]
+            _stpPos[stpNum][j]=get(1)
+        next j
+    endif
+next i
+
+tempNum=stpNum
+_tempPoint=_stpPoint
+_tempPos=_stpPos
+gosub "pos_translation"
+
+parameters \
+stpNum=stpNum,
+stpOd=stpOd,
+stpPen=stpPen,
+stpMat=stpMat,
+stpPoint=_stpPoint,
+stpPos=_transPos
+
+
+!====================================主筋
+!初期化
+mbarNum=0
+mbarOd=od_list[mbarNd]
+mbarPen=SDpen[scode_list[mbarNd]]
+mbarMat=SDmat[scode_list[mbarNd]]
+dim _mbarPoint[],_mbarPos[][]
+_mbarPoint[1]=0
+_mbarPos[1][1]=0
+_mbarPos[1][2]=0
+
+!主筋位置オフセット
+dim _topMbarOffset[],_downMbarOffset[]
+_topMbarOffset[1]=0
+_downMbarOffset[1]=0
+for i=1 to topMbarNum
+    _topMbarOffset[i]=topMbarOffset[i]
+next i
+for i=1 to downMbarNum
+    _downMbarOffset[i]=downMbarOffset[i]
+next i
+parameters topMbarOffset=_topMbarOffset,downMbarOffset=_downMbarOffset
+
+!上端
+if topMbarNum>0 then
+    !xpos
+    if startTopAnchor=1 then !直線L2定着
+        topMbarX1=-(L2+L2Plus)*mbarNd/1000
+    endif
+
+    if startTopAnchor=2 then !下アンカー
+        topMbarX1=-startConSize+startConCover+mbarOd/2
+    endif
+
+    if startTopAnchor=3 then !梁内下アンカー
+        topMbarX1=edgeCover+mbarOd/2
+    endif
+    
+    if startTopAnchor=4 then !継手L1/2
+        topMbarX1=-(L1+L1Plus)/2*mbarNd/1000
+    endif
+
+    if endTopAnchor=1 then !直線L2定着
+        topMbarX2=beamLen+(L2+L2Plus)*mbarNd/1000
+    endif
+
+    if endTopAnchor=2 then !下アンカー
+        topMbarX2=beamLen+endConSize-endConCover-mbarOd/2
+    endif
+
+    if endTopAnchor=3 then !梁内下アンカー
+        topMbarX2=beamLen-edgeCover-mbarOd/2
+    endif
+
+    if endTopAnchor=4 then !継手L1/2
+        topMbarX2=beamLen+(L1+L1Plus)/2*mbarNd/1000
+    endif
+
+    !ypos
+    dim _topMbarY[]
+
+    !zpos
+    topMbarZ=beamTopOffset-topCover-stpOd-mbarOd/2
+
+    for i=1 to topMbarNum
+        !ypos
+        if i=1 then
+            _topMbarY[i]=beamWid/2+beamLeftOffset-sideCover-(elbowRad+0.5)*stpOd
+        endif
+
+        if i=2 then
+            _topMbarY[i]=-beamWid/2-beamRightOffset+sideCover+(elbowRad+0.5)*stpOd
+        endif
+
+        if i>2 then
+            topMbarPitch=(beamWid+beamLeftOffset+beamRightOffset-2*sideCover-2*(elbowRad+0.5)*stpOd)/(topMbarNum-1)
+            _topMbarY[i]=beamWid/2+beamLeftOffset-sideCover-(elbowRad+0.5)*stpOd-(i-2)*topMbarPitch
+        endif
+
+        mbarNum=mbarNum+1
+        _mbarPoint[mbarNum]=2
+
+        if startTopAnchor=2 then
+            _mbarPoint[mbarNum]=_mbarPoint[mbarNum]+1
+            put topMbarX1
+            put _topMbarY[i]+_topMbarOffset[i]
+            put topMbarZ-elbowRad*mbarOd-max((L2+L2Plus)*mbarNd/1000-(startConSize-startConCover-(0.5+elbowRad)*mbarOd),8*mbarNd/1000)
+        endif
+
+        if startTopAnchor=3 then
+            _mbarPoint[mbarNum]=_mbarPoint[mbarNum]+1
+            put topMbarX1
+            put _topMbarY[i]+_topMbarOffset[i]
+            put topMbarZ-startEdgeDropSize-(L2+L2Plus)*mbarNd/1000
+        endif
+
+        put topMbarX1
+        put _topMbarY[i]+_topMbarOffset[i]
+        put topMbarZ
+
+        put topMbarX2
+        put _topMbarY[i]+_topMbarOffset[i]
+        put topMbarZ
+
+        if endTopAnchor=2 then
+            _mbarPoint[mbarNum]=_mbarPoint[mbarNum]+1
+            put topMbarX2
+            put _topMbarY[i]+_topMbarOffset[i]
+            put topMbarZ-elbowRad*mbarOd-max((L2+L2Plus)*mbarNd/1000-(endConSize-endConCover-(0.5+elbowRad)*mbarOd),8*mbarNd/1000)
+        endif
+
+        if endTopAnchor=3 then
+            _mbarPoint[mbarNum]=_mbarPoint[mbarNum]+1
+            put topMbarX2
+            put _topMbarY[i]+_topMbarOffset[i]
+            put topMbarZ-endEdgeDropSize-(L2+L2Plus)*mbarNd/1000
+        endif
+
+        for j=1 to 3*_mbarPoint[mbarNum]
+            _mbarPos[mbarNum][j]=get(1)
+        next j
+    next i
+endif
+
+!下端
+if downMbarNum>0 then
+    !xpos
+    if startDownAnchor=1 then !直線L2定着
+        downMbarX1=-(L2+L2Plus)*mbarNd/1000
+    endif
+
+    if startDownAnchor=2 then !上アンカー
+        downMbarX1=-startConSize+startConCover+mbarOd+mbarOd/2
+    endif
+    
+    if startDownAnchor=3 then !継手L1/2
+        downMbarX1=-(L1+L1Plus)/2*mbarNd/1000
+    endif
+
+    if endDownAnchor=1 then !直線L2定着
+        downMbarx2=beamLen+(L2+L2Plus)*mbarNd/1000
+    endif
+
+    if endDownAnchor=2 then !上アンカー
+        downMbarx2=beamLen+endConSize-endConCover-mbarOd-mbarOd/2
+    endif
+
+    if endDownAnchor=3 then !継手L1/2
+        downMbarx2=beamLen+(L1+L1Plus)/2*mbarNd/1000
+    endif
+
+    !ypos
+    dim _downMbarY[]
+
+    !zpos
+    downMbarZ=-beamHei-beamDownOffset+downCover+stpOd+mbarOd/2
+
+    for i=1 to downMbarNum
+        !ypos
+        if i=1 then
+            _downMbarY[i]=beamWid/2+beamLeftOffset-sideCover-(elbowRad+0.5)*stpOd
+        endif
+
+        if i=2 then
+            _downMbarY[i]=-beamWid/2-beamRightOffset+sideCover+(elbowRad+0.5)*stpOd
+        endif
+
+        if i>2 then
+            downMbarPitch=(beamWid+beamLeftOffset+beamRightOffset-2*sideCover-2*(elbowRad+0.5)*stpOd)/(downMbarNum-1)
+            _downMbarY[i]=beamWid/2+beamLeftOffset-sideCover-(elbowRad+0.5)*stpOd-(i-2)*downMbarPitch
+        endif
+
+        mbarNum=mbarNum+1
+        _mbarPoint[mbarNum]=2
+
+        if startDownAnchor=2 then
+            _mbarPoint[mbarNum]=_mbarPoint[mbarNum]+1
+            put downMbarX1
+            put _downMbarY[i]+_downMbarOffset[i]
+            put downMbarZ+elbowRad*mbarOd+max((L2+L2Plus)*mbarNd/1000-(startConSize-startConCover-(1.5+elbowRad)*mbarOd),8*mbarNd/1000)
+        endif
+
+        put downMbarX1
+        put _downMbarY[i]+_downMbarOffset[i]
+        put downMbarZ
+
+        put downMbarx2
+        put _downMbarY[i]+_downMbarOffset[i]
+        put downMbarZ
+
+        if endDownAnchor=2 then
+            _mbarPoint[mbarNum]=_mbarPoint[mbarNum]+1
+            put downMbarx2
+            put _downMbarY[i]+_downMbarOffset[i]
+            put downMbarZ+elbowRad*mbarOd+max((L2+L2Plus)*mbarNd/1000-(endConSize-endConCover-(1.5+elbowRad)*mbarOd),8*mbarNd/1000)
+        endif
+
+        for j=1 to 3*_mbarPoint[mbarNum]
+            _mbarPos[mbarNum][j]=get(1)
+        next j
+    next i
+endif
+
+tempNum=mbarNum
+_tempPoint=_mbarPoint
+_tempPos=_mbarPos
+gosub "pos_translation"
+
+parameters \
+mbarNum=mbarNum,
+mbarOd=mbarOd,
+mbarPen=mbarPen,
+mbarMat=mbarMat,
+mbarPoint=_mbarPoint,
+mbarPos=_transPos
+
+
+!====================================腹筋
+!初期化
+sidebarNum=0
+sidebarOd=od_list[sidebarNd]
+sidebarPen=SDpen[scode_list[sidebarNd]]
+sidebarMat=SDmat[scode_list[sidebarNd]]
+dim _sidebarNd[],_sidebarOd[],_sidebarPen[],_sidebarMat[],_sidebarPoint[],_sidebarPos[][]
+_sidebarPoint[1]=0
+_sidebarPos[1][1]=0
+_sidebarPos[1][2]=0
+
+!腹筋位置オフセット
+dim _sidebarOffset[]
+_sidebarOffset[1]=0
+for i=1 to sidebarLines
+    _sidebarOffset[i]=sidebarOffset[i]
+next i
+parameters sidebarOffset=_sidebarOffset
+
+if sidebarLines>0 then
+    !xpos
+    sidebarX1=-sidebarStartAnchorLen
+    sidebarX2=beamLen+sidebarEndAnchorLen
+
+    !ypos
+    leftSidebarY=beamWid/2+beamLeftOffset-sideCover-stpOd-sidebarOd/2
+    rightSidebarY=-beamWid/2-beamRightOffset+sideCover+stpOd+sidebarOd/2
+
+    !zpos
+    dim _sidebarZ[]
+
+    for i=1 to sidebarLines
+        !zpos
+        sidebarPitch=(beamHei+beamTopOffset+beamDownOffset-topCover-downCover-2*stpOd-sidebarOd)/(sidebarLines+1)
+        _sidebarZ[i]=beamTopOffset-topCover-stpOd-sidebarOd/2-i*sidebarPitch
+
+        !左端
+        if switchSidebarLeft then
+            sidebarNum=sidebarNum+1
+            _sidebarPoint[sidebarNum]=2
+
+            put sidebarX1
+            put leftSidebarY
+            put _sidebarZ[i]+_sidebarOffset[i]
+
+            put sidebarX2
+            put leftSidebarY
+            put _sidebarZ[i]+_sidebarOffset[i]
+
+            for j=1 to 3*_sidebarPoint[sidebarNum]
+                _sidebarPos[sidebarNum][j]=get(1)
+            next j
+        endif
+
+        !右端
+        if switchSidebarRight then
+            sidebarNum=sidebarNum+1
+            _sidebarPoint[sidebarNum]=2
+
+            put sidebarX1
+            put rightSidebarY
+            put _sidebarZ[i]+_sidebarOffset[i]
+
+            put sidebarX2
+            put rightSidebarY
+            put _sidebarZ[i]+_sidebarOffset[i]
+
+            for j=1 to 3*_sidebarPoint[sidebarNum]
+                _sidebarPos[sidebarNum][j]=get(1)
+            next j
+        endif
+    next i
+endif
+
+tempNum=sidebarNum
+_tempPoint=_sidebarPoint
+_tempPos=_sidebarPos
+gosub "pos_translation"
+
+parameters \
+sidebarNum=sidebarNum,
+sidebarOd=sidebarOd,
+sidebarPen=sidebarPen,
+sidebarMat=sidebarMat,
+sidebarPoint=_sidebarPoint,
+sidebarPos=_transPos
+
+
+
+
+
+goto "master_end"
+
+end
+
+
+
+
+"pos_translation":
+    !output用リスト初期化
+    _transPos=_resetList
+
+    for p=1 to tempNum
+        for q=1 to _tempPoint[p]
+            tempX1=_tempPos[p][3*q-2]
+            tempY1=_tempPos[p][3*q-1]
+            tempZ1=_tempPos[p][3*q]
+
+            !roty -beamElevation
+            tempX2=tempX1*cos(beamElevation)-tempZ1*sin(beamElevation)
+            tempY2=tempY1
+            tempZ2=tempX1*sin(beamElevation)+tempZ1*cos(beamElevation)
+
+            !rotz beamRtz
+            tempX3=tempX2*cos(beamRtz)-tempY2*sin(beamRtz)
+            tempY3=tempX2*sin(beamRtz)+tempY2*cos(beamRtz)
+            tempZ3=tempZ2
+
+            !add beamPos[1][x],beamPos[1][y],beamPos[1][z]
+            transX=beamPos[1][x]+tempX3
+            tramsY=beamPos[1][y]+tempY3
+            transZ=beamPos[1][z]+tempZ3
+
+            _transPos[p][3*q-2]=transX
+            _transPos[p][3*q-1]=tramsY
+            _transPos[p][3*q]=transZ
+        next q
+    next p
+return
+
+
+
+
+"master_end":
+
+
+

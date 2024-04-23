@@ -1,0 +1,509 @@
+!==========================================================敷地設定
+values "area_num" range[3,]
+
+dim _area_pos[][]
+
+for i=1 to area_num
+    _area_pos[i][1]=area_pos[i][1]
+    _area_pos[i][2]=area_pos[i][2]
+next i
+
+parameters area_pos=_area_pos
+
+!敷地面積
+area_area=0
+
+for i=1 to area_num
+    if i=area_num then
+        i2=1
+    else
+        i2=i+1
+    endif
+
+    area_area=area_area+(_area_pos[i][2]+_area_pos[i2][2])*(_area_pos[i][1]-_area_pos[i2][1])/2
+next i
+
+parameters area_area=abs(area_area)
+
+!方程式
+dim _area_a[]
+dim _area_b[]
+dim _area_c[]
+
+for i=1 to area_num
+    if i=area_num then
+        i2=1
+    else
+        i2=i+1
+    endif
+
+    _area_a[i]=_area_pos[i2][2]-_area_pos[i][2]
+    _area_b[i]=_area_pos[i][1]-_area_pos[i2][1]
+    _area_c[i]=_area_pos[i2][1]*_area_pos[i][2]-_area_pos[i][1]*_area_pos[i2][2]
+next i
+
+parameters area_a=_area_a
+parameters area_b=_area_b
+parameters area_c=_area_c
+
+
+!==========================================================用途境設定
+values "borderline_num" range[0,2]
+
+dim _borderline_sta[][]
+dim _borderline_end[][]
+
+for i=1 to borderline_num
+    for j=1 to 2
+        _borderline_sta[i][j]=borderline_sta[i][j]
+        _borderline_end[i][j]=borderline_end[i][j]
+    next j
+next i
+
+parameters borderline_sta=_borderline_sta
+parameters borderline_end=_borderline_end
+
+!長さ
+dim _borderline_len[]
+
+for i=1 to borderline_num
+    _borderline_len[i]=sqr((_borderline_end[i][1]-_borderline_sta[i][1])^2+(_borderline_end[i][2]-_borderline_sta[i][2])^2)
+next i
+
+parameters borderline_len=_borderline_len
+
+!回転角
+dim _borderline_rtz[]
+
+for i=1 to borderline_num
+    if _borderline_end[i][1]=_borderline_sta[i][1] and _borderline_end[i][2]=_borderline_sta[i][2] then
+        _borderline_rtz[i]=0
+    else
+        if _borderline_end[i][2]>=_borderline_sta[i][2] then
+            _borderline_rtz[i]=acs((_borderline_end[i][1]-_borderline_sta[i][1])/_borderline_len[i])
+        else
+            _borderline_rtz[i]=360-acs((_borderline_end[i][1]-_borderline_sta[i][1])/_borderline_len[i])
+        endif
+    endif
+next i
+
+parameters borderline_rtz=_borderline_rtz
+
+!方程式
+dim _borderline_a[]
+dim _borderline_b[]
+dim _borderline_c[]
+
+for i=1 to borderline_num
+    _borderline_a[i]=_borderline_end[i][2]-_borderline_sta[i][2]
+    _borderline_b[i]=_borderline_sta[i][1]-_borderline_end[i][1]
+    _borderline_c[i]=_borderline_end[i][1]*_borderline_sta[i][2]-_borderline_sta[i][1]*_borderline_end[i][2]
+next i
+
+parameters borderline_a=_borderline_a
+parameters borderline_b=_borderline_b
+parameters borderline_c=_borderline_c
+
+
+!==========================================================計算用データ
+dim _intsec_num[]
+dim _intsec_pos[][]
+dim _intsec_flag[][]
+
+!用途境交点リスト
+for i=1 to borderline_num
+    _intsec_num[i]=0
+
+    for j=1 to area_num !敷地辺との交点
+        if j=area_num then
+            j2=1
+        else
+            j2=j+1
+        endif
+
+        if _borderline_a[i]*_area_b[j]<>_area_a[j]*_borderline_b[i] then !平行判定
+            intsec_x=(_area_c[j]*_borderline_b[i]-_borderline_c[i]*_area_b[j])/(_borderline_a[i]*_area_b[j]-_area_a[j]*_borderline_b[i])
+            intsec_y=(_area_c[j]*_borderline_a[i]-_borderline_c[i]*_area_a[j])/(_borderline_b[i]*_area_a[j]-_area_b[j]*_borderline_a[i])
+            add_flag=0
+
+            if intsec_x>=min(_borderline_sta[i][1],_borderline_end[i][1])-eps and intsec_x<=max(_borderline_sta[i][1],_borderline_end[i][1])+eps and \
+               intsec_y>=min(_borderline_sta[i][2],_borderline_end[i][2])-eps and intsec_y<=max(_borderline_sta[i][2],_borderline_end[i][2])+eps then
+                if _area_b[j]=0 then
+                    if _area_pos[j2][2]>=_area_pos[j][2] then
+                        if intsec_y>=_area_pos[j][2]-eps and intsec_y<_area_pos[j2][2]-eps then add_flag=1
+                    else
+                        if intsec_y<=_area_pos[j][2]+eps and intsec_y>_area_pos[j2][2]+eps then add_flag=1
+                    endif
+                else
+                    if _area_pos[j2][1]>=_area_pos[j][1] then
+                        if intsec_x>=_area_pos[j][1]-eps and intsec_x<_area_pos[j2][1]-eps then add_flag=1
+                    else
+                        if intsec_x<=_area_pos[j][1]+eps and intsec_x>_area_pos[j2][1]+eps then add_flag=1
+                    endif
+                endif
+
+                if add_flag then
+                    _intsec_num[i]=_intsec_num[i]+1
+                    _intsec_flag[i][_intsec_num[i]]=j
+                    _intsec_pos[i][2*_intsec_num[i]-1]=intsec_x
+                    _intsec_pos[i][2*_intsec_num[i]]=intsec_y
+                endif
+            endif
+        endif
+    next j
+
+    for j=1 to borderline_num !ほかの用途境との交点
+        if j<>i and _borderline_a[i]*_borderline_b[j]<>_borderline_a[j]*_borderline_b[i] then
+            intsec_x=(_borderline_c[j]*_borderline_b[i]-_borderline_c[i]*_borderline_b[j])/(_borderline_a[i]*_borderline_b[j]-_borderline_a[j]*_borderline_b[i])
+            intsec_y=(_borderline_c[j]*_borderline_a[i]-_borderline_c[i]*_borderline_a[j])/(_borderline_b[i]*_borderline_a[j]-_borderline_b[j]*_borderline_a[i])
+
+            if intsec_x>=min(_borderline_sta[i][1],_borderline_end[i][1])-eps and intsec_x<=max(_borderline_sta[i][1],_borderline_end[i][1])+eps and \
+               intsec_y>=min(_borderline_sta[i][2],_borderline_end[i][2])-eps and intsec_y<=max(_borderline_sta[i][2],_borderline_end[i][2])+eps then
+                if intsec_x>=min(_borderline_sta[j][1],_borderline_end[j][1])-eps and intsec_x<=max(_borderline_sta[j][1],_borderline_end[j][1])+eps and \
+                   intsec_y>=min(_borderline_sta[j][2],_borderline_end[j][2])-eps and intsec_y<=max(_borderline_sta[j][2],_borderline_end[j][2])+eps then
+                    _intsec_num[i]=_intsec_num[i]+1
+                    _intsec_flag[i][_intsec_num[i]]=-j
+                    _intsec_pos[i][2*_intsec_num[i]-1]=intsec_x
+                    _intsec_pos[i][2*_intsec_num[i]]=intsec_y
+                endif
+            endif
+        endif
+    next j
+
+    for j=1 to _intsec_num[i]-1 !交点順番づけ(左から右or下から上)
+        for m=1 to _intsec_num[i]-1
+            exchange_flag=0
+
+            if _borderline_b[i]=0 then
+                if _intsec_pos[i][2*m]>_intsec_pos[i][2*(m+1)] then
+                    exchange_flag=1
+                endif
+            else
+                if _intsec_pos[i][2*m-1]>_intsec_pos[i][2*(m+1)-1] then
+                    exchange_flag=1
+                endif
+            endif
+
+            if exchange_flag then
+                !座標交換
+                temp_x=_intsec_pos[i][2*m-1]
+                temp_y=_intsec_pos[i][2*m]
+                _intsec_pos[i][2*m-1]=_intsec_pos[i][2*(m+1)-1]
+                _intsec_pos[i][2*m]=_intsec_pos[i][2*(m+1)]
+                _intsec_pos[i][2*(m+1)-1]=temp_x
+                _intsec_pos[i][2*(m+1)]=temp_y
+
+                !flag交換
+                temp_flag=_intsec_flag[i][m]
+                _intsec_flag[i][m]=_intsec_flag[i][m+1]
+                _intsec_flag[i][m+1]=temp_flag
+            endif
+        next m
+    next j
+
+    if _intsec_num[i]=0 then
+        _intsec_pos[i][1]=0
+        _intsec_flag[i][1]=0
+    endif
+next i
+
+parameters intsec_num=_intsec_num
+parameters intsec_pos=_intsec_pos
+parameters intsec_flag=_intsec_flag
+
+!総頂点リスト
+full_num=0
+dim _full_pos[][]
+dim _full_type_flag[] !0=敷地頂点 正数=用途境と敷地辺の交点 負数=用途境と用途境の交点
+dim _intsec_number[][]
+
+_intsec_number[1][1]=0
+
+for i=1 to area_num
+    if i=area_num then
+        i2=1
+    else
+        i2=i+1
+    endif
+
+    side_num=0
+
+    !敷地頂点
+    side_num=side_num+1
+    put _area_pos[i][1],_area_pos[i][2] !座標
+    put 0 !頂点タイプflag
+
+    for j=1 to borderline_num
+        for n=1 to _intsec_num[j]
+            if _intsec_flag[j][n]=i then
+                if _intsec_pos[j][2*n-1]=_area_pos[i][1] and _intsec_pos[j][2*n]=_area_pos[i][2] then
+                    side_num=side_num-1
+                    for m=1 to 3
+                        data_delete=get(1)
+                    next m
+                endif
+
+                !用途境と敷地辺の交点
+                side_num=side_num+1
+                put _intsec_pos[j][2*n-1],_intsec_pos[j][2*n]
+                put j*100+n
+
+                _intsec_number[j][n]=full_num+side_num !用途境交点(順番)番号を記録
+            endif
+        next n
+    next j
+
+    for j=1 to side_num
+        full_num=full_num+1
+        _full_pos[full_num][1]=get(1)
+        _full_pos[full_num][2]=get(1)
+        _full_type_flag[full_num]=get(1)
+    next j
+next i
+
+parameters full_num=full_num
+parameters full_pos=_full_pos
+parameters full_type_flag=_full_type_flag
+parameters intsec_number=_intsec_number
+
+
+!==========================================================用途地域情報
+!残り使用回数flag
+dim use_flag[]
+
+for i=1 to full_num
+    !敷地頂点(辺点)
+    if _full_type_flag[i]=0 then
+        use_flag[i]=1
+    endif
+
+    !用途境と敷地辺の交点(線辺点)
+    if _full_type_flag[i]>0 then
+        use_flag[i]=1
+    endif
+next i
+
+!用途地域頂点探す
+border_num=0
+dim _border_vertex_num[]
+dim _border_vertex_number[][]
+
+for i=1 to full_num-1
+    if use_flag[i]>0 and use_flag[i+1]>0 then !始点重複チェック
+        border_num=border_num+1
+        _border_vertex_num[border_num]=0
+
+        !始点追加
+        _border_vertex_num[border_num]=_border_vertex_num[border_num]+1 !当用途地域頂点数+1
+        _border_vertex_number[border_num][_border_vertex_num[border_num]]=i !当用途地域頂点番号インプット
+        use_flag[_border_vertex_number[border_num][_border_vertex_num[border_num]]]=use_flag[_border_vertex_number[border_num][_border_vertex_num[border_num]]]-1 !当頂点使用回数-1
+
+        _border_vertex_num[border_num]=_border_vertex_num[border_num]+1
+        _border_vertex_number[border_num][_border_vertex_num[border_num]]=i+1
+        use_flag[_border_vertex_number[border_num][_border_vertex_num[border_num]]]=use_flag[_border_vertex_number[border_num][_border_vertex_num[border_num]]]-1
+
+        break_flag=0 !ループを中止するflag初期化
+        move_flag=0 !移動方向flag初期化(0は次の辺点を探す -1は前の線辺点を探す 1は次の線辺点を探す)
+
+        repeat
+            if _full_type_flag[_border_vertex_number[border_num][_border_vertex_num[border_num]]]=0 then !辺点
+                move_flag=0
+            else
+                borderline_number=int(_full_type_flag[_border_vertex_number[border_num][_border_vertex_num[border_num]]]/100) !所属用途境
+                order_number=_full_type_flag[_border_vertex_number[border_num][_border_vertex_num[border_num]]]%100 !その順番
+
+                if _intsec_num[borderline_number]<=1 then !所属用途境の交点数は1以下
+                    move_flag=0
+                else !交点数は2以上
+                    if move_flag=0 then
+                        if order_number<_intsec_num[borderline_number] then
+                            center_x=(_full_pos[_intsec_number[borderline_number][order_number]][1]+_full_pos[_intsec_number[borderline_number][order_number+1]][1])/2
+                            center_y=(_full_pos[_intsec_number[borderline_number][order_number]][2]+_full_pos[_intsec_number[borderline_number][order_number+1]][2])/2
+
+                            temp_x=center_x
+                            temp_y=center_y
+                            gosub "inside_judge"
+
+                            if inside_judge then
+                                move_flag=1
+                            endif
+                        endif
+
+                        if order_number>1 then
+                            center_x=(_full_pos[_intsec_number[borderline_number][order_number]][1]+_full_pos[_intsec_number[borderline_number][order_number-1]][1])/2
+                            center_y=(_full_pos[_intsec_number[borderline_number][order_number]][2]+_full_pos[_intsec_number[borderline_number][order_number-1]][2])/2
+
+                            temp_x=center_x
+                            temp_y=center_y
+                            gosub "inside_judge"
+
+                            if inside_judge then
+                                move_flag=-1
+                            endif
+                        endif
+                    else
+                        if move_flag=-1 then
+                            if order_number=1 then
+                                move_flag=0
+                            else
+                                center_x=(_full_pos[_intsec_number[borderline_number][order_number]][1]+_full_pos[_intsec_number[borderline_number][order_number-1]][1])/2
+                                center_y=(_full_pos[_intsec_number[borderline_number][order_number]][2]+_full_pos[_intsec_number[borderline_number][order_number-1]][2])/2
+
+                                temp_x=center_x
+                                temp_y=center_y
+                                gosub "inside_judge"
+
+                                if inside_judge=0 then
+                                    move_flag=0
+                                endif
+                            endif
+                        else
+                            center_x=(_full_pos[_intsec_number[borderline_number][order_number]][1]+_full_pos[_intsec_number[borderline_number][order_number+1]][1])/2
+                            center_y=(_full_pos[_intsec_number[borderline_number][order_number]][2]+_full_pos[_intsec_number[borderline_number][order_number+1]][2])/2
+
+                            temp_x=center_x
+                            temp_y=center_y
+                            gosub "inside_judge"
+
+                            if order_number=_intsec_num[borderline_number] then
+                                move_flag=0
+                            else
+                                center_x=(_full_pos[_intsec_number[borderline_number][order_number]][1]+_full_pos[_intsec_number[borderline_number][order_number+1]][1])/2
+                                center_y=(_full_pos[_intsec_number[borderline_number][order_number]][2]+_full_pos[_intsec_number[borderline_number][order_number+1]][2])/2
+
+                                temp_x=center_x
+                                temp_y=center_y
+                                gosub "inside_judge"
+
+                                if inside_judge=0 then
+                                    move_flag=0
+                                endif
+                            endif
+                        endif
+                    endif
+                endif
+            endif
+
+            !次の辺点を探す
+            if move_flag=0 then
+                if _border_vertex_number[border_num][_border_vertex_num[border_num]]=full_num then
+                    next_border_vertex_number=1
+                else
+                    next_border_vertex_number=_border_vertex_number[border_num][_border_vertex_num[border_num]]+1
+                endif
+
+                if use_flag[next_border_vertex_number]>0 then
+                    _border_vertex_num[border_num]=_border_vertex_num[border_num]+1
+                    _border_vertex_number[border_num][_border_vertex_num[border_num]]=next_border_vertex_number
+                    use_flag[_border_vertex_number[border_num][_border_vertex_num[border_num]]]=use_flag[_border_vertex_number[border_num][_border_vertex_num[border_num]]]-1
+                else
+                    break_flag=1
+                endif
+            endif
+
+            !前の線辺点を探す
+            if move_flag=-1 then
+                if use_flag[_intsec_number[borderline_number][order_number-1]]>0 then
+                    _border_vertex_num[border_num]=_border_vertex_num[border_num]+1
+                    _border_vertex_number[border_num][_border_vertex_num[border_num]]=_intsec_number[borderline_number][order_number-1]
+                    use_flag[_border_vertex_number[border_num][_border_vertex_num[border_num]]]=use_flag[_border_vertex_number[border_num][_border_vertex_num[border_num]]]-1
+                else
+                    break_flag=1
+                endif
+            endif
+
+            !次の線辺点を探す
+            if move_flag=1 then
+                if use_flag[_intsec_number[borderline_number][order_number+1]]>0 then
+                    _border_vertex_num[border_num]=_border_vertex_num[border_num]+1
+                    _border_vertex_number[border_num][_border_vertex_num[border_num]]=_intsec_number[borderline_number][order_number+1]
+                    use_flag[_border_vertex_number[border_num][_border_vertex_num[border_num]]]=use_flag[_border_vertex_number[border_num][_border_vertex_num[border_num]]]-1
+                else
+                    break_flag=1
+                endif
+            endif
+        until break_flag=1
+
+        for j=1 to _border_vertex_num[border_num]
+            if _full_type_flag[_border_vertex_number[border_num][j]]>0 then
+                use_flag[_border_vertex_number[border_num][j]]=use_flag[_border_vertex_number[border_num][j]]+1 !辺線点使用回数+1
+            endif
+        next j
+    endif
+next i
+
+parameters border_num=border_num
+parameters border_vertex_num=_border_vertex_num
+parameters border_vertex_number=_border_vertex_number
+
+!用途地域中心座標
+dim _border_center_pos[][]
+
+for i=1 to border_num
+    _border_center_pos[i][1]=0
+    _border_center_pos[i][2]=0
+
+    for j=1 to _border_vertex_num[i]
+        _border_center_pos[i][1]=_border_center_pos[i][1]+_full_pos[_border_vertex_number[i][j]][1]
+        _border_center_pos[i][2]=_border_center_pos[i][2]+_full_pos[_border_vertex_number[i][j]][2]
+    next j
+
+    _border_center_pos[i][1]=_border_center_pos[i][1]/_border_vertex_num[i]
+    _border_center_pos[i][2]=_border_center_pos[i][2]/_border_vertex_num[i]
+next i
+
+parameters border_center_pos=_border_center_pos
+
+!用途地域面積
+dim _border_area[]
+
+for i=1 to border_num
+    _border_area[i]=0
+
+    for j=1 to _border_vertex_num[i]
+        if j=_border_vertex_num[i] then
+            j2=1
+        else
+            j2=j+1
+        endif
+
+        _border_area[i]=_border_area[i]+(_full_pos[_border_vertex_number[i][j]][2]+_full_pos[_border_vertex_number[i][j2]][2])*(_full_pos[_border_vertex_number[i][j]][1]-_full_pos[_border_vertex_number[i][j2]][1])/2
+    next j
+
+    _border_area[i]=abs(_border_area[i])
+next i
+
+parameters border_area=_border_area
+
+end
+
+
+!ある点と図形の位置関係を判定する
+"inside_judge":
+    temp_intsec_num=0
+
+    for jud=1 to area_num
+        if jud=area_num then
+            jud2=1
+        else
+            jud2=jud+1
+        endif
+
+        if _area_b[jud]<>0 then
+            temp_intsec_x=temp_x
+            temp_intsec_y=-(_area_a[jud]*temp_x+_area_c[jud])/_area_b[jud]
+
+            if temp_intsec_y>temp_y+eps then
+                if temp_intsec_y>=min(_area_pos[jud][2],_area_pos[jud2][2])-eps and temp_intsec_y<=max(_area_pos[jud][2],_area_pos[jud2][2])+eps then
+                    temp_intsec_num=temp_intsec_num+1
+                endif
+            endif
+        endif
+    next jud
+
+    if fra(temp_intsec_num/2)=0 then !交点は偶数
+        inside_judge=0
+    else !交点は奇数
+        inside_judge=1
+    endif
+return

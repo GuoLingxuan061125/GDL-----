@@ -1,0 +1,323 @@
+!====================================================================梁躯体
+!梁中心線ホットスポット
+for i=1 to 2
+    if beamMoveMode=1 then !水平移動
+        hotspot 0            ,beamPos[i][y],beamPos[i][z],code,beamPos[i][x],1+128:code=code+1
+        hotspot beamPos[i][x],beamPos[i][y],beamPos[i][z],code,beamPos[i][x],2    :code=code+1
+        hotspot -1           ,beamPos[i][y],beamPos[i][z],code,beamPos[i][x],3    :code=code+1
+
+        hotspot beamPos[i][x],0            ,beamPos[i][z],code,beamPos[i][y],1+128:code=code+1
+        hotspot beamPos[i][x],beamPos[i][y],beamPos[i][z],code,beamPos[i][y],2    :code=code+1
+        hotspot beamPos[i][x],-1           ,beamPos[i][z],code,beamPos[i][y],3    :code=code+1
+    endif
+
+    if beamMoveMode=2 then !垂直移動
+        hotspot beamPos[i][x],beamPos[i][y],0            ,code,beamPos[i][z],1+128:code=code+1
+        hotspot beamPos[i][x],beamPos[i][y],beamPos[i][z],code,beamPos[i][z],2    :code=code+1
+        hotspot beamPos[i][x],beamPos[i][y],-1           ,code,beamPos[i][z],3    :code=code+1
+    endif
+next i
+
+lin_ beamPos[1][x],beamPos[1][y],beamPos[1][z],beamPos[2][x],beamPos[2][y],beamPos[2][z]
+hotline beamPos[1][x],beamPos[1][y],beamPos[1][z],beamPos[2][x],beamPos[2][y],beamPos[2][z],code:code=code+1
+
+
+!隣接柱逃げ寸法ホットスポット
+if startTopAnchor=2 or startDownAnchor=2 then
+    add beamPos[1][x],beamPos[1][y],beamPos[1][z]+beamTopOffset/cos(beamElevation)
+    rotz beamRtz
+        hotspot -startConSize              ,0,0,code,startConCover,1+128:code=code+1
+        hotspot -startConSize+startConCover,0,0,code,startConCover,2    :code=code+1
+        hotspot -startConSize-1            ,0,0,code,startConCover,3    :code=code+1
+    del 2
+endif
+
+if endTopAnchor=2 or endDownAnchor=2 then
+    add beamPos[2][x],beamPos[2][y],beamPos[2][z]+beamTopOffset/cos(beamElevation)
+    rotz beamRtz
+        hotspot endConSize            ,0,0,code,endConCover,1+128:code=code+1
+        hotspot endConSize-endConCover,0,0,code,endConCover,2    :code=code+1
+        hotspot endConSize+1          ,0,0,code,endConCover,3    :code=code+1
+    del 2
+endif
+
+
+!梁躯体
+group "beamBody"
+    material beamMat
+
+    tube 4,4,1+2+4+8+16+32,
+    -beamWid/2,0,0,
+    beamWid/2,0,0,
+    beamWid/2,-beamHei,0,
+    -beamWid/2,-beamHei,0,
+    2*beamPos[1][x]-beamPos[2][x],2*beamPos[1][y]-beamPos[2][y],beamPos[2][z],0,
+    beamPos[1][x],beamPos[1][y],beamPos[1][z],0,
+    beamPos[2][x],beamPos[2][y],beamPos[2][z],0,
+    2*beamPos[2][x]-beamPos[1][x],2*beamPos[2][y]-beamPos[1][y],beamPos[1][z],0
+endgroup
+
+
+!梁フカシ
+group "beamPlusBody"
+    material beamMat
+
+    tube 4,4,1+2+4+8+16+32,
+    -beamWid/2-beamRightOffset,beamTopOffset,0,
+    beamWid/2+beamLeftOffset,beamTopOffset,0,
+    beamWid/2+beamLeftOffset,-beamHei-beamDownOffset,0,
+    -beamWid/2-beamRightOffset,-beamHei-beamDownOffset,0,
+    2*beamPos[1][x]-beamPos[2][x],2*beamPos[1][y]-beamPos[2][y],beamPos[2][z],0,
+    beamPos[1][x],beamPos[1][y],beamPos[1][z],0,
+    beamPos[2][x],beamPos[2][y],beamPos[2][z],0,
+    2*beamPos[2][x]-beamPos[1][x],2*beamPos[2][y]-beamPos[1][y],beamPos[1][z],0
+endgroup
+
+beamPlusBody=subgroup("beamPlusBody","beamBody")
+
+
+!隣接柱
+group "columnBody"
+    material beamMat
+
+    if startTopAnchor=2 or startDownAnchor=2 then
+        add beamPos[1][x],beamPos[1][y],beamPos[1][z]
+        rotz beamRtz
+        add -startConSize,-beamWid/2-beamRightOffset,-(beamHei+beamDownOffset)/cos(beamElevation)
+            block startConSize,beamWid+beamLeftOffset+beamRightOffset,(beamHei+beamTopOffset+beamDownOffset)/cos(beamElevation)
+
+            plane 5,
+            startConCover,0,0,
+            startConCover,beamWid+beamLeftOffset+beamRightOffset,0,
+            startConCover,beamWid+beamLeftOffset+beamRightOffset,(beamHei+beamTopOffset+beamDownOffset)/cos(beamElevation),
+            startConCover,0,(beamHei+beamTopOffset+beamDownOffset)/cos(beamElevation),
+            startConCover,0,0
+        del 3
+    endif
+
+    if endTopAnchor=2 or endDownAnchor=2 then
+        add beamPos[2][x],beamPos[2][y],beamPos[2][z]
+        rotz beamRtz
+        add 0,-beamWid/2-beamRightOffset,-(beamHei+beamDownOffset)/cos(beamElevation)
+            block endConSize,beamWid+beamLeftOffset+beamRightOffset,(beamHei+beamTopOffset+beamDownOffset)/cos(beamElevation)
+
+            plane 5,
+            endConSize-endConCover,0,0,
+            endConSize-endConCover,beamWid+beamLeftOffset+beamRightOffset,0,
+            endConSize-endConCover,beamWid+beamLeftOffset+beamRightOffset,(beamHei+beamTopOffset+beamDownOffset)/cos(beamElevation),
+            endConSize-endConCover,0,(beamHei+beamTopOffset+beamDownOffset)/cos(beamElevation),
+            endConSize-endConCover,0,0
+        del 3
+    endif
+endgroup
+
+
+if disBeam then
+    placegroup "beamBody"
+    placegroup beamPlusBody
+    placegroup "columnBody"
+
+    add beamPos[1][x],beamPos[1][y],beamPos[1][z]
+    rotz beamRtz
+        for i=1 to 2
+            hotspot 0,-beamWid/2,0
+            hotspot 0,beamWid/2,0
+            hotspot 0,-beamWid/2,-beamHei/cos(beamElevation)
+            hotspot 0,beamWid/2,-beamHei/cos(beamElevation)
+
+            hotspot 0,-beamWid/2-beamRightOffset,beamTopOffset/cos(beamElevation)
+            hotspot 0,beamWid/2+beamLeftOffset,beamTopOffset/cos(beamElevation)
+            hotspot 0,-beamWid/2-beamRightOffset,-(beamHei+beamDownOffset)/cos(beamElevation)
+            hotspot 0,beamWid/2+beamLeftOffset,-(beamHei+beamDownOffset)/cos(beamElevation)
+        add beamProjectLen,0,(beamPos[2][z]-beamPos[1][z])
+        next i
+        del 2
+    del 2
+    
+endif
+
+
+!====================================================================鉄筋
+!stp
+if disStp then
+    if stpNum>0 then
+        for i=1 to stpNum
+            !頂点表示
+            if disPoint then 
+                for j=1 to stpPoint[i]
+                    hotspot stpPos[i][3*j-2],stpPos[i][3*j-1],stpPos[i][3*j]
+                next j
+            endif
+
+            !中心線表示
+            if disCL then
+                pen stpPen
+
+                for j=1 to stpPoint[i]-1
+                    lin_ stpPos[i][3*j-2],stpPos[i][3*j-1],stpPos[i][3*j],stpPos[i][3*j+1],stpPos[i][3*j+2],stpPos[i][3*j+3]
+                next j
+            endif
+
+            !鉄筋表示
+            if disSD then
+                dim _vertices[][]
+
+                for j=1 to stpPoint[i]
+                    _vertices[j][x]=stpPos[i][x+3*(j-1)]
+                    _vertices[j][y]=stpPos[i][y+3*(j-1)]
+                    _vertices[j][z]=stpPos[i][z+3*(j-1)]
+                next j
+
+                call "API_Pipe" PARAMETERS \
+                showCL=0,
+                detail=SDresol,
+                elbowRad=elbowRad*stpOd,
+                nVertex=stpPoint[i],
+                vertices=_vertices,
+                pipeRad=stpOd/2,
+                matPipe=stpMat
+            endif
+        next i
+    endif
+endif
+
+
+!主筋
+if disMbar then
+    if mbarNum>0 then
+        for i=1 to mbarNum
+            !頂点表示
+            if disPoint then 
+                for j=1 to mbarPoint[i]
+                    hotspot mbarPos[i][3*j-2],mbarPos[i][3*j-1],mbarPos[i][3*j]
+                next j
+            endif
+
+            !中心線表示
+            if disCL then
+                pen mbarPen
+
+                for j=1 to mbarPoint[i]-1
+                    lin_ mbarPos[i][3*j-2],mbarPos[i][3*j-1],mbarPos[i][3*j],mbarPos[i][3*j+1],mbarPos[i][3*j+2],mbarPos[i][3*j+3]
+                next j
+            endif
+
+            !鉄筋表示
+            if disSD then
+                dim _vertices[][]
+
+                for j=1 to mbarPoint[i]
+                    _vertices[j][x]=mbarPos[i][x+3*(j-1)]
+                    _vertices[j][y]=mbarPos[i][y+3*(j-1)]
+                    _vertices[j][z]=mbarPos[i][z+3*(j-1)]
+                next j
+
+                call "API_Pipe" PARAMETERS \
+                showCL=0,
+                detail=SDresol,
+                elbowRad=elbowRad*mbarOd,
+                nVertex=mbarPoint[i],
+                vertices=_vertices,
+                pipeRad=mbarOd/2,
+                matPipe=mbarMat
+            endif
+        next i
+    endif
+
+    !主筋位置調整ホットスポット
+    if changeMbarPos then
+        add beamPos[1][x],beamPos[1][y],beamPos[1][z]
+        rotz beamRtz
+        roty -beamElevation
+            for i=1 to topMbarNum
+                for j=1 to 2
+                    hotspot topMbarX1,_topMbarY[i]                 ,topMbarZ,code,topMbarOffset[i],1+128:code=code+1
+                    hotspot topMbarX1,_topMbarY[i]+topMbarOffset[i],topMbarZ,code,topMbarOffset[i],2    :code=code+1
+                    hotspot topMbarX1,_topMbarY[i]-1               ,topMbarZ,code,topMbarOffset[i],3    :code=code+1
+                addx topMbarX2-topMbarX1
+                next j
+                del 2
+            next i
+
+            for i=1 to downMbarNum
+                for j=1 to 2
+                    hotspot downMbarX1,_downMbarY[i]                 ,downMbarZ,code,downMbarOffset[i],1+128:code=code+1
+                    hotspot downMbarX1,_downMbarY[i]+downMbarOffset[i],downMbarZ,code,downMbarOffset[i],2    :code=code+1
+                    hotspot downMbarX1,_downMbarY[i]-1               ,downMbarZ,code,downMbarOffset[i],3    :code=code+1
+                addx downMbarX2-downMbarX1
+                next j
+                del 2
+            next i
+        del 3
+    endif
+endif
+
+
+!腹筋
+if disSidebar then
+    if sidebarNum>0 then
+        for i=1 to sidebarNum
+            !頂点表示
+            if disPoint then 
+                for j=1 to sidebarPoint[i]
+                    hotspot sidebarPos[i][3*j-2],sidebarPos[i][3*j-1],sidebarPos[i][3*j]
+                next j
+            endif
+
+            !中心線表示
+            if disCL then
+                pen sidebarPen
+
+                for j=1 to sidebarPoint[i]-1
+                    lin_ sidebarPos[i][3*j-2],sidebarPos[i][3*j-1],sidebarPos[i][3*j],sidebarPos[i][3*j+1],sidebarPos[i][3*j+2],sidebarPos[i][3*j+3]
+                next j
+            endif
+
+            !鉄筋表示
+            if disSD then
+                dim _vertices[][]
+
+                for j=1 to sidebarPoint[i]
+                    _vertices[j][x]=sidebarPos[i][x+3*(j-1)]
+                    _vertices[j][y]=sidebarPos[i][y+3*(j-1)]
+                    _vertices[j][z]=sidebarPos[i][z+3*(j-1)]
+                next j
+
+                call "API_Pipe" PARAMETERS \
+                showCL=0,
+                detail=SDresol,
+                elbowRad=elbowRad*sidebarOd,
+                nVertex=sidebarPoint[i],
+                vertices=_vertices,
+                pipeRad=sidebarOd/2,
+                matPipe=sidebarMat
+            endif
+        next i
+    endif
+
+    !腹筋位置調整ホットスポット
+    if changeSidebarPos then
+        add beamPos[1][x],beamPos[1][y],beamPos[1][z]
+        rotz beamRtz
+        roty -beamElevation
+            for i=1 to sidebarLines
+                for j=1 to 2
+                    if switchSidebarLeft then
+                        hotspot sidebarX1,leftSidebarY,_sidebarZ[i]                 ,code,sidebarOffset[i],1+128:code=code+1
+                        hotspot sidebarX1,leftSidebarY,_sidebarZ[i]+sidebarOffset[i],code,sidebarOffset[i],2    :code=code+1
+                        hotspot sidebarX1,leftSidebarY,_sidebarZ[i]-1               ,code,sidebarOffset[i],3    :code=code+1
+                    endif
+
+                    if switchSidebarRight then
+                        hotspot sidebarX1,rightSidebarY,_sidebarZ[i]                 ,code,sidebarOffset[i],1+128:code=code+1
+                        hotspot sidebarX1,rightSidebarY,_sidebarZ[i]+sidebarOffset[i],code,sidebarOffset[i],2    :code=code+1
+                        hotspot sidebarX1,rightSidebarY,_sidebarZ[i]-1               ,code,sidebarOffset[i],3    :code=code+1
+                    endif
+                addx sidebarX2-sidebarX1
+                next j
+                del 2
+            next i
+        del 3
+    endif
+endif
+

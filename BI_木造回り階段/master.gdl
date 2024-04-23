@@ -1,0 +1,728 @@
+code=1
+x=1
+y=2
+z=3
+eps=1e-5
+
+!===============================================================================階段設定
+values{2} "patternSet" 2,"②",3,"③",4,"④",5,"⑤",7,"⑦",8,"⑧",9,"⑨",10,"⑩",12,"⑫",13,"⑬",14,"⑭",15,"⑮",16,"⑯",17,"⑰",18,"⑱",0,"カスタム設定"
+values{2} "winderDir" 1,"時計回り",2,"反時計回り"
+values{2} "startDir" 1,"上",2,"下",3,"左",4,"右"
+values{2} "startPattern" 1,"直線部から",2,"回り部から"
+if startPattern=1 then values{2} "pattern" 1,"直線→回り",2,"直線→回り→直線",3,"直線→回り→直線→回り",4,"直線→回り→直線→回り→直線"
+if startPattern=2 then values{2} "pattern" 5,"回り→直線",6,"回り→直線→回り",7,"回り→直線→回り→直線"
+
+if patternSet=2 then
+    startDir=4
+    startPattern=1
+    pattern=1
+    part1StairNum=10
+    part2StairNum=3
+    part3StairNum=0
+    part4StairNum=0
+    part5StairNum=0
+endif
+
+if patternSet=3 then
+    startDir=1
+    startPattern=2
+    pattern=6
+    part1StairNum=3
+    part2StairNum=8
+    part3StairNum=2
+    part4StairNum=0
+    part5StairNum=0
+endif
+
+if patternSet=4 then
+    startDir=1
+    startPattern=2
+    pattern=6
+    part1StairNum=2
+    part2StairNum=8
+    part3StairNum=3
+    part4StairNum=0
+    part5StairNum=0
+endif
+
+if patternSet=5 then
+    startDir=1
+    startPattern=1
+    pattern=4
+    part1StairNum=2
+    part2StairNum=3
+    part3StairNum=4
+    part4StairNum=3
+    part5StairNum=1
+endif
+
+if patternSet=7 then
+    startDir=1
+    startPattern=2
+    pattern=7
+    part1StairNum=2
+    part2StairNum=6
+    part3StairNum=3
+    part4StairNum=2
+    part5StairNum=0
+endif
+
+if patternSet=8 then
+    startDir=1
+    startPattern=1
+    pattern=3
+    part1StairNum=2
+    part2StairNum=3
+    part3StairNum=6
+    part4StairNum=2
+    part5StairNum=0
+endif
+
+if patternSet=9 then
+    startDir=1
+    startPattern=1
+    pattern=2
+    part1StairNum=4
+    part2StairNum=6
+    part3StairNum=3
+    part4StairNum=0
+    part5StairNum=0
+endif
+
+if patternSet=10 then
+    startDir=1
+    startPattern=2
+    pattern=6
+    part1StairNum=3
+    part2StairNum=4
+    part3StairNum=6
+    part4StairNum=0
+    part5StairNum=0
+endif
+
+if patternSet=12 then
+    startDir=3
+    startPattern=2
+    pattern=5
+    part1StairNum=5
+    part2StairNum=8
+    part3StairNum=0
+    part4StairNum=0
+    part5StairNum=0
+endif
+
+if patternSet=13 then
+    startDir=3
+    startPattern=2
+    pattern=6
+    part1StairNum=5
+    part2StairNum=6
+    part3StairNum=2
+    part4StairNum=0
+    part5StairNum=0
+endif
+
+if patternSet=14 then
+    startDir=3
+    startPattern=2
+    pattern=6
+    part1StairNum=6
+    part2StairNum=4
+    part3StairNum=3
+    part4StairNum=0
+    part5StairNum=0
+endif
+
+if patternSet=15 then
+    startDir=1
+    startPattern=1
+    pattern=2
+    part1StairNum=6
+    part2StairNum=6
+    part3StairNum=1
+    part4StairNum=0
+    part5StairNum=0
+endif
+
+if patternSet=16 then
+    startDir=3
+    startPattern=2
+    pattern=7
+    part1StairNum=3
+    part2StairNum=2
+    part3StairNum=6
+    part4StairNum=2
+    part5StairNum=0
+endif
+
+if patternSet=17 then
+    startDir=1
+    startPattern=1
+    pattern=3
+    part1StairNum=2
+    part2StairNum=6
+    part3StairNum=2
+    part4StairNum=3
+    part5StairNum=0
+endif
+
+if patternSet=18 then
+    startDir=3
+    startPattern=1
+    pattern=4
+    part1StairNum=2
+    part2StairNum=3
+    part3StairNum=2
+    part4StairNum=3
+    part5StairNum=3
+endif
+
+if pattern=1 then partNum=2
+if pattern=2 then partNum=3
+if pattern=3 then partNum=4
+if pattern=4 then partNum=5
+if pattern=5 then partNum=2
+if pattern=6 then partNum=3
+if pattern=7 then partNum=4
+
+if patternSet<>0 then
+    lock \
+    "startDir",
+    "startPattern",
+    "pattern",
+    "part1StairNum",
+    "part2StairNum",
+    "part3StairNum",
+    "part4StairNum",
+    "part5StairNum"
+
+    parameters \
+    startDir=startDir,
+    startPattern=startPattern,
+    pattern=pattern,
+    part1StairNum=part1StairNum,
+    part2StairNum=part2StairNum,
+    part3StairNum=part3StairNum,
+    part4StairNum=part4StairNum,
+    part5StairNum=part5StairNum
+endif
+
+if pattern=1 then !直線→回り
+    part1Flag=1
+    part2Flag=2
+    part3Flag=0
+    part4Flag=0
+    part5Flag=0
+endif
+
+if pattern=2 then !直線→回り→直線
+    part1Flag=1
+    part2Flag=2
+    part3Flag=1
+    part4Flag=0
+    part5Flag=0
+endif
+
+if pattern=3 then !直線→回り→直線→回り
+    part1Flag=1
+    part2Flag=2
+    part3Flag=1
+    part4Flag=2
+    part5Flag=0
+endif
+
+if pattern=4 then !直線→回り→直線→回り→直線
+    part1Flag=1
+    part2Flag=2
+    part3Flag=1
+    part4Flag=2
+    part5Flag=1
+endif
+
+if pattern=5 then !回り→直線
+    part1Flag=2
+    part2Flag=1
+    part3Flag=0
+    part4Flag=0
+    part5Flag=0
+endif
+
+if pattern=6 then !回り→直線→回り
+    part1Flag=2
+    part2Flag=1
+    part3Flag=2
+    part4Flag=0
+    part5Flag=0
+endif
+
+if pattern=7 then !回り→直線→回り→直線
+    part1Flag=2
+    part2Flag=1
+    part3Flag=2
+    part4Flag=1
+    part5Flag=0
+endif
+
+!part1
+if part1Flag=1 then values "part1StairNum" range[1,]
+if part1Flag=2 then values "part1StairNum" range[1,6]
+
+!part2
+if part2Flag=0 then
+    part2StairNum=0
+    parameters part2StairNum=part2StairNum
+    lock "part2StairNum"
+    hideparameter "part2StairNum"
+endif
+if part2Flag=1 then values "part2StairNum" range[1,]
+if part2Flag=2 then
+    if part3Flag<>0 then
+        values "part2StairNum" 3,6
+    else
+        values "part2StairNum" range[1,]
+    endif
+endif
+
+!part3
+if part3Flag=0 then
+    part3StairNum=0
+    parameters part3StairNum=part3StairNum
+    lock "part3StairNum"
+    hideparameter "part3StairNum"
+endif
+if part3Flag=1 then values "part3StairNum" range[1,]
+if part3Flag=2 then
+    if part4Flag<>0 then
+        values "part3StairNum" 3,6
+    else
+        values "part3StairNum" range[1,]
+    endif
+endif
+
+!part4
+if part4Flag=0 then
+    part4StairNum=0
+    parameters part4StairNum=part4StairNum
+    lock "part4StairNum"
+    hideparameter "part4StairNum"
+endif
+if part4Flag=1 then values "part4StairNum" range[1,]
+if part4Flag=2 then
+    if part5Flag<>0 then
+        values "part4StairNum" 3,6
+    else
+        values "part4StairNum" range[1,]
+    endif
+endif
+
+!part5
+if part5Flag=0 then
+    part5StairNum=0
+    parameters part5StairNum=part5StairNum
+    lock "part5StairNum"
+    hideparameter "part5StairNum"
+endif
+if part5Flag=1 then values "part5StairNum" range[1,]
+if part5Flag=2 then values "part5StairNum" range[1,]
+
+dim _partFlag[],_partStairNum[]
+_partFlag[1]=part1Flag
+_partFlag[2]=part2Flag
+_partFlag[3]=part3Flag
+_partFlag[4]=part4Flag
+_partFlag[5]=part5Flag
+_partStairNum[1]=part1StairNum
+_partStairNum[2]=part2StairNum
+_partStairNum[3]=part3StairNum
+_partStairNum[4]=part4StairNum
+_partStairNum[5]=part5StairNum
+
+
+
+values "centerLineSpan" range[0,]
+values "columnSize" range[0,centerLineSpan-2*boardThi]
+values "boardThi" range[0,(centerLineSpan-columnSize)/2]
+values "stairTread" range[0,]
+values "stairRiser" range[0,]
+values "stairNosing" range[0,]
+values "stairThi1" range[0,]
+values "stairThi2" range[0,]
+
+stairWid=centerLineSpan-columnSize-2*boardThi
+parameters stairWid=stairWid
+lock "stairWid"
+
+stairNum=part1StairNum+part2StairNum+part3StairNum+part4StairNum+part5StairNum
+parameters stairNum=stairNum
+lock "stairNum"
+
+
+
+!===================================================輪郭ライン
+outLineNum=0
+dim _outLinePos[][]
+_outLinePos[1][1]=0 : _outLinePos[1][2]=0
+
+inLineNum=0
+dim _inLinePos[][]
+_inLinePos[1][1]=0 : _inLinePos[1][2]=0
+
+rtz_defult=90
+
+!start_part
+if _partFlag[1]=1 then !直線部
+    !外
+    outLineNum=outLineNum+1
+    _outLinePos[outLineNum][1]=-centerLineSpan/2
+    _outLinePos[outLineNum][2]=0
+
+    outLineNum=outLineNum+1
+    _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+(_partStairNum[1]*stairTread)*cos(rtz_defult)
+    _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+(_partStairNum[1]*stairTread)*sin(rtz_defult)
+
+    !内
+    inLineNum=inLineNum+1
+    _inLinePos[inLineNum][1]=centerLineSpan/2
+    _inLinePos[inLineNum][2]=0
+
+    inLineNum=inLineNum+1
+    _inLinePos[inLineNum][1]=_inLinePos[inLineNum-1][1]+(_partStairNum[1]*stairTread)*cos(rtz_defult)
+    _inLinePos[inLineNum][2]=_inLinePos[inLineNum-1][2]+(_partStairNum[1]*stairTread)*sin(rtz_defult)
+endif
+
+if _partFlag[1]=2 then !回り部
+    if _partStairNum[1]=1 then
+        !外
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=-centerLineSpan/2
+        _outLinePos[outLineNum][2]=-centerLineSpan/2/sqr(3)
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=-centerLineSpan/2
+        _outLinePos[outLineNum][2]=centerLineSpan/2/sqr(3)
+
+        !内
+        inLineNum=inLineNum+1
+        _inLinePos[inLineNum][1]=centerLineSpan/2
+        _inLinePos[inLineNum][2]=centerLineSpan/2/sqr(3)
+    endif
+
+    if _partStairNum[1]=2 then
+        !外
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=-centerLineSpan/2
+        _outLinePos[outLineNum][2]=centerLineSpan/2/sqr(3)
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=-centerLineSpan/2
+        _outLinePos[outLineNum][2]=centerLineSpan-centerLineSpan/2/sqr(3)
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=centerLineSpan/2
+        _outLinePos[outLineNum][2]=centerLineSpan-centerLineSpan/2/sqr(3)
+
+        !内
+        inLineNum=inLineNum+1
+        _inLinePos[inLineNum][1]=centerLineSpan/2
+        _inLinePos[inLineNum][2]=-centerLineSpan/2/sqr(3)
+
+        rtz_defult=rtz_defult-90
+    endif
+
+    if _partStairNum[1]=3 then
+        !外
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=-centerLineSpan/2
+        _outLinePos[outLineNum][2]=0
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=-centerLineSpan/2
+        _outLinePos[outLineNum][2]=centerLineSpan
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=centerLineSpan/2
+        _outLinePos[outLineNum][2]=centerLineSpan
+
+        !内
+        inLineNum=inLineNum+1
+        _inLinePos[inLineNum][1]=centerLineSpan/2
+        _inLinePos[inLineNum][2]=0
+
+        rtz_defult=rtz_defult-90
+    endif
+
+    if _partStairNum[1]=4 then
+        !外
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=-centerLineSpan/2
+        _outLinePos[outLineNum][2]=-centerLineSpan/2/sqr(3)
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=-centerLineSpan/2
+        _outLinePos[outLineNum][2]=centerLineSpan+centerLineSpan/2/sqr(3)
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=centerLineSpan/2
+        _outLinePos[outLineNum][2]=centerLineSpan+centerLineSpan/2/sqr(3)
+
+        !内
+        inLineNum=inLineNum+1
+        _inLinePos[inLineNum][1]=centerLineSpan/2
+        _inLinePos[inLineNum][2]=centerLineSpan/2/sqr(3)
+
+        rtz_defult=rtz_defult-90
+    endif
+
+    if _partStairNum[1]=5 then
+        !外
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=-centerLineSpan/2
+        _outLinePos[outLineNum][2]=centerLineSpan/2/sqr(3)
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=-centerLineSpan/2
+        _outLinePos[outLineNum][2]=centerLineSpan-centerLineSpan/2/sqr(3)
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=centerLineSpan+centerLineSpan/2
+        _outLinePos[outLineNum][2]=centerLineSpan-centerLineSpan/2/sqr(3)
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=centerLineSpan+centerLineSpan/2
+        _outLinePos[outLineNum][2]=-centerLineSpan/2/sqr(3)
+
+        !内
+        inLineNum=inLineNum+1
+        _inLinePos[inLineNum][1]=centerLineSpan/2
+        _inLinePos[inLineNum][2]=-centerLineSpan/2/sqr(3)
+
+        rtz_defult=rtz_defult-180
+    endif
+
+    if _partStairNum[1]=6 then
+        !外
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=-centerLineSpan/2
+        _outLinePos[outLineNum][2]=0
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=-centerLineSpan/2
+        _outLinePos[outLineNum][2]=centerLineSpan
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=centerLineSpan+centerLineSpan/2
+        _outLinePos[outLineNum][2]=centerLineSpan
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=centerLineSpan+centerLineSpan/2
+        _outLinePos[outLineNum][2]=0
+
+        !内
+        inLineNum=inLineNum+1
+        _inLinePos[inLineNum][1]=centerLineSpan/2
+        _inLinePos[inLineNum][2]=0
+
+        rtz_defult=rtz_defult-180
+    endif
+endif
+
+!following_part
+for i=2 to partNum-1
+    if _partFlag[i]=1 then !直線部 
+        !外
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+(_partStairNum[i]*stairTread)*cos(rtz_defult)
+        _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+(_partStairNum[i]*stairTread)*sin(rtz_defult)
+
+        !内
+        inLineNum=inLineNum+1
+        _inLinePos[inLineNum][1]=_inLinePos[inLineNum-1][1]+(_partStairNum[i]*stairTread)*cos(rtz_defult)
+        _inLinePos[inLineNum][2]=_inLinePos[inLineNum-1][2]+(_partStairNum[i]*stairTread)*sin(rtz_defult)
+    endif
+
+    if _partFlag[i]=2 then !回り部
+        if _partStairNum[i]=3 then !90°回り
+            !外
+            outLineNum=outLineNum+1
+            _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+centerLineSpan*cos(rtz_defult)
+            _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+centerLineSpan*sin(rtz_defult)
+
+            outLineNum=outLineNum+1
+            _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+centerLineSpan*cos(rtz_defult-90)
+            _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+centerLineSpan*sin(rtz_defult-90)
+
+            !内(なし)
+
+            rtz_defult=rtz_defult-90
+        endif
+
+        if _partStairNum[i]=6 then !180°回り
+            !外
+            outLineNum=outLineNum+1
+            _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+centerLineSpan*cos(rtz_defult)
+            _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+centerLineSpan*sin(rtz_defult)
+
+            outLineNum=outLineNum+1
+            _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+2*centerLineSpan*cos(rtz_defult-90)
+            _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+2*centerLineSpan*sin(rtz_defult-90)
+
+            outLineNum=outLineNum+1
+            _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+centerLineSpan*cos(rtz_defult-180)
+            _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+centerLineSpan*sin(rtz_defult-180)
+
+            !内(なし)
+
+            rtz_defult=rtz_defult-180
+        endif
+    endif
+next i
+
+!end_part
+if _partFlag[partNum]=1 then !直線部 
+    !外
+    outLineNum=outLineNum+1
+    _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+(_partStairNum[i]*stairTread)*cos(rtz_defult)
+    _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+(_partStairNum[i]*stairTread)*sin(rtz_defult)
+
+    !内
+    inLineNum=inLineNum+1
+    _inLinePos[inLineNum][1]=_inLinePos[inLineNum-1][1]+(_partStairNum[i]*stairTread)*cos(rtz_defult)
+    _inLinePos[inLineNum][2]=_inLinePos[inLineNum-1][2]+(_partStairNum[i]*stairTread)*sin(rtz_defult)
+endif
+
+if _partFlag[partNum]=2 then !回り部
+    if _partStairNum[partNum]=1 then
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+centerLineSpan/sqr(3)*cos(rtz_defult)
+        _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+centerLineSpan/sqr(3)*sin(rtz_defult)
+    endif
+
+    if _partStairNum[partNum]=2 then
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+centerLineSpan*cos(rtz_defult)
+        _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+centerLineSpan*sin(rtz_defult)
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+(centerLineSpan-centerLineSpan/sqr(3))*cos(rtz_defult-90)
+        _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+(centerLineSpan-centerLineSpan/sqr(3))*sin(rtz_defult-90)
+    endif
+
+    if _partStairNum[partNum]=3 then
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+centerLineSpan*cos(rtz_defult)
+        _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+centerLineSpan*sin(rtz_defult)
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+centerLineSpan*cos(rtz_defult-90)
+        _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+centerLineSpan*sin(rtz_defult-90)
+    endif
+
+    if _partStairNum[partNum]=4 then
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+centerLineSpan*cos(rtz_defult)
+        _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+centerLineSpan*sin(rtz_defult)
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+(centerLineSpan+centerLineSpan/sqr(3))*cos(rtz_defult-90)
+        _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+(centerLineSpan+centerLineSpan/sqr(3))*sin(rtz_defult-90)
+    endif
+
+    if _partStairNum[partNum]=5 then
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+centerLineSpan*cos(rtz_defult)
+        _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+centerLineSpan*sin(rtz_defult)
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+2*centerLineSpan*cos(rtz_defult-90)
+        _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+2*centerLineSpan*sin(rtz_defult-90)
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+(centerLineSpan-centerLineSpan/sqr(3))*cos(rtz_defult-180)
+        _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+(centerLineSpan-centerLineSpan/sqr(3))*sin(rtz_defult-180)
+    endif
+
+    if _partStairNum[partNum]=6 then
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+centerLineSpan*cos(rtz_defult)
+        _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+centerLineSpan*sin(rtz_defult)
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+2*centerLineSpan*cos(rtz_defult-90)
+        _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+2*centerLineSpan*sin(rtz_defult-90)
+
+        outLineNum=outLineNum+1
+        _outLinePos[outLineNum][1]=_outLinePos[outLineNum-1][1]+centerLineSpan*cos(rtz_defult-180)
+        _outLinePos[outLineNum][2]=_outLinePos[outLineNum-1][2]+centerLineSpan*sin(rtz_defult-180)
+    endif
+endif
+
+
+!始点方向と回り方向の座標変換
+if winderDir=2 then
+    for i=1 to outLineNum
+        _outLinePos[i][1]=-_outLinePos[i][1]
+    next i
+
+    for i=1 to inLineNum
+        _inLinePos[i][1]=-_inLinePos[i][1]
+    next i
+endif
+
+if startDir=2 then
+    for i=1 to outLineNum
+        _outLinePos[i][1]=-_outLinePos[i][1]
+        _outLinePos[i][2]=-_outLinePos[i][2]
+    next i
+
+    for i=1 to inLineNum
+        _inLinePos[i][1]=-_inLinePos[i][1]
+        _inLinePos[i][2]=-_inLinePos[i][2]
+    next i
+endif
+
+if startDir=3 then
+    for i=1 to outLineNum
+        tempx=_outLinePos[i][1]
+        tempy=_outLinePos[i][2]
+        _outLinePos[i][1]=-tempy
+        _outLinePos[i][2]=tempx
+    next i
+
+    for i=1 to inLineNum
+        tempX=_inLinePos[i][1]
+        tempy=_inLinePos[i][2]
+        _inLinePos[i][1]=-tempy
+        _inLinePos[i][2]=tempx
+    next i
+endif
+
+if startDir=4 then
+    for i=1 to outLineNum
+        tempx=_outLinePos[i][1]
+        tempy=_outLinePos[i][2]
+        _outLinePos[i][1]=tempy
+        _outLinePos[i][2]=-tempx
+    next i
+
+    for i=1 to inLineNum
+        tempX=_inLinePos[i][1]
+        tempy=_inLinePos[i][2]
+        _inLinePos[i][1]=tempy
+        _inLinePos[i][2]=-tempx
+    next i
+endif
+
+
+
+
+
+
+outLinePos=_outLinePos
+inLinePos=_inLinePos
+
+parameters \
+outLineNum=outLineNum,
+outLinePos=_outLinePos,
+inLineNum=inLineNum,
+inLinePos=_inLinePos
+

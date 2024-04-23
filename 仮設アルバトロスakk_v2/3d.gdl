@@ -1,0 +1,3783 @@
+!
+!	仮設アルバトロス
+!	朝日機材株式会社　2017.2.20
+
+!-----------------------------------------------------------------------------------------------------main
+if details_elevation<EPS and (GLOB_VIEW_TYPE=4 or GLOB_VIEW_TYPE=5) then		!単線表示
+	app3d_f=int(0)
+else										!複線表示
+	app3d_f=int(1)
+endif
+
+if app3d_f<EPS then				!単線表示
+	model wire
+else						!複線表示
+	model solid
+endif
+
+resol res
+
+gosub "Jackbase"			! ジャッキベース
+gosub "Column"				! 支柱
+
+material mat
+pen SYMB_VIEW_PEN
+addz jb_pos
+	if not(joint) then gosub "OobikiJack"	! 大引受
+	gosub "decrease"			! 拡幅狭幅ブラケット
+	gosub "led"					! 布材・梁枠・先行手摺付ブレース
+	gosub "Bracket"				! ブラケット
+	gosub "Board"				! 布板
+del 1
+
+if GLOB_PREVIEW_MODE=1 then gosub "preview_num"
+
+
+!====================================================
+END
+!====================================================
+
+
+
+!-----------------------------------------------------------------------------------------------------sub
+!-------------------------------------------------------------------------- ベースジャッキ
+"Jackbase":
+	material mat
+	pen SYMB_VIEW_PEN
+	if jb_fl1 then
+		add _column_posX[1], _column_posY[1], jb_offset1
+			jb_h=jb_h1
+			gosub "fn_jackbase"
+		del 1
+	endif
+	if jb_fl2 then
+		add _column_posX[2], _column_posY[2], jb_offset2
+			jb_h=jb_h2
+			gosub "fn_jackbase"
+		del 1
+	endif
+	if jb_fl3 then
+		add _column_posX[3], _column_posY[3], jb_offset3
+			jb_h=jb_h3
+			gosub "fn_jackbase"
+		del 1
+	endif
+	if jb_fl4 then
+		add _column_posX[4], _column_posY[4], jb_offset4
+			jb_h=jb_h4
+			gosub "fn_jackbase"
+		del 1
+	endif
+return
+
+"fn_jackbase":
+	HOTSPOT 0, 0, 0, unID_3D : unID_3D=unID_3D+10
+
+	if app3d_f<EPS then !単線表示
+		lin_ 0, 0, 0, 0, 0, jb_h
+	
+		poly 4,
+			-base_w/2, -base_d/2,
+			base_w/2 , -base_d/2,
+			base_w/2 , base_d/2 ,
+			-base_w/2, base_d/2
+		addz jb_h
+		circle 0.175/2
+		del 1
+	else				!複線表示
+		prism 4, 0.006,
+			-base_w/2, -base_d/2,
+			base_w/2 , -base_d/2,
+			base_w/2 , base_d/2 ,
+			-base_w/2, base_d/2
+		roty -90
+			revolve 4, 360, 1+2+16+32,
+				0.006     , 0.035/2, 2,
+				jb_h-0.025, 0.035/2, 2,
+				jb_h-0.025, 0.06/2 , 2,
+				jb_h      , 0.06/2 , 2
+		del 1
+		
+		addz jb_h-0.02
+			prism 4, 0.015,
+				0.095 , -0.015/2,
+				0.095 , 0.015/2 , 
+				-0.095, 0.015/2 ,
+				-0.095, -0.015/2
+		del 1
+	endif
+return
+
+
+
+!-------------------------------------------------------------------------- 支柱
+"Column":
+	if prop1 then
+		add _column_posX[1], _column_posY[1], jb_pos
+			gosub "prop_p"
+		del 1
+	endif
+	if prop2 then
+		add _column_posX[2], _column_posY[2], jb_pos
+			gosub "prop_p"
+		del 1
+	endif
+	if prop3 then
+		add _column_posX[3], _column_posY[3], jb_pos
+			gosub "prop_p"
+		del 1
+	endif
+	if prop4 then
+		add _column_posX[4], _column_posY[4], jb_pos
+			gosub "prop_p"
+		del 1
+	endif
+return
+
+"prop_p":
+	_pen=SYMB_VIEW_PEN
+	_mat=mat
+	if usePenColor &\
+		(GLOB_VIEW_TYPE=3 OR GLOB_VIEW_TYPE=4 OR GLOB_VIEW_TYPE=5) then
+		_pen=penMat
+		_mat=0
+	endif
+	
+	if not(joint) then
+		_posZ=zz-0.025
+	else
+		_posZ=zz
+	endif
+
+	HOTSPOT 0, 0, 0    , unID_3D : unID_3D=unID_3D+10
+	HOTSPOT 0, 0, _posZ, unID_3D : unID_3D=unID_3D+10
+
+	PEN _pen
+	gosub "pillar"
+return
+
+
+!-------------------------------------------------------------------------- 拡幅狭幅ブラケット
+"decrease":
+	if frame_decrease1 then
+		add _column_posX[1], _column_posY[1], decrease_h1
+			gosub "fn_decrease"
+		del 1
+	endif
+	if frame_decrease2 then
+		add _column_posX[2], _column_posY[2], decrease_h2
+		muly -1
+			gosub "fn_decrease"
+		del 2
+	endif
+	if frame_decrease3 then
+		add _column_posX[3], _column_posY[3], decrease_h3
+		muly -1
+			gosub "fn_decrease"
+		del 2
+	endif
+	if frame_decrease4 then
+		add _column_posX[4], _column_posY[4], decrease_h4
+			gosub "fn_decrease"
+		del 1
+	endif
+return
+
+"fn_decrease":
+	rotz -90
+		gosub "bracket"
+	del 1
+return
+
+!-------------------------------------------------------------------------- 大引受ジャッキ
+"OobikiJack":
+	oobikiPosZ=zz-0.025
+	if oobikiType1>0 then
+		add _column_posX[1], _column_posY[1], oobikiPosZ
+			oobikiJackH=oobikiJackH1
+			oobikiAng=oobikiAng1
+			if oobikiColor1 then gosub "fn_color"
+			addz 0.06*oobikiColor1
+				gosub "fn_Oobiki"
+			del 1
+		del 1
+	endif
+	if oobikiType2>0 then
+		add _column_posX[2], _column_posY[2], oobikiPosZ
+			oobikiJackH=oobikiJackH2
+			oobikiAng=oobikiAng2
+			if oobikiColor2 then gosub "fn_color"
+			addz 0.06*oobikiColor2
+				gosub "fn_Oobiki"
+			del 1
+		del 1
+	endif
+	if oobikiType3>0 then
+		add _column_posX[3], _column_posY[3], oobikiPosZ
+			oobikiJackH=oobikiJackH3
+			oobikiAng=oobikiAng3
+			if oobikiColor3 then gosub "fn_color"
+			addz 0.06*oobikiColor3
+				gosub "fn_Oobiki"
+			del 1
+		del 1
+	endif
+	if oobikiType4>0 then
+		add _column_posX[4], _column_posY[4], oobikiPosZ
+			oobikiJackH=oobikiJackH4
+			oobikiAng=oobikiAng4
+			if oobikiColor4 then gosub "fn_color"
+			addz 0.06*oobikiColor4
+				gosub "fn_Oobiki"
+			del 1
+		del 1
+	endif
+return
+
+"fn_color":
+	if app3d_f<EPS then
+		lin_ 0, 0, 0, 0, 0, 0.06
+	else
+		cylind 0.06, 0.0486/2
+	endif
+return
+
+"fn_Oobiki":
+	hr=0
+
+	if oobikiType1=1 then
+		addz -0.1
+			gosub "大引受A-75akk"
+		del 1
+	endif
+
+	if oobikiType1=2 then
+		gosub "ロング大引受ジャッキakk"
+	endif
+return
+
+
+!-------------------------------------------------------------------------- 布材
+"led":
+	_flag=0
+	for i=1 to dan_max
+		addz dan[i]
+			_flag=0
+			if led1[i] then
+				_flag=1
+				led_Length=a
+				if (GLOB_VIEW_TYPE=4 or GLOB_VIEW_TYPE=5) then
+					if app3d_type<3 then gosub "fn_led"
+				else
+					gosub "fn_led"
+				endif
+			endif
+
+			if led2[i] then
+				_flag=2
+				led_Length=a
+				if (GLOB_VIEW_TYPE=4 or GLOB_VIEW_TYPE=5) then
+					if app3d_type<>2 then
+						addy b
+							gosub "fn_led"
+						del 1
+					endif
+				else
+					addy b
+						gosub "fn_led"
+					del 1
+				endif
+			endif
+
+			if led3[i] then
+				_flag=3
+				led_Length=b
+				rotz 90
+					gosub "fn_led"
+				del 1
+			endif
+
+			if led3_anglebrace[i] then		!方杖
+				rotz 90
+					gosub "fn_brace"
+				
+					addx b
+					mulx -1
+						gosub "fn_brace"
+					del 2
+				del 1
+			endif
+		del 1
+	next i
+return
+
+"fn_led":
+	if (_flag=1 & led1_type[i]="布材") or \
+	   (_flag=2 & led2_type[i]="布材") or \
+	   (_flag=3 & led3_type[i]="布材") then
+		board_a=led_Length
+		gosub "布材"
+	endif
+	
+	if (_flag=1 & led1_type[i]="先行手摺付ブレース" & A>0.60-EPS) or \
+	   (_flag=2 & led2_type[i]="先行手摺付ブレース" & A>0.60-EPS) or \
+	   (_flag=3 & led3_type[i]="先行手摺付ブレース" & B>0.60-EPS) then
+		gosub "先行手摺ブレース"
+	endif
+
+	if (_flag=3 & led3_type[i]="梁枠") then
+		mulx -1
+	else
+		mulx 1
+	endif
+		_num=0
+		_ledPosZ=0
+		if (_flag=1 & led1_type[i]="梁枠" & led1_beamtype[i]="1.5スパン") or \
+		   (_flag=2 & led2_type[i]="梁枠" & led2_beamtype[i]="1.5スパン") or \
+		   (_flag=3 & led3_type[i]="梁枠" & led3_beamtype[i]="1.5スパン") then
+			_num=1
+			_ledPosZ=0.18
+			gosub "梁枠2743"
+		endif
+
+		if (_flag=1 & led1_type[i]="梁枠" & led1_beamtype[i]="2スパン") or \
+		   (_flag=2 & led2_type[i]="梁枠" & led2_beamtype[i]="2スパン") or \
+		   (_flag=3 & led3_type[i]="梁枠" & led3_beamtype[i]="2スパン") then
+			_num=1
+			_ledPosZ=0.18
+			gosub "梁枠3658"
+		endif
+
+		if (_flag=1 & led1_type[i]="梁枠" & led1_beamtype[i]="3スパン") or \
+		   (_flag=2 & led2_type[i]="梁枠" & led2_beamtype[i]="3スパン") or \
+		   (_flag=3 & led3_type[i]="梁枠" & led3_beamtype[i]="3スパン") then
+			_num=2
+			_ledPosZ=0.28
+			gosub "梁枠5487"
+		endif
+
+		if (_flag=1 & led1_type[i]="梁枠" & led1_beamtype[i]="4スパン") or \
+		   (_flag=2 & led2_type[i]="梁枠" & led2_beamtype[i]="4スパン") or \
+		   (_flag=3 & led3_type[i]="梁枠" & led3_beamtype[i]="4スパン") then
+			_num=3
+			_ledPosZ=0.38
+			gosub "梁枠7316"
+		endif
+	del 1
+
+	if (_flag=1 & led1_type[i]="梁枠") then
+		if led_beamLed[i] then gosub "beam_led"
+		if led_beamBoard[i] & led1_beamtype[i]<>"1.5スパン" then gosub "beam_board"
+	endif
+return
+
+"beam_led":
+	for ii=1 to _num
+	addx a
+		for jj=1 to 2
+			rotz 90
+				board_a=b
+				gosub "布材"
+			del 1
+		addz -_ledPosZ
+		next jj
+		del 2
+	next ii
+	del _num
+return
+
+"beam_board":
+	addx a
+	for ii=1 to _num
+		for j=1 to board_n
+		addy board_pich
+			board_d=boardDepth[j]
+			board_w=unitSize_values[1]
+			gosub "fn_board"
+		addy boardDepth[j]
+		next j
+		del  board_n*2
+	addx unitSize_values[1]
+	next ii
+	del _num+1
+return
+
+!----　方杖
+"fn_brace":
+	addx 0.255
+	mulx -1
+		gosub "強化方づえ"
+	del 2
+return
+
+
+!-------------------------------------------------------------------------- ブラケット
+"Bracket":
+	for i=1 to dan_max
+		_flag=0
+		if bracketType1[i]<>0 then
+			_flag=1
+			add _column_posX[1], _column_posY[1], dan[i]
+			rotz 90*bracket1_pos[i]
+				gosub "fn_bracket"
+			del 2
+		endif
+		if bracketType2[i]<>0 then
+			_flag=2
+			add _column_posX[2], _column_posY[2], dan[i]
+			rotz 90*bracket2_pos[i]
+				gosub "fn_bracket"
+			del 2
+		endif
+		if bracketType3[i]<>0 then
+			_flag=3
+			add _column_posX[3], _column_posY[3], dan[i]
+			rotz 90*bracket3_pos[i]
+				gosub "fn_bracket"
+			del 2
+		endif
+		if bracketType4[i]<>0 then
+			_flag=4
+			add _column_posX[4], _column_posY[4], dan[i]
+			rotz 90*bracket4_pos[i]
+				gosub "fn_bracket"
+			del 2
+		endif
+	next i
+return
+
+"fn_bracket":
+	if (_flag=1 & bracketType1[i]=1) or \
+	   (_flag=2 & bracketType2[i]=1) or \
+	   (_flag=3 & bracketType3[i]=1) or \
+	   (_flag=4 & bracketType4[i]=1) then
+		rotz 180
+			gosub "先端クサビブラケットXB240S"
+		del 1
+	endif
+
+	if (_flag=1 & bracketType1[i]=2) or \
+	   (_flag=2 & bracketType2[i]=2) or \
+	   (_flag=3 & bracketType3[i]=2) or \
+	   (_flag=4 & bracketType4[i]=2) then
+		rotz 180
+			gosub "先端クサビブラケットXB500S"
+		del 1
+	endif
+return
+
+
+!-------------------------------------------------------------------------- 布板
+"Board":
+	for i=1 to dan_max
+		addz dan[i]
+		if board[i] then
+			if i<>vardim1(dan) then
+				rail_pos=dan[i+1]-dan[i]
+			else
+				rail_pos=0.45
+			endif
+			
+			if board_type[i]="布板" then gosub "Board_sub"              !--- 布板
+			if board_type[i]="階段" then gosub "Step_sub"               !--- 階段
+			if board_type[i]="ハッチ式布板" then gosub "hatchBoard_sub"  !--- ハッチ式布板	
+		endif
+		gosub "habaki_sub" !--- 巾木
+		del 1
+	next i 
+return
+
+!--- 布板
+"Board_sub":
+	for j=1 to board_n
+	addy board_pich
+		if board_flag[i][j] then
+			board_d=boardDepth[j]
+			board_w=a
+			gosub "fn_board"
+		endif
+	addy  boardDepth[j]
+	next j
+	del  board_n*2
+return
+
+"fn_board":
+	addy -orgpos_y
+		ksfi_a=board_w
+		ksfi_b=board_d
+		gosub "構成踏板"
+	del 1
+return
+
+!--- 階段
+"Step_sub":
+	if board_sreverse[i] then
+		addx a
+		mulx -1
+	else
+		addx 0
+		mulx 1
+	endif
+
+		board_w=a
+		for j=1 to board_n
+			_bottomFlag=0
+			if i=1 & _bNegarami then _bottomFlag=1
+
+			addy board_pich
+			if board_flag[i][j] then
+				if board_n>1 then
+					if j=1 then
+						board_d=boardDepth[j]
+						if  board_spos[i]="1"  then
+							gosub "fn_step"
+							if board_stepHanger[i] & _bNegarami then
+								gosub "fn_stepHanger"
+							endif
+							if board_stepRail[i] then
+								gosub "fn_stepRail"
+							endif
+						else
+							if _bBoardDepth2_9 then board_d=boardDepth[2]
+							gosub "fn_board"
+						endif
+					else
+						board_d=boardDepth[j]
+						if j=board_n then
+							if board_spos[i]="2" then
+								gosub "fn_step"
+
+								if _bBoardDepth2_9 then
+									addy boardDepth[1]
+								else
+									addy boardDepth[board_n]
+								endif
+								muly -1
+									if board_stepHanger[i] & _bNegarami then gosub "fn_stepHanger"
+									if board_stepRail[i] then gosub "fn_stepRail"
+								del 2
+							else
+								gosub "fn_board"
+							endif
+						else
+							gosub "fn_board"
+						endif
+					endif
+				else
+					board_d=boardDepth[j]
+					gosub "fn_step"
+					if board_stepHanger[i] & _bNegarami then gosub "fn_stepHanger"
+					if board_stepRail[i] then gosub "fn_stepRail"
+				endif
+			endif
+
+			board_d=boardDepth[j]
+			if _bBoardDepth2_9 & board_spos[i]="2" then
+				board_d=boardDepth[2]
+			endif
+			addy board_d
+		next j
+		del board_n*2
+	
+		if board_spos[i]="2" then
+			addy b
+			muly -1
+		else
+			addy 0
+			muly 1
+		endif
+			!---下側手摺
+			if board_srail1[i] then
+				add 0, rail_y, rail_pos
+					gosub "stair_rail"
+				del 1
+			endif
+		
+			!!---上側手摺
+			if board_srail2[i] then
+				add 0, rail_y, rail_pos+0.45
+					gosub "stair_rail"
+				del 1
+			endif
+		del 2
+	del 2
+return
+
+"fn_stepHanger":
+	stepHangerLen=b
+	if b>unitSize_values[3]+eps then
+		stepHangerLen=unitSize_values[3]
+	endif
+	
+	addy -board_pich
+	rotz 90
+		kdu_a=stepHangerLen
+		pipeLen=kdu_a-pipePosX*2
+		gosub "階段受"
+	del 2
+
+	unID_2D=unID_2D+10
+	unID_3D=unID_3D+10
+return
+
+"fn_stepRail":
+	add 0,  -board_pich, 1.8-stepRailPosZ
+		gosub "開口ガード"
+	del 1
+	unID_2D=unID_2D+10
+	unID_3D=unID_3D+10
+return
+
+"stair_rail":
+	if app3d_f<EPS then				!単線表示
+		lin_ 0, 0, 0.0179, unitSize_values[1]-0.0243, 0, 1.8-0.0076
+	else						!複線表示
+		rotx 90
+		addz -frame_w/2
+			prism_ 10, 0.0276,
+				0.009                    , 0.0117, 15,
+				unitSize_values[1]-0.0355, 1.768 , 15,
+				unitSize_values[1]-0.026 , 1.768 , 15,
+				unitSize_values[1]-0.026 , 1.8   , 15,
+				unitSize_values[1]       , 1.8   , 15,
+				unitSize_values[1]       , 1.789 , 15,
+				unitSize_values[1]+0.009 , 1.789 , 15,
+				unitSize_values[1]+0.009 , 1.818 , 15,
+				unitSize_values[1]-0.023 , 1.818 , 15,
+				0.009                    , 0.0498, 15
+		del 1
+
+		addz -0.009/2
+			prism_ 4, 0.009,
+				0    , 0.0498 , 15,
+				0    , -0.0226, 15,
+				0.009, -0.0226, 15,
+				0.009, 0.0498 , 15
+		del 2
+	endif
+return
+
+!--- ハッチ式布板
+"hatchBoard_sub":
+	for j=1 to board_n
+		board_w=a
+		addy board_pich
+		if board_flag[i][j] then
+			if board_n>1 then
+				if j=1 then
+					board_d=boardDepth[j]
+					if  board_hpos[i]="1"  then
+						gosub 9100
+					else
+						if _bBoardDepth2_9 then board_d=boardDepth[2]
+						gosub "fn_board"
+					endif
+				else
+					board_d=boardDepth[j]
+					if j=board_n then
+						if  board_hpos[i]="2" then
+							gosub 9100
+						else
+							gosub "fn_board"
+						endif
+					else
+						gosub "fn_board"
+					endif
+				endif
+			else
+				board_d=boardDepth[j]
+				gosub 9100
+			endif
+		endif
+
+		board_d=boardDepth[j]
+		if _bBoardDepth2_9 & board_hpos[i]="2" then board_d=boardDepth[2]
+		addy board_d
+	next j
+	del board_n*2
+return
+
+!--- 巾木
+"habaki_sub":
+	if board1_bboard[i] then				!---手前巾木
+		if app3d_f then						!複線
+			add 0, dia/2, 0
+				block a, 0.04, 0.24
+			del 1
+		else							!単線
+			add 0, dia/2, 0
+				block a, 0.04, 0.24
+			del 1
+		endif
+	endif
+	
+	if board2_bboard[i] then				!---奥巾木
+		if app3d_f then						!複線
+			add 0, b-0.04-dia/2, 0
+				block a, 0.04, 0.24
+			del 1
+		else							!単線
+			add 0, b-0.04-dia/2, 0
+				block a, 0.04, 0.24
+			del 1
+		endif
+	endif
+	
+	if board3_bboard[i] then				!--- 側面巾木
+		if app3d_f then						!複線
+			add dia/2, dia/2+0.04, 0
+				block 0.04, b-dia-0.04*2, 0.24
+			del 1
+		else							!単線
+			add dia/2, dia/2+0.04, 0
+				block 0.04, b-dia-0.04*2, 0.24
+			del 1
+		endif
+	endif
+return
+
+
+!-----ハッチ付布板
+9100:
+	addz c_board
+		if board_hreverse[i] then			!反転
+			addx a
+			mulx -1
+			gosub 9101	!-----ハッチ付布板
+			del 2
+		else
+			gosub 9101	!-----ハッチ付布板
+		endif
+	del 1
+return
+
+!-----ハッチ付布板 正方向
+9101:
+	if app3d_f<EPS then				!単線表示
+		poly 4,
+			0, 0     ,
+			a, 0     ,
+			a, side_w,
+			0, side_w
+	
+		poly 4,
+			0, c_board_b       ,
+			a, c_board_b       ,
+			a, c_board_b-side_w,
+			0, c_board_b-side_w
+	
+		addy side_w
+			poly 4,
+				0          , 0                 ,
+				0.064+c_b_1, 0                 ,
+				0.064+c_b_1, c_board_b-side_w*2,
+				0          , c_board_b-side_w*2
+
+		addx 0.064+c_b_1+hatch
+			poly 4,
+				0                    , 0                 ,
+				(a-0.064-c_b_1-hatch), 0                 ,
+				(a-0.064-c_b_1-hatch), c_board_b-side_w*2,
+				0                    , c_board_b-side_w*2
+		del 2
+	
+		if board_hopen[i]="閉" or GLOB_CONTEXT=2 then				!ハッチ閉
+			add 0.064+c_b_1, side_w, 0
+				plane 4,
+					0    , 0                 , 0,
+					hatch, 0                 , 0,
+					hatch, c_board_b-side_w*2, 0,
+					0    , c_board_b-side_w*2, 0
+			del 1
+		else
+			add 0.064+c_b_1, side_w, 0
+				plane 4,
+					0    , 0, 0                 ,
+					hatch, 0, 0                 ,
+					hatch, 0, c_board_b-side_w*2,
+					0    , 0, c_board_b-side_w*2
+			del 1
+		endif
+		
+		add ladder_br, (c_board_b-0.37)/2, -c_board
+			gosub 9050		!-----はしごブラケット
+		del 1
+		add ladder_br, (c_board_b-0.347)/2, -0.12
+			gosub 9300		!-----はしご
+		del 1
+	else						!複線表示
+		gosub 9102		!-----ハッチ付布板 側面
+
+		addy c_board_b
+		muly -1
+			gosub 9102		!-----ハッチ付布板 側面
+		del 2
+		
+		add 0.064, side_w, -c_board
+			block c_b_1, c_board_b-side_w*2, c_board
+		addx c_b_1+hatch
+			block (a-0.064*2-c_b_1-hatch), c_board_b-side_w*2, c_board
+		del 2
+		
+		if board_hopen[i]="閉" or GLOB_CONTEXT=2 then				!ハッチ閉
+			add 0.064+c_b_1, side_w, -c_board
+				block hatch, c_board_b-side_w*2, c_board
+				lin_ 0    , c_board_b-side_w*2, c_board, hatch/2, 0, c_board
+				lin_ hatch, c_board_b-side_w*2, c_board, hatch/2, 0, c_board
+			del 1
+		else
+			add 0.064+c_b_1, side_w, 0
+				block hatch, c_board, c_board_b-side_w*2
+			del 1
+		endif
+		
+		add ladder_br, (c_board_b-0.37)/2, -c_board
+			gosub 9050		!-----はしごブラケット
+		del 1
+		add ladder_br, (c_board_b-0.347)/2, -0.12
+			gosub 9300		!-----はしご
+		del 1
+	endif
+return
+
+!-----ハッチ付布板 側面
+9102:
+	addz -0.05
+	rotx 90
+		prism 12, -side_w,
+			-0.03 , 0   ,
+			-0.02 , 0   ,
+			-0.02 , 0.04,
+			0.02  , 0.04,
+			0.02  , 0   ,
+			a-0.02, 0   ,
+			a-0.02, 0.04,
+			a+0.02, 0.04,
+			a+0.02, 0   ,
+			a+0.03, 0   ,
+			a+0.03, 0.05,
+			-0.03 , 0.05
+	del 2
+return
+
+!---------------------------
+!-----はしご
+9300:
+	if board_huse[i]="使用時" then
+		gosub 9340		!-----はしご開
+	else
+		gosub 9330		!-----はしご閉
+	endif
+return
+
+!-----はしご閉
+9330:
+	gosub 9310		!-----はしご上段
+	add 0.055, 0, 0.049
+		gosub 9320		!-----はしご下段
+	del 1
+return
+
+!-----はしご開
+9340:
+	roty 72.8
+		gosub 9310		!-----はしご上段
+	add 0.055+0.6, 0, 0.049
+		gosub 9320		!-----はしご下段
+	del 2
+return
+
+!-----はしご上段
+9310:
+	if app3d_f<EPS then				!単線表示
+		rotx 90
+		mulz -1
+			lin_ 0, 0, 0       , 1.067, 0, 0
+			lin_ 0, 0, ladder_w, 1.067, 0, ladder_w
+		add 0.27-lad_step_d/2, 0, ladder_fd
+			lin_ 0, 0, -ladder_fd, 0, 0, ladder_w-ladder_fd
+		addx 0.26
+			lin_ 0, 0, -ladder_fd, 0, 0, ladder_w-ladder_fd
+		addx 0.26
+			lin_ 0, 0, -ladder_fd, 0, 0, ladder_w-ladder_fd
+		del 5
+	else						!複線表示
+		rotx 90
+		mulz -1
+			gosub 9301	!---はしご上　側面
+		addz ladder_w-ladder_fd
+			gosub 9301	!---はしご上　側面
+		del 1
+		
+		add 0.27-lad_step_d/2, -ladder_fw/2, ladder_fd
+			block lad_step_d, ladder_fw, ladder_w-ladder_fd*2
+		addx 0.26
+			block lad_step_d, ladder_fw, ladder_w-ladder_fd*2
+		addx 0.26
+			block lad_step_d, ladder_fw, ladder_w-ladder_fd*2
+		del 5
+	endif
+return
+
+!---はしご上　側面
+9301:
+	prism 10, ladder_fd,
+		0.02 , -ladder_fw/2    ,
+		1.067, -ladder_fw/2    ,
+		1.067, ladder_fw/2     ,
+		0.055, ladder_fw/2     ,
+		0.045, ladder_fw/2+0.01,
+		-0.03, ladder_fw/2+0.01,
+		-0.03, -ladder_fw/2    ,
+		-0.02, -ladder_fw/2    ,
+		-0.02, 0.0105          ,
+		0.02 , 0.0105
+return
+
+!---はしご下　側面
+9302:
+	prism 4, ladder_fd,
+		0    , -ladder_fw/2,
+		1    , -ladder_fw/2,
+		1.012, ladder_fw/2 ,
+		0    , ladder_fw/2
+return
+
+!-----はしご下段
+9320:
+	if app3d_f<EPS then				!単線表示
+		rotx 90
+		mulz -1
+			lin_ 0, 0, 0       , 1.012, 0, 0
+			lin_ 0, 0, ladder_w, 1.012, 0, ladder_w
+		add 0.04+0.26-lad_step_d/2, 0, ladder_fd
+			lin_ 0, 0, -ladder_fd, 0, 0, ladder_w-ladder_fd
+		addx 0.26
+			lin_ 0, 0, -ladder_fd, 0, 0, ladder_w-ladder_fd
+		addx 0.26
+			lin_ 0, 0, -ladder_fd, 0, 0, ladder_w-ladder_fd
+		del 5
+	else						!複線表示
+		rotx 90
+		mulz -1
+			gosub 9302	!---はしご下　側面
+		addz ladder_w-ladder_fd
+			gosub 9302	!---はしご下　側面
+		del 1
+		
+		add 0.04+0.26-lad_step_d/2, -ladder_fw/2, ladder_fd
+			block lad_step_d, ladder_fw, ladder_w-ladder_fd*2
+		addx 0.26
+			block lad_step_d, ladder_fw, ladder_w-ladder_fd*2
+		addx 0.26
+			block lad_step_d, ladder_fw, ladder_w-ladder_fd*2
+		del 3
+		
+		addx 0.08-0.05/2
+			gosub 9303		!-----はしご接続金物
+		addz ladder_w
+		mulz -1
+			gosub 9303		!-----はしご接続金物
+		del 2
+		addx 0.3
+			gosub 9303		!-----はしご接続金物
+		addz ladder_w
+		mulz -1
+			gosub 9303		!-----はしご接続金物
+		del 6
+	endif
+return
+
+!-----はしご接続金物
+9303:
+	roty 90
+	prism 8, 0.05,
+		0         , ladder_fw/2                      ,
+		-ladder_fd, ladder_fw/2                      ,
+		-ladder_fd, ladder_fw/2+0.005                ,
+		0.005     , ladder_fw/2+0.005                ,
+		0.005     , -ladder_fw/2-0.01-ladder_fw-0.005,
+		-ladder_fd, -ladder_fw/2-0.01-ladder_fw-0.005,
+		-ladder_fd, -ladder_fw/2-0.01-ladder_fw      ,
+		0         , -ladder_fw/2-0.01-ladder_fw
+	del 1
+return
+
+!-----はしごブラケット
+9050:
+	if app3d_f<EPS then				!単線表示
+		lin_ 0, 0   , c_board      , 0, 0   , -0.12+c_board
+		lin_ 0, 0.37, c_board      , 0, 0.37, -0.12+c_board
+		lin_ 0, 0   , -0.12+c_board, 0, 0.37, -0.12+c_board
+	else						!複線表示
+		rotx 90
+			gosub 9051
+		addz -0.37-0.005
+			gosub 9051
+		del 1
+		addy -0.095
+		mulz -1
+			cylind 0.37, dia2/2
+		del 3
+	endif
+return
+
+!-----はしごブラケット側部
+9051:
+	prism_ 5, 0.005,
+		-0.02, 0            , 79     ,
+		0.02 , 0            , 79     ,
+		0.02 , -0.12+c_board, 79     ,
+		-0.02, -0.12+c_board, 1000+79,
+		-0.02, 0            , -1
+return
+
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+"preview_num":
+	style "preview_3D"
+
+	material 0
+	pen 1
+	for i=1 to 4
+		if i=1 then add -0.3 , -0.3 , 0
+		if i=2 then add -0.3 , b+0.3, 0
+		if i=3 then add a+0.3, b+0.3, 0
+		if i=4 then add a+0.3, -0.3 , 0
+			text 0.01, 0, str(i, -1, 0)
+		del 1
+	next i
+return
+
+
+
+!--------------------------------------------------------------------------
+!クサビ足場用アルミ階段
+!--------------------------------------------------------------------------
+	"fn_step":
+		!--------------------------------------------------------------------------
+		!クサビ足場用アルミ階段(master)
+		!--------------------------------------------------------------------------
+			!---階段受取付時
+			plateLen=0.14			!--- 階段受のサイズ
+			plateAng=46.51
+
+			stepPosX=0
+			stepPosZ=0
+			if _bottomFlag then
+				stepPosX=(plateLen*cos(plateAng))
+				stepPosZ=(plateLen*sin(plateAng)) 
+			endif
+
+			if unitType=1 then
+				scaffold_a=1.829+stepPosX
+			else
+				scaffold_a=1.8+stepPosX
+			endif
+
+			scaffold_b=0.42
+
+			scaffold_zzyzx=1.8+stepPosZ 
+			if _bottomFlag then scaffold_zzyzx=1.595+stepPosZ
+
+			orgpos_y=0.1					! 配置基準点
+
+			ladder_dia=0.0486				! パイプ径
+
+			ang=atn(scaffold_zzyzx/scaffold_a)				! 階段角度
+			ladder_l=sqr(scaffold_a^2+scaffold_zzyzx^2)		! 階段長さ
+
+			ladder_ex=0.045					! 階段芯ー延長サイズ
+
+			frame_w=0.03					! フレーム厚
+			frame_d=0.078					! フレーム幅
+
+			scaffold_dan=8					! 階段段数
+			scaffold_dan_x=scaffold_a/(scaffold_dan+1)				! 1段当りの間隔　幅
+			scaffold_dan_z=scaffold_zzyzx/(scaffold_dan+1)			! 1段当りの間隔　高
+
+			step_w=scaffold_b-frame_w/2-frame_w/2		! ステップ幅
+			step_d=0.208					! ステップ奥行
+			step_h=0.03						! ステップ高
+		!--------------------------------------------------------------------------
+		!--------------------------------------------------------------------------
+
+		board_d=boardDepth[1]
+		add -stepPosX, -orgpos_y2+(board_d-stair_d)/2, -stepPosZ
+		muly -1
+			resol res
+			material mat
+
+			if not(bCalledSetObject) then
+				hotspot stepPosX, 0              , stepPosZ, unID_3D : unID_3D=unID_3D+1
+				hotspot stepPosX, -(orgpos_y*2+scaffold_b), stepPosZ, unID_3D : unID_3D=unID_3D+1
+				
+				addy -orgpos_y
+					hotspot 0, 0 , 0    , unID_3D : unID_3D=unID_3D+1
+					hotspot scaffold_a, 0 , scaffold_zzyzx, unID_3D : unID_3D=unID_3D+1
+					hotspot 0, -scaffold_b, 0    , unID_3D : unID_3D=unID_3D+1
+					hotspot scaffold_a, -scaffold_b, scaffold_zzyzx, unID_3D : unID_3D=unID_3D+1
+				del 1
+			endif
+				
+			addy -orgpos_y
+				if GLOB_CONTEXT=4 then						!---断面図／立面図
+					if details_elevation then
+						gosub 1000	!---複線表示
+					else
+						gosub 2000	!---単線表示
+					endif
+				else
+					if GLOB_CONTEXT=3 or GLOB_CONTEXT=5 then		!---3D表示／ダイアログ
+						if details_3d then
+							gosub 1000	!---複線表示
+						else
+							gosub 2000	!---単線表示
+						endif
+					else
+						gosub 1000	!---複線表示
+					endif
+				endif
+			del 1
+		del 2
+	return
+
+	!----複線表示
+	1000:
+		model solid
+		roty -ang
+			gosub 100		!フレーム 片側
+		addy -scaffold_b
+			gosub 100		!フレーム 片側
+		del 2
+		
+		for m=1 to scaffold_dan
+			add scaffold_dan_x*m, 0, scaffold_dan_z*m
+				gosub 1010		!-----段板 1枚
+			del 1
+		next m
+	return
+
+	!-----段板 1枚
+	1010:
+		addy -scaffold_b/2
+			prism 4, -step_h,
+				-step_d/2, -step_w/2,
+				-step_d/2, step_w/2 ,
+				step_d/2 , step_w/2 ,
+				step_d/2 , -step_w/2
+		del 1
+	return
+
+	!----フレーム 片側
+	100:
+		rotx 90
+		addz -frame_w/2
+			prism 12, frame_w,
+				-ladder_ex   , frame_d/2   ,
+				-ladder_ex   , -frame_d/2  ,
+				-ladder_dia/2, -frame_d/2  ,
+				-ladder_dia/2, ladder_dia/2,
+				ladder_dia/2 , ladder_dia/2,
+				ladder_dia/2 , -frame_d/2  ,
+			
+				ladder_l-ladder_dia/2, -frame_d/2  ,
+				ladder_l-ladder_dia/2, ladder_dia/2,
+				ladder_l+ladder_dia/2, ladder_dia/2,
+				ladder_l+ladder_dia/2, -frame_d/2  ,
+				ladder_l+ladder_ex   , -frame_d/2  ,
+				ladder_l+ladder_ex   , frame_d/2
+		del 2
+	return
+
+	!-----------------------------------------------------------------------------------
+	!----単線表示
+	2000:
+		model wire
+		
+		lin_ -0.0164 , 0, 0    , 0.014   , 0, 0
+		lin_ scaffold_a-0.0226, 0, scaffold_zzyzx, scaffold_a+0.0192, 0, scaffold_zzyzx
+		lin_ 0       , 0, 0    , scaffold_a       , 0, scaffold_zzyzx
+		
+		addy -scaffold_b
+			lin_ -0.0164 , 0, 0    , 0.014   , 0, 0
+			lin_ scaffold_a-0.0226, 0, scaffold_zzyzx, scaffold_a+0.0192, 0, scaffold_zzyzx
+			lin_ 0       , 0, 0    , scaffold_a       , 0, scaffold_zzyzx
+		del 1
+		
+		for m=1 to scaffold_dan
+			add scaffold_dan_x*m, 0, scaffold_dan_z*m
+				gosub 2010		!-----段板 1枚
+			del 1
+		next m
+	return
+
+	!-----段板 1枚
+	2010:
+		addy -scaffold_b/2
+			poly 4,
+				-step_d/2, -step_w/2,
+				-step_d/2, step_w/2 ,
+				step_d/2 , step_w/2 ,
+				step_d/2 , -step_w/2
+		del 1
+	return
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!支柱
+!--------------------------------------------------------------------------
+	"pillar":
+		resol res
+		material mat
+
+		if GLOB_CONTEXT=4 then						!---断面図／立面図
+			if details_elevation then
+				gosub 1000+prop_code	!---複線表示
+			else
+				gosub 2000+prop_code	!---単線表示
+			endif
+		else
+			if GLOB_CONTEXT=3 or GLOB_CONTEXT=5 then		!---3D表示／ダイアログ
+				if details_3d then
+					gosub 1000+prop_code	!---複線表示
+				else
+					gosub 2000+prop_code	!---単線表示
+				endif
+			else
+				gosub 1000+prop_code	!---複線表示
+			endif
+		endif
+	return
+
+	!----金物　複線表示
+	101:
+		addz -parts_d/2
+			prism_ 33, parts_d,
+				-0.053            , 0.008069235152469 , 79,
+				-0.053            , -0.008069235152469, 79,
+				-0.04666904745726 , -0.01697056228095 , 79,
+				-0.04101219336361 , -0.01979899011754 , 79,
+				-0.03103803575686 , -0.02351232291443 , 79,
+				-0.02351232291443 , -0.03103803575686 , 79,
+				-0.01979899011754 , -0.04101219336361 , 79,
+				-0.01697056228095 , -0.04666904745726 , 79,
+				-0.008069235152467, -0.053            , 79,
+				0.008069235152471 , -0.053            , 79,
+				0.01697056228095  , -0.04666904745726 , 79,
+				0.01979899011754  , -0.04101219336361 , 79,
+				0.02351232291443  , -0.03103803575686 , 79,
+				0.03103803575686  , -0.02351232291443 , 79,
+				0.04101219336361  , -0.01979899011754 , 79,
+				0.04666904745727  , -0.01697056228095 , 79,
+				0.053             , -0.008069235152469, 79,
+				0.053             , 0.008069235152469 , 79,
+				0.04666904745727  , 0.01697056228095  , 79,
+				0.04101219336361  , 0.01979899011754  , 79,
+				0.03103803575686  , 0.02351232291443  , 79,
+				0.02351232291443  , 0.03103803575686  , 79,
+				0.01979899011754  , 0.04101219336361  , 79,
+				0.01697056228095  , 0.04666904745726  , 79,
+				0.008069235152471 , 0.053             , 79,
+				-0.008069235152467, 0.053             , 79,
+				-0.01697056228095 , 0.04666904745726  , 79,
+				-0.01979899011754 , 0.04101219336361  , 79,
+				-0.02351232291443 , 0.03103803575686  , 79,
+				-0.03103803575686 , 0.02351232291443  , 79,
+				-0.04101219336361 , 0.01979899011754  , 79,
+				-0.04666904745726 , 0.01697056228095  , 79,
+				-0.053            , 0.008069235152469 , -1
+		del 1
+	return
+
+	!----複線表示
+	1001:
+		model solid
+
+		if joint then				!---ピン有
+			cylind prop, pillar_dia/2
+			addz prop
+				cylind 0.13, pillar_dia2/2
+			del 1
+		else					!---ピン無
+			cylind prop-0.025, pillar_dia/2
+		endif
+
+
+		addz 0.38
+			for m=0 to 7
+				if bCalledSetObject=1 & GLOB_PREVIEW_MODE=1 & m=section_no-1 then
+					_mat="mat_red"
+				else
+					_mat=mat
+				endif
+				
+				material _mat
+				addz 0.45*m
+					gosub 101
+				del 1
+			next m
+		del 1
+	return
+
+	!----単線表示
+	2001:
+		model wire
+		if joint then				!---ピン有
+			lin_ 0, 0, 0, 0, 0, prop
+		else					!---ピン無
+			lin_ 0, 0, 0, 0, 0, prop-0.025
+		endif
+
+		addz 0.38
+			for m=0 to 7
+				addz 0.45*m
+				lin_ -parts_w/2, 0, 0, parts_w/2, 0, 0
+				lin_ 0, -parts_w/2, 0, 0, parts_w/2, 0
+				del 1
+			next m
+		del 1
+	return
+	
+	!----複線表示
+	1002:
+		model solid
+
+		if joint then				!---ピン有
+			cylind prop, pillar_dia/2
+			addz prop
+				cylind 0.13, pillar_dia2/2
+			del 1
+		else					!---ピン無
+			cylind prop-0.025, pillar_dia/2
+		endif
+
+		addz 0.135
+			if bCalledSetObject=1 & GLOB_PREVIEW_MODE=1 & section_no=1 then
+				_mat="mat_red"
+			else
+				_mat=mat
+			endif
+
+			material _mat
+			gosub 101
+		del 1
+
+		addz 0.135+0.245
+			for m=0 to 5
+				if bCalledSetObject=1 & GLOB_PREVIEW_MODE=1 & m=section_no-2 then
+					_mat="mat_red"
+				else
+					_mat=mat
+				endif
+				
+				material _mat
+				addz 0.45*m
+					gosub 101
+				del 1
+			next m
+		del 1
+	return
+
+	!----単線表示
+	2002:
+		model wire
+		if joint then				!---ピン有
+			lin_ 0, 0, 0, 0, 0, prop
+		else					!---ピン無
+			lin_ 0, 0, 0, 0, 0, prop-0.025
+		endif
+
+		addz 0.135
+			lin_ -parts_w/2, 0, 0, parts_w/2, 0, 0
+			lin_ 0, -parts_w/2, 0, 0, parts_w/2, 0
+		del 1
+
+		addz 0.135+0.245
+			for m=0 to 5
+				addz 0.45*m
+					lin_ -parts_w/2, 0, 0, parts_w/2, 0, 0
+					lin_ 0, -parts_w/2, 0, 0, parts_w/2, 0
+				del 1
+			next m
+		del 1
+	return
+
+	!----複線表示
+	1003:
+		model solid
+
+		if joint then				!---ピン有
+			cylind prop, pillar_dia/2
+			addz prop
+				cylind 0.13, pillar_dia2/2
+			del 1
+		else					!---ピン無
+			cylind prop-0.025, pillar_dia/2
+		endif
+
+		addz 0.38
+			for m=0 to 3
+				addz 0.45*m
+					if bCalledSetObject=1 & GLOB_PREVIEW_MODE=1 & m=section_no-1 then
+						_mat="mat_red"
+					else
+						_mat=mat
+					endif
+				
+					material _mat
+					gosub 101
+				del 1
+			next m
+		del 1
+	return
+
+	!----単線表示
+	2003:
+		model wire
+		if joint then				!---ピン有
+			lin_ 0, 0, 0, 0, 0, prop
+		else					!---ピン無
+			lin_ 0, 0, 0, 0, 0, prop-0.025
+		endif
+
+		addz 0.38
+			for m=0 to 3
+				addz 0.45*m
+					lin_ -parts_w/2, 0, 0, parts_w/2, 0, 0
+					lin_ 0, -parts_w/2, 0, 0, parts_w/2, 0
+				del 1
+			next m
+		del 1
+	return
+
+	!----複線表示
+	1004:
+		model solid
+
+		if joint then				!---ピン有
+			cylind prop, pillar_dia/2
+			addz prop
+				cylind 0.13, pillar_dia2/2
+			del 1
+		else					!---ピン無
+			cylind prop-0.025, pillar_dia/2
+		endif
+
+		addz 0.135
+			if bCalledSetObject=1 & GLOB_PREVIEW_MODE=1 & section_no=1 then
+				_mat="mat_red"
+			else
+				_mat=mat
+			endif
+
+			material _mat
+			gosub 101
+		del 1
+
+		addz 0.135+0.245
+			for m=0 to 2
+				if bCalledSetObject=1 & GLOB_PREVIEW_MODE=1 & m=section_no-2 then
+					_mat="mat_red"
+				else
+					_mat=mat
+				endif
+				
+				material _mat
+				addz 0.45*m
+					gosub 101
+				del 1
+			next m
+		del 1
+	return
+
+	!----単線表示
+	2004:
+		model wire
+		if joint then				!---ピン有
+			lin_ 0, 0, 0, 0, 0, prop
+		else					!---ピン無
+			lin_ 0, 0, 0, 0, 0, prop-0.025
+		endif
+
+		addz 0.135
+			lin_ -parts_w/2, 0, 0, parts_w/2, 0, 0
+			lin_ 0, -parts_w/2, 0, 0, parts_w/2, 0
+		del 1
+
+		addz 0.135+0.245
+			for m=0 to 2
+				addz 0.45*m
+					lin_ -parts_w/2, 0, 0, parts_w/2, 0, 0
+					lin_ 0, -parts_w/2, 0, 0, parts_w/2, 0
+				del 1
+			next m
+		del 1
+	return
+
+	!----複線表示
+	1005:
+		model solid
+
+		if joint then				!---ピン有
+			cylind prop, pillar_dia/2
+			addz prop
+				cylind 0.13, pillar_dia2/2
+			del 1
+		else					!---ピン無
+			cylind prop-0.025, pillar_dia/2
+		endif
+
+		addz 0.135
+			if bCalledSetObject=1 & GLOB_PREVIEW_MODE=1 & section_no=1 then
+				_mat="mat_red"
+			else
+				_mat=mat
+			endif
+
+			material _mat
+			gosub 101
+		del 1
+
+		addz 0.135+0.245
+			for m=0 to 1
+				if bCalledSetObject=1 & GLOB_PREVIEW_MODE=1 & m=section_no-2 then
+					_mat="mat_red"
+				else
+					_mat=mat
+				endif
+				
+				material _mat
+				addz 0.45*m
+					gosub 101
+				del 1
+			next m
+		del 1
+	return
+
+	!----単線表示
+	2005:
+		model wire
+		if joint then				!---ピン有
+			lin_ 0, 0, 0, 0, 0, prop
+		else					!---ピン無
+			lin_ 0, 0, 0, 0, 0, prop-0.025
+		endif
+
+		addz 0.135
+			lin_ -parts_w/2, 0, 0, parts_w/2, 0, 0
+			lin_ 0, -parts_w/2, 0, 0, parts_w/2, 0
+		del 1
+
+		addz 0.135+0.245
+			for m=0 to 1
+				addz 0.45*m
+					lin_ -parts_w/2, 0, 0, parts_w/2, 0, 0
+					lin_ 0, -parts_w/2, 0, 0, parts_w/2, 0
+				del 1
+			next m
+		del 1
+	return
+
+	!----複線表示
+	1006:
+		model solid
+
+		if joint then				!---ピン有
+			cylind prop, pillar_dia/2
+			addz prop
+				cylind 0.13, pillar_dia2/2
+			del 1
+		else					!---ピン無
+			cylind prop-0.025, pillar_dia/2
+		endif
+
+		addz 0.38
+			for m=0 to 0
+				if bCalledSetObject=1 & GLOB_PREVIEW_MODE=1 then
+					_mat="mat_red"
+				else
+					_mat=mat
+				endif
+				
+				material _mat
+				addz 0.45*m
+					gosub 101
+				del 1
+			next m
+		del 1
+	return
+
+	!----単線表示
+	2006:
+		model wire
+		if joint then				!---ピン有
+			lin_ 0, 0, 0, 0, 0, prop
+		else					!---ピン無
+			lin_ 0, 0, 0, 0, 0, prop-0.025
+		endif
+
+		addz 0.38
+			for m=0 to 0
+				addz 0.45*m
+					lin_ -parts_w/2, 0, 0, parts_w/2, 0, 0
+					lin_ 0, -parts_w/2, 0, 0, parts_w/2, 0
+				del 1
+			next m
+		del 1
+	return
+
+	!----複線表示
+	1007:
+		model solid
+
+		if joint then				!---ピン有
+			cylind prop, pillar_dia/2
+			addz prop
+				cylind 0.13, pillar_dia2/2
+			del 1
+		else					!---ピン無
+			cylind prop-0.025, pillar_dia/2
+		endif
+
+		addz 0.135
+			if bCalledSetObject=1 & GLOB_PREVIEW_MODE=1 & section_no=1 then
+				_mat="mat_red"
+			else
+				_mat=mat
+			endif
+
+			material _mat
+			gosub 101
+		del 1
+
+		addz 0.135+0.245
+			for m=0 to 0
+				if bCalledSetObject=1 & GLOB_PREVIEW_MODE=1 & m=section_no-2 then
+					_mat="mat_red"
+				else
+					_mat=mat
+				endif
+				
+				material _mat
+				addz 0.45*m
+					gosub 101
+				del 1
+			next m
+		del 1
+	return
+
+	!----単線表示
+	2007:
+		model wire
+		if joint then				!---ピン有
+			lin_ 0, 0, 0, 0, 0, prop
+		else					!---ピン無
+			lin_ 0, 0, 0, 0, 0, prop-0.025
+		endif
+
+		addz 0.155
+			lin_ -parts_w/2, 0, 0, parts_w/2, 0, 0
+			lin_ 0, -parts_w/2, 0, 0, parts_w/2, 0
+		del 1
+	return
+
+	!----複線表示
+	1008:
+		model solid
+
+		if joint then				!---ピン有
+			cylind prop, pillar_dia/2
+			addz prop
+				cylind 0.13, pillar_dia2/2
+			del 1
+		else					!---ピン無
+			cylind prop-0.025, pillar_dia/2
+		endif
+
+		addz 0.155
+			if bCalledSetObject=1 & GLOB_PREVIEW_MODE=1 then
+				_mat="mat_red"
+			else
+				_mat=mat
+			endif
+
+			material _mat
+			gosub 101
+		del 1
+	return
+
+	!----単線表示
+	2008:
+		model wire
+		if joint then				!---ピン有
+			lin_ 0, 0, 0, 0, 0, prop
+		else					!---ピン無
+			lin_ 0, 0, 0, 0, 0, prop-0.025
+		endif
+
+		addz 0.155
+			lin_ -parts_w/2, 0, 0, parts_w/2, 0, 0
+			lin_ 0, -parts_w/2, 0, 0, parts_w/2, 0
+		del 1
+	return
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!拡幅狭幅ブラケット
+!--------------------------------------------------------------------------
+	"bracket":
+		resol res
+		material mat
+
+		if GLOB_CONTEXT=4 then						!---断面図／立面図
+			if details_elevation then
+				gosub "bracket_p1"	!---複線表示
+			else
+				gosub "bracket_p2"	!---単線表示
+			endif
+		else
+			if GLOB_CONTEXT=3 or GLOB_CONTEXT=5 then		!---3D表示／ダイアログ
+				if details_3d then
+					gosub "bracket_p1"	!---複線表示
+				else
+					gosub "bracket_p2"	!---単線表示
+				endif
+			else
+				gosub "bracket_p1"	!---複線表示
+			endif
+		endif
+	return
+
+	!----複線表示
+	"bracket_p1":
+		model solid
+
+		add 0.021, 0, bracket_zzyzx
+		roty 90
+			cylind 0.075-0.021, 0.043/2
+		addz 0.075-0.021
+			cylind bracket_a-0.075, bracket_dia/2
+		del 3
+
+		tube 2, 6, 1+2+16+32,
+			0, 0, 901,
+			bracket_dia2/2, 360, 4001,
+
+			0.066    , 0, 0                      , 0,
+			0.066    , 0, 0.03                   , 0,
+			0.066    , 0, 0.16                   , 0,
+			bracket_a, 0, 1.2                    , 0,
+			bracket_a, 0, bracket_zzyzx+0.07     , 0,
+			bracket_a, 0, bracket_zzyzx+0.07+0.01, 0
+
+		add bracket_a, 0, bracket_zzyzx+0.07
+			cylind 0.13, bracket_dia3/2
+		del 1
+
+		tube 2, 5, 1+2+16+32,
+			0, 0, 901,
+			bracket_dia4/2, 360, 4001,
+
+			0.0948, 0, 0.4686            , 0,
+			0.0971, 0, 0.4783            , 0,
+			0.12  , 0, 0.5776            , 0,
+			0.12  , 0, bracket_zzyzx     , 0,
+			0.12  , 0, bracket_zzyzx+0.01, 0
+
+		add bracket_a, 0, bracket_zzyzx
+			gosub "bracket_p3"			!----金物　複線表示
+		del 1
+	return
+
+	!----金物　複線表示
+	"bracket_p3":
+		addz -bracket_parts_d/2
+			prism 8, bracket_parts_d,
+				-bracket_parts_w/2, -bracket_parts_w/6,
+				-bracket_parts_w/2, bracket_parts_w/6 ,
+				-bracket_parts_w/6, bracket_parts_w/2 ,
+				bracket_parts_w/6 , bracket_parts_w/2 ,
+				bracket_parts_w/2 , bracket_parts_w/6 ,
+				bracket_parts_w/2 , -bracket_parts_w/6,
+				bracket_parts_w/6 , -bracket_parts_w/2,
+				-bracket_parts_w/6, -bracket_parts_w/2
+		del 1
+	return
+
+	!--------------------------------------------------------------------------
+	!----単線表示
+	"bracket_p2":
+		model wire
+
+		addz bracket_zzyzx
+			gosub "bracket_p4"			!---端部
+			lin_ 0.075, 0, 0, bracket_a, 0, 0
+		del 1
+
+		rotx 90
+			poly_ 4,
+				0.066    , 0.03              , 1,
+				0.066    , 0.16              , 1,
+				bracket_a, 1.2               , 1,
+				bracket_a, bracket_zzyzx+0.07, 0
+
+			poly_ 3,
+				0.0971, 0.4783       , 1,
+				0.12  , 0.5776       , 1,
+				0.12  , bracket_zzyzx, 0
+		del 1
+
+		add bracket_a, 0, bracket_zzyzx+0.07
+			lin_ -0.025/2, 0, 0, 0.025/2, 0, 0
+			lin_ 0, -0.025/2, 0, 0, 0.025/2, 0
+		del 1
+	return
+
+	!---端部
+	"bracket_p4":
+		lin_ 0.021, 0, 0.0335/2 , 0.075, 0, 0.0335/2
+		lin_ 0.021, 0, -0.0335/2, 0.075, 0, -0.0335/2
+		lin_ 0.075, 0, -0.0335/2, 0.075, 0, 0.0335/2
+	return
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!大引受A-75akk
+!--------------------------------------------------------------------------
+	"大引受A-75akk":
+		hotspot 0, 0, 0          , unID_3D=unID_3D+1
+		hotspot 0, 0, 0.131+0.003, unID_3D=unID_3D+1
+
+		material mat
+		resol res
+
+		if GLOB_VIEW_TYPE=4 | GLOB_VIEW_TYPE=5 then				!---断面図／立面図
+			if app3d then
+				gosub "大引受A-75akk_p1"
+			else
+				gosub "大引受A-75akk_p2"
+			endif
+		else
+			gosub "大引受A-75akk_p1"
+		endif
+	return
+
+	"大引受A-75akk_p2":
+		model wire
+		lin_ 0, 0, 0, 0, 0, 0.131+0.003
+
+		rotz oobikiAng
+		addz 0.131+0.003
+		roty -90
+			poly_ 4,
+				0.097, 0.15/2-0.003 , 1,
+				0    , 0.15/2-0.003 , 1,
+				0    , -0.15/2+0.003, 1,
+				0.097, -0.15/2+0.003, 0
+		del 3
+	return
+
+	"大引受A-75akk_p1":
+		model solid
+		rotz oobikiAng
+			cylind 0.131, 0.018		!0.002
+			add -0.0725, -0.075, 0.131
+				block 0.145, 0.150, 0.003
+			addz 0.003
+			
+				block 0.145, 0.003, 0.097
+			addy 0.147
+				block 0.145, 0.003, 0.097
+			del 3
+		del 1
+	return
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!ロング大引受ジャッキakk
+!--------------------------------------------------------------------------
+	"ロング大引受ジャッキakk":
+		hotspot 0, 0, 0                , unID_3D=unID_3D+1
+		hotspot 0, 0, oobikiJackH+0.006, unID_3D=unID_3D+1
+
+		material mat
+		resol res
+
+		if GLOB_VIEW_TYPE=4 | GLOB_VIEW_TYPE=5 then				!---断面図／立面図
+			if app3d then
+				gosub "ロング大引受ジャッキakk_p1"
+			else
+				gosub "ロング大引受ジャッキakk_p2"
+			endif
+		else
+			gosub "ロング大引受ジャッキakk_p1"
+		endif
+	return
+
+	"ロング大引受ジャッキakk_p2":
+		model wire
+		lin_ 0, 0, 0, 0, 0, oobikiJackH+0.006
+
+		rotz 90*hr
+			lin_ -0.17/2, 0, 0.0175, 0.17/2, 0, 0.0175
+		del 1
+
+		rotz oobikiAng
+		addz oobikiJackH+0.006
+		roty -90
+			poly_ 4,
+				0.084-0.006, 0.15/2 , 1,
+				0          , 0.15/2 , 1,
+				0          , -0.15/2, 1,
+				0.084-0.006, -0.15/2, 0
+		del 3
+	return
+
+
+	"ロング大引受ジャッキakk_p1":
+		model solid
+		cylind 0.034, 0.025
+		addz 0.034
+			cylind oobikiJackH-0.034, 0.017
+		del 1
+		
+		rotz 90*hr
+		add -0.17/2, 0, 0.0175
+		roty 90
+			cylind 0.17, 0.006
+		del 3
+		
+		rotz oobikiAng
+		addz oobikiJackH
+		addx -0.0725
+		addy -0.075
+			block 0.145, 0.15, 0.006
+		addy -0.006
+			block 0.145, 0.006, 0.084
+		addy 0.15+0.006
+			block 0.145, 0.006, 0.084
+		del 5+1
+	return
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!布材
+!--------------------------------------------------------------------------
+	"布材":
+		resol res
+		material mat
+
+		hotspot 0, 0, 0, unID_3D : unID_3D=unID_3D+1
+		hotspot board_a, 0, 0, unID_3D : unID_3D=unID_3D+1
+
+
+		if GLOB_CONTEXT=4 then						!---断面図／立面図
+			if details_elevation then
+				gosub "布材_p1"	!---複線表示
+			else
+				gosub "布材_p2"	!---単線表示
+			endif
+		else
+			if GLOB_CONTEXT=3 or GLOB_CONTEXT=5 then		!---3D表示／ダイアログ
+				if details_3d then
+					gosub "布材_p1"	!---複線表示
+				else
+					gosub "布材_p2"	!---単線表示
+				endif
+			else
+				gosub "布材_p1"		!---複線表示
+			endif
+		endif
+	return
+
+	!----複線表示
+	"布材_p1":
+		model solid
+		addx 0.021
+		roty 90
+			cylind 0.075-0.021, 0.043/2
+		addz 0.075-0.021
+			cylind board_a-0.075*2, board_dia/2
+		addz board_a-0.075*2
+			cylind 0.075-0.021, 0.043/2
+		del 4
+	return
+
+	!----単線表示
+	"布材_p2":
+		model wire
+		gosub "布材_p3"				!---端部
+		addx board_a
+		mulx -1
+			gosub "布材_p3"			!---端部
+		del 2
+		lin_ 0.075, 0, 0, board_a-0.075, 0, 0
+	return
+
+	!---端部
+	"布材_p3":
+		lin_ 0.021, 0, 0.0335/2 , 0.075, 0, 0.0335/2
+		lin_ 0.021, 0, -0.0335/2, 0.075, 0, -0.0335/2
+		lin_ 0.075, 0, -0.0335/2, 0.075, 0, 0.0335/2
+	return
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!強化方づえ
+!--------------------------------------------------------------------------
+	"強化方づえ":
+		resol res
+		material mat
+
+		hotspot 0, 0, 0     , unID_3D : unID_3D=unID_3D+1
+		hotspot cane_a, 0, -cane_zzyzx, unID_3D : unID_3D=unID_3D+1
+
+		if GLOB_CONTEXT=4 then						!---断面図／立面図
+			if details_elevation then
+				gosub "強化方づえ_p1"	!---複線表示
+			else
+				gosub "強化方づえ_p2"	!---単線表示
+			endif
+		else
+			if GLOB_CONTEXT=3 or GLOB_CONTEXT=5 then		!---3D表示／ダイアログ
+				if details_3d then
+					gosub "強化方づえ_p1"	!---複線表示
+				else
+					gosub "強化方づえ_p2"	!---単線表示
+				endif
+			else
+				gosub "強化方づえ_p1"		!---複線表示
+			endif
+		endif
+	return
+
+	!----複線表示
+	"強化方づえ_p1":
+		model solid
+
+		gosub "強化方づえ_p3"		!上部ガイド
+		addz -0.0827
+		roty 90+62
+			cylind 0.416, cane_dia/2
+		del 2
+
+		add cane_a-0.0223-cane_gw2, -cane_gw1/2, -cane_zzyzx-cane_gw3/2
+			block cane_gw2, cane_gw1, cane_gw3
+		del 1
+	return
+
+	!---上部ガイド
+	"強化方づえ_p3":
+		rotx 90
+		roty 90
+		addz -0.03/2
+			prism_ 9, 0.03,
+				-0.03707707888384, 0.0008540471181551, 79,
+				-0.03884470156687, -0.01459388782456 , 79,
+				-0.01977579344491, -0.06698552545918 , 79,
+				0.03965024411187 , -0.06698552545918 , 79,
+				0.05686512344161 , -0.0549319399947  , 79,
+				0.003285869936107, 0.03484809999029  , 79,
+				-0.01094525509381, 0.03324478123555  , 79,
+				-0.02950805273156, 0.01881469241398  , 79,
+				-0.03707707888384, 0.0008540471181551, -1
+
+			prism_ 5, 0.03,
+				-0.01719611356763, -0.06698552545918, 15,
+				-0.01719611356763, -0.09698532653506, 15,
+				0.01720367705567 , -0.09698532653506, 15,
+				0.01720367705567 , -0.06698552545918, 15,
+				-0.01719611356763, -0.06698552545918, -1
+		del 3
+	return
+
+	!----単線表示
+	"強化方づえ_p2":
+		model wire
+		lin_ 0, 0, 0, 0, 0, -0.0827
+
+		addz -0.0827
+		roty 90+62
+			lin_ 0, 0, 0, 0, 0, 0.416
+		del 2
+
+		add cane_a-0.0223-0.0374, 0, -cane_zzyzx
+			lin_ 0, 0, 0, cane_gw2, 0, 0
+		del 1
+	return
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!先行手摺ブレース
+!--------------------------------------------------------------------------
+	"先行手摺ブレース":
+		brace_a=led_Length
+		brace_bhl=brace_a-0.025*2			!ブレース水平長
+		brace_bw=brace_a-0.0636-0.0883		!ブレース水平基準幅
+		brace_ang=atn(brace_bh/brace_bw)	!ブレース水平基準角度
+		brace_bl=sqr(brace_bw^2+brace_bh^2)	!ブレース傾斜長さ
+
+		resol res
+		material mat
+
+		addy 0
+			if GLOB_CONTEXT=4 then						!---断面図／立面図
+				if details_elevation then
+					gosub "先行手摺ブレース_p1"	!---複線表示
+				else
+					gosub "先行手摺ブレース_p2"	!---単線表示
+				endif
+			else
+				if GLOB_CONTEXT=3 or GLOB_CONTEXT=5 then		!---3D表示／ダイアログ
+					if details_3d then
+						gosub "先行手摺ブレース_p1"	!---複線表示
+					else
+						gosub "先行手摺ブレース_p2"	!---単線表示
+					endif
+				else
+					gosub "先行手摺ブレース_p1"		!---複線表示
+				endif
+			endif
+		del 1
+	return
+
+	!----複線表示
+	"先行手摺ブレース_p1":
+		model solid
+
+		rotx 90
+			gosub "先行手摺ブレース_p3"			!ブレースステイ
+			ll1=brace_bl
+			ll2=0.1
+			dd1=brace_dia4
+			dd2=0.0315
+		addx 0.0883
+		rotz brace_ang
+			gosub "先行手摺ブレース_p4"			!---ブレース傾斜部
+		del 2
+
+		addx brace_a
+		mulx -1
+			gosub "先行手摺ブレース_p3"			!ブレースステイ
+		addx 0.0883
+		rotz brace_ang
+			gosub "先行手摺ブレース_p4"			!---ブレース傾斜部
+		del 4
+
+		add 0.1105, brace_bh+0.0279, 0
+			ll1=brace_a-0.1105*2
+			ll2=0.055
+			dd1=brace_dia3
+			dd2=0.038
+			gosub "先行手摺ブレース_p4"			!---ブレース傾斜部
+		del 2
+	return
+
+	!----ブレースステイ
+	"先行手摺ブレース_p3":
+		add 0.0223, 0, -0.03/2
+			prism 4, 0.03,
+				0     , -0.024,
+				0.0775, -0.024,
+				0.0775, 0.024 ,
+				0     , 0.024
+		addy brace_bh
+			prism 4, 0.03,
+				0     , 0     ,
+				0     , -0.025,
+				0.0882, -0.025,
+				0.0882, 0.0459
+		del 2
+	return
+
+	!-----パイプ　両端平
+	"先行手摺ブレース_p4":
+		gosub "先行手摺ブレース_p5"
+		addx ll1
+		mulx -1
+			gosub "先行手摺ブレース_p5"
+		del 2
+
+		addx ll2
+		roty 90
+			cylind ll1-ll2*2, dd1/2
+		del 2
+	return
+
+	"先行手摺ブレース_p5":
+		addz -0.01/2
+			prism 6, 0.01,
+				0       , -dd2/2,
+				ll2-0.02, -dd2/2,
+				ll2     , -dd1/2,
+				ll2     , dd1/2 ,
+				ll2-0.02, dd2/2 ,
+				0       , dd2/2
+		del 1
+	return
+
+	!----単線表示
+	"先行手摺ブレース_p2":
+		model wire
+
+		gosub "先行手摺ブレース_p6"			!---片側ブレース
+		addx brace_a
+		mulx -1
+			gosub "先行手摺ブレース_p6"			!---片側ブレース
+		del 2
+
+		lin_ 0.09, 0, brace_bh+0.0279, brace_a-0.09, 0, brace_bh+0.0279
+	return
+
+	"先行手摺ブレース_p6":
+		lin_ 0.0369       , 0, -0.02, 0.0369+0.0299, 0, -0.02
+		lin_ 0.0369+0.0299, 0, -0.02, 0.0369+0.0299, 0, 0.02
+		lin_ 0.0369       , 0, 0.02 , 0.0369+0.0299, 0, 0.02
+
+		lin_ 0.0668, 0, 0, 0.0883        , 0, 0
+		lin_ 0.0883, 0, 0, brace_a-0.0636, 0, 0.93
+
+		lin_ 0.0408, 0, brace_bh-0.063 , 0.0408, 0, brace_bh-0.0241
+		lin_ 0.0408, 0, brace_bh-0.0241, 0.09  , 0, brace_bh+0.0279
+	return
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!梁枠2743
+!--------------------------------------------------------------------------
+	"梁枠2743":
+		resol res
+		material mat
+
+		hotspot 0, 0, 0, unID_3D : unID_3D=unID_3D+1
+		hotspot beam2743_a, 0, 0, unID_3D : unID_3D=unID_3D+1
+
+		if not(bCalledSetObject) then
+			hotspot 0, 0, -beam2743_zzyzx, unID_3D : unID_3D=unID_3D+1
+			hotspot beam2743_a, 0, -beam2743_zzyzx, unID_3D : unID_3D=unID_3D+1
+		endif
+
+		if GLOB_VIEW_TYPE=4 | GLOB_VIEW_TYPE=5 then				!---断面図／立面図
+			if details_elevation then
+				gosub "梁枠2743_p1"	!---複線表示
+			else
+				gosub "梁枠2743_p2"	!---単線表示
+			endif
+		else
+			if GLOB_VIEW_TYPE=3 | GLOB_PREVIEW_MODE=1 then		!---3D表示／ダイアログ
+				if details_3d then
+					gosub "梁枠2743_p1"	!---複線表示
+				else
+					gosub "梁枠2743_p2"	!---単線表示
+				endif
+			else
+				gosub "梁枠2743_p1"	!---複線表示
+			endif
+		endif
+	return
+
+	!--- 複線表示
+	"梁枠2743_p1":
+		model solid
+		
+		gosub "梁枠2743_p3"			! ベースパイプ複線
+		gosub "梁枠2743_p4"			! 支柱
+		
+		add beam2743_bp1, 0, -beam2743_zzyzx
+		roty 90
+			cylind beam2743_bp_len, beam2743_dia/2
+		del 2
+
+		addx -beam2743_widthDif
+			addx 0.179				!---1
+			roty 90+45
+				cylind beam2743_baluster_l, beam2743_dia1/2
+			del 2
+			
+			addx 0.179+0.7			!---2
+			roty 90+135
+				cylind beam2743_baluster_l, beam2743_dia1/2
+			del 2
+			
+			addx 0.179+0.7+0.2			!---3
+			roty 90+45
+				cylind beam2743_baluster_l, beam2743_dia1/2
+			del 2
+			
+			addx 0.179+0.7+0.2+0.7			!---4
+			roty 90+135
+				cylind beam2743_baluster_l, beam2743_dia1/2
+			del 2
+			
+			addx 0.179+0.7+0.2+0.7+0.1		!---5
+			roty 90+45
+				cylind beam2743_baluster_l, beam2743_dia1/2
+			del 2
+			
+			addx 0.179+0.7+0.2+0.7+0.1+0.7		!---6
+			roty 90+135
+				cylind beam2743_baluster_l, beam2743_dia1/2
+			del 2
+		del 1
+	return
+
+	!--- ベースパイプ複線
+	"梁枠2743_p3":
+		addx 0.021
+		roty 90
+			cylind 0.075-0.021, 0.043/2
+		addz 0.075-0.021
+			cylind beam2743_a-0.075*2, beam2743_dia/2
+		addz beam2743_a-0.075*2
+			cylind 0.075-0.021, 0.043/2
+		del 4
+	return
+
+	!--- 支柱
+	"梁枠2743_p4":
+		addx prop_p1
+			gosub "梁枠2743_p5"
+		del 1
+
+		add prop_p1, 0, -beam2743_zzyzx-0.03
+			cylind prop_h, beam2743_dia2/2
+			
+			addz 0.1
+				gosub "梁枠2743_p5"
+			del 1
+		
+			if jp=int(1) then		!ジョイント有
+				gosub "梁枠2743_p6"		!---ジョイント
+			endif
+		del 1
+	return
+
+	!--- ジョイント
+	"梁枠2743_p6":
+		addz prop_h
+			cylind 0.025, beam2743_dia2/2
+		addz 0.025
+			cylind 0.13, beam2743_dia3/2
+		del 2
+	return
+
+	!--- 金物　複線表示
+	"梁枠2743_p5":
+		addz -beam2743_parts_d/2
+		prism 8, beam2743_parts_d,
+			-beam2743_parts_w/2, -beam2743_parts_w/6,
+			-beam2743_parts_w/2, beam2743_parts_w/6 ,
+			-beam2743_parts_w/6, beam2743_parts_w/2 ,
+			beam2743_parts_w/6 , beam2743_parts_w/2 ,
+			beam2743_parts_w/2 , beam2743_parts_w/6 ,
+			beam2743_parts_w/2 , -beam2743_parts_w/6,
+			beam2743_parts_w/6 , -beam2743_parts_w/2,
+			-beam2743_parts_w/6, -beam2743_parts_w/2
+		del 1
+	return
+
+	!----単線表示
+	"梁枠2743_p2":
+		model wire
+		
+		gosub "梁枠2743_p7"				!ベースパイプ単線
+
+		add prop_p1, 0, -beam2743_zzyzx
+			gosub "梁枠2743_p10"			!支柱
+
+		del 1
+		
+		_bpPosX =(0.179-beam2743_widthDif)+ABS(beam2743_baluster_l*cos(45))
+		_bpPosX2=(0.164-beam2743_widthDif)+ABS(beam2743_baluster_l*cos(135))
+		lin_ _bpPosX, 0, -beam2743_zzyzx, beam2743_a-_bpPosX2, 0, -beam2743_zzyzx
+
+		addx -beam2743_widthDif
+			addx 0.179				!---1
+			roty 90+45
+				lin_ 0, 0, 0, 0, 0, beam2743_baluster_l
+			del 2
+			
+			addx 0.179+0.7			!---2
+			roty 90+135
+				lin_ 0, 0, 0, 0, 0, beam2743_baluster_l
+			del 2
+			
+			addx 0.179+0.7+0.2			!---3
+			roty 90+45
+				lin_ 0, 0, 0, 0, 0, beam2743_baluster_l
+			del 2
+			
+			addx 0.179+0.7+0.2+0.7			!---4
+			roty 90+135
+				lin_ 0, 0, 0, 0, 0, beam2743_baluster_l
+			del 2
+			
+			addx 0.179+0.7+0.2+0.7+0.1		!---5
+			roty 90+45
+				lin_ 0, 0, 0, 0, 0, beam2743_baluster_l
+			del 2
+			
+			addx 0.179+0.7+0.2+0.7+0.1+0.7		!---6
+			roty 90+135
+				lin_ 0, 0, 0, 0, 0, beam2743_baluster_l
+			del 2
+		del 1
+	return
+
+	!---支柱
+	"梁枠2743_p10":
+		lin_ 0, 0, 0, 0, 0, prop_h-0.03
+			
+		if jp=int(1) then				!ジョイント有
+			gosub "梁枠2743_p8"		!---ジョイント
+		endif
+	return
+
+	!---ジョイント
+	"梁枠2743_p8":
+		addz prop_h-0.03
+			lin_ 0, 0, 0, 0, 0, 0.025
+			lin_ -0.025/2, 0, 0.025, 0.025/2, 0, 0.025
+			lin_ 0, -0.025/2, 0.025, 0, 0.025/2, 0.025
+		del 1
+	return
+
+	!---ベースパイプ単線
+	"梁枠2743_p7":
+		gosub "梁枠2743_p9"			!---端部
+		addx beam2743_a
+		mulx -1
+			gosub "梁枠2743_p9"			!---端部
+		del 2
+		
+		lin_ 0.075, 0, 0, beam2743_a-0.075, 0, 0
+	return
+
+	!---端部
+	"梁枠2743_p9":
+		lin_ 0.021, 0, 0.0335/2 , 0.075, 0, 0.0335/2
+		lin_ 0.021, 0, -0.0335/2, 0.075, 0, -0.0335/2
+		lin_ 0.075, 0, -0.0335/2, 0.075, 0, 0.0335/2
+	return
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!梁枠3658
+!--------------------------------------------------------------------------
+	"梁枠3658":
+		resol res
+		material mat
+
+		hotspot 0, 0, 0, unID_3D : unID_3D=unID_3D+1
+		hotspot beam3658_a, 0, 0, unID_3D : unID_3D=unID_3D+1
+
+		if not(bCalledSetObject) then
+			hotspot 0, 0, -beam3658_zzyzx, unID_3D : unID_3D=unID_3D+1
+			hotspot beam3658_a, 0, -beam3658_zzyzx, unID_3D : unID_3D=unID_3D+1
+		endif
+
+		if GLOB_VIEW_TYPE=4 | GLOB_VIEW_TYPE=5 then		!---断面図／立面図
+			if details_elevation then
+				gosub "梁枠3658_p1"	!---複線表示
+			else
+				gosub "梁枠3658_p2"	!---単線表示
+			endif
+		else
+			if GLOB_VIEW_TYPE=3 | GLOB_PREVIEW_MODE=1 then		!---3D表示／ダイアログ
+				if details_3d then
+					gosub "梁枠3658_p1"	!---複線表示
+				else
+					gosub "梁枠3658_p2"	!---単線表示
+				endif
+			else
+				gosub "梁枠3658_p1"	!---複線表示
+			endif
+		endif
+	return
+
+	!----複線表示
+	"梁枠3658_p1":
+		model solid
+		
+		gosub "梁枠3658_p3"			!ベースパイプ複線
+		gosub "梁枠3658_p4"			!支柱
+		
+		add beam3658_bp1, 0, -beam3658_zzyzx
+		roty 90
+			cylind beam3658_bp_len, beam3658_dia/2
+		del 2
+
+		addx -beam3658_widthDif		
+			addx 0.179				!---1
+			roty 90+45
+				cylind beam3658_baluster_l, beam3658_dia1/2
+			del 2
+			
+			addx 0.179+0.7			!---2
+			roty 90+135
+				cylind beam3658_baluster_l, beam3658_dia1/2
+			del 2
+			
+			addx 0.179+0.7+0.2			!---3
+			roty 90+45
+				cylind beam3658_baluster_l, beam3658_dia1/2
+			del 2
+			
+			addx 0.179+0.7+0.2+0.7			!---4
+			roty 90+135
+				cylind beam3658_baluster_l, beam3658_dia1/2
+			del 2
+			
+			addx 0.179+0.7+0.2+0.7+0.1		!---5
+			roty 90+45
+				cylind beam3658_baluster_l, beam3658_dia1/2
+			del 2
+			
+			addx 0.179+0.7+0.2+0.7+0.1+0.7		!---6
+			roty 90+135
+				cylind beam3658_baluster_l, beam3658_dia1/2
+			del 2
+			
+			addx 0.179+0.7+0.2+0.7+0.1+0.7+0.2		!---7
+			roty 90+45
+				cylind beam3658_baluster_l, beam3658_dia1/2
+			del 2
+			
+			addx 0.179+0.7+0.2+0.7+0.1+0.7+0.2+0.7		!---8
+			roty 90+135
+				cylind beam3658_baluster_l, beam3658_dia1/2
+			del 2
+		del 1
+	return
+
+	!---ベースパイプ複線
+	"梁枠3658_p3":
+		addx 0.021
+		roty 90
+			cylind 0.075-0.021, 0.043/2
+		addz 0.075-0.021
+			cylind beam3658_a-0.075*2, beam3658_dia/2
+		addz beam3658_a-0.075*2
+			cylind 0.075-0.021, 0.043/2
+		del 4
+	return
+
+	!---支柱
+	"梁枠3658_p4":
+		addx prop_p1
+			gosub "梁枠3658_p5"
+		del 1
+
+		add prop_p1, 0, -beam3658_zzyzx-0.03
+			cylind prop_h, beam3658_dia2/2
+		addz 0.1
+			gosub "梁枠3658_p5"
+		del 1
+			if jp=int(1) then			!ジョイント有
+				gosub "梁枠3658_p6"
+			endif
+		del 1
+	return
+
+	!---ジョイント
+	"梁枠3658_p6":
+		addz prop_h
+			cylind 0.025, beam3658_dia2/2
+		addz 0.025
+			cylind 0.13, beam3658_dia3/2
+		del 2
+	return
+
+	!----金物　複線表示
+	"梁枠3658_p5":
+		addz -beam3658_parts_d/2
+		prism 8, beam3658_parts_d,
+			-beam3658_parts_w/2, -beam3658_parts_w/6,
+			-beam3658_parts_w/2, beam3658_parts_w/6 ,
+			-beam3658_parts_w/6, beam3658_parts_w/2 ,
+			beam3658_parts_w/6 , beam3658_parts_w/2 ,
+			beam3658_parts_w/2 , beam3658_parts_w/6 ,
+			beam3658_parts_w/2 , -beam3658_parts_w/6,
+			beam3658_parts_w/6 , -beam3658_parts_w/2,
+			-beam3658_parts_w/6, -beam3658_parts_w/2
+		del 1
+	return
+
+	!----単線表示
+	"梁枠3658_p2":
+		model wire
+		
+		gosub "梁枠3658_p7"				!ベースパイプ単線
+
+		add prop_p1, 0, -beam3658_zzyzx
+			gosub "梁枠3658_p10"			!支柱
+		del 1
+		
+		_bpPosX =(0.179-beam3658_widthDif)+ABS(beam3658_baluster_l*cos(45))
+		_bpPosX2=(0.179-beam3658_widthDif)+ABS(beam3658_baluster_l*cos(135))
+		lin_ _bpPosX, 0, -beam3658_zzyzx, beam3658_a-_bpPosX2, 0, -beam3658_zzyzx
+
+		addx -beam3658_widthDif
+			addx 0.179					!---1
+			roty 90+45
+				lin_ 0, 0, 0, 0, 0, beam3658_baluster_l
+			del 2
+			
+			addx 0.179+0.7				!---2
+			roty 90+135
+				lin_ 0, 0, 0, 0, 0, beam3658_baluster_l
+			del 2
+			
+			addx 0.179+0.7+0.2			!---3
+			roty 90+45
+				lin_ 0, 0, 0, 0, 0, beam3658_baluster_l
+			del 2
+			
+			addx 0.179+0.7+0.2+0.7		!---4
+			roty 90+135
+				lin_ 0, 0, 0, 0, 0, beam3658_baluster_l
+			del 2
+			
+			addx 0.179+0.7+0.2+0.7+0.1	!---5
+			roty 90+45
+				lin_ 0, 0, 0, 0, 0, beam3658_baluster_l
+			del 2
+			
+			addx 0.179+0.7+0.2+0.7+0.1+0.7			!---6
+			roty 90+135
+				lin_ 0, 0, 0, 0, 0, beam3658_baluster_l
+			del 2
+			
+			addx 0.179+0.7+0.2+0.7+0.1+0.7+0.2		!---7
+			roty 90+45
+				lin_ 0, 0, 0, 0, 0, beam3658_baluster_l
+			del 2
+			
+			addx 0.179+0.7+0.2+0.7+0.1+0.7+0.2+0.7	!---8
+			roty 90+135
+				lin_ 0, 0, 0, 0, 0, beam3658_baluster_l
+			del 2
+		del 1
+	return
+
+	!---支柱
+	"梁枠3658_p10":
+		lin_ 0, 0, 0, 0, 0, prop_h-0.03
+		
+		if jp=int(1) then			!ジョイント有
+			gosub "梁枠3658_p9"
+		endif
+	return
+
+	!---ジョイント
+	"梁枠3658_p9":
+		addz prop_h-0.03
+			lin_ 0, 0, 0, 0, 0, 0.025
+			lin_ -0.025/2, 0, 0.025, 0.025/2, 0, 0.025
+			lin_ 0, -0.025/2, 0.025, 0, 0.025/2, 0.025
+		del 1
+	return
+
+	!---ベースパイプ単線
+	"梁枠3658_p7":
+		gosub "梁枠3658_p8"			!---端部
+		addx beam3658_a
+		mulx -1
+			gosub "梁枠3658_p8"			!---端部
+		del 2
+		
+		lin_ 0.075, 0, 0, beam3658_a-0.075, 0, 0
+	return
+
+	!---端部
+	"梁枠3658_p8":
+		lin_ 0.021, 0, 0.0335/2 , 0.075, 0, 0.0335/2
+		lin_ 0.021, 0, -0.0335/2, 0.075, 0, -0.0335/2
+		lin_ 0.075, 0, -0.0335/2, 0.075, 0, 0.0335/2
+	return
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!梁枠5487
+!--------------------------------------------------------------------------
+	"梁枠5487":
+		resol res
+		material mat
+
+		hotspot 0, 0, 0, unID_3D : unID_3D=unID_3D+1
+		hotspot beam5487_a, 0, 0, unID_3D : unID_3D=unID_3D+1
+
+		if not(bCalledSetObject) then
+			hotspot 0, 0, -beam5487_zzyzx, unID_3D : unID_3D=unID_3D+1
+			hotspot beam5487_a, 0, -beam5487_zzyzx, unID_3D : unID_3D=unID_3D+1
+		endif
+		if GLOB_VIEW_TYPE=4 | GLOB_VIEW_TYPE=5 then		!---断面図／立面図
+			if details_elevation then
+				gosub "梁枠5487_p1"	!---複線表示
+			else
+				gosub "梁枠5487_p2"	!---単線表示
+			endif
+		else
+			if GLOB_VIEW_TYPE=3 | GLOB_PREVIEW_MODE=1 then		!---3D表示／ダイアログ
+				if details_3d then
+					gosub "梁枠5487_p1"	!---複線表示
+				else
+					gosub "梁枠5487_p2"	!---単線表示
+				endif
+			else
+				gosub "梁枠5487_p1"	!---複線表示
+			endif
+		endif
+	return
+
+	!----複線表示
+	"梁枠5487_p1":
+		model solid
+		
+		gosub "梁枠5487_p3"						! ベースパイプ複線
+
+		for m =1 to 2
+			addx prop_p*m
+				gosub "梁枠5487_p4"				!支柱
+			del 1
+		next m
+
+		add beam5487_bp1, 0, -beam5487_zzyzx				! 下部パイプ
+		roty 90
+			cylind beam5487_bp_len, beam5487_dia/2
+		del 2
+
+		for m=1 to 2
+			addx -beam5487_widthDif
+				addx 0.079				
+				roty 90+45
+					cylind beam5487_baluster_l, beam5487_dia1/2
+				del 2
+				
+				addx 0.079+0.8			
+				roty 90+135
+					cylind beam5487_baluster_l, beam5487_dia1/2
+				del 2
+				
+				addx 0.079+0.8+0.1			
+				roty 90+45
+					cylind beam5487_baluster_l, beam5487_dia1/2
+				del 2
+				
+				addx 0.079+0.8+0.1+0.8			
+				roty 90+135
+					cylind beam5487_baluster_l, beam5487_dia1/2
+				del 2
+			del 1
+
+			add (prop_p+prop_p/2)-0.609/2, 0, -beam5487_zzyzx
+				cylind beam5487_zzyzx, beam5487_dia1/2
+			del 1
+		addx beam5487_a
+		mulx -1
+		next m
+		del 4
+	return
+
+	!---ベースパイプ複線
+	"梁枠5487_p3":
+		addx 0.021
+		roty 90
+			cylind 0.075-0.021, 0.043/2
+		addz 0.075-0.021
+			cylind beam5487_a-0.075*2, beam5487_dia/2
+		addz beam5487_a-0.075*2
+			cylind 0.075-0.021, 0.043/2
+		del 4
+	return
+
+	!---支柱
+	"梁枠5487_p4":
+		gosub "梁枠5487_p5"
+
+		addz -beam5487_zzyzx-0.03
+			cylind beam5487_prop_h, beam5487_dia2/2
+		addz 0.1
+			gosub "梁枠5487_p5"
+		del 1
+			if jp=int(1) then			!ジョイント有
+				gosub "梁枠5487_p6"		!---ジョイント
+			endif
+		del 1
+	return
+
+	!---ジョイント
+	"梁枠5487_p6":
+		addz beam5487_prop_h
+			cylind 0.025, beam5487_dia2/2
+		addz 0.025
+			cylind 0.13, beam5487_dia3/2
+		del 2
+	return
+
+	!----金物　複線表示
+	"梁枠5487_p5":
+		addz -beam5487_parts_d/2
+			prism 8, beam5487_parts_d,
+				-beam5487_parts_w/2, -beam5487_parts_w/6,
+				-beam5487_parts_w/2, beam5487_parts_w/6 ,
+				-beam5487_parts_w/6, beam5487_parts_w/2 ,
+				beam5487_parts_w/6 , beam5487_parts_w/2 ,
+				beam5487_parts_w/2 , beam5487_parts_w/6 ,
+				beam5487_parts_w/2 , -beam5487_parts_w/6,
+				beam5487_parts_w/6 , -beam5487_parts_w/2,
+				-beam5487_parts_w/6, -beam5487_parts_w/2
+		del 1
+	return
+
+	!----単線表示
+	"梁枠5487_p2":
+		model wire
+		
+		gosub "梁枠5487_p7" !ベースパイプ単線
+
+		for m=1 to 2
+			add prop_p*m, 0, -beam5487_zzyzx
+				gosub "梁枠5487_p9"				!支柱
+			del 1
+		next m
+
+		_bpPosX =(0.079-beam5487_widthDif)+ABS(beam5487_baluster_l*cos(45))
+		_bpPosX2=(0.079-beam5487_widthDif)+ABS(beam5487_baluster_l*cos(135))
+		lin_ _bpPosX, 0, -beam5487_zzyzx, beam5487_a-_bpPosX2, 0, -beam5487_zzyzx	!下部パイプ
+
+		for m=1 to 2
+			addx -beam5487_widthDif
+				addx 0.079
+				roty 90+45
+					lin_ 0, 0, 0, 0, 0, beam5487_baluster_l
+				del 2
+				
+				addx 0.079+0.8
+				roty 90+135
+					lin_ 0, 0, 0, 0, 0, beam5487_baluster_l
+				del 2
+				
+				addx 0.079+0.8+0.1
+				roty 90+45
+					lin_ 0, 0, 0, 0, 0, beam5487_baluster_l
+				del 2
+				
+				addx 0.079+0.8+0.1+0.8
+				roty 90+135
+					lin_ 0, 0, 0, 0, 0, beam5487_baluster_l
+				del 2
+			del 1
+
+			add (prop_p+prop_p/2)-0.609/2, 0, -beam5487_zzyzx
+				lin_ 0, 0, 0, 0, 0, beam5487_zzyzx
+			del 1
+		addx beam5487_a
+		mulx -1
+		next m
+		del 4
+	return
+
+	!---ベースパイプ単線
+	"梁枠5487_p7":
+		gosub "梁枠5487_p8"			!---端部
+		addx beam5487_a
+		mulx -1
+			gosub "梁枠5487_p8"			!---端部
+		del 2
+		
+		lin_ 0.075, 0, 0, beam5487_a-0.075, 0, 0
+	return
+
+	!---支柱
+	"梁枠5487_p9":
+		lin_ 0, 0, 0, 0, 0, beam5487_prop_h-0.03
+			
+		if jp=int(1) then				!ジョイント有
+			gosub "梁枠5487_p10"		!---ジョイント
+		endif
+	return
+
+
+	!---ジョイント
+	"梁枠5487_p10":
+		addz beam5487_prop_h-0.03
+			lin_ 0, 0, 0, 0, 0, 0.025
+			lin_ -0.025/2, 0, 0.025, 0.025/2, 0, 0.025
+			lin_ 0, -0.025/2, 0.025, 0, 0.025/2, 0.025
+		del 1
+	return
+
+
+	!---端部
+	"梁枠5487_p8":
+		lin_ 0.021, 0, 0.0335/2 , 0.075, 0, 0.0335/2
+		lin_ 0.021, 0, -0.0335/2, 0.075, 0, -0.0335/2
+		lin_ 0.075, 0, -0.0335/2, 0.075, 0, 0.0335/2
+	return
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!梁枠7316
+!--------------------------------------------------------------------------
+	"梁枠7316":
+		resol res
+		material mat
+
+		hotspot 0, 0, 0, unID_3D : unID_3D=unID_3D+1
+		hotspot beam7316_a, 0, 0, unID_3D : unID_3D=unID_3D+1
+
+		if not(bCalledSetObject) then
+			hotspot 0, 0, -beam7316_zzyzx, unID_3D : unID_3D=unID_3D+1
+			hotspot beam7316_a, 0, -beam7316_zzyzx, unID_3D : unID_3D=unID_3D+1
+		endif
+
+		if GLOB_VIEW_TYPE=4 | GLOB_VIEW_TYPE=5 then		!---断面図／立面図
+			if details_elevation then
+				gosub "梁枠7316_p1"	!---複線表示
+			else
+				gosub "梁枠7316_p2"	!---単線表示
+			endif
+		else
+			if GLOB_VIEW_TYPE=3 | GLOB_PREVIEW_MODE=1 then		!---3D表示／ダイアログ
+				if details_3d then
+					gosub "梁枠7316_p1"	!---複線表示
+				else
+					gosub "梁枠7316_p2"	!---単線表示
+				endif
+			else
+				gosub "梁枠7316_p1"	!---複線表示
+			endif
+		endif
+	return
+
+	!----複線表示
+	"梁枠7316_p1":
+		model solid
+		
+		gosub "梁枠7316_p3"						! ベースパイプ複線
+
+		for m=1 to 3
+			addx prop_p*m
+				gosub "梁枠7316_p5"				!支柱
+			del 1
+		next m
+
+		for m=1 to 2
+			addz -0.31-0.054/2
+				cylind 0.054, 0.07/2 			! ガイド
+			addz 0.054/2
+			roty 90
+				cylind beam7316_bp1, 0.054/2
+			del 3
+		
+			add beam7316_bp1, 0, -beam7316_zzyzx-0.0345
+				cylind beam7316_zzyzx+0.0345, beam7316_dia/2		! 端部支柱
+			del 1
+		addx beam7316_a
+		mulx -1
+		next m 
+		del 4
+		
+		add beam7316_bp1, 0, -beam7316_zzyzx				! 下部パイプ
+		roty 90
+			cylind beam7316_bp_len, beam7316_dia/2
+		del 2
+		
+		! 1、4スパン
+		for m=1 to 2
+			addx (prop_p-beam7316_bp1)/2+beam7316_bp1
+			for ii=1 to 2
+				addx -0.04/2
+				roty 90+130
+					cylind beam7316_baluster_l, beam7316_dia1/2
+				del 1
+				
+				addx -0.7952
+				roty 90+50
+					cylind beam7316_baluster_l, beam7316_dia1/2
+				del 3
+			mulx -1
+			next ii 
+			del 2+1
+		addx beam7316_a
+		mulx -1
+		next m
+		del 4
+
+		! 2スパン
+		addx prop_p+prop_p/2
+		for ii=1 to 2
+			addx -0.06/2
+			roty 90+130
+				cylind beam7316_baluster_l, beam7316_dia1/2
+			del 1
+			
+			addx -0.8152
+			roty 90+50
+				cylind beam7316_baluster_l, beam7316_dia1/2
+			del 3
+		mulx -1
+		next ii
+		del 2+1
+			
+		! 3スパン
+		addx prop_p*2+prop_p/2
+		addz -beam7316_zzyzx
+		addx -0.213/2
+			cylind beam7316_zzyzx, beam7316_dia/2
+		addx 0.213
+			cylind beam7316_zzyzx, beam7316_dia/2
+		del 2
+
+		add -0.213/2, -0.01/2, 0
+			block 0.213, 0.01, beam7316_zzyzx
+		del 1
+		del 1
+
+		for ii=1 to 2
+			addx -0.3146/2
+			roty 90+120
+				cylind beam7316_baluster_l2, beam7316_dia1/2
+			del 1
+			
+			addx -0.697
+			roty 90+50
+				cylind beam7316_baluster_l, beam7316_dia1/2
+			del 3
+		mulx -1
+		next ii
+		del 2+1
+	return
+
+	!---ベースパイプ複線
+	"梁枠7316_p3":
+		addx 0.021
+		roty 90
+			cylind 0.075-0.021, 0.043/2
+
+		addz 0.075-0.021
+			cylind beam7316_a-0.075*2, beam7316_dia/2
+
+		addz beam7316_a-0.075*2
+			cylind 0.075-0.021, 0.043/2
+		del 4
+	return
+
+	!---支柱
+	"梁枠7316_p5":
+		gosub "梁枠7316_p4"
+
+		addz -beam7316_zzyzx-0.03
+			cylind beam7316_prop_h, beam7316_dia2/2
+			
+			addz 0.1
+				gosub "梁枠7316_p4"
+			del 1
+			
+			if jp=int(1) then			!ジョイント有
+				gosub "梁枠7316_p6"		!---ジョイント
+			endif
+		del 1
+	return
+
+	!---ジョイント
+	"梁枠7316_p6":
+		addz beam7316_prop_h
+			cylind 0.025, beam7316_dia2/2
+		addz 0.025
+			cylind 0.13, beam7316_dia3/2
+		del 2
+	return
+
+	!----金物　複線表示
+	"梁枠7316_p4":
+		addz -beam7316_parts_d/2
+			prism 8, beam7316_parts_d,
+				-beam7316_parts_w/2, -beam7316_parts_w/6,
+				-beam7316_parts_w/2, beam7316_parts_w/6 ,
+				-beam7316_parts_w/6, beam7316_parts_w/2 ,
+				beam7316_parts_w/6 , beam7316_parts_w/2 ,
+				beam7316_parts_w/2 , beam7316_parts_w/6 ,
+				beam7316_parts_w/2 , -beam7316_parts_w/6,
+				beam7316_parts_w/6 , -beam7316_parts_w/2,
+				-beam7316_parts_w/6, -beam7316_parts_w/2
+		del 1
+	return
+
+	!----単線表示
+	"梁枠7316_p2":
+		model wire
+		
+		gosub "梁枠7316_p7"							!ベースパイプ単線
+		
+		lin_ beam7316_bp1, 0, 0, beam7316_bp1, 0, -beam7316_zzyzx !スタート支柱
+		lin_ beam7316_a-beam7316_bp2, 0, 0, beam7316_a-beam7316_bp2, 0, -beam7316_zzyzx !エンド支柱
+
+		for m=1 to 3
+			add prop_p*m, 0, -beam7316_zzyzx
+				gosub "梁枠7316_p8"					!支柱
+			del 1
+		next m
+
+		lin_ beam7316_bp1, 0, -beam7316_zzyzx, beam7316_a-beam7316_bp2, 0, -beam7316_zzyzx		! 下部パイプ
+
+		! 1、4スパン
+		for m=1 to 2
+			addx (prop_p-beam7316_bp1)/2+beam7316_bp1
+			for ii=1 to 2
+				addx -0.04/2
+				roty 90+130
+					lin_ 0, 0, 0, 0, 0, beam7316_baluster_l
+				del 1
+				
+				addx -0.7952
+				roty 90+50
+					lin_ 0, 0, 0, 0, 0, beam7316_baluster_l
+				del 3
+			mulx -1
+			next ii 
+			del 2+1
+		addx beam7316_a
+		mulx -1
+		next m
+		del 4
+
+		! 2スパン
+		addx prop_p+prop_p/2
+		for ii=1 to 2
+			addx -0.06/2
+			roty 90+130
+				lin_ 0, 0, 0, 0, 0, beam7316_baluster_l
+			del 1
+			
+			addx -0.8152
+			roty 90+50
+				lin_ 0, 0, 0, 0, 0, beam7316_baluster_l
+			del 3
+		mulx -1
+		next ii
+		del 2+1
+			
+		! 3スパン
+		addx  prop_p*2+prop_p/2
+			lin_ -0.213/2, 0, 0, -0.213/2, 0, -beam7316_zzyzx		!プレート
+			lin_ 0.213/2, 0, 0, 0.213/2, 0, -beam7316_zzyzx		!プレート
+
+		for ii=1 to 2
+			addx -0.3146/2
+			roty 90+120
+				lin_ 0, 0, 0, 0, 0, beam7316_baluster_l2
+			del 1
+			
+			addx -0.697
+			roty 90+50
+				lin_ 0, 0, 0, 0, 0, beam7316_baluster_l
+			del 3
+		mulx -1
+		next ii
+		del 2+1
+	return
+
+	!---ベースパイプ単線
+	"梁枠7316_p7":
+		gosub "梁枠7316_p10"			!---端部
+		addx beam7316_a
+		mulx -1
+			gosub "梁枠7316_p10"			!---端部
+		del 2
+		
+		lin_ 0.075, 0, 0, beam7316_a-0.075, 0, 0
+	return
+
+	!---端部
+	"梁枠7316_p10":
+		lin_ 0.021, 0, 0.0335/2 , 0.075, 0, 0.0335/2
+		lin_ 0.021, 0, -0.0335/2, 0.075, 0, -0.0335/2
+		lin_ 0.075, 0, -0.0335/2, 0.075, 0, 0.0335/2
+	return
+
+	!---支柱
+	"梁枠7316_p8":
+		lin_ 0, 0, 0, 0, 0, beam7316_prop_h-0.03
+			
+		if jp=int(1) then				!ジョイント有
+			gosub "梁枠7316_p9"			!---ジョイント
+		endif
+	return
+
+	!---ジョイント
+	"梁枠7316_p9":
+		addz beam7316_prop_h-0.03
+			lin_ 0, 0, 0, 0, 0, 0.025
+			lin_ -0.025/2, 0, 0.025, 0.025/2, 0, 0.025
+			lin_ 0, -0.025/2, 0.025, 0, 0.025/2, 0.025
+		del 1
+	return
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!先端クサビブラケットXB240S
+!--------------------------------------------------------------------------
+	"先端クサビブラケットXB240S":
+		resol res
+		material mat
+
+		hotspot 0, 0, 0, unID_3D : unID_3D=unID_3D+1
+		hotspot wedge_bracket240_a, 0, 0, unID_3D : unID_3D=unID_3D+1
+		hotspot 0, 0, -wedge_bracket240_zzyzx, unID_3D : unID_3D=unID_3D+1
+		hotspot wedge_bracket240_a, 0, -wedge_bracket240_zzyzx, unID_3D : unID_3D=unID_3D+1
+
+		if GLOB_CONTEXT=4 then						!---断面図／立面図
+			if details_elevation then
+				gosub "先端クサビブラケットXB240S_p1"	!---複線表示
+			else
+				gosub "先端クサビブラケットXB240S_p2"	!---単線表示
+			endif
+		else
+			if GLOB_CONTEXT=3 or GLOB_CONTEXT=5 then		!---3D表示／ダイアログ
+				if details_3d then
+					gosub "先端クサビブラケットXB240S_p1"	!---複線表示
+				else
+					gosub "先端クサビブラケットXB240S_p2"	!---単線表示
+				endif
+			else
+				gosub "先端クサビブラケットXB240S_p1"	!---複線表示
+			endif
+		endif
+	return
+
+	!----複線表示
+	"先端クサビブラケットXB240S_p1":
+		model solid
+		addx 0.021
+		roty 90
+			cylind 0.075-0.021, 0.043/2
+		addz 0.075-0.021
+			cylind wedge_bracket240_a-0.075*2, dia/2
+		addz wedge_bracket240_a-0.075*2
+			cylind 0.075-0.021, 0.043/2
+		del 4
+
+		rotx 90
+		addz -0.02/2
+			prism 11,         0.02,
+				0.03, -0.2300219,
+				0.04221145923373, -0.2300219,
+				0.2722332792646, -0,
+				0.2337667639369, -0,
+				0.1436, -0.09016673267947,
+				0.1436, -0,
+				0.1164, -0,
+				0.1164, -0.1173667232502,
+				0.0387447963301, -0.1950219,
+				0.03, -0.1950219,
+				0.03, -0.2300219
+		addz -0.01
+			prism 4, 0.04,
+				0.03, -0.18,
+				0.03, -0.23,
+				0.0195, -0.23,
+				0.0195, -0.18
+		del 3
+	return
+
+	!----単線表示
+	"先端クサビブラケットXB240S_p2":
+		model wire
+		gosub "先端クサビブラケットXB240S_p3"			!---端部
+		addx wedge_bracket240_a
+		mulx -1
+			gosub "先端クサビブラケットXB240S_p3"			!---端部
+		del 2
+			lin_ 0.075, 0, 0, wedge_bracket240_a-0.075, 0, 0
+			lin_ 0.0249, 0, -0.18, 0.0249, 0, -0.23
+			lin_ 0.13, 0, 0, 0.13, 0, -0.123
+		rotx 90
+			poly_ 3,
+				0.0249, -0.2138, 1,
+				0.0392, -0.2138, 1,
+				0.253, 0, 0
+		del 1
+	return
+
+	!---端部
+	"先端クサビブラケットXB240S_p3":
+		lin_ 0.021, 0, 0.0335/2 , 0.075, 0, 0.0335/2
+		lin_ 0.021, 0, -0.0335/2, 0.075, 0, -0.0335/2
+		lin_ 0.075, 0, -0.0335/2, 0.075, 0, 0.0335/2
+	return
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!先端クサビブラケットXB500S
+!--------------------------------------------------------------------------
+	"先端クサビブラケットXB500S":
+		resol res
+		material mat
+
+		hotspot 0, 0, 0, unID_3D : unID_3D= unID_3D+ 1
+		hotspot wedge_bracket500_a, 0, 0, unID_3D : unID_3D= unID_3D+ 1
+		hotspot 0, 0, -wedge_bracket500_zzyzx, unID_3D : unID_3D= unID_3D+ 1
+		hotspot wedge_bracket500_a, 0, -wedge_bracket500_zzyzx, unID_3D : unID_3D= unID_3D+ 1
+
+		if GLOB_CONTEXT=4 then						!---断面図／立面図
+			if details_elevation then
+				gosub "先端クサビブラケットXB500S_p1"	!---複線表示
+			else
+				gosub "先端クサビブラケットXB500S_p2"	!---単線表示
+			endif
+		else
+			if GLOB_CONTEXT=3 or GLOB_CONTEXT=5 then		!---3D表示／ダイアログ
+				if details_3d then
+					gosub "先端クサビブラケットXB500S_p1"	!---複線表示
+				else
+					gosub "先端クサビブラケットXB500S_p2"	!---単線表示
+				endif
+			else
+				gosub "先端クサビブラケットXB500S_p1"	!---複線表示
+			endif
+		endif
+	return
+
+	!----複線表示
+	"先端クサビブラケットXB500S_p1":
+		model solid
+		addx 0.021
+		roty 90
+			cylind 0.075-0.021, 0.043/2
+		addz 0.075-0.021
+			cylind wedge_bracket500_a-0.075*2, dia/2
+		addz wedge_bracket500_a-0.075*2
+			cylind 0.075-0.021, 0.043/2
+		del 4
+
+		rotx 90
+		addz -0.02/2
+			prism 11, 0.02,
+				0.03, -0.1984,
+				0.03, -0.2293,
+				0.0440, -0.2293,
+				0.4412, 0,
+				0.3868, 0,
+				0.1736, -0.1231,
+				0.1736, 0,
+				0.1464, 0,
+				0.1464, -0.1388,
+				0.0432, -0.1984,
+				0.0195, -0.1984
+
+		addz -0.01
+			prism 4, 0.04,
+				0.03, -0.18,
+				0.03, -0.23,
+				0.0195, -0.23,
+				0.0195, -0.18
+		del 3
+	return
+
+	!----単線表示
+	"先端クサビブラケットXB500S_p2":
+		model wire
+		gosub "先端クサビブラケットXB500S_p3"			!---端部
+		addx wedge_bracket500_a
+		mulx -1
+			gosub "先端クサビブラケットXB500S_p3"			!---端部
+		del 2
+
+			lin_ 0.075, 0, 0, wedge_bracket500_a-0.075, 0, 0
+			lin_ 0.0249, 0, -0.18, 0.0249, 0, -0.23
+			lin_ 0.16, 0, 0, 0.16, 0, -0.1466
+		rotx 90
+			poly_ 3,
+				0.0249, -0.2139, 1,
+				0.0436, -0.2139, 1,
+				0.414, 0, 0
+		del 1
+	return
+
+	!---端部
+	"先端クサビブラケットXB500S_p3":
+		lin_ 0.021, 0, 0.0335/2 , 0.075, 0, 0.0335/2
+		lin_ 0.021, 0, -0.0335/2, 0.075, 0, -0.0335/2
+		lin_ 0.075, 0, -0.0335/2, 0.075, 0, 0.0335/2
+	return
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!構成踏板
+!--------------------------------------------------------------------------
+	"構成踏板":
+		resol res
+		material mat
+
+		if not(bCalledSetObject) then
+			hotspot 0, 0, 0, unID_3D : unID_3D=unID_3D+1
+			hotspot ksfi_a, 0, 0, unID_3D : unID_3D=unID_3D+1
+		endif
+
+		addy ksfi_orgpos_y
+			if GLOB_CONTEXT=4 then						!---断面図／立面図
+				if details_elevation then
+					gosub "構成踏板_p1"	!---複線表示
+				else
+					gosub "構成踏板_p2"	!---単線表示
+				endif
+			else
+				if GLOB_CONTEXT=3 or GLOB_CONTEXT=5 then		!---3D表示／ダイアログ
+					if details_3d then
+						gosub "構成踏板_p1"	!---複線表示
+					else
+						gosub "構成踏板_p2"	!---単線表示
+					endif
+				else
+					gosub "構成踏板_p1"	!---複線表示
+				endif
+			endif
+		del 1
+	return
+
+	!----複線表示
+	"構成踏板_p1":
+		gosub "構成踏板_p3"		!ガイド
+		addy ksfi_b-ksfi_g_d
+		gosub "構成踏板_p3"		!ガイド
+		del 1
+		
+		addx ksfi_a
+		mulx -1
+		gosub "構成踏板_p3"		!ガイド
+		addy ksfi_b-ksfi_g_d
+		gosub "構成踏板_p3"		!ガイド
+		del 3
+		
+		addz -ksfi_zzyzx/2
+		if ksfi_a>0.153+eps then
+			prism_ 10, ksfi_zzyzx,
+				ksfi_mpos, 0, 15,
+				ksfi_a-ksfi_mpos, 0, 15,
+				ksfi_a-ksfi_mpos, ksfi_b, 15,
+				ksfi_mpos, ksfi_b, 15,
+				ksfi_mpos, 0, -1,
+			
+				ksfi_mpos+0.028, 0.02, 15,
+				ksfi_a-ksfi_mpos-0.028, 0.02, 15,
+				ksfi_a-ksfi_mpos-0.028, ksfi_b-0.02, 15,
+				ksfi_mpos+0.028, ksfi_b-0.02, 15,
+				ksfi_mpos+0.028, 0.02, -1
+			
+			if ksfi_b<0.24+EPS then
+				addz ksfi_zzyzx
+				poly 4,
+					ksfi_mpos+0.028, 0.02,
+					ksfi_a-ksfi_mpos-0.028, 0.02,
+					ksfi_a-ksfi_mpos-0.028, ksfi_b-0.02,
+					ksfi_mpos+0.028, ksfi_b-0.02
+				del 1
+			else
+				add ksfi_mpos+0.028, ksfi_b/2-0.03, 0
+				block ksfi_a-ksfi_mpos*2-0.028*2, 0.02, ksfi_zzyzx
+				addy 0.04
+				block ksfi_a-ksfi_mpos*2-0.028*2, 0.02, ksfi_zzyzx
+				del 2
+			
+				addz ksfi_zzyzx
+				poly 4,
+					ksfi_mpos+0.028, 0.02,
+					ksfi_a-ksfi_mpos-0.028, 0.02,
+					ksfi_a-ksfi_mpos-0.028, ksfi_b/2-0.01,
+					ksfi_mpos+0.028, ksfi_b/2-0.01
+				poly 4,
+					ksfi_mpos+0.028, ksfi_b-0.02,
+					ksfi_a-ksfi_mpos-0.028, ksfi_b-0.02,
+					ksfi_a-ksfi_mpos-0.028, ksfi_b/2+0.01,
+					ksfi_mpos+0.028, ksfi_b/2+0.01
+				del 1
+			endif
+		else
+			prism_ 4, ksfi_zzyzx,
+				ksfi_mpos, 0, 15,
+				ksfi_a-ksfi_mpos, 0, 15,
+				ksfi_a-ksfi_mpos, ksfi_b, 15,
+				ksfi_mpos, ksfi_b, 15
+		endif
+		
+		del 1
+	return
+
+	!----ガイド
+	"構成踏板_p3":
+		rotx 90
+		prism 8, -ksfi_g_d,
+			-ksfi_m_ex, -ksfi_zzyzx/2,
+			-ksfi_m_ex, ksfi_zzyzx/2,
+			ksfi_mpos, ksfi_zzyzx/2,
+			ksfi_mpos, -ksfi_zzyzx/2,
+			0.045/2, -ksfi_zzyzx/2,
+			0.045/2, -ksfi_zzyzx/2+0.04,
+			-0.045/2, -ksfi_zzyzx/2+0.04,
+			-0.045/2, -ksfi_zzyzx/2
+		del 1
+	return
+
+	!----単線表示
+	"構成踏板_p2":
+		model wire
+		
+		poly 4,
+			ksfi_mpos, 0,
+			ksfi_a-ksfi_mpos, 0,
+			ksfi_a-ksfi_mpos, ksfi_b,
+			ksfi_mpos, ksfi_b
+	return
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!階段受
+!--------------------------------------------------------------------------
+	"階段受":
+		resol res
+		material mat
+
+		hotspot 0, 0, 0, unID_3D : unID_3D=unID_3D+1
+		hotspot pipePosX , pipePosY, -pipePosZ, unID_3D : unID_3D=unID_3D+1
+		hotspot kdu_a, 0, 0, unID_3D : unID_3D=unID_3D+1
+		hotspot kdu_a -pipePosX , pipePosY, -pipePosZ, unID_3D : unID_3D=unID_3D+1
+
+		if GLOB_VIEW_TYPE=4 | GLOB_VIEW_TYPE=5 then				!---断面図／立面図
+			if details_elevation then
+				gosub "階段受_p1"	!---複線表示
+			else
+				gosub "階段受_p2"	!---単線表示
+			endif
+		else
+			if GLOB_VIEW_TYPE=3 | GLOB_PREVIEW_MODE=1 then		!---3D表示／ダイアログ
+				if details_3d then
+					gosub "階段受_p1"	!---複線表示
+				else
+					gosub "階段受_p2"	!---単線表示
+				endif
+			else
+				gosub "階段受_p1"	!---複線表示
+			endif
+		endif
+	return
+
+	!----複線表示
+	"階段受_p1":
+		model solid
+		for m=1 to 2
+			gosub "階段受_p3"
+			addx kdu_a
+			mulx -1
+		next m
+		del 4
+
+		add pipePosX, pipePosY, -pipePosZ
+		roty 90
+			cylind pipeLen, pipeDia/2
+		del 2
+	return
+
+	"階段受_p3":
+		add gwPosX, 0, -gwPosZ
+			prism_ 4, gw3,
+				0, -gw1/2, 15,
+				gw2, -gw1/2, 15,
+				gw2, gw1/2, 15,
+				0, gw1/2, 15
+		del 1
+
+		rotx 90-plateAng
+			add gwPosX+gw2, 0, 0
+			roty 90
+				prism_ 8, plateT,
+					-0.013, 0.025 , 15,
+					-0.028, 0.01  , 15,
+					-0.028, -0.01 , 15,
+					-0.013, -0.025, 15,
+					plateLen+0.01 , -0.025, 15,
+					plateLen+0.025, -0.01 , 15,
+					plateLen+0.025, 0.01  , 15,
+					plateLen+0.01 , 0.025 , 15
+			del 2
+		del 1
+	return
+
+	!----単線表示
+	"階段受_p2":
+		model wire
+		for m=1 to 2
+			gosub "階段受_p4"
+			addx kdu_a
+			mulx -1
+		next m
+		del 4
+
+		add pipePosX, pipePosY, -pipePosZ
+			lin_ 0, 0, 0, pipeLen, 0, 0
+		del 1
+	return
+
+
+	"階段受_p4":
+		rotx 90-plateAng+90
+			poly_ 3,
+				gwPosX, 0, 1,
+				gwPosX+gw2+plateT, 0, 1,
+				gwPosX+gw2+plateT, -plateLen, 0
+		del 1
+	return
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!開口ガード
+!--------------------------------------------------------------------------
+	"開口ガード":
+		if not(bCalledSetObject) then
+			hotspot 0,0,0, unID_3D : unID_3D=unID_3D+1 
+		endif
+
+		resol res
+		material mat
+
+		if GLOB_VIEW_TYPE=4 | GLOB_VIEW_TYPE=5 then				!---断面図／立面図
+			if app3d then
+				gosub "開口ガード_p1"
+			else
+				gosub "開口ガード_p2"
+			endif
+		else
+			gosub "開口ガード_p1"
+		endif
+	return
+
+	"開口ガード_p2":
+		model wire
+		pipePosY=0.563
+
+		addy pipePosY
+			lin_ 0.031, 0, 0, a-0.031*2, 0, 0
+			lin_ 0.2  , 0, 0, 0.2      , 0, 0.485
+			lin_ 0.72 , 0, 0, 0.72     , 0, 1.055
+			lin_ 1.4  , 0, 0, 1.4      , 0, 1.055
+		del 1
+
+		addz 0.485
+			lin_ 0   , 0.308   , 0, 0   , 0.308   , 0.57
+			lin_ 0   , pipePosY, 0, 0   , pipePosY, 0.57
+			lin_ 1.06, pipePosY, 0, 1.06, pipePosY, 0.57
+		del 1
+		
+		addz 1.055
+		poly_ 3, 
+			0, 0, 1,
+			0, pipePosY, 1,
+			1.4, pipePosY, 0
+		del 1
+
+		addz 0.485
+		poly_ 3, 
+			0, 0.308, 1,
+			0, pipePosY, 1,
+			1.4, pipePosY, 0
+		del 1
+	return
+
+	"開口ガード_p1":
+		model solid
+		!!桁行方向の布材
+			addy 0.563
+			addx 0.031
+			roty 90
+			cylind a-0.062,0.02135
+		del 3
+		
+		!!手摺_横
+			addy 0.563
+			addz 0.485
+			roty 90
+			cylind 1.4,0.01085
+		del 3
+			addy 0.563
+			addz 1.055
+			roty 90
+			cylind 1.4,0.01085
+		del 3
+		
+			addz 0.485
+			roty -90
+			rotx -90
+			addz 0.308
+			cylind 0.255,0.01085
+		del 4
+			addz 1.055
+			roty -90
+			rotx -90
+			cylind 0.563,0.01085
+		del 3
+
+		!!手摺_縦
+			addy 0.563
+			addx 0.2
+			cylind 0.485,0.01085
+		del 2
+			addy 0.563
+			addx 0.72
+			cylind 1.055,0.01085
+		del 2
+			addy 0.563
+			addz 0.485
+			addx 1.06
+			cylind 0.57,0.01085
+		del 3
+			addy 0.563
+			addx 1.4
+			cylind 1.07,0.01085
+		del 2
+			addy 0.563
+			addz 0.485
+			cylind 0.57,0.01085
+		del 2
+			addy 0.308
+			addz 0.485
+			cylind 0.57,0.01085
+		del 2
+	return
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------

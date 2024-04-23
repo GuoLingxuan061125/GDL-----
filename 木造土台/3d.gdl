@@ -1,0 +1,403 @@
+
+addz -0.105
+
+hotspot 0 ,0        ,0.105
+hotspot 0 ,-0.105/2 ,0.105
+hotspot 0 ,+0.105/2 ,0.105
+hotspot 0 ,0        ,0
+hotspot 0 ,-0.105/2 ,0
+hotspot 0 ,+0.105/2 ,0
+
+hotspot len ,0        ,0.105
+hotspot len ,-0.105/2 ,0.105
+hotspot len ,+0.105/2 ,0.105
+hotspot len ,0        ,0
+hotspot len ,-0.105/2 ,0
+hotspot len ,+0.105/2 ,0
+
+!材質
+if m=0 then 
+    if len*100>=round_int(len*100) then mw=172 else mw=174
+    if len*100<round_int(len*100) then mw=174 else mw=172
+else 
+    mw=m
+endif
+
+if mcol=0 then 
+    mcol=mw
+endif
+
+
+!柱表示
+if column=1 then    
+    addz B_hei/1000
+        call "wood_column" parameters mw=mcol,col=1,num3=num3,mx=mx,my=my,Cz=Cz,col_hei=col_hei,\
+        col_hei_offset=col_hei_offset,col_hei_offset_rep=col_hei_offset_rep,col_hei_corner=col_hei_corner,list_len2=list_len2   
+        call "wood_column" parameters mw=mcol,col=2,num3=num3,mx=mx,my=my,Cz=Cz,col_hei=col_hei,\
+        col_hei_offset=col_hei_offset,col_hei_offset_rep=col_hei_offset_rep,col_hei_corner=col_hei_corner,list_len2=list_len2   
+        call "wood_column" parameters mw=mcol,col=3,num3=num3,mx=mx,my=my,Cz=Cz,col_hei=col_hei,\
+        col_hei_offset=col_hei_offset,col_hei_offset_rep=col_hei_offset_rep,col_hei_corner=col_hei_corner,list_len2=list_len2   
+    del 1   
+endif
+
+
+!土台長さ
+hotspot 0,0,0
+
+addz 0.105
+    unID=1
+    hotspot 0  ,0,0,unID,len,1+256:unID=unID+1
+    hotspot -1 ,0,0,unID,len,3    :unID=unID+1
+    hotspot len,0,0,unID,len,2    :unID=unID+1
+del 1
+
+
+if E2=0 then
+    ms=mw
+    mz=mw
+endif
+
+
+!土台
+group "p1"
+    material mw 
+    add 0+list[left+1],-0.105/2,0
+        block len-list[left+1]-list[right+1],0.105,0.105
+    del 1
+endgroup
+
+
+add 0,0,0.105
+    !アンカーボルト座標========================================================================================
+    for i=1 to num
+        hotspot 0,-ly[i],0 ,	unID,lx[i],1+128		:unID=unID+1
+        hotspot -1,-ly[i],0 ,	unID,lx[i],3			:unID=unID+1
+        hotspot lx[i],-ly[i],0 ,unID,lx[i],2			:unID=unID+1
+        hotspot lx[i],0,0 ,		unID,ly[i],1+128		:unID=unID+1
+        hotspot lx[i],1,0 ,		unID,ly[i],3			:unID=unID+1
+        hotspot lx[i],-ly[i],0 ,unID,ly[i],2			:unID=unID+1
+    next i
+
+    for j=1 to list_len
+        for i=1 to num2[j]
+            hotspot 0,-jy[i][j],0 ,			unID,jx[i][j],1+128		:unID=unID+1
+            hotspot -1,-jy[i][j],0 ,		unID,jx[i][j],3			:unID=unID+1
+            hotspot jx[i][j],-jy[i][j],0 ,	unID,jx[i][j],2			:unID=unID+1
+            hotspot jx[i][j],0,0 ,			unID,jy[i][j],1+128		:unID=unID+1
+            hotspot jx[i][j],1,0 ,			unID,jy[i][j],3			:unID=unID+1
+            hotspot jx[i][j],-jy[i][j],0 ,	unID,jy[i][j],2			:unID=unID+1
+        next i
+    next j
+
+
+    !柱座標===================================================================================================
+    for j=1 to list_len2
+        for i=1 to num3[j]
+            hotspot 0,-my[i][j],0 ,			unID,mx[i][j],1+128		:unID=unID+1
+            hotspot -1,-my[i][j],0 ,		unID,mx[i][j],3			:unID=unID+1
+            hotspot mx[i][j],-my[i][j],0 ,	unID,mx[i][j],2			:unID=unID+1
+            hotspot mx[i][j],0,0 ,			unID,my[i][j],1+128		:unID=unID+1
+            hotspot mx[i][j],1,0 ,			unID,my[i][j],3			:unID=unID+1
+            hotspot mx[i][j],-my[i][j],0 ,	unID,my[i][j],2			:unID=unID+1
+        next i
+    next j
+del 1
+
+
+!アンカーボルト
+anchor_dd=10.7/1000  !M12
+
+group "p2"
+    group "p3"
+        material mz
+        cylind 0.002,0.015*E4
+    endgroup
+
+    group "p4"
+        material mz
+        cylind 0.330,anchor_dd/2
+    endgroup
+
+    add 0,0,0.105
+        for i=1 to num 
+            material ms
+
+            add lx[i],-ly[i],-0.33
+                cylind 0.330,anchor_dd/2
+            del 1
+
+            add lx[i],-ly[i],0-0.002
+                placegroup ( subgroup ("p3","p4"))
+            del 1
+        next i
+    del 1
+endgroup
+
+
+group "base"
+    !土台＆開孔
+    if E=1 and E3=1 then 
+        placegroup(subgroup("p1","p2"))
+    endif
+
+    !土台
+    if E=1 and E3=0 then 
+        placegroup"p1"
+    endif
+endgroup
+
+
+!アンカーボルト
+if E2=1 then
+    placegroup"p2"
+endif
+
+
+
+!継手===================================================================================================
+mc=mw
+
+group "connection"
+    material mw
+
+    if left<>0 and left<>12 then
+        if left%2=0 then
+            rotz 180
+                call "wood_connection" parameters mw=mc ,connection_type=left,reverse_lr=1,joint=0
+            del 1
+        else
+            call "wood_connection" parameters mw=mc ,connection_type=left,reverse_lr=1,joint=0
+        endif
+    endif
+
+    if right<>0 and right<>12 then
+        if right%2=0 then
+            addx len
+                call "wood_connection" parameters mw=mc,connection_type=right,joint=0
+            del 1
+        else
+            addx len
+            rotz 180
+                call "wood_connection" parameters mw=mc,connection_type=right,joint=0
+            del 2
+        endif
+    endif
+
+    group "hardwareEdge"
+        group "hardwareEdge_1"
+            addy -0.105/2
+                block hardwareX,0.105,0.105
+            del 1
+        endgroup
+
+        group "hardwareEdge_2"
+            add 0,-hardwareWid/2,0.105-ditchDep
+                block hardwareX,hardwareThi,ditchDep
+            del 1
+
+            addz 0.105-ditchDep
+                extrude 9,0,0,ditchDep,1+2+4+8+16,
+                0          ,-hardwareWid/2            ,0 ,
+                hardwareX  ,-hardwareWid/2            ,0 ,
+                hardwareX  ,-hardwareWid/2+hardwareThi,0 ,
+                hardwareGap,-hardwareWid/2+hardwareThi,0 ,
+                hardwareGap,hardwareWid/2-hardwareThi ,0 ,
+                hardwareX  ,hardwareWid/2-hardwareThi ,0 ,
+                hardwareX  ,hardwareWid/2             ,0 ,
+                0          ,hardwareWid/2             ,0 ,
+                0          ,-hardwareWid/2            ,-1
+            del 1
+        endgroup
+
+        placegroup subgroup ("hardwareEdge_1","hardwareEdge_2")
+    endgroup
+
+    if left=12 then
+        placegroup "hardwareEdge"
+    endif
+
+    if right=12 then
+        addx len
+        rotz 180
+            placegroup "hardwareEdge"
+        del 2
+    endif
+endgroup
+
+
+!金物===================================================================================================
+group "hardware"
+    material hardwareMat
+
+    addz 0.105-ditchDep
+        !TH-10
+        group "TH_10_part1"
+            addz 0.008
+                extrude 7,0,0,hardwareZ-(hardwareWid-2*cornerRad)/2-0.008,1+2+4+16+32,
+                0          ,-hardwareWid/2+cornerRad  ,1   ,
+                cornerRad  ,-hardwareWid/2+cornerRad  ,901 ,
+                0          ,90                        ,4001,
+                cornerRad  ,-hardwareWid/2+hardwareThi,1   ,
+                cornerRad  ,-hardwareWid/2+cornerRad  ,901 ,
+                0          ,-90                       ,4001,
+                0          ,-hardwareWid/2+cornerRad  ,-1
+
+                extrude 7,0,0,hardwareZ-(hardwareWid-2*cornerRad)/2-0.008,1+2+4+16+32,
+                hardwareThi,hardwareWid/2-cornerRad   ,1   ,
+                cornerRad  ,hardwareWid/2-cornerRad   ,901 ,
+                0          ,-90                       ,4001,
+                cornerRad  ,hardwareWid/2             ,1   ,
+                cornerRad  ,hardwareWid/2-cornerRad   ,901 ,
+                0          ,90                        ,4001,
+                hardwareThi,hardwareWid/2-cornerRad   ,-1
+            del 1
+        endgroup
+
+        group "TH_10_part2"
+            add hardwareThi,0,0.008
+            roty -90
+                extrude 13,0,0,hardwareThi,1+2+4+16+32,
+                0                                                        ,-hardwareWid/2+cornerRad,1   ,
+                hardwareZ-(hardwareWid-2*cornerRad)/2-0.008,-hardwareWid/2+cornerRad,1   ,
+                hardwareZ-(hardwareWid-2*cornerRad)/2-0.008,-hardwareWid/2+cornerRad,1   ,
+                hardwareZ-(hardwareWid-2*cornerRad)/2-0.008,0                       ,901 ,
+                hardwareZ-(hardwareWid-2*cornerRad)/2-0.008,180                     ,4001,
+                0                                                        ,hardwareWid/2-cornerRad ,1   ,
+                0                                                        ,hardwareWid/2-cornerRad ,-1  ,
+                0.008+0.0205                                             ,0                       ,901 ,
+                driftPinRad2                                             ,360                     ,4001,
+                0.008+0.0205+0.025                                       ,0                       ,901 ,
+                driftPinRad2                                             ,360                     ,4001,
+                0.008+0.0205+2*0.025                                     ,0                       ,901 ,
+                driftPinRad2                                             ,360                     ,4001
+            del 2
+        endgroup
+
+        group "TH_10_part3"
+            for i=1 to 2
+                addy -hardwareWid/2+hardwareThi
+                rotx 90
+                    extrude 15,0,0,hardwareThi,1+2+4+16+32,
+                    cornerRad         ,0.008                                              ,1   ,
+                    0.02              ,0.008                                              ,1   ,
+                    0.02              ,0                                                  ,1   ,
+                    hardwareX         ,0                                                  ,1   ,
+                    hardwareX         ,hardwareZ-0.015                      ,1   ,
+                    0.075+driftPinRad1,hardwareZ-0.015                      ,1   ,
+                    0.075+driftPinRad1,hardwareZ-0.029                      ,1   ,
+                    0.075             ,hardwareZ-0.029                      ,901 ,
+                    0                 ,-180                                               ,4001,
+                    0.075-driftPinRad1,hardwareZ-0.015                      ,1   ,
+                    0.01              ,hardwareZ-0.015                      ,1   ,
+                    cornerRad         ,hardwareZ-(hardwareWid-2*cornerRad)/2,1   ,
+                    cornerRad         ,0.008                                              ,-1  ,
+                    0.075             ,0.034                                              ,901 ,
+                    driftPinRad1      ,360                                                ,4001
+                del 2
+            addy hardwareWid-hardwareThi
+            next i
+            del 2
+        endgroup
+
+        TH_10_1 = addgroup ("TH_10_part1","TH_10_part2")
+        TH_10_2 = addgroup (TH_10_1,"TH_10_part3")
+        placegroup TH_10_2
+    del 1
+endgroup
+
+
+!ドリフトピン============================================================================================
+group "driftPin"
+    material driftPinMat
+
+    driftPinCount=0
+    dim driftPinPos[][]
+
+    driftPinCount=2
+    driftPinPos[1][1]=0.075 : driftPinPos[1][2]=0.034
+    driftPinPos[2][1]=0.075 : driftPinPos[2][2]=0.034+0.0355
+
+    addz 0.105-ditchDep
+        for i=1 to driftPinCount
+            add driftPinPos[i][1],0,driftPinPos[i][2]
+            rotx 90
+            addz -0.105/2-0.001
+                cylind 0.105+2*0.001,driftPinRad1
+            del 3
+        next i
+    del 1
+endgroup
+
+if left=12 then
+    placegroup "hardware"
+    placegroup "driftPin"
+endif
+
+if right=12 then
+    addx len
+    rotz 180
+        placegroup "hardware"
+        placegroup "driftPin"
+    del 2
+endif
+
+
+!仕口===================================================================================================
+group "joint"!仕口開口
+    if mortise<>0 then
+        addz 0.105
+            call "wood_column" parameters mw=mm ,col=1,num3=num3,mx=mx,my=my,cz=cz,list_len2=list_len2
+            call "wood_column" parameters mw=mm ,col=2,num3=num3,mx=mx,my=my,cz=cz,list_len2=list_len2
+            call "wood_column" parameters mw=mm ,col=3,num3=num3,mx=mx,my=my,cz=cz,list_len2=list_len2
+        del 1
+    endif
+
+    for j=1 to list_len
+        if num2[j]>0 and joint<>0  then	
+            for i=1 to num2[j]
+                if jy[i][j]<0 then 
+                    add jx[i][j],0.105/2,0
+                    rotz -90
+                        if jx[i][j]<>len and jx[i][j]<=len/2 then call "wood_connection" parameters mw=mm ,mm=mm,connection_type=0 ,joint=joint_list[j]
+                        if jx[i][j]<>len and jx[i][j]>len/2 then call "wood_connection" parameters mw=mm ,mm=mm,connection_type=0 ,reverse_LR=1,joint=joint_list[j]
+                else
+                    add jx[i][j],-0.105/2,0
+                    rotz 90
+                        if jx[i][j]<>len and jx[i][j]<=len/2 then call "wood_connection" parameters mw=mm ,mm=mm,connection_type=0 ,reverse_LR=1,joint=joint_list[j]
+                        if jx[i][j]<>len and jx[i][j]>len/2 then call "wood_connection" parameters mw=mm ,mm=mm,connection_type=0 ,reverse_LR=0,joint=joint_list[j]
+                endif
+                del 2
+            next i 
+        endif
+    next j
+endgroup
+
+group "jo"!仕口
+    for j=1 to list_len
+        if num2[j]>0 and joint<>0  then	
+            for i=1 to num2[j]
+                if jy[i][j]<0 then 
+                    add jx[i][j],0.105/2,0
+                    rotz -90
+                        if jx[i][j]<>len and jx[i][j]<=len/2 then call "wood_connection" parameters mw=mw,mm=mm,connection_type=joint_list[j],joint=0
+                        if jx[i][j]<>len and jx[i][j]>len/2 then call "wood_connection" parameters mw=mw,mm=mm ,connection_type=joint_list[j],reverse_LR=1,joint=0
+                else
+                    add jx[i][j],-0.105/2,0
+                    rotz 90
+                        if jx[i][j]<>len and jx[i][j]<=len/2 then call "wood_connection" parameters mw=mw ,mm=mm,connection_type=joint_list[j],reverse_LR=1,joint=0
+                        if jx[i][j]<>len and jx[i][j]>len/2 then call "wood_connection" parameters mw=mw ,mm=mm,connection_type=joint_list[j],reverse_LR=0,joint=0
+                endif
+                del 2
+            next i
+        endif
+    next j
+endgroup
+
+
+group "add"
+    placegroup(subgroup("base","joint"))
+    placegroup"jo"
+endgroup
+
+placegroup(addgroup("connection","add"))
+

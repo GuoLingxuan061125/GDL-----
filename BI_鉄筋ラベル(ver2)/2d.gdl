@@ -1,0 +1,82 @@
+define style "moji" fontType,fontSize*100/GLOB_SCALE,5,0
+
+
+add2 LABEL_POSITION[2][1]+LABEL_POSITION[3][1],LABEL_POSITION[2][2]+LABEL_POSITION[3][2]
+
+!hotspot2 0                  ,0                  ,code,scaleRatio,1+128 : code=code+1
+!hotspot2 frameX2D*scaleRatio,frameY2D*scaleRatio,code,scaleRatio,2     : code=code+1
+!hotspot2 frameX2D*(-1)      ,frameY2D*(-1)      ,code,scaleRatio,3     : code=code+1
+
+mul2 scaleRatio,scaleRatio
+    hotspot2 0,0
+    hotspot2 frameX2D,0
+    hotspot2 frameX2D,frameY2D
+    hotspot2 0,frameY2D
+
+    pen frameColor
+    rect2 0,0,frameX2D,frameY2D
+
+    add2 fontSize/2-minx2D,fontSize/2-miny2D
+        !-------------------輪郭線
+        pen rebarColor
+
+        for i=1 to newNum
+            hotspot2 _framePos1[i][x],_framePos1[i][y]
+            hotspot2 _framePos2[i][x],_framePos2[i][y]
+            !hotspot2 _framePos3[i][x],_framePos3[i][y]
+            !hotspot2 _framePos4[i][x],_framePos4[i][y]
+        next i
+
+        for i=1 to newNum
+            put _framePos1[i][x],_framePos1[i][y],_framePos1[i][s]
+        next i
+
+        for i=1 to newNum
+            put _framePos2[newNum+1-i][x],_framePos2[newNum+1-i][y],_framePos2[newNum+1-i][s]
+        next i
+
+        poly2_ 2*newNum,1+4,
+        get(nsp)
+
+        !-------------------寸法
+        pen mojiColor
+        style "moji"
+
+        for i=1 to newNum/2
+            if sizeDisplayChange=0 then
+                tempX1=_framePos4[2*i-1][x]
+                tempX2=_framePos4[2*i][x]
+                tempY1=_framePos4[2*i-1][y]
+                tempY2=_framePos4[2*i][y]
+
+                line2 _framePos2[2*i-1][x],_framePos2[2*i-1][y],_framePos4[2*i-1][x],_framePos4[2*i-1][y]
+                line2 _framePos2[2*i][x],_framePos2[2*i][y],_framePos4[2*i][x],_framePos4[2*i][y]
+            else
+                tempX1=_framePos3[2*i-1][x]
+                tempX2=_framePos3[2*i][x]
+                tempY1=_framePos3[2*i-1][y]
+                tempY2=_framePos3[2*i][y]
+
+                line2 _framePos1[2*i-1][x],_framePos1[2*i-1][y],_framePos3[2*i-1][x],_framePos3[2*i-1][y]
+                line2 _framePos1[2*i][x],_framePos1[2*i][y],_framePos3[2*i][x],_framePos3[2*i][y]
+            endif
+
+            sizeLen=sqr((tempX2-tempX1)^2+(tempY2-tempY1)^2)
+            if roundUpSwitch then sizeLen=ceil(sizeLen/roundUpUnit)*roundUpUnit
+
+            add2 (tempX1+tempX2)/2,(tempY1+tempY2)/2
+                if _rtz[i]>90 and _rtz[i]<=270 then _rtz[i]=_rtz[i]-180
+                rot2 _rtz[i]
+                    text2 0,0,sizeLen*1000
+                del 1
+            del 1
+        next i
+    del 1
+del 1
+
+
+
+
+
+
+

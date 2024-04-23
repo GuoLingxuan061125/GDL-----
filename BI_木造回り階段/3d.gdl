@@ -1,0 +1,368 @@
+hotspot 0,0,0
+
+!回り部パーツ
+maxLength=sqr(2)*centerLineSpan
+rotAngle=180/6
+
+group "winder_frame"
+    material woodMat
+
+    addz -stairThi1
+        extrude 9,0,0,stairNum*stairRiser+stairThi1,1+2+4+8+16+32,
+        (columnSize/2+boardThi)                ,-centerLineSpan+(columnSize/2+boardThi),0 ,
+        -centerLineSpan+(columnSize/2+boardThi),-centerLineSpan+(columnSize/2+boardThi),0 ,
+        -centerLineSpan+(columnSize/2+boardThi),centerLineSpan-(columnSize/2+boardThi) ,0 ,
+        (columnSize/2+boardThi)                ,centerLineSpan-(columnSize/2+boardThi) ,0 ,
+        (columnSize/2+boardThi)                ,(columnSize/2+boardThi)                ,0 ,
+        -(columnSize/2+boardThi)               ,(columnSize/2+boardThi)                ,0 ,
+        -(columnSize/2+boardThi)               ,-(columnSize/2+boardThi)               ,0 ,
+        (columnSize/2+boardThi)                ,-(columnSize/2+boardThi)               ,0 ,
+        (columnSize/2+boardThi)                ,-centerLineSpan+(columnSize/2+boardThi),-1
+    del 1
+endgroup
+
+
+!===============================================================================階段
+material woodMat
+
+stairCount=0
+
+if winderDir=2 then mulx -1
+
+if winderDir=1 then
+    if startDir=1 then rotz 0
+    if startDir=2 then rotz 180
+    if startDir=3 then rotz 90
+    if startDir=4 then rotz -90
+else
+    if startDir=1 then rotz 0
+    if startDir=2 then rotz 180
+    if startDir=3 then rotz -90
+    if startDir=4 then rotz 90
+endif
+
+!start_part
+if _partFlag[1]=1 then !直線部
+    hotspot -stairWid/2,0,0
+    hotspot stairWid/2,0,0
+    hotspot -centerLineSpan/2,0,0
+    hotspot centerLineSpan/2,0,0
+
+    cutplane 1,1,0,1
+        for i=1 to _partStairNum[1]
+            stairCount=stairCount+1
+            gosub 101
+        addy stairTread
+        next i
+    cutend
+endif
+
+if _partFlag[1]=2 then !回り部
+    if _partStairNum[1]=6 then
+        rotz -90
+        add 0,centerLineSpan/2,0
+    endif
+
+    if _partStairNum[1]=5 then
+        rotz -90
+        add centerLineSpan/2/sqr(3),centerLineSpan/2,0
+    endif
+
+    if _partStairNum[1]=4 then
+        rotz 0
+        add centerLineSpan/2,centerLineSpan/2/sqr(3),0 
+    endif
+
+    if _partStairNum[1]=3 then
+        rotz 0
+        add centerLineSpan/2,0,0 
+    endif
+
+    if _partStairNum[1]=2 then
+        rotz 0
+        add centerLineSpan/2,-centerLineSpan/2/sqr(3),0
+    endif
+
+    if _partStairNum[1]=1 then
+        rotz 90
+        add centerLineSpan/2/sqr(3),-centerLineSpan/2,0
+    endif
+
+    cutplane 1,1,0,1
+        for i=6-_partStairNum[1]+1 to 6
+            stairCount=stairCount+1
+            gosub 200+i
+        next i
+    cutend
+
+    del 2
+
+    if _partStairNum[1]=6 then
+        add centerLineSpan,0,0
+        rotz 180
+    endif
+
+    if _partStairNum[1]=5 then
+        add centerLineSpan,-centerLineSpan/2/sqr(3),0
+        rotz 180
+    endif
+
+    if _partStairNum[1]=4 then
+        add centerLineSpan/2,centerLineSpan/2/sqr(3)+centerLineSpan/2,0
+        rotz -90
+    endif
+
+    if _partStairNum[1]=3 then
+        add centerLineSpan/2,centerLineSpan/2,0
+        rotz -90
+    endif
+
+    if _partStairNum[1]=2 then
+        add centerLineSpan/2,centerLineSpan/2-centerLineSpan/2/sqr(3),0
+        rotz -90
+    endif
+
+    if _partStairNum[1]=1 then
+        add 0,centerLineSpan/2/sqr(3),0
+    endif 
+endif
+
+!following_part
+for i=2 to partNum
+    if _partFlag[i]=1 then !直線部
+        for j=1 to _partStairNum[i]
+            stairCount=stairCount+1
+            gosub 101
+        addy stairTread
+        next j
+    endif
+
+    if _partFlag[i]=2 then !回り部
+        rotz -90
+        add 0,centerLineSpan/2,0
+            for j=1 to _partStairNum[i]
+                stairCount=stairCount+1
+                gosub 200+j
+            next j
+        del 2
+
+        if _partStairNum[i]=3 then !90°回り
+            add centerLineSpan/2,centerLineSpan/2,0
+            rotz -90
+        else !180°回り
+            add centerLineSpan,0,0
+            rotz 180
+        endif
+    endif
+next i
+
+
+del top
+
+
+
+
+
+
+end
+
+
+
+
+!straight_part
+101:
+    add -stairWid/2,0,-stairThi1+(stairCount-1)*stairRiser
+        block stairWid,stairThi2,stairRiser
+    del 1
+
+    add -stairWid/2,-stairNosing,stairRiser-stairThi1+(stairCount-1)*stairRiser
+        block stairWid,stairTread+stairNosing,stairThi1
+    del 1
+return
+
+
+!winder_part1
+201:
+    group "winder_part1"
+        material woodMat
+
+        add -stairThi2,-maxLength,-stairThi1
+            block stairThi2,maxLength,stairRiser
+        del 1
+
+        add 0,0,stairRiser-stairThi1
+            extrude 7,0,0,stairThi1,1+2+4+8+16+32,
+            0          ,0         ,0   ,
+            stairNosing,0         ,0   ,
+            stairNosing,-maxLength,0   ,
+            0          ,-maxLength,0   ,
+            0          ,0         ,900 ,
+            0          ,-rotAngle ,4000,
+            0          ,0         ,-1  
+        del 1
+    endgroup
+
+    winder_part1 = isectgroup ("winder_part1","winder_frame")
+
+    addz (stairCount-1)*stairRiser
+        placegroup winder_part1
+    del 1
+return
+
+
+!winder_part2
+202:
+    group "winder_part2"
+        material woodMat
+
+        rotz -rotAngle
+            add -stairThi2,-maxLength,-stairThi1
+                block stairThi2,maxLength,stairRiser
+            del 1
+
+            add 0,0,stairRiser-stairThi1
+                extrude 7,0,0,stairThi1,1+2+4+8+16+32,
+                0          ,0         ,0   ,
+                stairNosing,0         ,0   ,
+                stairNosing,-maxLength,0   ,
+                0          ,-maxLength,0   ,
+                0          ,0         ,900 ,
+                0          ,-rotAngle ,4000,
+                0          ,0         ,-1  
+            del 1
+        del 1
+    endgroup
+
+    winder_part2 = isectgroup ("winder_part2","winder_frame")
+
+    addz (stairCount-1)*stairRiser
+        placegroup winder_part2
+    del 1
+return
+
+
+!winder_part3
+203:
+    group "winder_part3"
+        material woodMat
+
+        rotz -2*rotAngle
+            add -stairThi2,-maxLength,-stairThi1
+                block stairThi2,maxLength,stairRiser
+            del 1
+
+            add 0,0,stairRiser-stairThi1
+                extrude 7,0,0,stairThi1,1+2+4+8+16+32,
+                0          ,0         ,0   ,
+                stairNosing,0         ,0   ,
+                stairNosing,-maxLength,0   ,
+                0          ,-maxLength,0   ,
+                0          ,0         ,900 ,
+                0          ,-rotAngle ,4000,
+                0          ,0         ,-1  
+            del 1
+        del 1
+    endgroup
+
+    winder_part3 = isectgroup ("winder_part3","winder_frame")
+
+    addz (stairCount-1)*stairRiser
+        placegroup winder_part3
+    del 1
+return
+
+
+!winder_part4
+204:
+    group "winder_part4"
+        material woodMat
+
+        rotz -3*rotAngle
+            add -stairThi2,-maxLength,-stairThi1
+                block stairThi2,maxLength,stairRiser
+            del 1
+
+            add 0,0,stairRiser-stairThi1
+                extrude 7,0,0,stairThi1,1+2+4+8+16+32,
+                0          ,0         ,0   ,
+                stairNosing,0         ,0   ,
+                stairNosing,-maxLength,0   ,
+                0          ,-maxLength,0   ,
+                0          ,0         ,900 ,
+                0          ,-rotAngle ,4000,
+                0          ,0         ,-1  
+            del 1
+        del 1
+    endgroup
+
+    winder_part4 = isectgroup ("winder_part4","winder_frame")
+
+    addz (stairCount-1)*stairRiser
+        placegroup winder_part4
+    del 1
+return
+
+
+!winder_part5
+205:
+    group "winder_part5"
+        material woodMat
+
+        rotz -4*rotAngle
+            add -stairThi2,-maxLength,-stairThi1
+                block stairThi2,maxLength,stairRiser
+            del 1
+
+            add 0,0,stairRiser-stairThi1
+                extrude 7,0,0,stairThi1,1+2+4+8+16+32,
+                0          ,0         ,0   ,
+                stairNosing,0         ,0   ,
+                stairNosing,-maxLength,0   ,
+                0          ,-maxLength,0   ,
+                0          ,0         ,900 ,
+                0          ,-rotAngle ,4000,
+                0          ,0         ,-1  
+            del 1
+        del 1
+    endgroup
+
+    winder_part5 = isectgroup ("winder_part5","winder_frame")
+
+    addz (stairCount-1)*stairRiser
+        placegroup winder_part5
+    del 1
+return
+
+
+!winder_part6
+206:
+    group "winder_part6"
+        material woodMat
+
+        rotz -5*rotAngle
+            add -stairThi2,-maxLength,-stairThi1
+                block stairThi2,maxLength,stairRiser
+            del 1
+
+            add 0,0,stairRiser-stairThi1
+                extrude 7,0,0,stairThi1,1+2+4+8+16+32,
+                0          ,0         ,0   ,
+                stairNosing,0         ,0   ,
+                stairNosing,-maxLength,0   ,
+                0          ,-maxLength,0   ,
+                0          ,0         ,900 ,
+                0          ,-rotAngle ,4000,
+                0          ,0         ,-1  
+            del 1
+        del 1
+    endgroup
+
+    winder_part6 = isectgroup ("winder_part6","winder_frame")
+
+    addz (stairCount-1)*stairRiser
+        placegroup winder_part6
+    del 1
+return
+
+
+

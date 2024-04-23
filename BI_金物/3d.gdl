@@ -1,0 +1,5517 @@
+hotspot 0,0,0
+
+!hotspot offset_horizontal_Y
+hotspot 0,-offset_horizontal_x,0,unID,offset_horizontal_Y,1+128 : unID=unID+1
+hotspot offset_horizontal_Y,-offset_horizontal_x,0,unID,offset_horizontal_Y,2 : unID=unID+1
+hotspot -1,-offset_horizontal_x,0,unID,offset_horizontal_Y,3 : unID=unID+1
+
+!hotspot offset_horizontal_x
+hotspot offset_horizontal_Y,0,0,unID,offset_horizontal_x,1+128 : unID=unID+1
+hotspot offset_horizontal_Y,-offset_horizontal_x,0,unID,offset_horizontal_x,2 : unID=unID+1
+hotspot offset_horizontal_Y,1,0,unID,offset_horizontal_x,3 : unID=unID+1
+
+
+group "CPQ45"
+	!!φ8.4×45
+	!!CPQ-45
+
+	material 11
+
+	group "maru45"
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		8.4/2/td, 360, 4000
+	endgroup
+
+	group "shikaku45"
+		extrude 4, 0, 0, 3/td, 1+2+4+16+32, 
+		1.5/td, 1.5/td, 0, 
+		-1.5/td, 1.5/td, 0, 
+		-1.5/td, -1.5/td, 0, 
+		1.5/td, -1.5/td, 0
+	endgroup
+
+	placegroup subgroup("maru45", "shikaku45")
+
+	addz -2/td
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		5.5/2/td, 360, 4000
+
+	addz -43/td
+		cylind 45/td, 1.5/td
+	del 2
+endgroup
+
+
+group "CPQ55"
+	!!φ8.4×55
+	!!CPQ-55
+
+	material 69
+
+	group "maruq55"
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		8.4/2/td, 360, 4000
+	endgroup
+
+	group "shikakuq55"
+		extrude 4, 0, 0, 3/td, 1+2+4+16+32, 
+		1.5/td, 1.5/td, 0, 
+		-1.5/td, 1.5/td, 0, 
+		-1.5/td, -1.5/td, 0, 
+		1.5/td, -1.5/td, 0
+	endgroup
+
+	placegroup subgroup("maruq55", "shikakuq55")
+
+	addz -2/td
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		5.5/2/td, 360, 4000
+
+	addz -53/td
+		cylind 55/td, 1.5/td
+	del 2
+endgroup
+
+
+group "CPQ75"
+	!!φ8.4×75
+	!!CPQ-75
+
+	material 100
+
+	group "maru75"
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		8.4/2/td, 360, 4000
+	endgroup
+
+	group "shikaku75"
+		extrude 4, 0, 0, 3/td, 1+2+4+16+32, 
+		1.5/td, 1.5/td, 0, 
+		-1.5/td, 1.5/td, 0, 
+		-1.5/td, -1.5/td, 0, 
+		1.5/td, -1.5/td, 0
+	endgroup
+
+	placegroup subgroup("maru75", "shikaku75")
+
+	addz -2/td
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		5.5/2/td, 360, 4000
+
+	addz -73/td
+		cylind 75/td, 1.5/td
+	del 2
+endgroup
+
+
+group "maru55"
+	material 11
+
+	extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+	0, 0, 900, 
+	5.5/2/td, 360, 4000
+endgroup
+
+
+group "shikaku15"
+	material 11
+
+	extrude 4, 0, 0, 3/td, 1+2+4+16+32, 
+	1.5/td, 1.5/td, 0, 
+	-1.5/td, 1.5/td, 0, 
+	-1.5/td, -1.5/td, 0, 
+	1.5/td, -1.5/td, 0
+endgroup
+
+
+group "YAS45"
+	!!φ5.5×45
+	!!YA-S45
+
+	material 11
+
+	placegroup subgroup("maru55", "shikaku15")
+
+	addz -2/td
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		5.5/2/td, 360, 4000
+
+	addz -43/td
+		cylind 45/td, 1.5/td
+	del 2
+endgroup
+
+
+group "YSN45"
+	!!φ5.5×45
+	!!YS-N45
+
+	placegroup "YAS45"
+endgroup
+
+
+group "YSC55"
+	!!φ5.5×55
+	!!YS-C45
+
+	material 99
+
+	group "maruc55"
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		5.5/2/td, 360, 4000
+	endgroup
+
+	group "shikakuc15"
+		extrude 4, 0, 0, 3/td, 1+2+4+16+32, 
+		1.5/td, 1.5/td, 0, 
+		-1.5/td, 1.5/td, 0, 
+		-1.5/td, -1.5/td, 0, 
+		1.5/td, -1.5/td, 0
+	endgroup
+
+	placegroup subgroup("maruc55", "shikakuc15")
+
+	addz -2/td
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		5.5/2/td, 360, 4000
+
+	addz -53/td
+		cylind 55/td, 1.5/td
+	del 2
+endgroup
+
+
+group "ZN40"
+	!!φ3.33×40
+	!!ZN40
+
+	material 12
+
+	extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+	0, 0, 900, 
+	7.14/2/td, 360, 4000
+
+	add 0, 0, 1/td
+		DEFINE STYLE "aa" "New York", 3.5, 5, 0
+		SET STYLE "aa"
+		TEXT 0.0013, 0, "Z"
+	del 1
+
+	addz -2/td
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		7.14/2/td, 360, 4000
+
+	addz -37/td
+		cylind 40/td, 3.33/2/td
+	del 2
+endgroup
+
+
+group "PZFRN55"
+    !!φ4.5×55
+    !!PZ-FRN-55
+
+    material 99
+
+    extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+	0, 0, 900, 
+	4.5/2/td, 360, 4000
+
+    add 0, 0, 1/td
+		DEFINE STYLE "bb" "New York", 1.5, 5, 0
+		SET STYLE "bb"
+		TEXT 0.0015, 0, "55"
+    del 1
+
+    addz -2/td
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		5.5/2/td, 360, 4000
+    addz -53/td
+    	cylind 55/td, 1.5/td
+	del 2
+endgroup
+
+
+group "YDR60"
+	!!φ6×60
+	!!YDR60
+
+	material 100
+
+	group "maru60"
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		6/2/td, 360, 4000
+	endgroup
+
+	group "shikaku60"
+		extrude 4, 0, 0, 3/td, 1+2+4+16+32, 
+		1.5/td, 1.5/td, 0, 
+		-1.5/td, 1.5/td, 0, 
+		-1.5/td, -1.5/td, 0, 
+		1.5/td, -1.5/td, 0
+	endgroup
+
+	placegroup subgroup("maru60", "shikaku60")
+
+	addz -2/td
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		6/2/td, 360, 4000
+	addz -58/td
+		cylind 60/td, 1.5/td
+	del 2
+endgroup
+
+
+group "YAS75"
+	!!φ5.5×75
+	!!YA-S75  
+	!!YS-N75
+
+	material 40
+
+	group "maru551"
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		5.5/2/td, 360, 4000
+	endgroup
+
+	group "shikaku151"
+		extrude 4, 0, 0, 3/td, 1+2+4+16+32, 
+		1.5/td, 1.5/td, 0, 
+		-1.5/td, 1.5/td, 0, 
+		-1.5/td, -1.5/td, 0, 
+		1.5/td, -1.5/td, 0
+	endgroup
+
+	placegroup subgroup("maru551", "shikaku151")
+
+	addz -2/td
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		5.5/2/td, 360, 4000
+	addz -73/td
+		cylind 75/td, 1.5/td
+	del 2
+endgroup
+
+
+group "YSN75"
+    !!φ7×75
+    !!YS-N75
+
+    material 32
+
+    group "maru751"
+        extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		7/2/td, 360, 4000
+    endgroup
+
+    group "shikaku751"
+        extrude 4, 0, 0, 3/td, 1+2+4+16+32, 
+		1.5/td, 1.5/td, 0, 
+		-1.5/td, 1.5/td, 0, 
+		-1.5/td, -1.5/td, 0, 
+		1.5/td, -1.5/td, 0
+    endgroup
+
+    placegroup subgroup ("maru751", "shikaku751")
+
+    addz -2/td
+        extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		7/2/td, 360, 4000
+    addz -73/td
+    	cylind 75/td, 1.5/td
+    del 2
+endgroup
+
+
+group "YPR85"
+    !!φ9.3×85
+    !!YPR-85
+
+    material 43
+
+    group "maru851"
+        extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		9.3/2/td, 360, 4000
+    endgroup
+
+    group "shikaku851"
+        extrude 4, 0, 0, 3/td, 1+2+4+16+32, 
+		1.5/td, 1.5/td, 0, 
+		-1.5/td, 1.5/td, 0, 
+		-1.5/td, -1.5/td, 0, 
+		1.5/td, -1.5/td, 0
+    endgroup
+
+    placegroup subgroup ("maru851", "shikaku851")
+
+    addz -2/td
+        extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		7/2/td, 360, 4000
+    addz -83/td
+    	cylind 85/td, 1.5/td
+    del 2
+endgroup
+
+
+group "YDN90"
+	!!φ6×90
+	!!YD-N90
+
+	material 69
+	group "maru150"
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		6/2/td, 360, 4000
+	endgroup
+
+	group "shikaku150"
+		extrude 4, 0, 0, 3/td, 1+2+4+16+32, 
+		1.5/td, 1.5/td, 0, 
+		-1.5/td, 1.5/td, 0, 
+		-1.5/td, -1.5/td, 0, 
+		1.5/td, -1.5/td, 0
+	endgroup
+
+	placegroup subgroup("maru150", "shikaku150")
+
+	addz -2/td
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		6/2/td, 360, 4000
+	addz -90/td
+		cylind 90/td, 1.5/td
+	del 2
+endgroup
+
+
+group "YDH90"
+	!!φ6×90
+	!!YD-H90
+
+	material 69
+
+	group "maru90"
+		resol 6
+
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		6/2/td, 360, 4000
+	endgroup
+
+	placegroup "maru90"
+
+	resol 36
+
+	addz -2/td
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		6/2/td, 360, 4000
+	addz -90/td
+		cylind 90/td, 1.5/td
+	del 2
+endgroup
+
+
+group "YS105"
+	!!φ5.5×105
+	!!YS-N105
+
+	material 20
+
+	group "maru105"
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		5.5/2/td, 360, 4000
+	endgroup
+
+	group "shikaku105"
+		extrude 4, 0, 0, 3/td, 1+2+4+16+32, 
+		1.5/td, 1.5/td, 0, 
+		-1.5/td, 1.5/td, 0, 
+		-1.5/td, -1.5/td, 0, 
+		1.5/td, -1.5/td, 0
+	endgroup
+
+	placegroup subgroup("maru105", "shikaku105")
+
+	addz -2/td
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		5.5/2/td, 360, 4000
+	addz -105/td
+		cylind 105/td, 1.5/td
+	del 2
+endgroup
+
+
+group "YPR115"
+	!!φ9.3×115
+	!!YPR-115
+
+	material 70
+
+	group "maru115"
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		9.3/2/td, 360, 4000
+	endgroup
+
+	group "shikaku115"
+		extrude 4, 0, 0, 3/td, 1+2+4+16+32, 
+		1.5/td, 1.5/td, 0, 
+		-1.5/td, 1.5/td, 0, 
+		-1.5/td, -1.5/td, 0, 
+		1.5/td, -1.5/td, 0
+	endgroup
+
+	placegroup subgroup("maru115", "shikaku115")
+
+	addz -2/td
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		7/2/td, 360, 4000
+	addz -113/td
+		cylind 115/td, 1.5/td
+	del 2
+endgroup
+
+
+
+group "YS150"
+	!!φ5.5×150
+	!!YS-N150
+
+	material 11
+
+	group "maru1501"
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		5.5/2/td, 360, 4000
+	endgroup
+
+	group "shikaku1501"
+		extrude 4, 0, 0, 3/td, 1+2+4+16+32, 
+		1.5/td, 1.5/td, 0, 
+		-1.5/td, 1.5/td, 0, 
+		-1.5/td, -1.5/td, 0, 
+		1.5/td, -1.5/td, 0
+	endgroup
+
+	placegroup subgroup("maru1501", "shikaku1501")
+
+	addz -2/td
+		extrude 2, 0, 0, 2/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		5.5/2/td, 360, 4000
+	addz -105/td
+		cylind 105/td, 1.5/td
+	del 2
+endgroup
+
+
+group "ZF55"
+	material 11
+
+	extrude 6, 0, 0, 3/td, 1+2+4+16+32, 
+	-3/td, 2/td, 0, 
+	-3/td, -2/td, 0, 
+	0, -2/td, 900, 
+	3/td, 180, 4000, 
+	3/td, 2/td, 0, 
+	-3/td, 2/td, 1001
+
+	add 0, 0, 3/td
+		DEFINE STYLE "cc" "New York", 3.5, 5, 0
+		SET STYLE "cc"
+		TEXT 0.0005, 0, "Z"
+	del 1
+
+	addz -52/td
+		extrude 6, 0, 0, 52/td, 1+2+4+16+32, 
+		-3.4/2/td, 3.4/2/td, 0, 
+		-3.4/2/td, -3.4/2/td, 0, 
+		0, -3.4/2/td, 900, 
+		3.4/2/td, 180, 4000, 
+		3.4/2/td, 3.4/2/td, 0, 
+		-3.4/2/td, 3.4/2/td, 1001
+	del 1
+endgroup
+
+!メインプレート
+if product_name=1 then
+	rotx -90
+	addz -0.6/td
+	addz -offset_horizontal_x
+		extrude 47, 0, 0, 0.6/td, 1+2+4+16+32, 
+		-22.5/td, 25/td, 0, 
+		-18.5/td, 45/td, 0, 
+		-14/td, 50/td, 1001, 
+		14/td, 50/td, 0, 
+		14/td, 44/td, 900, 
+		18.5/td, 45/td, 3001, 
+		22.5/td, 25/td, 0, 
+		22.5/td, -25/td, 0, 
+		18.5/td, -45/td, 0, 
+		14/td, -50/td, 1001, 
+		-14/td, -50/td, 0, 
+		-14/td, -45/td, 900, 
+		-18.5/td, -45/td, 3001, 
+		-22.5/td, -25/td, 0, 
+		-22.5/td, 25/td, -1, 
+		0, 30/td, 900, 
+		2.3/td, 360, 4000, 
+		0, -30/td, 900, 
+		2.3/td, 360, 4000, 
+		-11/td, 42/td, 900, 
+		2.3/td, 360, 4000, 
+		11/td, -42/td, 900, 
+		2.3/td, 360, 4000, 
+		11/td, 40/td, 900, 
+		2.3/td, 360, 4000, 
+		-11/td, -40/td, 900, 
+		2.3/td, 360, 4000, 
+		-5.2/td, -18.3/td, 0, 
+		-7.3/td, -8/td, 0, 
+		-7.3/td, 8/td, 0, 
+		-5.2/td, 18.3/td, 0, 
+		-4.3/td, 19.8/td, 1001, 
+		-1.2/td, 19.8/td, 0, 
+		1.2/td, 19.8/td, 0, 
+		4.3/td, 19.8/td, 0, 
+		3/td, 18/td, 900, 
+		5.2/td, 18.3/td, 3001, 
+		7.3/td, 8/td, 0, 
+		7.3/td, -8/td, 0, 
+		5.2/td, -18.3/td, 0, 
+		4.3/td, -19.8/td, 1001, 
+		1.2/td, -19.8/td, 0, 
+		-1.2/td, -19.8/td, 0, 
+		-4.3/td, -19.8/td, 0, 
+		-3/td, -18/td, 900, 
+		-5.2/td, -18.3/td, 3001, 
+		-5.2/td, -18.3/td, -1
+
+		extrude 3, 0, 0, 2.8/td, 1+2+4+16+32, 
+		0, 30/td, 900, 
+		4.8/td, 360, 4000, 
+		2.4/td, 360, 4000
+
+		extrude 3, 0, 0, 2.8/td, 1+2+4+16+32, 
+		0, -30/td, 900, 
+		4.8/td, 360, 4000, 
+		2.4/td, 360, 4000
+
+		extrude 3, 0, 0, 2.8/td, 1+2+4+16+32, 
+		-11/td, 42/td, 900, 
+		4.8/td, 360, 4000, 
+		2.4/td, 360, 4000
+
+		extrude 3, 0, 0, 2.8/td, 1+2+4+16+32, 
+		11/td, -42/td, 900, 
+		4.8/td, 360, 4000, 
+		2.4/td, 360, 4000
+
+		extrude 3, 0, 0, 2.8/td, 1+2+4+16+32, 
+		11/td, 40/td, 900, 
+		4.8/td, 360, 4000, 
+		2.4/td, 360, 4000
+
+		extrude 3, 0, 0, 2.8/td, 1+2+4+16+32, 
+		-11/td, -40/td, 900, 
+		4.8/td, 360, 4000, 
+		2.4/td, 360, 4000
+
+		if screw_indication=1 then
+			mulz -1
+				add 0, 30/td, 0
+					placegroup "YAS45"
+				del 1
+
+				add 0, -30/td, 0
+					placegroup "YAS45"
+				del 1
+
+				add -11/td, 42/td, 0
+					placegroup "YAS45"
+				del 1
+
+				add 11/td, -42/td, 0
+					placegroup "YAS45"
+				del 1
+
+				add 11/td, 40/td, 0
+					placegroup "YAS45"
+				del 1
+
+				add -11/td, -40/td, 0
+					placegroup "YAS45"
+				del 1
+			del 1
+		endif
+	del top
+endif
+
+!スリムビルトコーナー
+if product_name=2 then
+	if hardware_position=1 then 
+		mulz -1
+	endif
+	rotx 90
+	addz offset_horizontal_x
+		extrude 12, 0, 0, 1.6/td, 1+2+4+16+32, 
+		-15/td, 0, 0, 
+		-15/td, 55.5/td, 0, 
+		0, 55.5/td, 900, 
+		15/td, 55.5/td, 3001, 
+		15/td, 0, 0, 
+		-15/td, 0, -1, 
+		0, 60.7/td, 900, 
+		2.8/td, 360, 4000, 
+		8.2/td, 35.5/td, 900, 
+		2.8/td, 360, 4000, 
+		-8.2/td, 35.5/td, 900, 
+		2.8/td, 360, 4000
+	mulz -1
+		extrude 3, 0, 0, 1.6/td, 1+2+4+16+32, 
+		0, 60.7/td, 900, 
+		4.8/td, 360, 4000, 
+		2.8/td, 360, 4000
+
+		extrude 3, 0, 0, 1.6/td, 1+2+4+16+32, 
+		8.2/td, 35.5/td, 900, 
+		4.8/td, 360, 4000, 
+		2.8/td, 360, 4000
+
+		extrude 3, 0, 0, 1.6/td, 1+2+4+16+32, 
+		-8.2/td, 35.5/td, 900, 
+		4.8/td, 360, 4000, 
+		2.8/td, 360, 4000
+	del 1
+		if screw_indication=1 then
+			add 0, 60.7/td, 0
+				placegroup "YAS45"
+			del 1
+			
+			add 8.2/td, 35.5/td, 0
+				placegroup "YAS45"
+			del 1
+
+			add -8.2/td, 35.5/td, 0
+				placegroup "YAS45"
+			del 1
+		endif
+
+	rotx -90
+		extrude 11, 0, 0, 1.6/td, 1+2+4+16+32, 
+		-15/td, 0, 0, 
+		-15/td, -30/td, 0, 
+		15/td, -30/td, 0, 
+		15/td, 0, 0, 
+		-15/td, 0, -1, 
+		0, -20/td, 900, 
+		2.8/td, 360, 4000, 
+		8.5/td, -11.7/td, 900, 
+		2.8/td, 360, 4000, 
+		-8.5/td, -11.7/td, 900, 
+		2.8/td, 360, 4000
+	mulz -1
+		extrude 3, 0, 0, 1.6/td, 1+2+4+16+32, 
+		0, -20/td, 900, 
+		4.8/td, 360, 4000, 
+		2.8/td, 360, 4000
+
+		extrude 3, 0, 0, 1.6/td, 1+2+4+16+32, 
+		8.5/td, -11.7/td, 900, 
+		4.8/td, 360, 4000, 
+		2.8/td, 360, 4000
+
+		extrude 3, 0, 0, 1.6/td, 1+2+4+16+32, 
+		-8.5/td, -11.7/td, 900, 
+		4.8/td, 360, 4000, 
+		2.8/td, 360, 4000
+	del 1
+		if screw_indication=1 then
+			add 0, -20/td, 0
+				placegroup "YAS45"
+			del 1
+
+			add 8.5/td, -11.7/td, 0
+				placegroup "YAS45"
+			del 1
+
+			add -8.5/td, -11.7/td, 0
+				placegroup "YAS45"
+			del 1
+		endif
+
+		group "sankaku3"
+			addx -8/td
+			rotz -60
+			rotx -11.5
+				block 20/td, 35/td, 40/td
+			del 3
+		endgroup
+
+		group "sankaku4"
+			addx 8/td
+			rotz 60
+			rotx -11.5
+			mulx -1
+				block 20/td, 35/td, 40/td
+			del 4
+		endgroup
+
+		middles2 =ISECTGROUP("sankaku3", "sankaku4")
+
+		group "sankut1"
+			addx -20/td
+			addy -1.6/td
+			addz -10/td
+				block 40/td, 40/td, 80/td
+			del 3
+		endgroup
+
+		group "sankut2"
+			muly -1
+			mulz -1
+			addx -20/td
+			addz -1.6/td
+				block 40/td, 40/td, 80/td
+			del 4
+		endgroup
+
+		middles3=SUBGROUP(middles2, "sankut1")
+		middles4=SUBGROUP(middles3, "sankut2")
+		placegroup middles4
+	del top
+endif
+
+!スリムビルトコーナー75
+if product_name=3 then
+	if hardware_position=1 then
+		mulz -1
+	endif
+
+	rotx 90
+	addz offset_horizontal_x
+		extrude 12, 0, 0, 1.6/td, 1+2+4+16+32, 
+		-15/td, 0, 0, 
+		-15/td, 55.5/td, 0, 
+		0, 55.5/td, 900, 
+		15/td, 55.5/td, 3001, 
+		15/td, 0, 0, 
+		-15/td, 0, -1, 
+		0, 60.7/td, 900, 
+		2.8/td, 360, 4000, 
+		8.2/td, 35.5/td, 900, 
+		2.8/td, 360, 4000, 
+		-8.2/td, 35.5/td, 900, 
+		2.8/td, 360, 4000
+	mulz -1
+		extrude 3, 0, 0, 1.6/td, 1+2+4+16+32, 
+		0, 60.7/td, 900, 
+		4.8/td, 360, 4000, 
+		2.8/td, 360, 4000
+
+		extrude 3, 0, 0, 1.6/td, 1+2+4+16+32, 
+		8.2/td, 35.5/td, 900, 
+		4.8/td, 360, 4000, 
+		2.8/td, 360, 4000
+
+		extrude 3, 0, 0, 1.6/td, 1+2+4+16+32, 
+		-8.2/td, 35.5/td, 900, 
+		4.8/td, 360, 4000, 
+		2.8/td, 360, 4000
+	del 1
+		if screw_indication=1 then
+			add 0, 60.7/td, 0
+				placegroup "YAS45"
+			del 1
+
+			add 8.2/td, 35.5/td, 0
+				placegroup "YAS45"
+			del 1
+
+			add -8.2/td, 35.5/td, 0
+				placegroup "YAS45"
+			del 1
+		endif
+	rotx -90
+		extrude 11, 0, 0, 1.6/td, 1+2+4+16+32, 
+		-15/td, 0, 0, 
+		-15/td, -30/td, 0, 
+		15/td, -30/td, 0, 
+		15/td, 0, 0, 
+		-15/td, 0, -1, 
+		0, -20/td, 900, 
+		2.8/td, 360, 4000, 
+		8.5/td, -11.7/td, 900, 
+		2.8/td, 360, 4000, 
+		-8.5/td, -11.7/td, 900, 
+		2.8/td, 360, 4000
+	mulz -1
+		extrude 3, 0, 0, 1.6/td, 1+2+4+16+32, 
+		0, -20/td, 900, 
+		4.8/td, 360, 4000, 
+		2.8/td, 360, 4000
+
+		extrude 3, 0, 0, 1.6/td, 1+2+4+16+32, 
+		8.5/td, -11.7/td, 900, 
+		4.8/td, 360, 4000, 
+		2.8/td, 360, 4000
+
+
+		extrude 3, 0, 0, 1.6/td, 1+2+4+16+32, 
+		-8.5/td, -11.7/td, 900, 
+		4.8/td, 360, 4000, 
+		2.8/td, 360, 4000
+	del 1
+		if screw_indication=1 then
+			add 0, -20/td, 0
+				placegroup "YAS75"
+			del 1
+
+			add 8.5/td, -11.7/td, 0
+				placegroup "YAS75"
+			del 1
+
+			add -8.5/td, -11.7/td, 0
+				placegroup "YAS75"
+			del 1
+		endif
+
+		group "sankaku1"
+			addx -8/td
+			rotz -60
+			rotx -11.5
+				block 20/td, 35/td, 40/td
+			del 3
+		endgroup
+
+		group "sankaku2"
+			addx 8/td
+			rotz 60
+			rotx -11.5
+			mulx -1
+				block 20/td, 35/td, 40/td
+			del 4
+		endgroup
+
+		middles2 =ISECTGROUP("sankaku1", "sankaku2")
+
+		group "sankut3"
+			addx -20/td
+			addy -1.6/td
+			addz -10/td
+				block 40/td, 40/td, 80/td
+			del 3
+		endgroup
+
+		group "sankut4"
+			muly -1
+			mulz -1
+			addx -20/td
+			addz -1.6/td
+				block 40/td, 40/td, 80/td
+			del 4
+		endgroup
+
+		middles3=SUBGROUP(middles2, "sankut3")
+		middles4=SUBGROUP(middles3, "sankut4")
+		placegroup middles4
+	del top
+endif
+
+!アレントコーナー
+if product_name=4 then
+	if hardware_position=1 then 
+		mulz -1
+	endif
+
+	rotx 90
+	addz offset_horizontal_x
+		extrude 17, 0, 0, 3.2/td, 1+2+4+16+32, 
+		-6/td, 19.4/td, 0, 
+		-15/td, 30/td, 0, 
+		-15/td, 117/td, 0, 
+		-12/td, 120/td, 1001, 
+		12/td, 120/td, 0, 
+		15/td, 117/td, 1001, 
+		15/td, 30/td, 0, 
+		6/td, 19.4/td, 0, 
+		-6/td, 19.4/td, -1, 
+		-7.7/td, 111.5/td, 900, 
+		3/td, 360, 4000, 
+		7.7/td, 111.5/td, 900, 
+		3/td, 360, 4000, 
+		-5.9/td, 49.2/td, 900, 
+		3/td, 360, 4000, 
+		5.9/td, 49.2/td, 900, 
+		3/td, 360, 4000
+
+		if screw_indication=1 then
+			add -7.7/td, 111.5/td, 3.2/td
+				placegroup "YAS75"
+			del 1
+
+			add 7.7/td, 111.5/td, 3.2/td
+				placegroup "YAS75"
+			del 1
+			
+			add -5.9/td, 49.2/td, 3.2/td
+				placegroup "YAS75"
+			del 1
+
+			add 5.9/td, 49.2/td, 3.2/td
+				placegroup "YAS75"
+			del 1
+		endif
+	rotx -90
+		extrude 13, 0, 0, 3.2/td, 1+2+4+16+32, 
+		-6.4/td, -14/td, 0, 
+		-15/td, -20/td, 0, 
+		-15/td, -40/td, 0, 
+		-13/td, -42/td, 1001, 
+		13/td, -42/td, 0, 
+		15/td, -40/td, 1001, 
+		15/td, -20/td, 0, 
+		6.4/td, -14/td, 0, 
+		-6.4/td, -14/td, -1, 
+		-7.9/td, -22/td, 900, 
+		3/td, 360, 4000, 
+		7.9/td, -22/td, 900, 
+		3/td, 360, 4000
+
+		if screw_indication=1 then
+			add 7.9/td, -22/td, 3.2/td
+				placegroup "YS105"
+			del 1
+
+			add -7.9/td, -22/td, 3.2/td
+				placegroup "YS105"
+			del 1
+		endif
+	add -6.4/td, -14/td, 0
+	rotx 54.2
+		block 12.8/td, 24/td, 3.2/td
+	del 2
+		group "trapezoid1"
+			add -15/td, -22/td, 0
+			rotz 42.93
+			rotx 62.2
+				block 26/td, 60/td, 2.3/td
+			del 3
+		endgroup
+
+		group "trapezoid2"
+			add -15/td, -22/td, 0
+			rotz 42.93
+			rotx 62.2
+			rotz -20.8
+				block 60/td, 60/td, 2.3/td
+			del 4
+		endgroup
+
+		tzoid=ISECTGROUP("trapezoid1", "trapezoid2")
+
+		group "trape1"
+			rotx 90
+			mulz -1
+				extrude 8, 0, 0, 32/td, 1+2+4+16+32, 
+				-6/td, 19.4/td, 0, 
+				-15/td, 0/td, 0, 
+				-15/td, 117/td, 0, 
+				-12/td, 120/td, 1001, 
+				12/td, 120/td, 0, 
+				15/td, 117/td, 1001, 
+				15/td, 0/td, 0, 
+				6/td, 19.4/td, 0
+			del 2
+
+			extrude 6, 0, 0, 3.2/td, 1+2+4+16+32, 
+			-6.4/td, -14/td, 0, 
+			-15/td, -22/td, 0, 
+			-15/td, -42/td, 0, 
+			15/td, -42/td, 0, 
+			15/td, -22/td, 0, 
+			6.4/td, -14/td, 0
+		endgroup
+
+		group "trapecut1"
+		add -6.4/td, -14/td, 0
+		rotx 54.2
+		mulz -1
+			block 12.8/td, 30/td, 32/td
+		del 3
+		endgroup
+
+		tzoid2=SUBGROUP(tzoid, "trape1")
+		tzoid3=SUBGROUP(tzoid2, "trapecut1")
+
+		CUTPLANE{3}-14.99/td, 0
+			placegroup tzoid3
+		cutend
+	mulx -1
+		CUTPLANE{3}-14.99/td, 0
+			placegroup tzoid3
+		cutend
+	del top
+endif
+
+!ウォールコーナー
+if product_name=5 then
+	if hardware_position=1 then 
+		mulz -1
+	endif
+
+	rotx 90
+	addz offset_horizontal_x
+	addz 3.2/td
+		HPRISM_ 11, 11, 11, 11, 
+		5, 2/td, 0, 2/td, 1, 
+		-4.7/td, 49/td, 15, 
+		-4.7/td, 120/td, 15, 
+		0, 120/td, 900, 
+		4.7/td, 120/td, 3015, 
+		4.7/td, 49/td, 15
+	del 1
+		group "main5"
+			addx 25/td
+			roty -90
+				extrude 9, 0, 0, 50/td, 1+2+4+16+32+64, 
+				73.2/td, 3.2/td, 0, 
+				73.2/td, 0, 0, 
+				12.8/td, 0, 1, 
+				0, 12.8/td, 1001, 
+				0, 163.2/td, 1, 
+				3.2/td, 163.2/td, 0, 
+				3.2/td, 12.8/td, 1, 
+				12.8/td, 3.2/td, 1001, 
+				73.2/td, 3.2/td, 1
+			del 2
+		endgroup
+
+		group "mulcut"
+			extrude 3, 0, 0, 3.2/td, 1+2+4+16+32, 
+			-45/2/td, 163.2/td, 0, 
+			-50/2/td, 153.2/td, 0, 
+			-50/2/td, 163.2/td, 0
+
+			extrude 3, 0, 0, 3.2/td, 1+2+4+16+32, 
+			45/2/td, 163.2/td, 0, 
+			50/2/td, 153.2/td, 0, 
+			50/2/td, 163.2/td, 0
+
+			extrude 2, 0, 0, 3.2/td, 1+2+4+16+32, 
+			-12/td, 152/td, 900, 
+			3/td, 360, 4000
+
+			extrude 2, 0, 0, 3.2/td, 1+2+4+16+32, 
+			12/td, 152/td, 900, 
+			3/td, 360, 4000
+
+			extrude 2, 0, 0, 3.2/td, 1+2+4+16+32, 
+			0, 132/td, 900, 
+			3/td, 360, 4000
+
+			extrude 2, 0, 0, 3.2/td, 1+2+4+16+32, 
+			-12/td, 102/td, 900, 
+			3/td, 360, 4000
+
+			extrude 2, 0, 0, 3.2/td, 1+2+4+16+32, 
+			12/td, 102/td, 900, 
+			3/td, 360, 4000
+
+			extrude 2, 0, 0, 3.2/td, 1+2+4+16+32, 
+			-15.5/td, 53/td, 900, 
+			3/td, 360, 4000
+
+			extrude 2, 0, 0, 3.2/td, 1+2+4+16+32, 
+			15.5/td, 53/td, 900, 
+			3/td, 360, 4000
+		endgroup
+
+		mar1=subgroup("main5", "mulcut")
+
+		group "mulcut2"
+			rotx -90
+				extrude 2, 0, 0, 3.2/td, 1+2+4+16+32, 
+				-18/td, -29.3/td, 900, 
+				3/td, 360, 4000
+
+				extrude 2, 0, 0, 3.2/td, 1+2+4+16+32, 
+				18/td, -29.3/td, 900, 
+				3/td, 360, 4000
+				
+				extrude 2, 0, 0, 3.2/td, 1+2+4+16+32, 
+				11.6/td, -41.3/td, 900, 
+				3/td, 360, 4000
+
+				extrude 2, 0, 0, 3.2/td, 1+2+4+16+32, 
+				-11.6/td, -41.3/td, 900, 
+				3/td, 360, 4000
+			del 1
+		endgroup
+
+		mar2=subgroup(mar1, "mulcut2")
+
+		placegroup mar2
+
+		if screw_indication=1 then
+			add -12/td, 152/td, 3.2/td
+				placegroup "YAS75"
+			del 1
+
+			add 12/td, 152/td, 3.2/td
+				placegroup "YAS75"
+			del 1
+			add 12/td, 102/td, 3.2/td
+				placegroup "YAS75"
+			del 1
+
+			add -12/td, 102/td, 3.2/td
+				placegroup "YAS75"
+			del 1
+
+			add -15.5/td, 53/td, 3.2/td
+				placegroup "YAS75"
+			del 1
+
+			add 15.5/td, 53/td, 3.2/td
+				placegroup "YAS75"
+			del 1
+
+			add 0, 132/td, 3.2/td
+				placegroup "YAS75"
+			del 1
+		endif
+	rotx -90
+	muly -1
+	addz 3.2/td
+		HPRISM_ 11, 11, 11, 11, 
+		5, 2/td, 0, 2/td, 1, 
+		-4.7/td, 20/td, 15, 
+		-4.7/td, 55.5/td, 15, 
+		0, 55.5/td, 900, 
+		4.7/td, 55.5/td, 3015, 
+		4.7/td, 20/td, 15
+	del 2
+		if screw_indication=1 then
+			add 18/td, -29.3/td, 3.2/td
+				placegroup "YS150"
+			del 1
+
+			add -18/td, -29.3/td, 3.2/td
+				placegroup "YS150"
+			del 1
+
+			add 11.6/td, -41.3/td, 3.2/td
+				placegroup "YS150"
+			del 1
+
+			add -11.6/td, -41.3/td, 3.2/td
+				placegroup "YS150"
+			del 1
+		endif
+
+		group "sanka1"
+			addx -18/td
+			rotz -60
+			rotx -11.5
+				block 40/td, 35/td, 70/td
+			del 3
+		endgroup
+
+		group "sanka2"
+			addx 18/td
+			rotz 60
+			rotx -11.5
+			mulx -1
+				block 40/td, 35/td, 70/td
+			del 4
+		endgroup
+
+		middles2 =ISECTGROUP("sanka1", "sanka2")
+
+		group "sanut5"
+			rotx 90
+			addx 25/td
+			roty -90
+				extrude 9, 0, 0, 50/td, 1+2+4+16+32+64, 
+				73.2/td, 3.2/td, 0, 
+				73.2/td, -26/td, 0, 
+				12.8/td, -26/td, 0, 
+				-26/td, 12.8/td-5/td, 1001, 
+				-26/td, 163.2/td, 0, 
+				3.2/td, 163.2/td, 0, 
+				3.2/td, 12.8/td, 0, 
+				12.8/td, 3.2/td, 1001, 
+				73.2/td, 3.2/td, 0
+			del 3
+		endgroup
+
+		group "sanut4"
+			rotx 90
+			addx 25/td
+			roty -90
+				extrude 8, 0, 0, 50/td, 1+2+4+16+32+64, 
+				29.9/td, 3.2/td, 1, 
+				29.9/td, 10/td, 1, 
+				29.9/td, 10/td, 1, 
+				10/td, 70/td, 1, 
+				10/td, 121/td, 1, 
+				3.2/td, 121/td, 1, 
+				3.2/td, 70/td, 1, 
+				29.9/td, 3.2/td, 1001
+			del 3
+		endgroup
+
+		middles5=SUBGROUP(middles2, "sanut5")
+		middles4=SUBGROUP(middles5, "sanut4")
+
+		placegroup middles4
+	del top
+endif
+
+!プロパスホールダウン25
+if product_name=6 then
+    if hardware_position=1 then 
+		mulz -1
+    endif
+
+    addz 25/td
+    rotx 90
+    addz offset_horizontal_x
+        group "main6"
+			extrude 27, 0, 0, 6/td, 1+2+4+16+32, 
+			-19.1/td, 12.5/td, 0, 
+			-16.5/td, 38.8/td, 0, 
+			-16.5/td, 85.8/td, 0, 
+			-19.5/td, 118.1/td, 0, 
+			-20/td, 178/td, 0, 
+			-18/td, 180/td, 1001, 
+			18/td, 180/td, 0, 
+			20/td, 178/td, 1001, 
+			19.5/td, 118.1/td, 0, 
+			16.5/td, 85.8/td, 0, 
+			16.5/td, 38.8/td, 0, 
+			19.1/td, 12.5/td, 0, 
+			20/td, 2/td, 0, 
+			18/td, 0, 1001, 
+			-18/td, 0, 0, 
+			-20/td, 2/td, 1001, 
+			-19.1/td, 12.5/td, -1, 
+			-11.4/td, 133.9/td, 900, 
+			3/td, 360, 4000, 
+			11.4/td, 133.9/td, 900, 
+			3/td, 360, 4000, 
+			9.6/td, 170/td, 900, 
+			3/td, 360, 4000, 
+			-9.6/td, 170/td, 900, 
+			3/td, 360, 4000, 
+			0, 142.5/td, 900, 
+			3/td, 360, 4000
+        endgroup
+
+        group "parts6"
+            extrude 7, 0, 0, 12/td, 1+2+4+16+32, 
+            -16.5/td, 38.8/td, 0, 
+            -16.5/td, 85.8/td, 0, 
+            -19.5/td, 118.1/td, 0, 
+            -44/td, 94.4/td, 900, 
+            -10.1/td, 94.4/td, 3001, 
+            -10.1/td, 36.9/td, 0, 
+            -19.1/td, 12.5/td, 1001
+
+            extrude 7, 0, 0, 12/td, 1+2+4+16+32, 
+            16.5/td, 38.8/td, 0, 
+            16.5/td, 85.8/td, 0, 
+            19.5/td, 118.1/td, 0, 
+            44/td, 94.4/td, 900, 
+            10.1/td, 94.4/td, 3001, 
+            10.1/td, 36.9/td, 0, 
+            19.1/td, 12.5/td, 1001
+        endgroup
+
+        placegroup addgroup ("main6", "parts6")
+
+        if screw_indication=1 then
+            add -11.4/td, 133.9/td, 6/td
+				placegroup "YSN75"
+            del 1
+
+            add 11.4/td, 133.9/td, 6/td
+				placegroup "YSN75"
+            del 1
+
+            add 9.6/td, 170/td, 6/td
+				placegroup "YSN75"
+            del 1
+
+            add -9.6/td, 170/td, 6/td
+				placegroup "YSN75"
+            del 1
+
+            add 0, 142.5/td, 6/td
+				placegroup "YSN75"
+            del 1
+        endif
+    rotx -90
+    addz 50/td
+        extrude 20, 0, 0, 30/td, 1+2+4+16+32+64, 
+        -10/td, 0, 1, 
+        -10/td, -15/td, 1, 
+        -14.5/td, -25/td, 1, 
+        -14.5/td, -40/td, 1, 
+        0, -40/td, 900, 
+        14.5/td, 180, 4001, 
+        14.5/td, -25/td, 1, 
+        10/td, -15/td, 1, 
+        10/td, 0, 1, 
+        -10/td, 0, -1, 
+        -3.7/td, 0, 0, 
+        -3.7/td, -15/td, 0, 
+        -8.2/td, -25/td, 0, 
+        -8.2/td, -40/td, 0, 
+        0, -40/td, 900, 
+        8.2/td, 180, 4000, 
+        8.2/td, -25/td, 0, 
+        3.7/td, -15/td, 0, 
+        3.7/td, 0, 0, 
+        3.7/td, 0, -1
+	add 0, -40/td, 40/td
+        if bolt_indication=1 then
+            gosub "M16"
+        endif
+    del top
+endif
+
+!シークホールダウンC-HD2535
+if product_name=7 then
+	if hardware_position=1 then 
+		mulz -1
+	endif
+
+	addz 25/td
+	rotx 90
+	addz offset_horizontal_x
+		group "main7"
+			extrude 35, 0, 0, 4.5/td, 1+2+4+16+32, 
+			-20/td, 0, 0, 
+			-20/td, 20/td, 0, 
+			-25.55/td, 29/td, 900, 
+			-15/td, 28.3/td, 3001, 
+			-15/td, 28.3/td, 1, 
+			-15/td, 105/td, 0, 
+			-20/td, 112/td, 0, 
+			-20/td, 240/td, 0, 
+			20/td, 240/td, 0, 
+			20/td, 112/td, 0, 
+			15/td, 105/td, 0, 
+			15/td, 28.3/td, 0, 
+			20/td, 20/td, 1001, 
+			20/td, 0, 0, 
+			-20/td, 0, -1, 
+			-8.5/td, 129/td, 900, 
+			3/td, 360, 4000, 
+			8.5/td, 129/td, 900, 
+			3/td, 360, 4000, 
+			0, 145/td, 900, 
+			3/td, 360, 4000, 
+			-8.5/td, 162/td, 900, 
+			3/td, 360, 4000, 
+			8.5/td, 162/td, 900, 
+			3/td, 360, 4000, 
+			-8.5/td, 195.5/td, 900, 
+			3/td, 360, 4000, 
+			8.5/td, 195.5/td, 900, 
+			3/td, 360, 4000, 
+			0, 212.5/td, 900, 
+			3/td, 360, 4000, 
+			-8.5/td, 229/td, 900, 
+			3/td, 360, 4000, 
+			8.5/td, 229/td, 900, 
+			3/td, 360, 4000
+		endgroup
+
+		group "parts7"
+			extrude 15, 0, 0, 16.6/td, 1+2+4+16+32, 
+			-20/td, 0, 0, 
+			-20/td, 20/td, 0, 
+			-25.55/td, 29/td, 900, 
+			-15/td, 28.3/td, 3001, 
+			-15/td, 28.3/td, 1, 
+			-15/td, 105/td, 0, 
+			-20/td, 112/td, 0, 
+			-20/td, 240/td, 0, 
+			-20/td+4.4/td, 240/td, 0, 
+			-20/td+4.4/td, 240/td, 0, 
+			-20/td+4.4/td, 112/td, 0, 
+			-15/td+4.4/td, 105/td, 0, 
+			-15/td+4.4/td, 28.3/td, 1, 
+			-20/td+4.4/td, 20/td, 1001, 
+			-20/td+4.4/td, 0, 0
+
+			mulx -1
+				extrude 15, 0, 0, 16.6/td, 1+2+4+16+32, 
+				-20/td, 0, 0, 
+				-20/td, 20/td, 0, 
+				-25.55/td, 29/td, 900, 
+				-15/td, 28.3/td, 3001, 
+				-15/td, 28.3/td, 1, 
+				-15/td, 105/td, 0, 
+				-20/td, 112/td, 0, 
+				-20/td, 240/td, 0, 
+				-20/td+4.4/td, 240/td, 0, 
+				-20/td+4.4/td, 240/td, 0, 
+				-20/td+4.4/td, 112/td, 0, 
+				-15/td+4.4/td, 105/td, 0, 
+				-15/td+4.4/td, 28.3/td, 1, 
+				-20/td+4.4/td, 20/td, 1001, 
+				-20/td+4.4/td, 0, 0
+			del 1
+		endgroup
+
+		group "mulcut7"
+			addx -20/td+4.4/td
+			roty -90
+				extrude 5, 0, 0, 4.4/td, 1+2+4+16+32, 
+				16.6/td, 240/td, 0, 
+				11/td, 240/td, 0, 
+				11/td, 234.4/td, 900, 
+				16.6/td, 234.4/td, 3001, 
+				16.6/td, 234.4/td, 1
+			del 2
+
+			addx 20/td
+			roty -90
+				extrude 5, 0, 0, 4.4/td, 1+2+4+16+32, 
+				16.6/td, 240/td, 0, 
+				11/td, 240/td, 0, 
+				11/td, 234.4/td, 900, 
+				16.6/td, 234.4/td, 3001, 
+				16.6/td, 234.4/td, 1
+			del 2
+
+			addx -20/td+4.4/td
+			roty -90
+				extrude 5, 0, 0, 4.4/td, 1+2+4+16+32, 
+				16.6/td, 0, 0, 
+				11/td, 0, 0, 
+				11/td, 5.6/td, 900, 
+				16.6/td, 5.6/td, 3001, 
+				16.6/td, 5.6/td, 1
+			del 2
+
+			addx 20/td
+			roty -90
+				extrude 5, 0, 0, 4.4/td, 1+2+4+16+32, 
+				16.6/td, 0, 0, 
+				11/td, 0, 0, 
+				11/td, 5.6/td, 900, 
+				16.6/td, 5.6/td, 3001, 
+				16.6/td, 5.6/td, 1
+			del 2
+		endgroup
+
+		main7f=addgroup("main7", "parts7")
+
+		placegroup subgroup(main7f, "mulcut7")
+
+		if screw_indication=1 then
+			add -8.5/td, 129/td, 4.5/td
+				placegroup "YDN90"
+			del 1
+
+			add 8.5/td, 129/td, 4.5/td
+				placegroup "YDN90"
+			del 1
+
+			add 0, 145/td, 4.5/td
+				placegroup "YDN90"
+			del 1
+
+			add -8.5/td, 195.5/td, 4.5/td
+				placegroup "YDN90"
+			del 1
+
+			add 8.5/td, 195.5/td, 4.5/td
+				placegroup "YDN90"
+			del 1
+
+			add -8.5/td, 229/td, 4.5/td
+				placegroup "YDN90"
+			del 1
+
+			add 8.5/td, 229/td, 4.5/td
+				placegroup "YDN90"
+			del 1
+
+			add 0, 212.5/td, 4.5/td
+				placegroup "YDN90"
+			del 1
+
+			add -8.5/td, 162/td, 4.5/td
+				placegroup "YDN90"
+			del 1
+
+			add 8.5/td, 162/td, 4.5/td
+				placegroup "YDN90"
+			del 1
+		endif
+	rotx -90
+	addz 40/td
+		extrude 20, 0, 0, 55/td, 1+2+4+16+32+64, 
+		-10/td, 0, 1, 
+		-10/td, -15/td, 1, 
+		-14.5/td, -25/td, 1, 
+		-14.5/td, -40/td, 1, 
+		0, -40/td, 900, 
+		14.5/td, 180, 4001, 
+		14.5/td, -25/td, 1, 
+		10/td, -15/td, 1, 
+		10/td, 0, 1, 
+		-10/td, 0, -1, 
+		-3.7/td, 0, 0, 
+		-3.7/td, -15/td, 0, 
+		-8.2/td, -25/td, 0, 
+		-8.2/td, -40/td, 0, 
+		0, -40/td, 900, 
+		8.2/td, 180, 4000, 
+		8.2/td, -25/td, 0, 
+		3.7/td, -15/td, 0, 
+		3.7/td, 0, 0, 
+		3.7/td, 0, -1
+	add 0, -40/td, 65/td
+		if bolt_indication=1 then
+			gosub "M16"
+		endif
+	del top
+endif
+
+!ホールドコーナー
+if product_name=8 then
+	if hardware_position=1 then 
+		mulz -1
+	endif
+
+	rotx 90
+	addz offset_horizontal_x
+		extrude 23, 0, 0, 1/td, 1+2+4+16+32, 
+		-45/td, 0, 0, 
+		-45/td, 8/td, 0, 
+		-20/td, 47.7/td, 0, 
+		-20/td, 98/td, 0, 
+		-18/td, 100/td, 1001, 
+		18/td, 100/td, 0, 
+		20/td, 98/td, 1001, 
+		20/td, 47.7/td, 0, 
+		45/td, 8/td, 0, 
+		45/td, 0, 0, 
+		-45/td, 0, -1, 
+		-12.1/td, 25.7/td, 900, 
+		3/td, 360, 4000, 
+		12.1/td, 25.7/td, 900, 
+		3/td, 360, 4000, 
+		10/td, 66/td, 900, 
+		3/td, 360, 4000, 
+		-10/td, 66/td, 900, 
+		3/td, 360, 4000, 
+		0, 45.5/td, 900, 
+		3/td, 360, 4000, 
+		0, 85.5/td, 900, 
+		3/td, 360, 4000
+	mulz -1
+		extrude 3, 0, 0, 1/td, 1+2+4+16+32, 
+		-12.1/td, 25.7/td, 900, 
+		4.8/td, 360, 4000, 
+		3/td, 360, 4000
+
+		extrude 3, 0, 0, 1/td, 1+2+4+16+32, 
+		12.1/td, 25.7/td, 900, 
+		4.8/td, 360, 4000, 
+		3/td, 360, 4000
+
+		extrude 3, 0, 0, 1/td, 1+2+4+16+32, 
+		10/td, 66/td, 900, 
+		4.8/td, 360, 4000, 
+		3/td, 360, 4000
+
+		extrude 3, 0, 0, 1/td, 1+2+4+16+32, 
+		-10/td, 66/td, 900, 
+		4.8/td, 360, 4000, 
+		3/td, 360, 4000
+
+		extrude 3, 0, 0, 1/td, 1+2+4+16+32, 
+		0, 45.5/td, 900, 
+		4.8/td, 360, 4000, 
+		3/td, 360, 4000
+
+		extrude 3, 0, 0, 1/td, 1+2+4+16+32, 
+		0, 85.5/td, 900, 
+		4.8/td, 360, 4000, 
+		3/td, 360, 4000
+	del 1
+		if screw_indication=1 then
+			add 12.1/td, 25.7/td, 1/td
+				placegroup "YDR60"
+			del 1
+
+			add -12.1/td, 25.7/td, 1/td
+				placegroup "YDR60"
+			del 1
+
+			add 10/td, 66/td, 1/td
+				placegroup "YDR60"
+			del 1
+
+			add -10/td, 66/td, 1/td
+				placegroup "YDR60"
+			del 1
+
+			add 0, 45.5/td, 1/td
+				placegroup "YDR60"
+			del 1
+
+			add 0, 85.5/td, 1/td
+				placegroup "YDR60"
+			del 1
+		endif
+	rotx -90
+		extrude 21, 0, 0, 1/td, 1+2+4+16+32, 
+		-45/td, 0, 0, 
+		-45/td, -20/td, 0, 
+		-40/td, -26/td, 1001, 
+		40/td, -26/td, 0, 
+		45/td, -20/td, 1001, 
+		45/td, 0, 0, 
+		-45/td, 0, -1, 
+		-36/td, -7/td, 900, 
+		3/td, 360, 4000, 
+		36/td, -7/td, 900, 
+		3/td, 360, 4000, 
+		-24.7/td, -13.1/td, 900, 
+		3/td, 360, 4000, 
+		24.7/td, -13.1/td, 900, 
+		3/td, 360, 4000, 
+		-11.6/td, -7/td, 900, 
+		3/td, 360, 4000, 
+		11.6/td, -7/td, 900, 
+		3/td, 360, 4000, 
+		0, -13.1/td, 900, 
+		3/td, 360, 4000
+	mulz -1
+		extrude 3, 0, 0, 1/td, 1+2+4+16+32, 
+		-36/td, -7/td, 900, 
+		4.8/td, 360, 4000, 
+		3/td, 360, 4000
+
+		extrude 3, 0, 0, 1/td, 1+2+4+16+32, 
+		36/td, -7/td, 900, 
+		4.8/td, 360, 4000, 
+		3/td, 360, 4000
+
+		extrude 3, 0, 0, 1/td, 1+2+4+16+32, 
+		-24.7/td, -13.1/td, 900, 
+		4.8/td, 360, 4000, 
+		3/td, 360, 4000
+
+		extrude 3, 0, 0, 1/td, 1+2+4+16+32, 
+		24.7/td, -13.1/td, 900, 
+		4.8/td, 360, 4000, 
+		3/td, 360, 4000
+
+		extrude 3, 0, 0, 1/td, 1+2+4+16+32, 
+		-11.6/td, -7/td, 900, 
+		4.8/td, 360, 4000, 
+		3/td, 360, 4000
+
+		extrude 3, 0, 0, 1/td, 1+2+4+16+32, 
+		0, -13.1/td, 900, 
+		4.8/td, 360, 4000, 
+		3/td, 360, 4000
+
+		extrude 3, 0, 0, 1/td, 1+2+4+16+32, 
+		11.6/td, -7/td, 900, 
+		4.8/td, 360, 4000, 
+		3/td, 360, 4000
+	del 1
+		if screw_indication=1 then
+			add -36/td, -7/td, 1/td
+				placegroup "YDR60"
+			del 1
+
+			add 36/td, -7/td, 1/td
+				placegroup "YDR60"
+			del 1
+
+			add -24.7/td, -13.1/td, 1/td
+				placegroup "YDR60"
+			del 1
+
+			add 24.7/td, -13.1/td, 1/td
+				placegroup "YDR60"
+			del 1
+
+			add -11.6/td, -7/td, 1/td
+				placegroup "YDR60"
+			del 1
+
+			add 11.6/td, -7/td, 1/td
+				placegroup "YDR60"
+			del 1
+
+			add 0, -13.1/td, 1/td
+				placegroup "YDR60"
+			del 1
+		endif
+	del top
+endif
+
+!ミニビルトコーナー
+if product_name=9 then
+	if hardware_position=1 then 
+		mulz -1
+	endif
+
+	rotx 90
+	addz offset_horizontal_x
+		extrude 11, 0, 0, 1/td, 1+2+4+16+32, 
+		-15/td, 0, 0, 
+		-15/td, 39/td, 0, 
+		-13/td, 41/td, 1001, 
+		13/td, 41/td, 0, 
+		15/td, 39/td, 1001, 
+		15/td, 0, 0, 
+		-15/td, 0, -1, 
+		-7.5/td, 16/td, 900, 
+		2.5/td, 360, 4000, 
+		7.5/td, 30/td, 900, 
+		2.5/td, 360, 4000
+
+		mulz -1
+			extrude 3, 0, 0, 1/td, 1+2+4+16+32, 
+			-7.5/td, 16/td, 900, 
+			4/td, 360, 4000, 
+			2.5/td, 360, 4000
+
+			extrude 3, 0, 0, 1.6/td, 1+2+4+16+32, 
+			7.5/td, 30/td, 900, 
+			4/td, 360, 4000, 
+			2.5/td, 360, 4000
+		del 1
+
+		if screw_indication=1 then
+			add -7.5/td, 16/td, 1/td
+				placegroup "YAS45"
+			del 1
+
+			add 7.5/td, 30/td, 1/td
+				placegroup "YAS45"
+			del 1
+		endif
+	rotx -90
+		extrude 11, 0, 0, 1/td, 1+2+4+16+32, 
+		-15/td, 0, 0, 
+		-15/td, -21/td, 0, 
+		-13/td, -23/td, 1001, 
+		13/td, -23/td, 0, 
+		15/td, -21/td, 1001, 
+		15/td, 0, 0, 
+		-15/td, 0, -1, 
+		-8/td, -12/td, 900, 
+		2.8/td, 360, 4000, 
+		8/td, -12/td, 900, 
+		2.8/td, 360, 4000
+
+		addx -7.4/td
+			PYRAMID 3, 10.9/td, 1+4+16, 
+			-3/td, 0, 0, 
+			3/td, 0, 0, 
+			0, -5/td, 0
+		del 1
+
+		addx 7.4/td
+			PYRAMID 3, 10.9/td, 1+4+16, 
+			-3/td, 0, 0, 
+			3/td, 0, 0, 
+			0, -5/td, 0
+		del 1
+		
+		mulz -1
+			extrude 3, 0, 0, 1/td, 1+2+4+16+32, 
+			8/td, -12/td, 900, 
+			4/td, 360, 4000, 
+			2.5/td, 360, 4000
+
+			extrude 3, 0, 0, 1/td, 1+2+4+16+32, 
+			-8/td, -12/td, 900, 
+			4/td, 360, 4000, 
+			2.5/td, 360, 4000
+		del 1
+
+		if screw_indication=1 then
+			add 8/td, -12/td, 1/td
+				placegroup "YAS45"
+			del 1
+
+			add -8/td, -12/td, 1/td
+				placegroup "YAS45"
+			del 1
+		endif
+	del top
+endif
+
+!K-タイシンニート
+if product_name=10 then
+	rotx -90
+	addz -0.6/td
+		hotspot 0, 0, 0.6/td
+		hotspot 0, 0, -0.6/td
+	addz -offset_horizontal_x
+		extrude 35, 0, 0, 0.6/td, 1+2+4+16+32, 
+		-30/td, -21.6/td, 0, 
+		-30/td, 21.6/td, 0, 
+		-20/td, 58/td, 0, 
+		-18/td, 60/td, 1001, 
+		18/td, 60/td, 0, 
+		20/td, 59/td, 1001, 
+		30/td, 21.6/td, 0, 
+		30/td, -21.6/td, 0, 
+		20/td, -58/td, 0, 
+		18/td, -60/td, 1001, 
+		-18/td, -60/td, 0, 
+		-20/td, -58/td, 1001, 
+		-30/td, -21.6/td, -1, 
+		-15.3/td, -28/td, 900, 
+		2.3/td, 360, 4000, 
+		-7.8/td, -46.1/td, 900, 
+		2.3/td, 360, 4000, 
+		7.5/td, -37.2/td, 900, 
+		2.3/td, 360, 4000, 
+		15/td, -19.3/td, 900, 
+		2.3/td, 360, 4000, 
+		15.3/td, 30/td, 900, 
+		2.3/td, 360, 4000, 
+		7.8/td, 48/td, 900, 
+		2.3/td, 360, 4000, 
+		-7.5/td, 38.5/td, 900, 
+		2.3/td, 360, 4000, 
+		-15/td, 20.5/td, 900, 
+		2.3/td, 360, 4000, 
+		0, 34.7/td, 0, 
+		2.3/td, 31.9/td, 0, 
+		2.3/td, 14.6/td, 0, 
+		-2.3/td, 14.6/td, 0, 
+		-2.3/td, 31.9/td, 0, 
+		-2.3/td, 31.9/td, -1
+
+		extrude 3, 0, 0, 2.8/td, 1+2+4+16+32, 
+		-15.3/td, -28/td, 900, 
+		3.7/td, 360, 4000, 
+		2.3/td, 360, 4000
+
+		extrude 3, 0, 0, 2.8/td, 1+2+4+16+32, 
+		-7.8/td, -46.1/td, 900, 
+		3.7/td, 360, 4000, 
+		2.3/td, 360, 4000
+
+		extrude 3, 0, 0, 2.8/td, 1+2+4+16+32, 
+		7.5/td, -37.2/td, 900, 
+		3.7/td, 360, 4000, 
+		2.3/td, 360, 4000
+
+		extrude 3, 0, 0, 2.8/td, 1+2+4+16+32, 
+		15/td, -19.3/td, 900, 
+		3.7/td, 360, 4000, 
+		2.3/td, 360, 4000
+
+		extrude 3, 0, 0, 2.8/td, 1+2+4+16+32, 
+		15.3/td, 30/td, 900, 
+		3.7/td, 360, 4000, 
+		2.3/td, 360, 4000
+
+		extrude 3, 0, 0, 2.8/td, 1+2+4+16+32, 
+		7.8/td, 48/td, 900, 
+		3.7/td, 360, 4000, 
+		2.3/td, 360, 4000
+
+		extrude 3, 0, 0, 2.8/td, 1+2+4+16+32, 
+		-7.5/td, 38.5/td, 900, 
+		3.7/td, 360, 4000, 
+		2.3/td, 360, 4000
+
+		extrude 3, 0, 0, 2.8/td, 1+2+4+16+32, 
+		-15/td, 20.5/td, 900, 
+		3.7/td, 360, 4000, 
+		2.3/td, 360, 4000
+
+		if screw_indication=1 then
+			mulz -1
+				add -15.3/td, -28/td, 0
+					placegroup "YAS45"
+				del 1
+
+				add -7.8/td, -46.1/td, 0
+					placegroup "YAS45"
+				del 1
+
+				add 7.5/td, -37.2/td, 0
+					placegroup "YAS45"
+				del 1
+
+				add 15/td, -19.3/td, 0
+					placegroup "YAS45"
+				del 1
+
+				add 15.3/td, 30/td, 0
+					placegroup "YAS45"
+				del 1
+
+				add 7.8/td, 48/td, 0
+					placegroup "YAS45"
+				del 1
+
+				add -7.5/td, 38.5/td, 0
+					placegroup "YAS45"
+				del 1
+
+				add -15/td, 20.5/td, 0
+					placegroup "YAS45"
+				del 1
+			del 1
+		endif
+	del top
+endif
+
+!エーステンプレートⅢ-ZM
+if product_name=11 then
+	if hardware_position=1 then
+		mulz -1
+	endif
+
+	rotx 90
+	addz offset_horizontal_x
+		hotspot 0, 0, 0.6/td
+		hotspot 0, 0, -0.6/td
+		
+		extrude 46, 0, 0, 0.6/td, 1+2+4+16+32, 
+		-35/td, -53/td, 0, 
+		-35/td, -9.5/td, 0, 
+		-13.94/td, 67.5/td, 0, 
+		-11/td, 70/td, 1001, 
+		11/td, 70/td, 0, 
+		13.94/td, 67.5/td, 1001, 
+		35/td, -9.5/td, 0, 
+		35/td, -53/td, 0, 
+		33/td, -55/td, 1001, 
+		23/td, -55/td, 0, 
+		20.8/td, -53.4/td, 1001, 
+		15.7/td, -34.1/td, 0, 
+		12.8/td, -31.9/td, 1001, 
+		-12.8/td, -31.9/td, 0, 
+		-15.7/td, -34.1/td, 1001, 
+		-20.8/td, -53.4/td, 0, 
+		-23/td, -55/td, 1001, 
+		-33/td, -55/td, 0, 
+		-35/td, -53/td, 1001, 
+		-35/td, -53/td, -1, 
+		0, 55.1/td, 900, 
+		3/td, 360, 4000, 
+		-14.1/td, 29.8/td, 900, 
+		3/td, 360, 4000, 
+		14.1/td, 29.8/td, 900, 
+		3/td, 360, 4000, 
+		0, -23.5/td, 900, 
+		3/td, 360, 4000, 
+		-26.6/td, -44.8/td, 900, 
+		3/td, 360, 4000, 
+		27.2/td, -38.1/td, 900, 
+		3/td, 360, 4000, 
+		-10.3/td, 0, 0, 
+		-19.7/td, 0, 0, 
+		-18.5/td, 6.4/td, 0, 
+		-16.7/td, 8.2/td, 1001, 
+		-13.8/td, 8.2/td, 0, 
+		-11.7/td, 6.4/td, 1001, 
+		19.7/td, 0, -1, 
+		10.3/td, 0, 0, 
+		19.7/td, 0, 0, 
+		18.5/td, 6.4/td, 0, 
+		16.7/td, 8.2/td, 1001, 
+		13.8/td, 8.2/td, 0, 
+		11.7/td, 6.4/td, 1001, 
+		19.7/td, 0, -1
+	mulz -1
+		extrude 3, 0, 0, 0.6/td, 1+2+4+16+32, 
+		0, 55.1/td, 900, 
+		3.7/td, 360, 4000, 
+		3/td, 360, 4000
+
+		extrude 3, 0, 0, 0.6/td, 1+2+4+16+32, 
+		-14.1/td, 29.8/td, 900, 
+		3.7/td, 360, 4000, 
+		3/td, 360, 4000
+
+		extrude 3, 0, 0, 0.6/td, 1+2+4+16+32, 
+		14.1/td, 29.8/td, 900, 
+		3.7/td, 360, 4000, 
+		3/td, 360, 4000
+
+		extrude 3, 0, 0, 0.6/td, 1+2+4+16+32, 
+		0, -23.5/td, 900, 
+		3.7/td, 360, 4000, 
+		3/td, 360, 4000
+
+		extrude 3, 0, 0, 0.6/td, 1+2+4+16+32, 
+		-26.6/td, -44.8/td, 900, 
+		3.7/td, 360, 4000, 
+		3/td, 360, 4000
+
+		extrude 3, 0, 0, 0.6/td, 1+2+4+16+32, 
+		27.2/td, -38.1/td, 900, 
+		3.7/td, 360, 4000, 
+		3/td, 360, 4000
+	del 1
+
+		if screw_indication=1 then
+			add 0, 55.1/td, 0.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add -14.1/td, 29.8/td, 0.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add 14.1/td, 29.8/td, 0.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add 0, -23.5/td, 0.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add -26.6/td, -44.8/td, 0.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add 27.2/td, -38.1/td, 0.6/td
+				placegroup "CPQ45"
+			del 1
+		endif
+	del top
+endif
+
+!ライトコーナー
+if product_name=12 then
+	hotspot -8.1/td, 0, 16/td
+	hotspot 8.1/td, 0, 16/td
+	hotspot -8/td, -10.7/td, 0
+	hotspot 8/td, -10.7/td, 0
+
+	if hardware_position=1 then 
+		mulz -1
+	endif
+
+	rotx 90
+	addz offset_horizontal_x
+		extrude 19, 0, 0, 1.6/td, 1+2+4+16+32, 
+		-8.1/td, 16/td, 0, 
+		-12.3/td, 28.2/td, 0, 
+		-14.1/td, 36.7/td, 0, 
+		-14.6/td, 41.6/td, 1001, 
+		-15/td, 56/td, 0, 
+		-10.8/td, 60/td, 1001, 
+		10.8/td, 60/td, 0, 
+		15/td, 56/td, 1001, 
+		14.6/td, 41.6/td, 0, 
+		14.1/td, 36.7/td, 0, 
+		12.3/td, 28.2/td, 0, 
+		8.1/td, 16/td, 0, 
+		-8.1/td, 16/td, -1, 
+		-9.2/td, 45.3/td, 900, 
+		3/td, 360, 4000, 
+		9.2/td, 45.3/td, 900, 
+		3/td, 360, 4000, 
+		0, 54.4/td, 900, 
+		3/td, 360, 4000
+
+		if screw_indication=1 then
+			add -9.2/td, 45.3/td, 1.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add 9.2/td, 45.3/td, 1.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add 0, 54.4/td, 1.6/td
+				placegroup "CPQ45"
+			del 1
+		endif
+	rotx -90
+		extrude 15, 0, 0, 1.6/td, 1+2+4+16+32, 
+		-8/td, -10.7/td, 0, 
+		-14/td, -24.3/td, 0, 
+		-15/td, -35.2/td, 0, 
+		-11.1/td, -40/td, 1001, 
+		11.1/td, -40/td, 0, 
+		15/td, -35.2/td, 1001, 
+		14/td, -24.3/td, 0, 
+		8/td, -10.7/td, 0, 
+		8/td, -10.7/td, -1, 
+		8/td, -25.2/td, 900, 
+		3/td, 360, 4000, 
+		-8/td, -25.2/td, 900, 
+		3/td, 360, 4000, 
+		0, -34.5/td, 900, 
+		3/td, 360, 4000
+
+		if screw_indication=1 then
+			add 8/td, -25.2/td, 1.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add -8/td, -25.2/td, 1.6/td
+				placegroup "CPQ45"
+			del 1
+			
+			add 0, -34.5/td, 1.6/td
+				placegroup "CPQ45"
+			del 1
+		endif
+
+		cutplane{3} 1, -1.6/td, 1, 1
+			cutplane{3} 1, 1, 1.6/td, 1
+				add 0, -11.7/td, 0
+				rotx 57.66
+				rotx -90
+				addz -9/td
+					extrude 5, 0, 0, 60/td, 1+2+4+16+32, 
+					-8/td, 0, 1, 
+					8/td, 0, 1, 
+					1/td, -13/td, 1, 
+					-1/td, -13/td, 1001, 
+					-8/td, 0, 1
+				del 4
+			cutend
+		cutend
+	roty 90
+	addz -8/td
+		extrude 4, 0, 0, 16/td, 1+2+4+16+32, 
+		0, -10.7/td, 1, 
+		-1.6/td, -10.7/td, 1, 
+		-16/td, -1.6/td, 1, 
+		-16/td, 0, 1
+	del top
+endif
+
+!ライトコーナー合板
+if product_name=13 then
+	hotspot -8.1/td, 0, 16/td
+	hotspot 8.1/td, 0, 16/td
+	hotspot -8/td, -10.7/td, 0
+	hotspot 8/td, -10.7/td, 0
+
+	if hardware_position=1 then 
+		mulz -1
+	endif
+
+	rotx 90
+	addz offset_horizontal_x
+		extrude 19, 0, 0, 1.6/td, 1+2+4+16+32, 
+		-8.1/td, 16/td, 0, 
+		-12.3/td, 28.2/td, 0, 
+		-14.1/td, 36.7/td, 0, 
+		-14.6/td, 41.6/td, 1001, 
+		-15/td, 56/td, 0, 
+		-10.8/td, 60/td, 1001, 
+		10.8/td, 60/td, 0, 
+		15/td, 56/td, 1001, 
+		14.6/td, 41.6/td, 0, 
+		14.1/td, 36.7/td, 0, 
+		12.3/td, 28.2/td, 0, 
+		8.1/td, 16/td, 0, 
+		-8.1/td, 16/td, -1, 
+		-9.2/td, 45.3/td, 900, 
+		3/td, 360, 4000, 
+		9.2/td, 45.3/td, 900, 
+		3/td, 360, 4000, 
+		0, 54.4/td, 900, 
+		3/td, 360, 4000
+
+		if screw_indication=1 then
+			add -9.2/td, 45.3/td, 1.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add 9.2/td, 45.3/td, 1.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add 0, 54.4/td, 1.6/td
+				placegroup "CPQ45"
+			del 1
+		endif
+	rotx -90
+		extrude 15, 0, 0, 1.6/td, 1+2+4+16+32, 
+		-8/td, -10.7/td, 0, 
+		-14/td, -24.3/td, 0, 
+		-15/td, -35.2/td, 0, 
+		-11.1/td, -40/td, 1001, 
+		11.1/td, -40/td, 0, 
+		15/td, -35.2/td, 1001, 
+		14/td, -24.3/td, 0, 
+		8/td, -10.7/td, 0, 
+		8/td, -10.7/td, -1, 
+		8/td, -25.2/td, 900, 
+		3/td, 360, 4000, 
+		-8/td, -25.2/td, 900, 
+		3/td, 360, 4000, 
+		0, -34.5/td, 900, 
+		3/td, 360, 4000
+
+		if screw_indication=1 then
+			add 8/td, -25.2/td, 1.6/td
+				placegroup "CPQ75"
+			del 1
+
+			add -8/td, -25.2/td, 1.6/td
+				placegroup "CPQ75"
+			del 1
+
+			add 0, -34.5/td, 1.6/td
+				placegroup "CPQ75"
+			del 1
+		endif
+
+		cutplane{3} 1, -1.6/td, 1, 1
+			cutplane{3} 1, 1, 1.6/td, 1
+				add 0, -11.7/td, 0
+				rotx 57.66
+				rotx -90
+				addz -9/td
+					extrude 5, 0, 0, 60/td, 1+2+4+16+32, 
+					-8/td, 0, 1, 
+					8/td, 0, 1, 
+					1/td, -13/td, 1, 
+					-1/td, -13/td, 1001, 
+					-8/td, 0, 1
+				del 4
+			cutend
+		cutend
+	roty 90
+	addz -8/td
+		extrude 4, 0, 0, 16/td, 1+2+4+16+32, 
+		0, -10.7/td, 1, 
+		-1.6/td, -10.7/td, 1, 
+		-16/td, -1.6/td, 1, 
+		-16/td, 0, 1
+	del top
+endif
+
+!スリムヘビー10
+if product_name=14 then
+	if hardware_position=1 then 
+		mulz -1
+	endif
+
+	rotx 90
+	addz offset_horizontal_x
+		extrude 18, 0, 0, 2.3/td, 1+2+4+16+32, 
+		-15/td, 50/td, 0, 
+		-15/td, 83/td, 0, 
+		0/td, 83/td, 900, 
+		15/td, 83/td, 3001, 
+		15/td, 50/td, 0, 
+		4/td, 50/td, 0, 
+		2.3/td, 47.7/td, 1001, 
+		2.3/td, 10/td, 0, 
+		-2.3/td, 10/td, 0, 
+		-2.3/td, 47.7/td, 0, 
+		-4/td, 50/td, 1001, 
+		-15/td, 50/td, -1, 
+		8.1/td, 83.5/td, 900, 
+		3/td, 360, 4000, 
+		-8.1/td, 83.5/td, 900, 
+		3/td, 360, 4000, 
+		0, 59.3/td, 900, 
+		3/td, 360, 4000
+
+		if screw_indication=1 then
+			add 8.1/td, 83.5/td, 2.3/td
+				placegroup "YPR85"
+			del 1
+
+			add -8.1/td, 83.5/td, 2.3/td
+				placegroup "YPR85"
+			del 1
+
+			add 0, 59.3/td, 2.3/td
+				placegroup "YPR85"
+			del 1
+		endif
+	rotx -90
+		extrude 11, 0, 0, 2.3/td, 1+2+4+16+32, 
+		-15/td, -25.2/td, 0, 
+		-15/td, -46.5/td, 0, 
+		-11.1/td, -50/td, 1001, 
+		11.1/td, -50/td, 0, 
+		15/td, -46.5/td, 1001, 
+		15/td, -25.2/td, 0, 
+		-15/td, -25.2/td, -1, 
+		8.1/td, -32/td, 900, 
+		6.5/2/td, 360, 4000, 
+		-8.1/td, -32/td, 900, 
+		6.5/2/td, 360, 4000
+
+		if screw_indication=1 then
+			add 8.1/td, -32/td, 2.3/td
+				placegroup "YPR85"
+			del 1
+
+			add -8.1/td, -32/td, 2.3/td
+				placegroup "YPR85"
+			del 1
+		endif
+	addy -25.2/td
+	rotx 63.25
+		extrude 11, 0, 0, 2.3/td, 1+2+4+16+32, 
+		-15/td, 0, 1, 
+		-15/td, 56/td, 1, 
+		15/td, 56/td, 1, 
+		15/td, 0, 1, 
+		-15/td, 0, -1, 
+		-7/td, 56/td, 1, 
+		-7/td, 18/td, 1, 
+		0, 18/td, 900, 
+		7/td, 180, 4000, 
+		7/td, 56/td, 1, 
+		-7/td, 56/td, -1
+	del top
+endif
+
+!スリムヘビー10合板
+if product_name=15 then
+	if hardware_position=1 then 
+		mulz -1
+	endif
+
+	rotx 90
+	addz offset_horizontal_x
+		extrude 18, 0, 0, 2.3/td, 1+2+4+16+32, 
+		-15/td, 50/td, 0, 
+		-15/td, 83/td, 0, 
+		0/td, 83/td, 900, 
+		15/td, 83/td, 3001, 
+		15/td, 50/td, 0, 
+		4/td, 50/td, 0, 
+		2.3/td, 47.7/td, 1001, 
+		2.3/td, 10/td, 0, 
+		-2.3/td, 10/td, 0, 
+		-2.3/td, 47.7/td, 0, 
+		-4/td, 50/td, 1001, 
+		-15/td, 50/td, -1, 
+		8.1/td, 83.5/td, 900, 
+		3/td, 360, 4000, 
+		-8.1/td, 83.5/td, 900, 
+		3/td, 360, 4000, 
+		0, 59.3/td, 900, 
+		3/td, 360, 4000
+
+		if screw_indication=1 then
+			add 8.1/td, 83.5/td, 2.3/td
+				placegroup "YPR85"
+			del 1
+
+			add -8.1/td, 83.5/td, 2.3/td
+				placegroup "YPR85"
+			del 1
+
+			add 0, 59.3/td, 2.3/td
+				placegroup "YPR85"
+			del 1
+		endif
+	rotx -90
+		extrude 11, 0, 0, 2.3/td, 1+2+4+16+32, 
+		-15/td, -25.2/td, 0, 
+		-15/td, -46.5/td, 0, 
+		-11.1/td, -50/td, 1001, 
+		11.1/td, -50/td, 0, 
+		15/td, -46.5/td, 1001, 
+		15/td, -25.2/td, 0, 
+		-15/td, -25.2/td, -1, 
+		8.1/td, -32/td, 900, 
+		6.5/2/td, 360, 4000, 
+		-8.1/td, -32/td, 900, 
+		6.5/2/td, 360, 4000
+
+		if screw_indication=1 then
+			add 8.1/td, -32/td, 2.3/td
+				placegroup "YPR115"
+			del 1
+
+			add -8.1/td, -32/td, 2.3/td
+				placegroup "YPR115"
+			del 1
+		endif
+	addy -25.2/td
+	rotx 63.25
+		extrude 11, 0, 0, 2.3/td, 1+2+4+16+32, 
+		-15/td, 0, 1, 
+		-15/td, 56/td, 1, 
+		15/td, 56/td, 1, 
+		15/td, 0, 1, 
+		-15/td, 0, -1, 
+		-7/td, 56/td, 1, 
+		-7/td, 18/td, 1, 
+		0, 18/td, 900, 
+		7/td, 180, 4000, 
+		7/td, 56/td, 1, 
+		-7/td, 56/td, -1
+	del top
+endif
+
+!ミドルコーナー15
+if product_name=16 then
+    if hardware_position=1 then mulz -1
+	add offset_horizontal_Y,-offset_horizontal_x,distance_from_beam
+		hotspot -9.6/td, 0       , 19.1/td
+		hotspot 9.6/td , 0       , 19.1/td
+		hotspot -9.6/td, -15.5/td, 0
+		hotspot 9.6/td , -15.5/td, 0
+    rotx 90
+		extrude 19, 0, 0, 3.2/td, 1+2+4+16+32, 
+		-9.6/td, 19.1/td, 0, 
+		-18.7/td, 41.5/td, 0, 
+		-22/td, 58.2/td, 0, 
+		-22.5/td, 97.3/td, 0, 
+		-20/td, 100/td, 1001, 
+		20/td, 100/td, 0, 
+		22.5/td, 97.3/td, 1001, 
+		22/td, 58.2/td, 0, 
+		18.7/td, 41.5/td, 0, 
+		9.6/td, 19.1/td, 0, 
+		-9.6/td, 19.1/td, -1, 
+		-8.8/td, 60.3/td, 900, 
+		3/td, 360, 4000, 
+		8.8/td, 60.3/td, 900, 
+		3/td, 360, 4000, 
+		14.3/td, 90.4/td, 900, 
+		3/td, 360, 4000, 
+		-14.3/td, 90.4/td, 900, 
+		3/td, 360, 4000
+
+        if screw_indication=1 then
+            add -8.8/td, 60.3/td, 3.2/td
+        		placegroup "YPR85"
+            del 1
+
+            add 8.8/td, 60.3/td, 3.2/td
+            	placegroup "YPR85"
+            del 1
+
+            add 14.3/td, 90.4/td, 3.2/td
+            	placegroup "YPR85"
+            del 1
+
+            add -14.3/td, 90.4/td, 3.2/td
+            	placegroup "YPR85"
+            del 1
+        endif
+    rotx -90
+        extrude 19, 0, 0, 3.2/td, 1+2+4+16+32, 
+		-9.6/td, -15.5/td, 0, 
+		-18.6/td, -22.6/td, 0, 
+		-22/td, -38.1/td, 0, 
+		-22.5/td, -62.7/td, 0, 
+		-20/td, -65/td, 1001, 
+		20/td, -65/td, 0, 
+		22.5/td, -62.7/td, 1001, 
+		22/td, -38.1/td, 0, 
+		18.6/td, -22.6/td, 0, 
+		9.6/td, -15.5/td, 0, 
+		-9.6/td, -15.5/td, -1, 
+		-13.1/td, -32.2/td, 900, 
+		3/td, 360, 4000, 
+		13.1/td, -32.2/td, 900, 
+		3/td, 360, 4000, 
+		7.7/td, -45.3/td, 900, 
+		3/td, 360, 4000, 
+		-7.7/td, -45.3/td, 900, 
+		3/td, 360, 4000
+
+        if screw_indication=1 then
+            add 13.1/td, -32.2/td, 3.2/td
+            	placegroup "YPR85"
+            del 1
+
+            add -13.1/td, -32.2/td, 3.2/td
+            	placegroup "YPR85"
+            del 1
+
+            add 7.7/td, -45.3/td, 3.2/td
+            	placegroup "YPR85"
+            del 1
+
+            add -7.7/td, -45.3/td, 3.2/td
+            	placegroup "YPR85"
+            del 1
+        endif
+
+        group "midcor"
+            cutplane{3} 1, -3.2/td, 1, 1
+				cutplane{3} 1, 1, 3.2/td, 1
+					add 0, -9.5/td, 0
+					rotx 58.24
+					rotx -90
+					addz -15/td
+						extrude 5, 0, 0, 90/td, 1+2+4+16+32, 
+						-11/td, 0, 1, 
+						11/td, 0, 1, 
+						4.5/td, -21.5/td, 1, 
+						-4.5/td, -21.5/td, 1001, 
+						-11/td, 0, 1
+					del 4
+				cutend
+            cutend
+        endgroup
+
+        group "midcorcut"
+            roty 90
+            addz -11.3/td
+                extrude 5, 0, 0, 22.6/td, 1+2+4+16+32, 
+				0, 0, 1, 
+				0, -15.5/td, 1, 
+				-3.2/td, -15.5/td, 1, 
+				-19.1/td, -3.2/td, 1, 
+				-19.1/td, 0, 1
+            del 2 
+        endgroup
+
+        placegroup subgroup ("midcor", "midcorcut")
+    roty 90
+    addz -9.6/td
+        extrude 4, 0, 0, 19.2/td, 1+2+4+16+32, 
+		0, -15.5/td, 1, 
+		-3.2/td, -15.5/td, 1, 
+		-19.1/td, -3.2/td, 1, 
+		-19.1/td, 0, 1
+    del top
+endif
+
+!ミドルコーナー15合板
+if product_name=17 then
+	if hardware_position=1 then mulz -1
+	add offset_horizontal_Y,-offset_horizontal_x,distance_from_beam
+		hotspot -9.6/td, 0       , 19.1/td
+		hotspot 9.6/td , 0       , 19.1/td
+		hotspot -9.6/td, -15.5/td, 0
+		hotspot 9.6/td , -15.5/td, 0
+	rotx 90
+		extrude 19, 0, 0, 3.2/td, 1+2+4+16+32, 
+		-9.6/td, 19.1/td, 0, 
+		-18.7/td, 41.5/td, 0, 
+		-22/td, 58.2/td, 0, 
+		-22.5/td, 97.3/td, 0, 
+		-20/td, 100/td, 1001, 
+		20/td, 100/td, 0, 
+		22.5/td, 97.3/td, 1001, 
+		22/td, 58.2/td, 0, 
+		18.7/td, 41.5/td, 0, 
+		9.6/td, 19.1/td, 0, 
+		-9.6/td, 19.1/td, -1, 
+		-8.8/td, 60.3/td, 900, 
+		3/td, 360, 4000, 
+		8.8/td, 60.3/td, 900, 
+		3/td, 360, 4000, 
+		14.3/td, 90.4/td, 900, 
+		3/td, 360, 4000, 
+		-14.3/td, 90.4/td, 900, 
+		3/td, 360, 4000
+
+		if screw_indication=1 then
+			add -8.8/td, 60.3/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+
+			add 8.8/td, 60.3/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+
+			add 14.3/td, 90.4/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+
+			add -14.3/td, 90.4/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+		endif
+	rotx -90
+		extrude 19, 0, 0, 3.2/td, 1+2+4+16+32, 
+		-9.6/td, -15.5/td, 0, 
+		-18.6/td, -22.6/td, 0, 
+		-22/td, -38.1/td, 0, 
+		-22.5/td, -62.7/td, 0, 
+		-20/td, -65/td, 1001, 
+		20/td, -65/td, 0, 
+		22.5/td, -62.7/td, 1001, 
+		22/td, -38.1/td, 0, 
+		18.6/td, -22.6/td, 0, 
+		9.6/td, -15.5/td, 0, 
+		-9.6/td, -15.5/td, -1, 
+		-13.1/td, -32.2/td, 900, 
+		3/td, 360, 4000, 
+		13.1/td, -32.2/td, 900, 
+		3/td, 360, 4000, 
+		7.7/td, -45.3/td, 900, 
+		3/td, 360, 4000, 
+		-7.7/td, -45.3/td, 900, 
+		3/td, 360, 4000
+
+		if screw_indication=1 then
+			add 13.1/td, -32.2/td, 3.2/td
+				placegroup "YPR115"
+			del 1
+
+			add -13.1/td, -32.2/td, 3.2/td
+				placegroup "YPR115"
+			del 1
+
+			add 7.7/td, -45.3/td, 3.2/td
+				placegroup "YPR115"
+			del 1
+
+			add -7.7/td, -45.3/td, 3.2/td
+				placegroup "YPR115"
+			del 1
+		endif
+
+		group "midcor2"
+			cutplane{3} 1, -3.2/td, 1, 1
+				cutplane{3} 1, 1, 3.2/td, 1
+					add 0, -9.5/td, 0
+					rotx 58.24
+					rotx -90
+					addz -15/td
+						extrude 5, 0, 0, 90/td, 1+2+4+16+32, 
+						-11/td, 0, 1, 
+						11/td, 0, 1, 
+						4.5/td, -21.5/td, 1, 
+						-4.5/td, -21.5/td, 1001, 
+						-11/td, 0, 1
+					del 4
+				cutend
+			cutend
+		endgroup
+
+		group "midcorcut2"
+			roty 90
+			addz -11.3/td
+				extrude 5, 0, 0, 22.6/td, 1+2+4+16+32, 
+				0, 0, 1, 
+				0, -15.5/td, 1, 
+				-3.2/td, -15.5/td, 1, 
+				-19.1/td, -3.2/td, 1, 
+				-19.1/td, 0, 1
+			del 2
+		endgroup
+
+		placegroup subgroup("midcor2", "midcorcut2")
+	roty 90
+	addz -9.6/td
+		extrude 4, 0, 0, 19.2/td, 1+2+4+16+32, 
+		0, -15.5/td, 1, 
+		-3.2/td, -15.5/td, 1, 
+		-19.1/td, -3.2/td, 1, 
+		-19.1/td, 0, 1
+	del top
+endif
+
+!ヘビーコーナー20
+if product_name=18 then
+	if hardware_position=1 then mulz -1
+	rotx 90
+	addz offset_horizontal_x
+		extrude 25, 0, 0, 3.2/td, 1+2+4+16+32, 
+		-27.5/td, 72/td, 0, 
+		-27.5/td, 103/td, 0, 
+		-10/td, 123/td, 1001, 
+		10/td, 123/td, 0, 
+		27.5/td, 103/td, 1001, 
+		27.5/td, 72/td, 0, 
+		5/td, 72/td, 0, 
+		2.8/td, 70/td, 1001, 
+		2.8/td, 13.1/td, 0, 
+		-2.8/td, 13.1/td, 0, 
+		-2.8/td, 70/td, 0, 
+		-5/td, 72/td, 1001, 
+		-27.5/td, 72/td, -1, 
+		-7.2/td, 78.7/td, 900, 
+		6.5/2/td, 360, 4000, 
+		7.2/td, 78.7/td, 900, 
+		6.5/2/td, 360, 4000, 
+		21.2/td, 95.6/td, 900, 
+		6.5/2/td, 360, 4000, 
+		-21.2/td, 95.6/td, 900, 
+		6.5/2/td, 360, 4000, 
+		14.2/td, 113.5/td, 900, 
+		6.5/2/td, 360, 4000, 
+		-14.2/td, 113.5/td, 900, 
+		6.5/2/td, 360, 4000
+
+		if screw_indication=1 then
+			add -7.2/td, 78.7/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+
+			add 7.2/td, 78.7/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+
+			add 21.2/td, 95.6/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+
+			add -21.2/td, 95.6/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+
+			add 14.2/td, 113.5/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+
+			add -14.2/td, 113.5/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+		endif
+	rotx -90
+		extrude 19, 0, 0, 3.2/td, 1+2+4+16+32, 
+		-27.5/td, -35.3/td, 0, 
+		27.5/td, -35.3/td, 0, 
+		27.5/td, -63/td, 0, 
+		25/td, -65/td, 1001, 
+		-25/td, -65/td, 0, 
+		-27.5/td, -63/td, 1001, 
+		-27.5/td, -35.3/td, -1, 
+		7.2/td, -42/td, 900, 
+		6.5/2/td, 360, 4000, 
+		-7.2/td, -42/td, 900, 
+		6.5/2/td, 360, 4000, 
+		21.3/td, -42/td, 900, 
+		6.5/2/td, 360, 4000, 
+		-21.3/td, -42/td, 900, 
+		6.5/2/td, 360, 4000, 
+		14.2/td, -53.8/td, 900, 
+		6.5/2/td, 360, 4000, 
+		-14.2/td, -53.8/td, 900, 
+		6.5/2/td, 360, 4000
+
+		if screw_indication=1 then
+			add -7.2/td, -42/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+
+			add 7.2/td, -42/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+
+			add -21.3/td, -42/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+
+			add 21.3/td, -42/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+
+			add -14.2/td, -53.8/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+
+			add 14.2/td, -53.8/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+		endif
+	addy -35.3/td
+	rotx 63.88
+		extrude 11, 0, 0, 2.3/td, 1+2+4+16+32, 
+		-27.5/td, 0, 1, 
+		-27.5/td, 80.2/td, 1, 
+		27.5/td, 80.2/td, 1, 
+		27.5/td, 0, 1, 
+		-27.5/td, 0, -1, 
+		-7/td, 80.2/td, 1, 
+		-7/td, 22.3/td, 1, 
+		0, 22.3/td, 900, 
+		7/td, 180, 4000, 
+		7/td, 80.2/td, 1, 
+		-7/td, 80.2/td, -1
+	del top
+endif
+
+!プルースホールダウン25
+if product_name=19 then
+	group "main19"
+		extrude 36, 0, 0, 3.2/td, 1+2+4+16+32, 
+		16.2/td, 150/td, 0, 
+		-16.2/td, 150/td, 0, 
+		-20/td, 146/td, 1001, 
+		-20/td, 105.7/td, 1, 
+		-21.6/td, 105.7/td, 1, 
+		-21.6/td, 89/td, 0, 
+		-15.4/td, 76.2/td, 0, 
+		-15.4/td, 33.8/td, 0, 
+		-21.6/td, 19.6/td, 0, 
+		-21.6/td, 5.6/td, 0, 
+		-20/td, 5.6/td, 0, 
+		-20/td, 3.5/td, 0, 
+		-16.2/td, 0, 1001, 
+		16.2/td, 0, 0, 
+		20/td, 3.5/td, 1001, 
+		20/td, 5.6/td, 0, 
+		21.6/td, 5.6/td, 0, 
+		21.6/td, 19.6/td, 0, 
+		15.4/td, 33.8/td, 0, 
+		15.4/td, 76.2/td, 0, 
+		21.6/td, 89/td, 0, 
+		21.6/td, 105.7/td, 1, 
+		20/td, 105.7/td, 1, 
+		20/td, 146/td, 0, 
+		16.2/td, 150/td, 1001, 
+		16.2/td, 150/td, -1, 
+		-12.1/td, 102/td, 900, 
+		3.25/td, 360, 4000, 
+		12.1/td, 102/td, 900, 
+		3.25/td, 360, 4000, 
+		0, 112.6/td, 900, 
+		3.25/td, 360, 4000, 
+		-11.4/td, 140/td, 900, 
+		3.25/td, 360, 4000, 
+		11.4/td, 140/td, 900, 
+		3.25/td, 360, 4000
+	endgroup
+
+	group "parts19"
+		extrude 12, 0, 0, 12.2/td, 1+2+4+16+32, 
+		-21.6/td, 105.7/td, 1, 
+		-21.6/td, 89/td, 0, 
+		-15.4/td, 76.2/td, 0, 
+		-15.4/td, 33.8/td, 0, 
+		-21.6/td, 19.6/td, 0, 
+		-21.6/td, 5.6/td, 0, 
+		-18.4/td, 5.6/td, 0, 
+		-18.4/td, 19.6/td, 0, 
+		-12.2/td, 33.8/td, 0, 
+		-12.2/td, 76.2/td, 0, 
+		-18.4/td, 89/td, 0, 
+		-18.4/td, 105.7/td, 0
+
+		mulx -1
+			extrude 12, 0, 0, 12.2/td, 1+2+4+16+32, 
+			-21.6/td, 105.7/td, 1, 
+			-21.6/td, 89/td, 0, 
+			-15.4/td, 76.2/td, 0, 
+			-15.4/td, 33.8/td, 0, 
+			-21.6/td, 19.6/td, 0, 
+			-21.6/td, 5.6/td, 0, 
+			-18.4/td, 5.6/td, 0, 
+			-18.4/td, 19.6/td, 0, 
+			-12.2/td, 33.8/td, 0, 
+			-12.2/td, 76.2/td, 0, 
+			-18.4/td, 89/td, 0, 
+			-18.4/td, 105.7/td, 0
+		del 1
+	endgroup
+
+	group "mulcut19"
+		addx -21.6/td+3.2/td
+		roty -90
+			extrude 5, 0, 0, 3.2/td, 1+2+4+16+32, 
+			16.6/td, 240/td, 0, 
+			11/td, 240/td, 0, 
+			11/td, 234.4/td, 900, 
+			16.6/td, 234.4/td, 3001, 
+			16.6/td, 234.4/td, 1
+		del 2
+
+		addx 20/td
+		roty -90
+			extrude 5, 0, 0, 4.4/td, 1+2+4+16+32, 
+			16.6/td, 240/td, 0, 
+			11/td, 240/td, 0, 
+			11/td, 234.4/td, 900, 
+			16.6/td, 234.4/td, 3001, 
+			16.6/td, 234.4/td, 1
+		del 2
+
+		addx -20/td+4.4/td
+		roty -90
+			extrude 5, 0, 0, 4.4/td, 1+2+4+16+32, 
+			16.6/td, 0, 0, 
+			11/td, 0, 0, 
+			11/td, 5.6/td, 900, 
+			16.6/td, 5.6/td, 3001, 
+			16.6/td, 5.6/td, 1
+		del 2
+
+		addx 20/td
+		roty -90
+			extrude 5, 0, 0, 4.4/td, 1+2+4+16+32, 
+			16.6/td, 0, 0, 
+			11/td, 0, 0, 
+			11/td, 5.6/td, 900, 
+			16.6/td, 5.6/td, 3001, 
+			16.6/td, 5.6/td, 1
+		del 2
+	endgroup
+
+	main7f=addgroup("main19", "parts19")
+	main7f1=subgroup(main7f, "mulcut19")
+
+	if hardware_position=1 then mulz -1
+		add offset_horizontal_Y,-offset_horizontal_x,distance_from_beam
+			rotx 90
+				placegroup main7f1
+
+				if screw_indication=1 then
+					add -12.1/td, 102/td, 3.2/td
+						placegroup "YPR85"
+					del 1
+
+					add 12.1/td, 102/td, 3.2/td
+						placegroup "YPR85"
+					del 1
+
+					add 0, 112.6/td, 3.2/td
+						placegroup "YPR85"
+					del 1
+
+					add -11.4/td, 140/td, 3.2/td
+						placegroup "YPR85"
+					del 1
+
+					add 11.4/td, 140/td, 3.2/td
+						placegroup "YPR85"
+					del 1
+				endif
+			del 1
+
+			addz 30/td
+				extrude 18, 0, 0, 47/td, 1+2+4+16+32+64, 
+					-11.7/td, -3.2/td, 1, 
+					-11.7/td, -42.7/td, 1, 
+					-6.5/td, -40.4/td, 900, 
+					-17/2/td, -45.7/td, 3001, 
+					17/2/td, -45.7/td, 1, 
+					6.5/td, -40.4/td, 900, 
+					11.7/td, -42.7/td, 3001, 
+					11.7/td, -3.2/td, 1, 
+					-11.7/td, -3.2/td, -1, 
+					-8.5/td, 0, 1, 
+					-8.5/td, -40.3/td, 1, 
+					-6.5/td, -40.4/td, 900, 
+					-6.5/td, -42.5/td, 3001, 
+					6.5/td, -42.5/td, 1, 
+					6.5/td, -40.4/td, 900, 
+					8.5/td, -40.3/td, 3001, 
+					8.5/td, 0, 1, 
+					-8.5/td, 0, -1
+			del 1
+		del 1
+
+		if bolt_indication=1 then
+			add offset_horizontal_Y,-offset_horizontal_x-bolt_position_x,-woodenbase_height-woodenbase_packing_thickness
+				gosub "M16"
+			del 1
+		endif
+	if hardware_position=1 then del 1
+endif
+
+!プルースホールダウン40
+if product_name=20 then
+	if hardware_position=1 then mulz -1
+		add offset_horizontal_Y,-offset_horizontal_x,distance_from_beam
+			rotx 90
+				group "main20"
+					extrude 30, 0, 0, 4/td, 1+2+4+16+32, 
+					-20.8/td, 3/td, 0, 
+					-20.8/td, 234/td, 0, 
+					-18/td, 237/td, 1001, 
+					18/td, 237/td, 0, 
+					20.8/td, 234/td, 1001, 
+					20.8/td, 3/td, 0, 
+					18/td, 0, 1001, 
+					-18/td, 0, 0, 
+					-20.8/td, 3/td, 1001, 
+					-20.8/td, 3/td, -1, 
+					-7.8/td, 228.3/td, 900, 
+					3.25/td, 360, 4000, 
+					11.2/td, 228.3/td, 900, 
+					3.25/td, 360, 4000, 
+					0, 208.4/td, 900, 
+					3.25/td, 360, 4000, 
+					-11.2/td, 188.1/td, 900, 
+					3.25/td, 360, 4000, 
+					7.8/td, 188.1/td, 900, 
+					3.25/td, 360, 4000, 
+					-7.8/td, 158.1/td, 900, 
+					3.25/td, 360, 4000, 
+					11.2/td, 158.1/td, 900, 
+					3.25/td, 360, 4000, 
+					0, 138.2/td, 900, 
+					3.25/td, 360, 4000, 
+					-11.2/td, 117.9/td, 900, 
+					3.25/td, 360, 4000, 
+					11/td, 117.9/td, 900, 
+					3.25/td, 360, 4000
+				endgroup
+
+				roty 90
+					addz -20.8/td
+						extrude 7, 0, 0, 4/td, 1+2+4+16+32, 
+						0, 14/td, 0, 
+						-9/td, 14/td, 0, 
+						-15/td, 20/td, 1001, 
+						-15/td, 90/td, 0, 
+						-7.5/td, 135.6/td, 0, 
+						-4/td, 137.7/td, 1001, 
+						0, 137.9/td, 0
+					del 1
+
+					addz 20.8/td-4/td
+						extrude 7, 0, 0, 4/td, 1+2+4+16+32, 
+						0, 14/td, 0, 
+						-9/td, 14/td, 0, 
+						-15/td, 20/td, 1001, 
+						-15/td, 90/td, 0, 
+						-7.5/td, 135.6/td, 0, 
+						-4/td, 137.7/td, 1001, 
+						0, 137.9/td, 0
+					del 1
+				del 1
+
+				placegroup "main20"
+
+				if screw_indication=1 then
+					add -7.8/td, 228.3/td, 3.2/td
+						placegroup "YPR85"
+					del 1
+
+					add 11.2/td, 228.3/td, 3.2/td
+						placegroup "YPR85"
+					del 1
+
+					add 0, 208.4/td, 3.2/td
+						placegroup "YPR85"
+					del 1
+
+					add -11.2/td, 188.1/td, 3.2/td
+						placegroup "YPR85"
+					del 1
+
+					add 7.8/td, 188.1/td, 3.2/td
+						placegroup "YPR85"
+					del 1
+
+					add -7.8/td, 158.1/td, 3.2/td
+						placegroup "YPR85"
+					del 1
+
+					add 11.2/td, 158.1/td, 3.2/td
+						placegroup "YPR85"
+					del 1
+
+					add 0, 138.2/td, 3.2/td
+						placegroup "YPR85"
+					del 1
+
+					add -11.2/td, 117.9/td, 3.2/td
+						placegroup "YPR85"
+					del 1
+
+					add 11.2/td, 117.9/td, 3.2/td
+						placegroup "YPR85"
+					del 1
+				endif
+			rotx -90
+			addz 20/td
+				extrude 28, 0, 0, 70/td, 1+2+4+16+32+64, 
+					-12/td, -4/td, 1, 
+					-12/td, -8.5/td, 1, 
+					-12/td, -13/td, 900, 
+					10/td, 180, 4001, 
+					-12/td, -33.8/td, 1, 
+					0, -33.8/td, 900, 
+					24/td, 180, 4001, 
+					12/td, -17.5/td, 1, 
+					12/td, -13/td, 900, 
+					10/td, 180, 4001, 
+					12/td, -4/td, 1, 
+					-12/td, -4/td, -1, 
+					-9/td, 0, 1, 
+					-9/td, -8/td, 1, 
+					-12/td, -11.2/td, 1001, 
+					-12/td, -13/td, 900, 
+					3.6/td, 180, 4001, 
+					-9/td, -17.5/td, 1001, 
+					-9/td, -33.8/td, 1, 
+					0, -33.8/td, 900, 
+					18/td, 180, 4001, 
+					9/td, -17.5/td, 1, 
+					12/td, -14.8/td, 1001, 
+					12/td, -13/td, 900, 
+					3.6/td, 180, 4001, 
+					9/td, -8/td, 1001, 
+					9/td, 0, 1, 
+					-9/td, 0, -1
+			del 3
+		del 1
+
+		if bolt_indication=1 then
+			add offset_horizontal_Y,-offset_horizontal_x-bolt_position_x,-woodenbase_height-woodenbase_packing_thickness
+				gosub "M16"
+			del 1
+		endif
+	if hardware_position=1 then del 1
+endif
+
+!枠材用フレックスホールダウン20
+if product_name=21 then
+    if hardware_position=1 then mulz -1
+    addz 25/td
+    rotx 90
+    addz offset_horizontal_x
+        group "main21"
+            extrude 18, 0, 0, 4/td, 1+2+4+16+32, 
+            -20/td, 3/td, 0, 
+            -20/td, 167/td, 0, 
+            20/td, 167/td, 0, 
+            20/td, 3/td, 0, 
+            17/td, 0, 1001, 
+            -17/td, 0, 0, 
+            -20/td, 3/td, 1001, 
+            -20/td, 3/td, -1, 
+            0, 138.2/td, 900, 
+            3.25/td, 360, 4000, 
+            -7.1/td, 158.3/td, 900, 
+            3.25/td, 360, 4000, 
+            11.3/td, 158.3/td, 900, 
+            3.25/td, 360, 4000, 
+            -10.8/td, 118.1/td, 900, 
+            3.25/td, 360, 4000, 
+            7.7/td, 118.1/td, 900, 
+            3.25/td, 360, 4000
+        endgroup
+
+        group "parts21"
+            roty 90
+                addz -20.8/td
+                    extrude 7, 0, 0, 4/td, 1+2+4+16+32, 
+                    0, 14.6/td, 0, 
+                    0, 167/td, 0, 
+                    -11.2/td, 167/td, 0, 
+                    -15/td, 163.2/td, 1001, 
+                    -15/td, 20/td, 0, 
+                    -11.2/td, 14.6/td, 1001, 
+                    0, 14.6/td, 0
+                del 1
+                
+                addz 20.8/td-4/td
+                    extrude 7, 0, 0, 4/td, 1+2+4+16+32, 
+                    0, 14.6/td, 0, 
+                    0, 167/td, 0, 
+                    -11.2/td, 167/td, 0, 
+                    -15/td, 163.2/td, 1001, 
+                    -15/td, 20/td, 0, 
+                    -11.2/td, 14.6/td, 1001, 
+                    0, 14.6/td, 0
+                del 1
+            del 1
+        endgroup
+
+        placegroup addgroup ("main21", "parts21")
+
+        if screw_indication=1 then
+            add -7.1/td, 158.3/td, 4/td
+        		placegroup "YPR85"
+            del 1
+
+            add 11.3/td, 158.3/td, 4/td
+            	placegroup "YPR85"
+            del 1
+
+            add 0, 138.2/td, 4/td
+            	placegroup "YPR85"
+            del 1
+
+            add -10.8/td, 118.1/td, 4/td
+            	placegroup "YPR85"
+            del 1
+            
+            add 7.7/td, 118.1/td, 4/td
+            	placegroup "YPR85"
+            del 1
+        endif
+    rotx -90
+    addz 20/td
+        extrude 28, 0, 0, 70/td, 1+2+4+16+32+64, 
+        -12/td, -4/td, 1, 
+        -12/td, -8/td, 1, 
+        -12/td, -13/td, 900, 
+        10/td, 180, 4001, 
+        -12/td, -33/td, 1, 
+        0, -33/td, 900, 
+        24/td, 180, 4001, 
+        12/td, -18/td, 1, 
+        12/td, -13/td, 900, 
+        10/td, 180, 4001, 
+        12/td, -4/td, 1, 
+        -12/td, -4/td, -1, 
+        -9/td, 0, 1, 
+        -9/td, -8/td, 1, 
+        -12/td, -11.2/td, 1001, 
+        -12/td, -13/td, 900, 
+        3.6/td, 180, 4001, 
+        -9/td, -18/td, 1001, 
+        -9/td, -33/td, 1, 
+        0, -33/td, 900, 
+        18/td, 180, 4001, 
+        9/td, -18/td, 1, 
+        12/td, -14.8/td, 1001, 
+        12/td, -13/td, 900, 
+        3.6/td, 180, 4001, 
+        9/td, -8/td, 1001, 
+        9/td, 0, 1, 
+        -9/td, 0, -1
+	add 0, -33/td, 80/td
+        if bolt_indication=1 then
+            gosub "M16"
+        endif
+    del top
+endif
+
+!枠材用フレックスホールダウン34
+if product_name=22 then
+    if hardware_position=1 then mulz -1
+    addz 25/td
+    rotx 90
+    addz offset_horizontal_x
+        group "main22"
+            extrude 28, 0, 0, 4/td, 1+2+4+16+32, 
+            -20/td, 3/td, 0, 
+            -20/td, 237/td, 0, 
+            20/td, 237/td, 0, 
+            20/td, 3/td, 0, 
+            17/td, 0, 1001, 
+            -17/td, 0, 0, 
+            -20/td, 3/td, 1001, 
+            -20/td, 3/td, -1, 
+            0, 138.2/td, 900, 
+            3.25/td, 360, 4000, 
+            -7.1/td, 228.5/td, 900, 
+            3.25/td, 360, 4000, 
+            11.3/td, 228.5/td, 900, 
+            3.25/td, 360, 4000, 
+            -10.8/td, 188.4/td, 900, 
+            3.25/td, 360, 4000, 
+            7.7/td, 188.4/td, 900, 
+            3.25/td, 360, 4000, 
+            0, 208.6/td, 900, 
+            3.25/td, 360, 4000, 
+            -7.1/td, 158.3/td, 900, 
+            3.25/td, 360, 4000, 
+            11.3/td, 158.3/td, 900, 
+            3.25/td, 360, 4000, 
+            -10.8/td, 118.1/td, 900, 
+            3.25/td, 360, 4000, 
+            7.7/td, 118.1/td, 900, 
+            3.25/td, 360, 4000
+        endgroup
+
+        group "parts22"
+            roty 90
+                addz -20.8/td
+                    extrude 7, 0, 0, 4/td, 1+2+4+16+32, 
+                    0, 14.6/td, 0, 
+                    0, 237/td, 0, 
+                    -11.2/td, 237/td, 0, 
+                    -15/td, 233.2/td, 1001, 
+                    -15/td, 20/td, 0, 
+                    -11.2/td, 14.6/td, 1001, 
+                    0, 14.6/td, 0
+                del 1
+
+                addz 20.8/td-4/td
+                    extrude 7, 0, 0, 4/td, 1+2+4+16+32, 
+                    0, 14.6/td, 0, 
+                    0, 237/td, 0, 
+                    -11.2/td, 237/td, 0, 
+                    -15/td, 233.2/td, 1001, 
+                    -15/td, 20/td, 0, 
+                    -11.2/td, 14.6/td, 1001, 
+                    0, 14.6/td, 0
+                del 1
+            del 1
+        endgroup
+
+        placegroup addgroup ("main22", "parts22")
+
+        if screw_indication=1 then
+            add -7.1/td, 158.3/td, 4/td
+            	placegroup "YPR85"
+            del 1
+
+            add 11.3/td, 158.3/td, 4/td
+            	placegroup "YPR85"
+            del 1
+
+            add 0, 138.2/td, 4/td
+            	placegroup "YPR85"
+            del 1
+
+            add -10.8/td, 118.1/td, 4/td
+            	placegroup "YPR85"
+            del 1
+
+            add 7.7/td, 118.1/td, 4/td
+            	placegroup "YPR85"
+            del 1
+
+            add -7.1/td, 228.5/td, 4/td
+            	placegroup "YPR85"
+            del 1
+
+            add 11.3/td, 228.5/td, 4/td
+            	placegroup "YPR85"
+            del 1
+
+            add 0, 208.6/td, 4/td
+            	placegroup "YPR85"
+            del 1
+
+            add -10.8/td, 188.4/td, 4/td
+            	placegroup "YPR85"
+            del 1
+
+            add 7.7/td, 188.4/td, 4/td
+            	placegroup "YPR85"
+            del 1
+        endif
+    rotx -90
+    addz 20/td
+        extrude 28, 0, 0, 70/td, 1+2+4+16+32+64, 
+        -12/td, -4/td, 1, 
+        -12/td, -8/td, 1, 
+        -12/td, -13/td, 900, 
+        10/td, 180, 4001, 
+        -12/td, -33/td, 1, 
+        0, -33/td, 900, 
+        24/td, 180, 4001, 
+        12/td, -18/td, 1, 
+        12/td, -13/td, 900, 
+        10/td, 180, 4001, 
+        12/td, -4/td, 1, 
+        -12/td, -4/td, -1, 
+        -9/td, 0, 1, 
+        -9/td, -8/td, 1, 
+        -12/td, -11.2/td, 1001, 
+        -12/td, -13/td, 900, 
+        3.6/td, 180, 4001, 
+        -9/td, -18/td, 1001, 
+        -9/td, -33/td, 1, 
+        0, -33/td, 900, 
+        18/td, 180, 4001, 
+        9/td, -18/td, 1, 
+        12/td, -14.8/td, 1001, 
+        12/td, -13/td, 900, 
+        3.6/td, 180, 4001, 
+        9/td, -8/td, 1001, 
+        9/td, 0, 1, 
+        -9/td, 0, -1
+	add 0, -33/td, 80/td
+        if bolt_indication=1 then
+            gosub "M16"
+        endif
+    del top
+endif
+
+!デフコーナー
+if product_name=25 then
+	if hardware_position=1 then mulz -1
+	rotx 90
+	addz offset_horizontal_x
+		extrude 17, 0, 0, 1.6/td, 1+2+4+16+32, 
+		15/td, 62.3/td, 0, 
+		15/td, 47.8/td, 0, 
+		2.7/td, 27.7/td, 0, 
+		0, 30/td, 900, 
+		-2.7/td, 27.7/td, 3001, 
+		-15/td, 47.8/td, 0, 
+		-15/td, 62.3/td, 0, 
+		-12.5/td, 65/td, 1001, 
+		12.5/td, 65/td, 0, 
+		15/td, 62.3/td, 1001, 
+		15/td, 62.3/td, -1, 
+		-9.4/td, 55/td, 900, 
+		3/td, 360, 4000, 
+		9.4/td, 55/td, 900, 
+		3/td, 360, 4000, 
+		0, 35/td, 900, 
+		3/td, 360, 4000
+
+		if screw_indication=1 then
+			add -9.4/td, 55/td, 2/td
+				placegroup "YSC55"
+			del 1
+
+			add 9.4/td, 55/td, 2/td
+				placegroup "YSC55"
+			del 1
+
+			add 0, 35/td, 2/td
+				placegroup "YSC55"
+			del 1
+		endif
+	rotx -90
+		extrude 16, 0, 0, 1.6/td, 1+2+4+16+32, 
+		-4.3/td, -21.8/td, 0, 
+		-15/td, -35/td, 0, 
+		-15/td, -42.3/td, 0, 
+		-12.1/td, -45/td, 1001, 
+		12.1/td, -45/td, 0, 
+		15/td, -42.3/td, 1001, 
+		15/td, -35/td, 0, 
+		4.3/td, -21.8/td, 0, 
+		-4.3/td, -21.8/td, 1001, 
+		-4.3/td, -21.8/td, -1, 
+		0, -27/td, 900, 
+		3/td, 360, 4000, 
+		-9/td, -37.8/td, 900, 
+		3/td, 360, 4000, 
+		9/td, -37.8/td, 900, 
+		3/td, 360, 4000
+
+		if screw_indication=1 then
+			add -9/td, -37.8/td, 2/td
+				placegroup "YSC55"
+			del 1
+
+			add 9/td, -37.8/td, 2/td
+				placegroup "YSC55"
+			del 1
+
+			add 0, -27/td, 2/td
+				placegroup "YSC55"
+			del 1
+		endif
+
+		CUTPLANE 1, 0, 1, 0
+			extrude 9, 0, 35/td, 48/td, 1+2+4+16+32+64+128, 
+			-4.3/td, -21.8/td, 0, 
+			-15/td, -35/td, 0, 
+			-13.4/td, -35/td, 0, 
+			-2.7/td, -21.8/td, 0, 
+			2.7/td, -21.8/td, 1001, 
+			13.4/td, -35/td, 0, 
+			15/td, -35/td, 0, 
+			4.3/td, -21.8/td, 0, 
+			-4.3/td, -21.8/td, 1001
+		CUTEND
+	del top
+endif
+
+!ロックダウン20
+if product_name=26 then
+	if hardware_position=1 then mulz -1
+	rotx 90
+	addz offset_horizontal_x
+		extrude 21, 0, 0, 4/td, 1+2+4+16+32, 
+		-9.8/2/td, 250/td, 0, 
+		-9.8/2/td, 245/td, 0, 
+		-16/td, 245/td, 0, 
+		-16/td, 60/td, 0, 
+		16/td, 60/td, 0, 
+		16/td, 245/td, 0, 
+		9.8/2/td, 245/td, 0, 
+		9.8/2/td, 250/td, 0, 
+		-9.8/2/td, 250/td, -1, 
+		-6.6/td, 160/td, 900, 
+		3/td, 360, 4000, 
+		-6.6/td, 210/td, 900, 
+		3/td, 360, 4000, 
+		7.2/td, 185/td, 900, 
+		3/td, 360, 4000, 
+		7.2/td, 235/td, 900, 
+		3/td, 360, 4000, 
+		7.2/td, 135/td, 900, 
+		3/td, 360, 4000, 
+		0, 105/td, 900, 
+		3/td, 360, 4000
+
+		if screw_indication=1 then
+			add -6.6/td, 160/td, 4/td
+				placegroup "YDH90"
+			del 1
+
+			add -6.6/td, 210/td, 4/td
+				placegroup "YDH90"
+			del 1
+
+			add 7.2/td, 185/td, 4/td
+				placegroup "YDH90"
+			del 1
+
+			add 7.2/td, 235/td, 4/td
+				placegroup "YDH90"
+			del 1
+
+			add 7.2/td, 135/td, 4/td
+				placegroup "YDH90"
+			del 1
+
+			add 0, 105/td, 4/td
+				placegroup "YDH90"
+			del 1
+		endif
+
+		cutplane  1, 0, 1, 1
+			add 0, 44/td, 11.8/td
+			rotx 180-116
+				cutplane 1, 0, 1, 0
+			del 2
+				add 0, 44/td, -7.82/td
+				rotx 116
+					cutplane 1, 0, 1, 1
+				del 2
+					addz 2/td
+					rotz 90
+						REVOLVE 2, 360, 1+2+4+8+16+32+64, 
+						44/td, 9.8/td, 0, 
+						60/td, 16/td, 0
+				cutend
+			cutend
+		cutend
+
+		REVOLVE 5, 360, 1+2+4+8+16+32+64, 
+		0, 7.8/td, 0, 
+		20/td, 7.8/td, 0, 
+		30/td, 10.7/td, 0, 
+		41.5/td, 10.7/td, 0, 
+		44/td, 9.8/td, 0
+	del top
+endif
+
+!ロックダウン30
+if product_name=27 then
+	if hardware_position=1 then mulz -1
+	rotx 90
+	addz offset_horizontal_x
+		extrude 29, 0, 0, 5/td, 1+2+4+16+32, 
+		-9.8/2/td, 350/td, 0, 
+		-9.8/2/td, 345/td, 0, 
+		-16/td, 345/td, 0, 
+		-16/td, 60/td, 0, 
+		16/td, 60/td, 0, 
+		16/td, 345/td, 0, 
+		9.8/2/td, 345/td, 0, 
+		9.8/2/td, 350/td, 0, 
+		-9.8/2/td, 350/td, -1, 
+		-6.6/td, 160/td, 900, 
+		3/td, 360, 4000, 
+		-6.6/td, 210/td, 900, 
+		3/td, 360, 4000, 
+		-6.6/td, 260/td, 900, 
+		3/td, 360, 4000, 
+		-6.6/td, 310/td, 900, 
+		3/td, 360, 4000, 
+		7.2/td, 285/td, 900, 
+		3/td, 360, 4000, 
+		7.2/td, 335/td, 900, 
+		3/td, 360, 4000, 
+		7.2/td, 185/td, 900, 
+		3/td, 360, 4000, 
+		7.2/td, 235/td, 900, 
+		3/td, 360, 4000, 
+		7.2/td, 135/td, 900, 
+		3/td, 360, 4000, 
+		0, 105/td, 900, 
+		3/td, 360, 4000
+
+		if screw_indication=1 then
+			add -6.6/td, 160/td, 4/td
+				placegroup "YDH90"
+			del 1
+
+			add -6.6/td, 210/td, 4/td
+				placegroup "YDH90"
+			del 1
+
+			add -6.6/td, 260/td, 4/td
+				placegroup "YDH90"
+			del 1
+
+			add -6.6/td, 310/td, 4/td
+				placegroup "YDH90"
+			del 1
+
+			add 7.2/td, 185/td, 4/td
+				placegroup "YDH90"
+			del 1
+
+			add 7.2/td, 235/td, 4/td
+				placegroup "YDH90"
+			del 1
+
+			add 7.2/td, 285/td, 4/td
+				placegroup "YDH90"
+			del 1
+
+			add 7.2/td, 335/td, 4/td
+				placegroup "YDH90"
+			del 1
+
+			add 7.2/td, 135/td, 4/td
+				placegroup "YDH90"
+			del 1
+
+			add 0, 105/td, 4/td
+				placegroup "YDH90"
+			del 1
+		endif
+
+		cutplane  1, 0, 1, 1
+			add 0, 44/td, 12.12/td
+			rotx 180-114
+				cutplane 1, 0, 1, 0
+			del 2
+				add 0, 44/td, -7.18/td
+				rotx 114
+					cutplane 1, 0, 1, 1
+				del 2
+					addz 2.5/td
+					rotz 90
+						REVOLVE 2, 360, 1+2+4+8+16+32+64, 
+						44/td, 9.8/td, 0, 
+						60/td, 16/td, 0
+				cutend
+			cutend
+		cutend
+
+		REVOLVE 5, 360, 1+2+4+8+16+32+64, 
+		0, 7.8/td, 0, 
+		20/td, 7.8/td, 0, 
+		30/td, 10.7/td, 0, 
+		41.5/td, 10.7/td, 0, 
+		44/td, 9.8/td, 0
+	del top
+endif
+
+!ハイパースリム・Ⅱ合板
+if product_name=29 then
+	if hardware_position=1 then mulz -1
+	rotx 90
+	addz offset_horizontal_x
+		group "main29"
+			addx 15/td
+			roty -90
+				extrude 9, 0, 0, 30/td, 1+2+4+16+32+64, 
+				60/td, 3.2/td, 0, 
+				60/td, 0, 0, 
+				3.2/td, 0, 1, 
+				0, 3.2/td, 1001, 
+				0, 110/td, 1, 
+				3.2/td, 110/td, 0, 
+				3.2/td, 5.4/td, 1, 
+				5.4/td, 3.2/td, 1001, 
+				60/td, 3.2/td, 1
+
+				extrude 8, 0, 0, 3.2/td, 1+2+4+16+32+64, 
+				0, 35/td, 1, 
+				0, 3.2/td, 1, 
+				3.2/td, 0, 1001, 
+				12/td, 0, 1, 
+				12/td, 3.2/td, 1, 
+				12.1/td, 8.1/td, 900, 
+				8.1/td, 8.1/td, 3001, 
+				3.2/td, 35/td, 1
+
+			addz 30/td-3.2/td
+				extrude 8, 0, 0, 3.2/td, 1+2+4+16+32+64, 
+				0, 35/td, 1, 
+				0, 3.2/td, 1, 
+				3.2/td, 0, 1001, 
+				12/td, 0, 1, 
+				12/td, 3.2/td, 1, 
+				12.1/td, 8.1/td, 900, 
+				8.1/td, 8.1/td, 3001, 
+				3.2/td, 35/td, 1
+			del top
+		endgroup
+
+		group "mulcut29"
+			extrude 5, 0, 0, 3.2/td, 1+2+4+16+32, 
+			-9.5/td, 110/td, 0, 
+			-15/td, 110/td, 0, 
+			-15/td, 104.5/td, 0, 
+			-9.5/td, 104.5/td, 900, 
+			-9.5/td, 110/td, 3001
+
+			extrude 5, 0, 0, 3.2/td, 1+2+4+16+32, 
+			9.5/td, 110/td, 0, 
+			15/td, 110/td, 0, 
+			15/td, 104.5/td, 0, 
+			9.5/td, 104.5/td, 900, 
+			9.5/td, 110/td, 3001
+
+			extrude 2, 0, 0, 3.2/td, 1+2+4+16+32, 
+			-6.8/td, 101.5/td, 900, 
+			6.3/2/td, 360, 4000
+
+			extrude 2, 0, 0, 3.2/td, 1+2+4+16+32, 
+			6.8/td, 101.5/td, 900, 
+			6.3/2/td, 360, 4000
+
+			extrude 2, 0, 0, 3.2/td, 1+2+4+16+32, 
+			0, 37.5/td, 900, 
+			6.3/2/td, 360, 4000
+		endgroup
+
+		mar1=subgroup("main29", "mulcut29")
+
+		group "mulcut292"
+			rotx -90
+				extrude 6, 0, 0, 3.2/td, 1+2+4+16+32, 
+				-10/td, -60/td, 0, 
+				-15/td, -60/td, 0, 
+				-15/td, -55/td, 0, 
+				-10/td, -55/td, 900, 
+				-10/td, -60/td, 3001, 
+				-10/td, -60/td, -1
+
+				extrude 6, 0, 0, 3.2/td, 1+2+4+16+32, 
+				10/td, -60/td, 0, 
+				15/td, -60/td, 0, 
+				15/td, -55/td, 0, 
+				10/td, -55/td, 900, 
+				10/td, -60/td, 3001, 
+				10/td, -60/td, -1
+
+				extrude 2, 0, 0, 3.2/td, 1+2+4+16+32, 
+				-7.8/td, -18.6/td, 900, 
+				6.3/2/td, 360, 4000
+
+				extrude 2, 0, 0, 3.2/td, 1+2+4+16+32, 
+				7.8/td, -18.6/td, 900, 
+				6.3/2/td, 360, 4000
+			del 1
+		endgroup
+
+		mar2=subgroup(mar1, "mulcut292")
+
+		placegroup mar2
+
+		if screw_indication=1 then
+			add -6.8/td, 101.5/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+
+			add 6.8/td, 101.5/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+
+			add 0, 37.5/td, 3.2/td
+				placegroup "YPR85"
+			del 1
+		endif
+	rotx -90
+		if screw_indication=1 then
+			add -7.8/td, -18.6/td, 3.2/td
+				placegroup "YPR115"
+			del 1
+
+			add 7.8/td, -18.6/td, 3.2/td
+				placegroup "YPR115"
+			del 1
+		endif
+
+		addy -3.2/td
+			PYRAMID 3, 14.2/td, 1+4+16, 
+			-6/td, 0, 0, 
+			6/td, 0, 0, 
+			0, -5/td, 0
+		del 1
+	del top
+endif
+
+!???
+if product_name=33 then
+	group "m2"
+		if bolt_down=1 then addz udis
+			cylind 175/td, 10.7/2/td
+			cylind 65/td, 12/2/td
+
+			addz 175/td
+				elbow 80/td, 60, 10.7/2/td
+			del 1
+
+			if bolt_down=0 then
+				resol 6
+				addz cdis
+					cylind 8/td, 19/2/td
+				addz 8/td
+					extrude 4, 0, 0, 4.5/td, 1+2+4+16+32, 
+					40/2/td, 40/2/td, 0, 
+					40/2/td, -40/2/td, 0, 
+					-40/2/td, -40/2/td, 0, 
+					-40/2/td, 40/2/td, 0
+			else
+				material m1
+
+				resol 36
+				cylind udis+cdis, 50/2/td
+
+				material 11
+
+				resol 6
+				addz cdis
+					cylind 8/td, 19/2/td
+				addz 8/td
+					extrude 4, 0, 0, 4.5/td, 1+2+4+16+32, 
+					30/2/td, 30/2/td, 0, 
+					30/2/td, -30/2/td, 0, 
+					-30/2/td, -30/2/td, 0, 
+					-30/2/td, 30/2/td, 0
+			endif
+		del top
+	endgroup
+
+	group "cut1"
+		if bolt_down=1 then addz udis
+		addz 175/td
+		addy -25.5/2/td
+		addx (22-3.2)/td
+			block 300/td, 25.5/td, (280-175)/td
+		del top
+	endgroup
+
+	group "parts"
+		if bolt_down=0 then addy -(cdis+8/td+4.5/td+S_B)
+		if bolt_down=1 then addy -udis-S_B
+		rotx 270
+		addx -22/td-0.5*S_A
+			placegroup subgroup("m2", "cut1")
+		if bolt_down=1 then addz udis
+		addz 175/td+42.5/td
+		addx 22/td
+		roty -90
+			extrude 8, 0, 0, 4.8/td, 1+2+4+16+32, 
+			0, 5/td, 0, 
+			0, -5/td, 0, 
+			4/td, -5/td, 0, 
+			11/td, -7/td, 0, 
+			24/td, -10.2/td, 0, 
+			24/td, 10.2/td, 0, 
+			11/td, 7/td, 0, 
+			4/td, 5/td, 0
+
+			extrude 10, 0, 0, 3/td, 1+2+4+16+32, 
+			24/td, 0, 1, 
+			24/td, -10.2/td, 1, 
+			(13.4+24)/td, 10.2/td, 900, 
+			(13.4*2+24)/td, -10.2/td, 3001, 
+			(13.4*2+24)/td, 10.2/td, 1, 
+			(13.4+24)/td, -10.2/td, 900, 
+			24/td, 10.2/td, 3001, 
+			24/td, 10.2/td, -1, 
+			(13.4+24)/td, 0, 900, 
+			6/td, 360, 4000
+
+			extrude 2, 0, 0, 20/td, 1+2+4+16+32, 
+			(13.4+24)/td, 0, 900, 
+			4.5/td, 360, 4000
+
+			add (13.4+24)/td, 0, 2/td
+				resol 6
+				cylind 8/td, 19/2/td
+			del 1
+
+			mulz -1
+				resol 36
+				extrude 2, 0, 0, 105/td, 1+2+4+16+32, 
+				(13.4+24)/td, 0, 900, 
+				4.5/td, 360, 4000
+			add (13.4+24)/td, 0, 105/td
+				resol 6
+				cylind 8/td, 19/2/td
+			del 2
+
+			resol 36
+			extrude 6, 0, 0, 4.3/td, 1+2+4+16+32, 
+			(13.4*2+24)/td, 10.2/td, 1, 
+			(13.4*2+24)/td, 0, 1, 
+			(13.4*2+24)/td, -10.2/td, 1, 
+			(30.1+13.4+24)/td, -10.2/td, 1, 
+			(30.1+13.4+24)/td, 0, 1, 
+			(30.1+13.4+24)/td, 10.2/td, 1
+		del top
+	endgroup
+
+		if hardware_position=1 then
+			rotz 270
+				placegroup "parts"
+		endif
+
+		if hardware_position=2 then
+			roty 180
+			rotz 270
+				placegroup "parts"
+		endif
+	del top
+endif
+
+!ホーマープレート240
+if product_name=46 then
+	if hardware_position=1 then muly -1
+	rotx 90
+	addz offset_horizontal_x
+		hotspot 0, 0, 0.7/td
+		hotspot 0, 0, -0.7/td
+
+		extrude 46, 0, 0, 0.7/td, 1+2+4+16+32, 
+		0, -35/td, 0, 
+		-116/td, -35/td, 0, 
+		-120/td, -31/td, 1001, 
+		-120/td, 31/td, 0, 
+		-116/td, 35/td, 1001, 
+		116/td, 35/td, 0, 
+		120/td, 31/td, 1001, 
+		120/td, -31/td, 0, 
+		116/td, -35/td, 1001, 
+		0, -35/td, -1, 
+		-105/td, 20/td, 900, 
+		2.4/td, 360, 4000, 
+		-80/td, 15/td, 900, 
+		2.4/td, 360, 4000, 
+		-55/td, 20/td, 900, 
+		2.4/td, 360, 4000, 
+		-105/td, -20/td, 900, 
+		2.4/td, 360, 4000, 
+		-80/td, -15/td, 900, 
+		2.4/td, 360, 4000, 
+		-55/td, -20/td, 900, 
+		2.4/td, 360, 4000, 
+		105/td, -20/td, 900, 
+		2.4/td, 360, 4000, 
+		80/td, -15/td, 900, 
+		2.4/td, 360, 4000, 
+		55/td, -20/td, 900, 
+		2.4/td, 360, 4000, 
+		105/td, 20/td, 900, 
+		2.4/td, 360, 4000, 
+		80/td, 15/td, 900, 
+		2.4/td, 360, 4000, 
+		55/td, 20/td, 900, 
+		2.4/td, 360, 4000, 
+		-105/td, 0, 0, 
+		-101.3/td, -1.4/td, 0, 
+		-80/td, -2/td, 0, 
+		-80/td, 2/td, 0, 
+		-101.3/td, 1.4/td, 0, 
+		-105/td, 0, -1,     
+		105/td, 0, 0, 
+		101.3/td, -1.4/td, 0, 
+		80/td, -2/td, 0, 
+		80/td, 2/td, 0, 
+		101.3/td, 1.4/td, 0, 
+		105/td, 0, -1
+
+		if screw_indication=1 then
+			add -105/td, 20/td, 0.7/td
+				placegroup "YAS45"
+			del 1
+
+			add -80/td, 15/td, 0.7/td
+				placegroup "YAS45"
+			del 1
+
+			add -55/td, 20/td, 0.7/td
+				placegroup "YAS45"
+			del 1
+
+			add 105/td, 20/td, 0.7/td
+				placegroup "YAS45"
+			del 1
+
+			add 80/td, 15/td, 0.7/td
+				placegroup "YAS45"
+			del 1
+
+			add 55/td, 20/td, 0.7/td
+				placegroup "YAS45"
+			del 1
+
+			add 105/td, -20/td, 0.7/td
+				placegroup "YAS45"
+			del 1
+
+			add 80/td, -15/td, 0.7/td
+				placegroup "YAS45"
+			del 1
+
+			add 55/td, -20/td, 0.7/td
+				placegroup "YAS45"
+			del 1
+
+			add -105/td, -20/td, 0.7/td
+				placegroup "YAS45"
+			del 1
+
+			add -80/td, -15/td, 0.7/td
+				placegroup "YAS45"
+			del 1
+
+			add -55/td, -20/td, 0.7/td
+				placegroup "YAS45"
+			del 1
+		endif
+	del top
+endif
+
+!N-1.6短ざく金物300
+if product_name=47 then
+	if hardware_position=1 then muly -1
+	rotx 90
+	addz offset_horizontal_x
+		hotspot 0, 0, 1.6/td
+		hotspot 0, 0, -1.6/td
+
+		group "main47"
+			extrude 5, 0, 0, 1.6/td, 1+2+4+16+32+64, 
+			-150/td, -20/td, 0, 
+			-150/td, 20/td, 0, 
+			150/td, 20/td, 0, 
+			150/td, -20/td, 0, 
+			-150/td, -20/td, -1
+		endgroup
+
+		group "cut47"
+			extrude 2, 0, 0, 1.6/td, 1+2+4+16+32+64, 
+			-92/td, 0, 900, 
+			2.4/td, 360, 4000
+
+			extrude 2, 0, 0, 1.6/td, 1+2+4+16+32+64, 
+			-116.5/td, 0, 900, 
+			6.8/td, 360, 4000
+			extrude 2, 0, 0, 1.6/td, 1+2+4+16+32+64, 
+			92/td, 0/td, 900, 
+			2.4/td, 360, 4000
+
+			extrude 2, 0, 0, 1.6/td, 1+2+4+16+32+64, 
+			116.5/td, 0, 900, 
+			6.8/td, 360, 4000
+
+			extrude 2, 0, 0, 1.6/td, 1+2+4+16+32+64, 
+			0, 0, 900, 
+			2.4/td, 360, 4000
+		endgroup
+
+		placegroup subgroup ("main47", "cut47")
+
+		group "nt47"
+			material 43
+			resol 6
+
+			addz -10/td
+				extrude 2, 0, 0, 10/td, 1+2+4+16+32, 
+				0, 0, 900, 
+				16/td, 360, 4000
+			del 1
+
+			addz -offset_horizontal_x*2-30/td
+				resol 36
+				cylind offset_horizontal_x*2+40/td, 7.25/td
+			del 1
+
+			addz -offset_horizontal_x*2-20/td-1.6/td
+
+			PRISM_ 25, 10/td, 
+			COS(0)*16/td, SIN(0)*17.5/td, 64+15, 
+			COS(15)*16/td, SIN(15)*17.5/td, 64+15, 
+			COS(30)*16/td, SIN(30)*17.5/td, 64+15, 
+			COS(45)*16/td, SIN(45)*17.5/td, 64+15, 
+			COS(60)*16/td, SIN(60)*17.5/td, 64+15, 
+			COS(75)*16/td, SIN(75)*17.5/td, 64+15, 
+			COS(90)*16/td, SIN(90)*17.5/td, 64+15, 
+			COS(105)*16/td, SIN(105)*17.5/td, 64+15, 
+			COS(120)*16/td, SIN(120)*17.5/td, 64+15, 
+			COS(135)*16/td, SIN(135)*17.5/td, 64+15, 
+			COS(150)*16/td, SIN(150)*17.5/td, 64+15, 
+			COS(165)*16/td, SIN(165)*17.5/td, 64+15, 
+			COS(180)*16/td, SIN(180)*17.5/td, 64+15, 
+			COS(195)*16/td, SIN(195)*17.5/td, 64+15, 
+			COS(210)*16/td, SIN(210)*17.5/td, 64+15, 
+			COS(225)*16/td, SIN(225)*17.5/td, 64+15, 
+			COS(240)*16/td, SIN(240)*17.5/td, 64+15, 
+			COS(255)*16/td, SIN(255)*17.5/td, 64+15, 
+			COS(270)*16/td, SIN(270)*17.5/td, 64+15, 
+			COS(285)*16/td, SIN(285)*17.5/td, 64+15, 
+			COS(300)*16/td, SIN(300)*17.5/td, 64+15, 
+			COS(315)*16/td, SIN(315)*17.5/td, 64+15, 
+			COS(330)*16/td, SIN(330)*17.5/td, 64+15, 
+			COS(345)*16/td, SIN(345)*17.5/td, 64+15, 
+			COS(360)*16/td, SIN(360)*17.5/td, 64+15
+			material 11
+		endgroup
+
+		if bolt_down=1 then
+			add -116.5/td, 0, 11.6/td
+				placegroup "nt47"
+			del 1
+
+			add 116.5/td, 0, 11.6/td
+				placegroup "nt47"
+			del 1
+		endif
+	del top
+endif
+
+!ビスどめ短冊S
+if product_name=48 then
+	if hardware_position=1 then muly -1
+	rotx 90
+	addz offset_horizontal_x
+		hotspot 0, 0, 0.6/td
+		hotspot 0, 0, -0.6/td
+
+		extrude 36, 0, 0, 0.6/td, 1+2+4+16+32, 
+		115/td, -25/td, 0, 
+		-115/td, -25/td, 0, 
+		-120/td, -20/td, 1001, 
+		-120/td, 20/td, 0, 
+		-115/td, 25/td, 1001, 
+		115/td, 25/td, 0, 
+		120/td, 20/td, 1001, 
+		120/td, -20/td, 0, 
+		115/td, -25/td, 1001, 
+		115/td, -25/td, -1, 
+		-105/td, 10/td, 900, 
+		3/td, 360, 4000, 
+		-65/td, 10/td, 900, 
+		3/td, 360, 4000, 
+		-35/td, 0, 900, 
+		3/td, 360, 4000, 
+		-105/td, -10/td, 900, 
+		3/td, 360, 4000, 
+		-65/td, -10/td, 900, 
+		3/td, 360, 4000, 
+		105/td, 10/td, 900, 
+		3/td, 360, 4000, 
+		65/td, 10/td, 900, 
+		3/td, 360, 4000, 
+		35/td, 0, 900, 
+		3/td, 360, 4000, 
+		105/td, -10/td, 900, 
+		3/td, 360, 4000, 
+		65/td, -10/td, 900, 
+		3/td, 360, 4000, 
+		-13.9/td, 2/td, 0, 
+		-13.9/td, -2/td, 0, 
+		6.4/td, -2/td, 0, 
+		14.3/td, 0, 0, 
+		6.4/td, 2/td, 0, 
+		-13.9/td, 0, -1
+
+		if screw_indication=1 then
+			add -105/td, 10/td, 0.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add -65/td, 10/td, 0.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add -35/td, 0, 0.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add -105/td, -10/td, 0.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add -65/td, -10/td, 0.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add 105/td, 10/td, 0.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add 65/td, 10/td, 0.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add 35/td, 0, 0.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add 105/td, -10/td, 0.6/td
+				placegroup "CPQ45"
+			del 1
+
+			add 65/td, -10/td, 0.6/td
+				placegroup "CPQ45"
+			del 1
+		endif
+	del top
+endif
+
+!釘どめ短冊S
+if product_name=50 then
+	if hardware_position=1 then muly -1
+	rotx 90
+	addz offset_horizontal_x
+		hotspot 0, 0, 0.6/td
+		hotspot 0, 0, -0.6/td
+
+		extrude 36, 0, 0, 0.6/td, 1+2+4+16+32, 
+		115/td, -25/td, 0, 
+		-115/td, -25/td, 0, 
+		-120/td, -20/td, 1001, 
+		-120/td, 20/td, 0, 
+		-115/td, 25/td, 1001, 
+		115/td, 25/td, 0, 
+		120/td, 20/td, 1001, 
+		120/td, -20/td, 0, 
+		115/td, -25/td, 1001, 
+		115/td, -25/td, -1, 
+		-105/td, 10/td, 900, 
+		3/td, 360, 4000, 
+		-65/td, 10/td, 900, 
+		3/td, 360, 4000, 
+		-35/td, 0, 900, 
+		3/td, 360, 4000, 
+		-105/td, -10/td, 900, 
+		3/td, 360, 4000, 
+		-65/td, -10/td, 900, 
+		3/td, 360, 4000, 
+		105/td, 10/td, 900, 
+		3/td, 360, 4000, 
+		65/td, 10/td, 900, 
+		3/td, 360, 4000, 
+		35/td, 0, 900, 
+		3/td, 360, 4000, 
+		105/td, -10/td, 900, 
+		3/td, 360, 4000, 
+		65/td, -10/td, 900, 
+		3/td, 360, 4000, 
+		-13.9/td, 2/td, 0, 
+		-13.9/td, -2/td, 0, 
+		6.4/td, -2/td, 0, 
+		14.3/td, 0, 0, 
+		6.4/td, 2/td, 0, 
+		-13.9/td, 0, -1
+
+		if screw_indication=1 then
+			add -105/td, 10/td, 0.6/td
+				placegroup "PZFRN55"
+			del 1
+
+			add -65/td, 10/td, 0.6/td
+				placegroup "PZFRN55"
+			del 1
+
+			add -35/td, 0, 0.6/td
+				placegroup "PZFRN55"
+			del 1
+
+			add -105/td, -10/td, 0.6/td
+				placegroup "PZFRN55"
+			del 1
+
+			add -65/td, -10/td, 0.6/td
+				placegroup "PZFRN55"
+			del 1
+
+			add 105/td, 10/td, 0.6/td
+				placegroup "PZFRN55"
+			del 1
+
+			add 65/td, 10/td, 0.6/td
+				placegroup "PZFRN55"
+			del 1
+
+			add 35/td, 0, 0.6/td
+				placegroup "PZFRN55"
+			del 1
+
+			add 105/td, -10/td, 0.6/td
+				placegroup "PZFRN55"
+			del 1
+
+			add 65/td, -10/td, 0.6/td
+				placegroup "PZFRN55"
+			del 1
+		endif
+	del top
+endif
+
+!N-フリーダム筋交いプレート
+if product_name=52 then
+    if hardware_position=1 then mulx +1
+    if hardware_position=2 then mulx -1
+    if hardware_position=3 then mulz -1
+    if hardware_position=4 then roty 180
+    add +offset_horizontal_Y, -offset_horizontal_x, distance_from_beam
+        hotspot 0, 0, 0
+
+	rotz -90
+	rotx 90
+		extrude 35, 0, 0, 1.6/td, 1+2+4+16+32, 
+		0, 0, 0, 
+		63.4/td, 0, 0, 
+		63.4/td, 34.2/td, 900, 
+		97.6/td, 34.2/td, 3001, 
+		91.4/td, 49.8/td, 1001, 
+		91.4/td, 59.3/td, 1001, 
+		97.6/td, 75.8/td, 1001, 
+		63.4/td, 75.8/td, 900, 
+		63.4/td, 110/td, 3001, 
+		0, 110/td, 0, 
+		0, 0, -1, 
+		9.4/td, 55/td, 900, 
+		2/td, 360, 4000, 
+		49.4/td, 20.6/td, 900, 
+		3/td, 360, 4000, 
+		49.4/td, 89.4/td, 900, 
+		3/td, 360, 4000, 
+		65.4/td, 99/td, 900, 
+		3/td, 360, 4000, 
+		65.4/td, 11/td, 900, 
+		3/td, 360, 4000, 
+		87.1/td, 77/td, 900, 
+		3/td, 360, 4000, 
+		87.1/td, 33/td, 900, 
+		3/td, 360, 4000, 
+		51.2/td, 52/td, 0, 
+		51.2/td, 58/td, 0, 
+		57.2/td, 58/td, 0, 
+		57.2/td, 52/td, 0, 
+		51.2/td, 52/td, -1, 
+		73.5/td, 52/td, 0, 
+		73.5/td, 58/td, 0, 
+		79.5/td, 58/td, 0, 
+		79.5/td, 52/td, 0, 
+		73.5/td, 52/td, -1  
+
+		if screw_indication=1 then
+			add 9.4/td, 55/td, 1.6/td
+				placegroup "YSN45"
+			del 1
+
+			add 49.4/td, 20.6/td, 1.6/td
+				placegroup "YSN45"
+			del 1
+
+			add 49.4/td, 89.4/td, 1.6/td
+				placegroup "YSN45"
+			del 1
+
+			add 65.4/td, 99/td, 1.6/td
+				placegroup "YSN45"
+			del 1
+
+			add 65.4/td, 11/td, 1.6/td
+				placegroup "YSN45"
+			del 1
+
+			add 87.1/td, 77/td, 1.6/td
+				placegroup "YSN45"
+			del 1
+
+			add 87.1/td, 33/td, 1.6/td
+				placegroup "YSN45"
+			del 1
+		endif
+	roty 90
+		extrude 32, 0, 0, 1.6/td, 1+2+4+16+32, 
+		0, 0, 0, 
+		-43.6/td, 0, 0, 
+		-46.6/td, 3/td, 1001, 
+		-46.6/td, 11.4/td, 0, 
+		-76.2/td, 36.5/td, 900, 
+		-37.8/td, 40.6/td, 3001, 
+		-50/td, 39.2/td, 900, 
+		-43.9/td, 49.7/td, 3001, 
+		-41.4/td, 55/td, 900, 
+		-43.9/td, 60.3/td, 3001, 
+		-50/td, 70.8/td, 900, 
+		-37.8/td, 69.4/td, 3001, 
+		-76.2/td, 73.5/td, 900, 
+		-46.6/td, 98.6/td, 3001, 
+		-46.6/td, 107/td, 0, 
+		-43.6/td, 110/td, 1001, 
+		0, 110/td, 1, 
+		0, 0, -1, 
+		-12.6/td, 55/td, 900, 
+		2.8/td, 360, 4000, 
+		-20.1/td, 33/td, 900, 
+		2.8/td, 360, 4000, 
+		-20.1/td, 77/td, 900, 
+		2.8/td, 360, 4000, 
+		-12.6/td, 99/td, 900, 
+		3/td, 360, 4000, 
+		-31.7/td, 99/td, 900, 
+		3/td, 360, 4000, 
+		-12.6/td, 11/td, 900, 
+		3/td, 360, 4000, 
+		-31.7/td, 11/td, 900, 
+		3/td, 360, 4000
+
+		rotz 90
+			addx 32.7/td
+				PYRAMID 3, 10.9/td, 1+4+16, 
+				10.3/td, 0, 0, 
+				-10.3/td, 0, 0, 
+				0, 10.5/td, 0
+			del 1
+		addx 77.3/td
+			PYRAMID 3, 10.9/td, 1+4+16, 
+			10.3/td, 0, 0, 
+			-10.3/td, 0, 0, 
+			0, 10.5/td, 0
+		del 2
+
+		if screw_indication=1 then
+			add -12.6/td, 55/td, 1.6/td
+			placegroup "YSN45"
+			del 1
+
+			add -20.1/td, 33/td, 1.6/td
+			placegroup "YSN45"
+			del 1
+
+			add -20.1/td, 77/td, 1.6/td
+			placegroup "YSN45"
+			del 1
+
+			add -12.6/td, 99/td, 1.6/td
+			placegroup "YSN45"
+			del 1
+
+			add -31.7/td, 99/td, 1.6/td
+			placegroup "YSN45"
+			del 1
+
+			add -12.6/td, 11/td, 1.6/td
+			placegroup "YSN45"
+			del 1
+
+			add -31.7/td, 11/td, 1.6/td
+			placegroup "YSN45"
+			del 1
+		endif
+    del top
+endif
+
+!ハイパーガゼットII
+if product_name=53 then
+    !get data 
+    plateThi=1.6/td 
+    plateDep=46.6/td
+    plateHei=113/td 
+    plateWid=91.3/td 
+    plateHei2=93/td 
+
+    holeD_1=6/td 
+    holeR_1=holeD_1/2
+    holeD_2=6.5/td 
+    holeR_2=holeD_2/2
+
+    if hardware_position=1 then mulx +1
+    if hardware_position=2 then mulx -1
+    if hardware_position=3 then mulz -1
+    if hardware_position=4 then roty 180
+    add +offset_horizontal_Y, -offset_horizontal_x, distance_from_beam
+        rotz -90
+        rotx 90
+            !long part
+            extrude 11+6*2+4*2, 0, 0, plateThi, 1+2+4+16+32, 
+			0, 0, 0, 
+			41.4/td       , 0, 0, 
+			77/td         , 10/td, 0, 
+			plateWid-5/td , 10/td, 0, 
+			plateWid      , 15/td, 1001, !curve conner
+			plateWid      , 98/td, 0, 
+			plateWid-5/td , 103/td, 1001, !curve conner
+			77/td         , 103/td, 0, 
+			41.4/td       , plateHei, 0, 
+			0             , plateHei, 0, 
+			0, 0, -1, 
+			85/td, 18/td, 900, !hole x 6
+			holeR_2, 360, 4000, !φ6.5*4
+			85/td, 44/td, 900, 
+			holeR_1, 360, 4000, !φ6*2
+			85/td, 69/td, 900, 
+			holeR_1, 360, 4000, 
+			85/td, plateHei-18/td, 900, 
+			holeR_2, 360, 4000, 
+			43/td, 18/td, 900, 
+			holeR_2, 360, 4000, 
+			43/td, plateHei-18/td, 900, 
+			holeR_2, 360, 4000, 
+			77/td-10/td , plateHei/2, 0, !small triangle
+			71/td-10/td , plateHei/2+3.5/td, 0, 
+			71/td-10/td , plateHei/2-3.5/td, 0, 
+			77/td-10/td , plateHei/2, -1, 
+			20/td-8/td , plateHei/2, 0, !large triangle
+			40/td-8/td , 28/td, 0, 
+			40/td-8/td , plateHei-28/td, 0, 
+			20/td-8/td , plateHei/2, -1
+
+            if screw_indication=1 then
+                add 85/td, 18/td, plateThi
+                	placegroup "CPQ45"
+                del 1
+
+                add 85/td, 44/td, plateThi
+                	placegroup "CPQ45"
+                del 1
+
+                add 85/td, 69/td, plateThi
+                	placegroup "CPQ45"
+                del 1
+
+                add 85/td, plateHei-18/td, plateThi
+                	placegroup "CPQ45"
+                del 1
+
+                add 43/td, 18/td, plateThi
+                	placegroup "CPQ45"
+                del 1
+
+                add 43/td, plateHei-18/td, plateThi
+                	placegroup "CPQ45"
+                del 1
+            endif
+        roty 90
+            !short part
+            extrude 7+8*2+6, 0, 0, plateThi, 1+2+4+16+32, 
+			0, 0, 0, 
+			-plateDep+3/td  , 0, 0, 
+			-plateDep       , 3/td, 1001, !curve conner
+			-plateDep       , plateHei-3/td, 0, 
+			-plateDep+3/td  , plateHei, 1001, !curve conner
+			0               , plateHei, 0, 
+			0, 0, -1, 
+			-23/td, 85/td, 900, 		!8*φ6
+			holeR_1, 360, 4000, 
+			-23/td, 85/td, 900, 
+			holeR_1, 360, 4000, 
+			-35/td, 6/td, 900, 		
+			holeR_1, 360, 4000, 
+			-35/td, plateHei-6/td, 900, 
+			holeR_1, 360, 4000, 
+			-11.2/td, plateHei-6/td, 900, 
+			holeR_1, 360, 4000, 
+			-11.2/td, plateHei/2-10/td, 900, 
+			holeR_1, 360, 4000, 
+			-11.2/td, plateHei/2+10/td, 900, 
+			holeR_1, 360, 4000, 
+			-11.2/td, 6/td, 900, 
+			holeR_1, 360, 4000, 
+			-41.7/td, 60/td, 0, !candle
+			-36.9/td, 58.4/td, 0, 
+			-20.7/td, 58.4/td, 0, 
+			-20.7/td, 61.6/td, 0, 
+			-36.9/td, 61.6/td, 0, 
+			-41.7/td, 60/td, -1
+
+			rotz 90
+				addx 18/td
+					PYRAMID 3, 10.9/td, 1+4+16, 
+					10.3/td, 0, 0, 
+					-10.3/td, 0, 0, 
+					0, 10.5/td, 0
+				del 1
+
+				addx plateHei/2
+					PYRAMID 3, 10.9/td, 1+4+16, 
+					10.3/td, 0, 0, 
+					-10.3/td, 0, 0, 
+					0, 10.5/td, 0
+				del 1
+
+				addx plateHei-18/td 
+					PYRAMID 3, 10.9/td, 1+4+16, 
+					10.3/td, 0, 0, 
+					-10.3/td, 0, 0, 
+					0, 10.5/td, 0
+				del 1 
+			del 1
+
+            if screw_indication=1 then
+                add -23/td, 85/td, plateThi
+                	placegroup "CPQ45"
+                del 1 
+
+                add -23/td, 85/td, plateThi
+                	placegroup "CPQ45"
+                del 1 
+
+                add -35/td, 6/td, plateThi
+                	placegroup "CPQ45"
+                del 1 
+
+                add -35/td, plateHei-6/td, plateThi
+                	placegroup "CPQ45"
+                del 1 
+
+                add -11.2/td, plateHei-6/td, plateThi
+                	placegroup "CPQ45"
+                del 1 
+
+                add -11.2/td, plateHei/2-10/td, plateThi
+                	placegroup "CPQ45"
+                del 1 
+
+                add -11.2/td, plateHei/2+10/td, plateThi
+                	placegroup "CPQ45"
+                del 1 
+
+                add -11.2/td, 6/td, plateThi
+                	placegroup "CPQ45"
+                del 1 
+            endif
+        del 3
+    del 2 
+endif
+
+!ひねり金物ST-II
+if product_name=54 then
+	hotspot 0, 0, 0
+
+	if hardware_position=1 then muly -1
+	rotx 90
+	addz offset_horizontal_x
+		extrude 9, 0, 0, 2.3/td, 1+2+4+16+32, 
+		-10/td, 88/td, 0, 
+		-10/td, 150/td, 0, 
+		10/td, 150/td, 0, 
+		10/td, 88/td, 0, 
+		-10/td, 88/td, -1, 
+		0, 136.8/td, 900, 
+		1.6/td, 360, 4000, 
+		0, 117.3/td, 900, 
+		1.6/td, 360, 4000
+
+		if screw_indication=1 then
+			add 0, 136.8/td, 2.3/td
+				placegroup "ZN40"
+			del 1
+
+			add 0, 117.3/td, 2.3/td
+				placegroup "ZN40"
+			del 1
+		endif
+	rotz 90
+		addz 2.3/td
+			cutplane{3} -1, 0, 0, 0
+		del 1
+			cutplane{3} 1, 0, 0, 1
+				REVOLVE 4, 360, 1+2+4+8+16+32+64, 
+				64/td, 0/td, 0, 
+				69.3/td, 0.8/td, 0, 
+				78.5/td, 7/td, 0, 
+				88/td, 10/td, 0
+			cutend
+		cutend
+	del top
+endif
+
+!タルフィックL
+if product_name=601 then
+	hotspot 0, 0, 0
+
+	if hardware_position=1 then muly -1
+	rotx 90
+	addz offset_horizontal_x
+		extrude 11, 0, 0, 0.6/td, 1+2+4+16+32, 
+		0, 34.5/td, 0, 
+		0, 117.5/td, 0, 
+		2.5/td, 120/td, 1001, 
+		22.5/td, 120/td, 0, 
+		25/td, 117.5/td, 1001, 
+		25/td, 84/td, 0, 
+		0, 34.5/td, -1, 
+		12.5/td, 95/td, 900, 
+		3.5/2/td, 360, 4000, 
+		12.5/td, 114/td, 900, 
+		3.5/2/td, 360, 4000
+
+		if screw_indication=1 then
+			add 12.5/td, 95/td, 2/td
+				placegroup "ZN40"
+			del 1
+
+			add 12.5/td, 114/td, 2/td
+				placegroup "ZN40"
+			del 1
+		endif
+
+	roty 90
+		extrude 11, 0, 0, 0.6/td, 1+2+4+16+32, 
+		0, 84/td, 0, 
+		-25/td, 34.5/td, 0, 
+		-25/td, 2.5/td, 0, 
+		-22.5/td, 0, 1001, 
+		-2.5/td, 0, 0, 
+			0, 2.5/td, 1001, 
+		0, 84/td, -1, 
+		-12.5/td, 6/td, 900, 
+		1.6/td, 360, 4000, 
+		-12.5/td, 25/td, 900, 
+		1.6/td, 360, 4000
+
+		if screw_indication=1 then
+			add -12.5/td, 6/td, 2/td
+				placegroup "ZN40"
+			del 1
+
+			add -12.5/td, 25/td, 2/td
+				placegroup "ZN40"
+			del 1
+		endif
+	del top
+endif
+
+!タルフィックR
+if product_name=602 then
+	muly -1
+	if hardware_position=1 then del 1
+	rotx 90
+	addz offset_horizontal_x
+		extrude 11, 0, 0, 0.6/td, 1+2+4+16+32, 
+		0, 34.5/td, 0, 
+		0, 117.5/td, 0, 
+		2.5/td, 120/td, 1001, 
+		22.5/td, 120/td, 0, 
+		25/td, 117.5/td, 1001, 
+		25/td, 84/td, 0, 
+		0, 34.5/td, -1, 
+		12.5/td, 95/td, 900, 
+		3.5/2/td, 360, 4000, 
+		12.5/td, 114/td, 900, 
+		3.5/2/td, 360, 4000
+
+		if screw_indication=1 then
+			add 12.5/td, 95/td, 2/td
+				placegroup "ZN40"
+			del 1
+
+			add 12.5/td, 114/td, 2/td
+				placegroup "ZN40"
+			del 1
+		endif
+
+	roty 90
+		extrude 11, 0, 0, 0.6/td, 1+2+4+16+32, 
+		0, 84/td, 0, 
+		-25/td, 34.5/td, 0, 
+		-25/td, 2.5/td, 0, 
+		-22.5/td, 0, 1001, 
+		-2.5/td, 0, 0, 
+			0, 2.5/td, 1001, 
+		0, 84/td, -1, 
+		-12.5/td, 6/td, 900, 
+		1.6/td, 360, 4000, 
+		-12.5/td, 25/td, 900, 
+		1.6/td, 360, 4000
+
+		if screw_indication=1 then
+			add -12.5/td, 6/td, 2/td
+				placegroup "ZN40"
+			del 1
+
+			add -12.5/td, 25/td, 2/td
+				placegroup "ZN40"
+			del 1
+		endif
+	del top
+endif
+
+!フリーダム鋼製火打
+if product_name=61 then
+	hotspot 0, 0, 0
+
+	material 18
+
+	rotz 45
+	addx 0.5*920/td+offset_horizontal_x-23.4/td
+	roty 90
+		extrude 5, 0, 0, 2.3/td, 1+2+4+16+32, 
+		-15/td, -414.9/td, 0, 
+		-15/td, 414.9/td, 0, 
+		15/td, 414.9/td, 0, 
+		15/td, -414.9/td, 0, 
+		-15/td, -414.9/td, -1
+
+		addy -414.9/td
+		rotx -45
+			extrude 28, 0, 0, 2.3/td, 1+2+4+16+32, 
+			17.8/td, -3.2/td, 0, 
+			29.1/td, -37.8/td, 0, 
+			27.25/td, -38.4/td, 0, 
+			27.25/td, -42.7/td, 0, 
+			25/td, -45.5/td, 0, 
+			12.1/td, -45.5/td, 0, 
+			8.7/td, -42.7/td, 0, 
+			4.4/td, -30.7/td, 0, 
+			3/td, -36.2/td, 0, 
+			-3/td, -36.2/td, 0, 
+			-4.4/td, -30.7/td, 0, 
+			-8.7/td, -42.7/td, 0, 
+			-12.1/td, -45.5/td, 0, 
+			-25/td, -45.5/td, 0, 
+			-27.25/td, -42.7/td, 0, 
+			-27.25/td, -38.4/td, 0, 
+			-29.1/td, -37.8/td, 0, 
+			-17.8/td, -3.2/td, 0, 
+			-12/td, 0, 0, 
+			12/td, 0, 0, 
+			17.8/td, -3.2/td, 1001, 
+			17.8/td, -3.2/td, -1, 
+			16.2/td, -30/td, 900, 
+			2/td, 360, 4000, 
+			-16.2/td, -30/td, 900, 
+			2/td, 360, 4000, 
+			0, -8.8/td, 900, 
+			2/td, 360, 4000
+
+			if screw_indication=1 then
+				add 16.2/td, -30/td, 2/td
+					placegroup "YDN90"
+				del 1
+
+				add -16.2/td, -30/td, 2/td
+					placegroup "YDN90"
+				del 1
+
+				add 0, -8.8/td, 2/td
+					placegroup "YDN90"
+				del 1
+			endif	
+		del 2
+
+		addy 414.9/td
+		rotx 45
+			extrude 28, 0, 0, 2.3/td, 1+2+4+16+32, 
+			17.8/td, 3.2/td, 0, 
+			29.1/td, 37.8/td, 0, 
+			27.25/td, 38.4/td, 0, 
+			27.25/td, 42.7/td, 0, 
+			25/td, 45.5/td, 0, 
+			12.1/td, 45.5/td, 0, 
+			8.7/td, 42.7/td, 0, 
+			4.4/td, 30.7/td, 0, 
+			3/td, 36.2/td, 0, 
+			-3/td, 36.2/td, 0, 
+			-4.4/td, 30.7/td, 0, 
+			-8.7/td, 42.7/td, 0, 
+			-12.1/td, 45.5/td, 0, 
+			-25/td, 45.5/td, 0, 
+			-27.25/td, 42.7/td, 0, 
+			-27.25/td, 38.4/td, 0, 
+			-29.1/td, 37.8/td, 0, 
+			-17.8/td, 3.2/td, 0, 
+			-12/td, 0, 0, 
+			12/td, 0, 0, 
+			17.8/td, 3.2/td, 1001, 
+			17.8/td, 3.2/td, -1, 
+			16.2/td, 30/td, 900, 
+			2/td, 360, 4000, 
+			-16.2/td, 30/td, 900, 
+			2/td, 360, 4000, 
+			0, 8.8/td, 900, 
+			2/td, 360, 4000
+
+			if screw_indication=1 then
+				add 16.2/td, 30/td, 2/td
+					placegroup "YDN90"
+				del 1
+
+				add -16.2/td, 30/td, 2/td
+					placegroup "YDN90"
+				del 1
+
+				add 0, 8.8/td, 2/td
+					placegroup "YDN90"
+				del 1
+			endif
+		del 2
+	roty 270
+		addz 14/td
+		roty -25
+			extrude 5, 0, 0, 2.3/td, 1+2+4+16+32, 
+			0, -414.9/td, 0, 
+			31/td, -442.95/td, 0, 
+			31/td, 442.95/td, 0, 
+			0, 414.9/td, 0, 
+			0, -414.9/td, -1
+		del 2
+	addz -16.5/td
+	roty 25
+		extrude 5, 0, 0, 2.3/td, 1+2+4+16+32, 
+		0, -414.9/td, 0, 
+		31/td, -442.95/td, 0, 
+		31/td, 442.95/td, 0, 
+		0, 414.9/td, 0, 
+		0, -414.9/td, -1
+	del top
+endif
+
+!鋼製火打N-600(ボルト)
+if product_name=62 then
+	material 18
+
+	rotz 45
+	addx 0.5*920/td+offset_horizontal_x-23.4/td
+	roty 90
+		extrude 5, 0, 0, 2.3/td, 1+2+4+16+32, 
+			-15/td, -414.9/td, 0, 
+			-15/td, 414.9/td, 0, 
+			15/td, 414.9/td, 0, 
+			15/td, -414.9/td, 0, 
+			-15/td, -414.9/td, -1
+
+		addy -414.9/td
+		rotx -45
+			extrude 19, 0, 0, 1.6/td, 1+2+4+16+32, 
+				17.1/td, -3.9/td, 0, 
+				28.5/td, -40/td, 0, 
+				28.5/td, -59.7/td, 0, 
+				23.4/td, -64.5/td, 0, 
+				-23.4/td, -64.5/td, 0, 
+				-28.5/td, -59.7/td, 0, 
+				-28.5/td, -40/td, 0, 
+				-17.1/td, -3.9/td, 0, 
+				-12.6/td, 0, 0, 
+				12.6/td, 0, 0, 
+				17.1/td, -3.9/td, -1, 
+				17.8/td, -45.1/td, 900, 
+				2/td, 360, 4000, 
+				-17.8/td, -45.1/td, 900, 
+				2/td, 360, 4000, 
+				0, -54.5/td, 900, 
+				2/td, 360, 4000, 
+				0, -22.2/td, 900, 
+				6.5/td, 360, 4000
+
+			if screw_indication=1 then
+				add 17.8/td, -45.1/td, 1.3/td
+					placegroup "ZF55"
+				del 1
+				
+				add -17.8/td, -45.1/td, 1.3/td
+					placegroup "ZF55"
+				del 1
+
+				add 0, -54.5/td, 1.3/td
+					placegroup "ZF55"
+				del 1
+			endif	
+		del 2
+
+		addy 414.9/td
+		rotx 45
+			extrude 19, 0, 0, 1.6/td, 1+2+4+16+32, 
+				17.1/td, 3.9/td, 0, 
+				28.5/td, 40/td, 0, 
+				28.5/td, 59.7/td, 0, 
+				23.4/td, 64.5/td, 0, 
+				-23.4/td, 64.5/td, 0, 
+				-28.5/td, 59.7/td, 0, 
+				-28.5/td, 40/td, 0, 
+				-17.1/td, 3.9/td, 0, 
+				-12.6/td, 0, 0, 
+				12.6/td, 0, 0, 
+				17.1/td, 3.9/td, -1, 
+				17.8/td, 45.1/td, 900, 
+				2/td, 360, 4000, 
+				-17.8/td, 45.1/td, 900, 
+				2/td, 360, 4000, 
+				0, 54.5/td, 900, 
+				2/td, 360, 4000, 
+				0, 22.2/td, 900, 
+				6.5/td, 360, 4000
+
+			if screw_indication=1 then
+				add 17.8/td, 45.1/td, 1.3/td
+					placegroup "ZF55"
+				del 1
+
+				add -17.8/td, 45.1/td, 1.3/td
+					placegroup "ZF55"
+				del 1
+
+				add 0, 54.5/td, 1.3/td
+					placegroup "ZF55"
+				del 1
+			endif	
+		del 2
+	roty 270
+		addz 14/td
+		roty -25
+			extrude 5, 0, 0, 2.3/td, 1+2+4+16+32, 
+				0, -414.9/td, 0, 
+				31/td, -442.95/td, 0, 
+				31/td, 442.95/td, 0, 
+				0, 414.9/td, 0, 
+				0, -414.9/td, -1
+		del 2
+	addz -16.5/td
+	roty 25
+		extrude 5, 0, 0, 2.3/td, 1+2+4+16+32, 
+		0, -414.9/td, 0, 
+		31/td, -442.95/td, 0, 
+		31/td, 442.95/td, 0, 
+		0, 414.9/td, 0, 
+		0, -414.9/td, -1
+	del top
+endif
+
+!トラスティ600(ボルト)
+if product_name=63 then
+	hotspot 0, 0, 0
+
+	material 18
+
+	rotz 45
+	addx 0.5*920/td+offset_horizontal_x-23.4/td
+	roty 90
+		extrude 5, 0, 0, 2.3/td, 1+2+4+16+32, 
+			-28/td, -414.9/td, 0, 
+			-28/td, 414.9/td, 0, 
+			28/td, 414.9/td, 0, 
+			28/td, -414.9/td, 0, 
+			-28/td, -414.9/td, -1
+
+		addy -414.9/td
+		rotx -45
+			extrude 19, 0, 0, 1.6/td, 1+2+4+16+32, 
+				28/td, 0, 0, 
+				30/td, -5/td, 0, 
+				30/td, -84.7/td, 0, 
+				25/td, -88.8/td, 0, 
+				-25/td, -88.8/td, 0, 
+				-30/td, -84.7/td, 0, 
+				-30/td, -5/td, 0, 
+				-28/td, 0, 0, 
+				28/td, 0, -1, 
+				23.3/td, -26.3/td, 900, 
+				5.6/2/td, 360, 4000, 
+				-23.3/td, -26.3/td, 900, 
+				5.6/2/td, 360, 4000, 
+				15.6/td, -51.5/td, 900, 
+				5.6/21000, 360, 4000, 
+				-15.6/td, -51.5/td, 900, 
+				5.6/21000, 360, 4000, 
+				0, -68.6/td, 900, 
+				6.25/td, 360, 4000
+
+			if screw_indication=1 then
+				add 23.3/td, -26.3/td, 1.3/td
+					placegroup "PZFRN55"
+				del 1
+
+				add -23.3/td, -26.3/td, 1.3/td
+					placegroup "PZFRN55"
+				del 1
+
+				add 15.6/td, -51.5/td, 1.3/td
+					placegroup "PZFRN55"
+				del 1
+
+				add -15.6/td, -51.5/td, 1.3/td
+					placegroup "PZFRN55"
+				del 1
+			endif	
+		del 2
+
+		addy 414.9/td
+		rotx 45
+			extrude 19, 0, 0, 1.6/td, 1+2+4+16+32, 
+				28/td, 0, 0, 
+				30/td, 5/td, 0, 
+				30/td, 84.7/td, 0, 
+				25/td, 88.8/td, 0, 
+				-25/td, 88.8/td, 0, 
+				-30/td, 84.7/td, 0, 
+				-30/td, 5/td, 0, 
+				-28/td, 0, 0, 
+				28/td, 0, -1, 
+				23.3/td, 26.3/td, 900, 
+				5.6/2/td, 360, 4000, 
+				-23.3/td, 26.3/td, 900, 
+				5.6/2/td, 360, 4000, 
+				15.6/td, 51.5/td, 900, 
+				5.6/21000, 360, 4000, 
+				-15.6/td, 51.5/td, 900, 
+				5.6/21000, 360, 4000, 
+				0, 68.6/td, 900, 
+				6.25/td, 360, 4000
+
+			if screw_indication=1 then
+				add 23.3/td, 26.3/td, 1.3/td
+					placegroup "PZFRN55"
+				del 1
+
+				add -23.3/td, 26.3/td, 1.3/td
+					placegroup "PZFRN55"
+				del 1
+
+				add 15.6/td, 51.5/td, 1.3/td
+					placegroup "PZFRN55"
+				del 1
+
+				add -15.6/td, 51.5/td, 1.3/td
+					placegroup "PZFRN55"
+				del 1
+			endif	
+		del 2
+	roty 270
+		addz 14/td
+		roty 30
+			extrude 5, 0, 0, 2.3/td, 1+2+4+16+32, 
+				0, -414.9/td, 0, 
+				31/td, -442.95/td, 0, 
+				31/td, 442.95/td, 0, 
+				0, 414.9/td, 0, 
+				0, -414.9/td, -1
+		del 2
+	addz -16.5/td
+	roty -30
+		extrude 5, 0, 0, 2.3/td, 1+2+4+16+32, 
+			0, -414.9/td, 0, 
+			31/td, -442.95/td, 0, 
+			31/td, 442.95/td, 0, 
+			0, 414.9/td, 0, 
+			0, -414.9/td, -1
+	del top
+endif
+
+!プロ二ック600
+if product_name=64 then
+	material 18
+
+	rotz 45
+	addx 0.5*920/td+offset_horizontal_x-23.4/td
+	roty 90
+		extrude 5, 0, 0, 2.3/td, 1+2+4+16+32, 
+			-28/td, -414.9/td, 0, 
+			-28/td, 414.9/td, 0, 
+			28/td, 414.9/td, 0, 
+			28/td, -414.9/td, 0, 
+			-28/td, -414.9/td, -1
+
+		addy -414.9/td
+		rotx -45
+			extrude 15, 0, 0, 2.3/td, 1+2+4+16+32, 
+				30/td, 0, 0, 
+				30/td, -85/td, 0, 
+				-30/td, -85/td, 0, 
+				-30/td, 0, 0, 
+				30/td, 0, -1, 
+				15.3/td, -43.3/td, 900, 
+				5.6/2/td, 360, 4000, 
+				-15.3/td, -43.3/td, 900, 
+				5.6/2/td, 360, 4000, 
+				20.3/td, -70.8/td, 900, 
+				5.6/21000, 360, 4000, 
+				-20.3/td, -70.8/td, 900, 
+				5.6/21000, 360, 4000, 
+				0, -18.6/td, 900, 
+				6.25/td, 360, 4000
+
+			if screw_indication=1 then
+				add 15.3/td, -43.3/td, 2.3/td
+					placegroup "CPQ55"
+				del 1
+
+				add -15.3/td, -43.3/td, 2.3/td
+					placegroup "CPQ55"
+				del 1
+
+				add 20.3/td, -70.8/td, 2.3/td
+					placegroup "CPQ55"
+				del 1
+
+				add -20.3/td, -70.8/td, 2.3/td
+					placegroup "CPQ55"
+				del 1
+			endif	
+		del 2
+
+		addy 414.9/td
+		rotx 45
+			extrude 15, 0, 0, 2.3/td, 1+2+4+16+32, 
+				30/td, 0, 0, 
+				30/td, 85/td, 0, 
+				-30/td, 85/td, 0, 
+				-30/td, 0, 0, 
+				30/td, 0, -1, 
+				15.3/td, 43.3/td, 900, 
+				5.6/2/td, 360, 4000, 
+				-15.3/td, 43.3/td, 900, 
+				5.6/2/td, 360, 4000, 
+				20.3/td, 70.8/td, 900, 
+				5.6/21000, 360, 4000, 
+				-20.3/td, 70.8/td, 900, 
+				5.6/21000, 360, 4000, 
+				0, 18.6/td, 900, 
+				6.25/td, 360, 4000
+
+			if screw_indication=1 then
+				add 15.3/td, 43.3/td, 2.3/td
+					placegroup "CPQ55"
+				del 1
+
+				add -15.3/td, 43.3/td, 2.3/td
+					placegroup "CPQ55"
+				del 1
+
+				add 20.3/td, 70.8/td, 2.3/td
+					placegroup "CPQ55"
+				del 1
+
+				add -20.3/td, 70.8/td, 2.3/td
+					placegroup "CPQ55"
+				del 1
+			endif
+		del 2
+	roty 270
+		addz 28/td
+		roty 1
+			extrude 5, 0, 0, 2.3/td, 1+2+4+16+32, 
+				0, -414.9/td, 0, 
+				25/td, -439.85/td, 0, 
+				25/td, 439.85/td, 0, 
+				0, 414.9/td, 0, 
+				0, -414.9/td, -1
+		del 2
+	addz -30/td
+	roty -1
+		extrude 5, 0, 0, 2.3/td, 1+2+4+16+32, 
+			0, -414.9/td, 0, 
+			25/td, -439.85/td, 0, 
+			25/td, 439.85/td, 0, 
+			0, 414.9/td, 0, 
+			0, -414.9/td, -1
+	del top
+endif
+
+!Z火打金物HB
+if product_name=65 then
+	material 18
+
+	rotz 45
+	addx 0.5*920/td+offset_horizontal_x-23.4/td
+	roty 90
+		extrude 5, 0, 0, 2.3/td, 1+2+4+16+32, 
+			-17/td, -414.9/td, 0, 
+			-17/td, 414.9/td, 0, 
+			17/td, 414.9/td, 0, 
+			17/td, -414.9/td, 0, 
+			-17/td, -414.9/td, -1
+
+		addy -414.9/td
+		rotx -45
+			extrude 15, 0, 0, 2.3/td, 1+2+4+16+32, 
+				17/td, 0, 0, 
+				30/td, -30/td, 0, 
+				30/td, -105/td, 0, 
+				-30/td, -105/td, 0, 
+				-30/td, -30/td, 0, 
+				-17/td, 0, 0, 
+				30/td, 0, -1, 
+				0, -79.4/td, 900, 
+				5.6/2/td, 360, 4000, 
+				20.3/td, -88.9/td, 900, 
+				5.6/21000, 360, 4000, 
+				-20.3/td, -88.9/td, 900, 
+				5.6/21000, 360, 4000, 
+				0, -34.3/td, 900, 
+				6.25/td, 360, 4000
+
+			if screw_indication=1 then
+				add 0, -79.4/td, 2.3/td
+					placegroup "ZF55"
+				del 1
+
+				add 20.3/td, -88.9/td, 2.3/td
+					placegroup "ZF55"
+				del 1
+
+				add -20.3/td, -88.9/td, 2.3/td
+					placegroup "ZF55"
+				del 1
+			endif
+		del 2
+
+		addy 414.9/td
+		rotx 45
+			extrude 15, 0, 0, 2.3/td, 1+2+4+16+32, 
+				17/td, 0, 0, 
+				30/td, 30/td, 0, 
+				30/td, 105/td, 0, 
+				-30/td, 105/td, 0, 
+				-30/td, 30/td, 0, 
+				-17/td, 0, 0, 
+				30/td, 0, -1, 
+				0, 79.4/td, 900, 
+				5.6/2/td, 360, 4000, 
+				20.3/td, 88.9/td, 900, 
+				5.6/21000, 360, 4000, 
+				-20.3/td, 88.9/td, 900, 
+				5.6/21000, 360, 4000, 
+				0, 34.3/td, 900, 
+				6.25/td, 360, 4000
+
+			if screw_indication=1 then
+				add 0, 79.4/td, 2.3/td
+					placegroup "ZF55"
+				del 1
+
+				add 20.3/td, 88.9/td, 2.3/td
+					placegroup "ZF55"
+				del 1
+
+				add -20.3/td, 88.9/td, 2.3/td
+					placegroup "ZF55"
+				del 1
+			endif
+		del 2
+
+	roty 270
+		addz 15.4/td
+		roty -30
+			extrude 5, 0, 0, 2.3/td, 1+2+4+16+32, 
+				0, -414.9/td, 0, 
+				25/td, -436.5/td, 0, 
+				25/td, 436.5/td, 0, 
+				0, 414.9/td, 0, 
+				0, -414.9/td, -1
+		del 2
+	addz -17.4/td
+	roty 30
+		extrude 5, 0, 0, 2.3/td, 1+2+4+16+32, 
+			0, -414.9/td, 0, 
+			25/td, -436.5/td, 0, 
+			25/td, 436.5/td, 0, 
+			0, 414.9/td, 0, 
+			0, -414.9/td, -1
+	del top
+endif
+
+!チャームかすがい90
+if product_name=66 then
+	addy offset_horizontal_x
+		extrude 8, 0, 0, 55/td, 1+2+4+16+32, 
+			0.5/td, (2.8+1.8)/td, 0, 
+			3/td, (-0.9+1.8)/td, 0, 
+			2.6/td, (-1.8+1.8)/td, 1001, 
+			-2.6/td, (-1.8+1.8)/td, 0, 
+			-3/td, (-0.9+1.8)/td, 1001, 
+			-0.5/td, (2.8+1.8)/td, 0, 
+			0.5/td, (2.8+1.8)/td, 1001, 
+			0.5/td, (2.8+1.8)/td, -1
+	addz 55/td
+	addy 2/td
+		elbow 5/td, 90, 2/td
+	del top
+endif
+
+
+
+end
+
+
+"M16":
+    material 43
+
+	hotspot 0, 0, 0
+
+	addz -bolt_embedded_length-10/td
+		cylind bolt_length+10/td, 7.25/td
+	addz 6/td
+		PRISM_ 25, 4/td, 
+		COS(0)*16/td, SIN(0)*17.5/td, 64+15, 
+		COS(15)*16/td, SIN(15)*17.5/td, 64+15, 
+		COS(30)*16/td, SIN(30)*17.5/td, 64+15, 
+		COS(45)*16/td, SIN(45)*17.5/td, 64+15, 
+		COS(60)*16/td, SIN(60)*17.5/td, 64+15, 
+		COS(75)*16/td, SIN(75)*17.5/td, 64+15, 
+		COS(90)*16/td, SIN(90)*17.5/td, 64+15, 
+		COS(105)*16/td, SIN(105)*17.5/td, 64+15, 
+		COS(120)*16/td, SIN(120)*17.5/td, 64+15, 
+		COS(135)*16/td, SIN(135)*17.5/td, 64+15, 
+		COS(150)*16/td, SIN(150)*17.5/td, 64+15, 
+		COS(165)*16/td, SIN(165)*17.5/td, 64+15, 
+		COS(180)*16/td, SIN(180)*17.5/td, 64+15, 
+		COS(195)*16/td, SIN(195)*17.5/td, 64+15, 
+		COS(210)*16/td, SIN(210)*17.5/td, 64+15, 
+		COS(225)*16/td, SIN(225)*17.5/td, 64+15, 
+		COS(240)*16/td, SIN(240)*17.5/td, 64+15, 
+		COS(255)*16/td, SIN(255)*17.5/td, 64+15, 
+		COS(270)*16/td, SIN(270)*17.5/td, 64+15,
+		COS(285)*16/td, SIN(285)*17.5/td, 64+15,
+		COS(300)*16/td, SIN(300)*17.5/td, 64+15, 
+		COS(315)*16/td, SIN(315)*17.5/td, 64+15, 
+		COS(330)*16/td, SIN(330)*17.5/td, 64+15, 
+		COS(345)*16/td, SIN(345)*17.5/td, 64+15, 
+		COS(360)*16/td, SIN(360)*17.5/td, 64+15
+	del 2
+
+	resol 6
+	
+	addz -bolt_embedded_length+bolt_length-bolt_position_z
+        extrude 2, 0, 0, 10/td, 1+2+4+16+32, 
+		0, 0, 900, 
+		16/td, 360, 4000
+	del 1
+
+	!調整hotspot
+		!bolt_embedded_length
+		hotspot 0, 0, 0          , unID, bolt_embedded_length, 1+128 : unID=unID+1
+		hotspot 0, 0, -bolt_embedded_length, unID, bolt_embedded_length, 2     : unID=unID+1
+		hotspot 0, 0, 1          , unID, bolt_embedded_length, 3     : unID=unID+1
+
+		!bolt_length
+		hotspot 0, 0, -bolt_embedded_length         , unID, bolt_length, 1+128 : unID=unID+1
+		hotspot 0, 0, -bolt_embedded_length+bolt_length, unID, bolt_length, 2     : unID=unID+1
+		hotspot 0, 0, -bolt_embedded_length-1       , unID, bolt_length, 3     : unID=unID+1
+
+		!bolt_position_z
+		hotspot 0, 0, -bolt_embedded_length+bolt_length        , unID, bolt_position_z, 1+128 : unID=unID+1
+		hotspot 0, 0, -bolt_embedded_length+bolt_length-bolt_position_z, unID, bolt_position_z, 2     : unID=unID+1
+		hotspot 0, 0, -bolt_embedded_length+bolt_length+1      , unID, bolt_position_z, 3     : unID=unID+1
+return
+

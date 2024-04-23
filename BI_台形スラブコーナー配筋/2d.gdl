@@ -1,0 +1,12 @@
+project2{3} 3,270,1,1+2+4+8+16,parameters slabDis=0
+
+!hotspot2 0         ,0          
+!hotspot2 slabBotLen,0          
+!hotspot2 slabBotLen,slabBotLen 
+!hotspot2 0         ,slabBotLen
+!
+!hotspot2 0         ,0         
+!hotspot2 slabTopLen,0         
+!hotspot2 slabTopLen,slabTopLen
+!hotspot2 0         ,slabTopLen
+

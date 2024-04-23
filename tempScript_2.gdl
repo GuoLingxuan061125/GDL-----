@@ -1,0 +1,5 @@
+unid=1
+td=1000
+
+values{2} "cylind_h" 330/td,"CA16-33",550/td,"CA16-55",800/td,"CA16-80"
+values "cylind_deep" range[0.24,cylind_h]

@@ -1,0 +1,53 @@
+project2{3} 3,270,1,1+2+4+8+16,parameters disSlab=0,disPoint=1,disCL=1,disSD=0
+
+
+define style "moji1" FontType,sideNumSize*100/glob_scale,5,0
+style "moji1"
+
+!=====================================================================スラブ躯体=====================================================================!
+for i=1 to slabPoint
+    if i<slabPoint then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    hotspot2 _slabPos[i][x],_slabPos[i][y]
+    line2 _slabPos[i][x],_slabPos[i][y],_slabPos[i2][x],_slabPos[i2][y]
+
+    hotspot2 0            ,slabPos[i][y],code,slabPos[i][x],1+128:code=code+1
+    hotspot2 slabPos[i][x],slabPos[i][y],code,slabPos[i][x],2:code=code+1
+    hotspot2 -1           ,slabPos[i][y],code,slabPos[i][x],3:code=code+1
+
+    hotspot2 slabPos[i][x],0            ,code,slabPos[i][y],1+128:code=code+1
+    hotspot2 slabPos[i][x],slabPos[i][y],code,slabPos[i][y],2:code=code+1
+    hotspot2 slabPos[i][x],-1           ,code,slabPos[i][y],3:code=code+1
+next i
+
+
+!=====================================================================2D番号=====================================================================!
+if disSideNum2D then
+    for i=1 to slabPoint
+        if i<slabPoint then
+            i2=i+1
+        else
+            i2=1
+        endif
+
+        add2 _slabPos[i][x],_slabPos[i][y]
+        rot2 _slabRtz[i]
+        add2 _slabLen[i]/2,sideNumSize/15
+        rot2 -_slabRtz[i]
+            text2 0,0,i
+        del 4
+    next i
+endif
+
+
+
+
+
+
+
+
+

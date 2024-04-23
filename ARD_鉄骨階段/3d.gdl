@@ -1,0 +1,2575 @@
+!上下左右反転
+if turn_left_right then mulx -1
+if turn_up_down then muly -1
+
+
+hotspot 0,0,0
+hotspot 0,step_wid1/2,0
+hotspot 0,step_wid1,0
+
+
+!=============================躯体・仕上げ
+!階段
+group "step"
+	material m_step
+
+	step_wid=valid_wid
+
+	if stair_type=1 then
+		step_plus_z=step_thi
+	else
+		step_plus_z=step_t2_size
+	endif
+
+	for i=1 to step_num_sum
+		add _step_pos[i][x],_step_pos[i][y],_step_pos[i][z]
+		rotz _step_rtz[i]
+			if _step_flag[i]<>1 then
+				gosub 100+stair_type
+				ruledsegmented{2} m_step,m_step,cross_section_num,1+2+4+16+32,0,
+				get(nsp)
+			else
+				ruledsegmented{2} m_step,m_step,5,1+2+4+16+32,0,
+				0,ssr1_thi,0,0,m_step_riser,
+				-step_nosing,ssr1_thi,step_riser,0,m_step_landing,
+				step_thi,ssr1_thi,step_riser,0,m_step_riser_down,
+				step_thi,ssr1_thi,0,0,m_step,
+				0,ssr1_thi,0,-1,m_step,
+				0,step_wid-ssr2_thi,0,
+				-step_nosing,step_wid-ssr2_thi,step_riser,
+				step_thi,step_wid-ssr2_thi,step_riser,
+				step_thi,step_wid-ssr2_thi,0,
+				0,step_wid-ssr2_thi,0
+			endif
+
+			if _step_flag[i]<>-1 then
+				gosub 100
+			endif
+		del 2
+	next i
+endgroup
+
+placegroup "step"
+
+
+!中間踊り場
+group "landing"
+	if switch_landing then
+		if stair_mode=2 then !廻り階段
+			add landing_x,0,step_num_down*step_riser
+			rotz 0
+		endif
+
+		if stair_mode=3 then
+			add landing_x,step_wid_tot,step_num_down*step_riser+floor_hei
+			rotz 180
+		endif
+			for i=1 to landing_num
+				!鉄骨プレート
+				m_ruled=m_step
+				ruled_start=0
+				ruled_end=-step_thi
+				gosub "廻り階段中間踊り場"
+
+				ruledsegmented{2} m_step,m_step_landing,9,1+2+4+8+16,0,
+				get(9*5),
+				get(9*3)
+
+				!コンクリート
+				m_ruled=m_landing
+				ruled_start=-step_thi
+				ruled_end=-step_thi-landing_thi
+				gosub "廻り階段中間踊り場"
+
+				ruledsegmented{2} m_landing,m_step_landing,9,1+2+4+8+16,0,
+				get(9*5),
+				get(9*3)
+
+				!鉄骨プレート
+				m_ruled=m_step
+				ruled_start=-step_thi-landing_thi
+				ruled_end=-2*step_thi-landing_thi
+				gosub "廻り階段中間踊り場"
+
+				ruledsegmented{2} m_step_landing_down,m_step,9,1+2+4+8+16,0,
+				get(9*5),
+				get(9*3)
+
+				!側面プレート
+				add landing_size1-landing_size2,step_wid1+landing_gap,0
+					ruledsegmented{2} m_step,m_step,5,1+2+4+8+16,0,
+					0        ,ssr2_thi          ,0                      ,0,m_step,
+					-step_thi,ssr2_thi          ,0                      ,0,m_step_riser_down,
+					-step_thi,ssr2_thi          ,-2*step_thi-landing_thi,0,m_step,
+					0        ,ssr2_thi          ,-2*step_thi-landing_thi,0,m_step,
+					0        ,ssr2_thi          ,0                      ,0,m_step,
+					0        ,step_wid2-ssr1_thi,0                      ,
+					-step_thi,step_wid2-ssr1_thi,0                      ,
+					-step_thi,step_wid2-ssr1_thi,-2*step_thi-landing_thi,
+					0        ,step_wid2-ssr1_thi,-2*step_thi-landing_thi,
+					0        ,step_wid2-ssr1_thi,0                      
+				del 1
+
+				!hotspot
+				hotspot 0,0,0
+				hotspot 0,step_wid1,0
+				hotspot landing_size1+landing_len,0,0
+				hotspot landing_size1+landing_len,step_wid_tot,0
+				hotspot landing_size1-landing_size2,step_wid1+landing_gap,0
+				hotspot landing_size1-landing_size2,step_wid_tot,0
+
+				!==========================調整hotspot
+				!landing_size1
+				hotspot 0            ,step_wid1/2,0,code,landing_size1,1+128 : code=code+1
+				hotspot landing_size1,step_wid1/2,0,code,landing_size1,2     : code=code+1
+				hotspot -1           ,step_wid1/2,0,code,landing_size1,3     : code=code+1
+
+				!landing_size2
+				if stair_mode=2 then
+					hotspot landing_size1              ,step_wid_tot-step_wid2/2,0,code,landing_size2,1+128 : code=code+1
+					hotspot landing_size1-landing_size2,step_wid_tot-step_wid2/2,0,code,landing_size2,2     : code=code+1
+					hotspot landing_size1+1            ,step_wid_tot-step_wid2/2,0,code,landing_size2,3     : code=code+1
+				endif
+
+				!landing_len
+				hotspot landing_size1            ,step_wid1+landing_gap/2,0,code,landing_len,1+128 : code=code+1
+				hotspot landing_size1+landing_len,step_wid1+landing_gap/2,0,code,landing_len,2     : code=code+1
+				hotspot landing_size1-1          ,step_wid1+landing_gap/2,0,code,landing_len,3     : code=code+1
+
+				!landing_gap
+				hotspot landing_size1,step_wid1            ,0,code,landing_gap,1+128 : code=code+1
+				hotspot landing_size1,step_wid1+landing_gap,0,code,landing_gap,2     : code=code+1
+				hotspot landing_size1,step_wid1-1          ,0,code,landing_gap,3     : code=code+1
+			addz floor_hei
+			next i
+			del landing_num
+		del 2
+	endif
+endgroup
+
+if switch_landing then
+	placegroup "landing"
+endif
+
+
+!フロア踊り場
+group "floor"
+	if switch_floor then
+		if stair_mode=1 then !直線階段
+			for j=1 to 2
+				if j=1 then
+					loop_index=floor_num-1
+					add floor_x,0,floor_hei
+					rotz 0
+				endif
+
+				if j=2 then
+					loop_index=floor_num-2
+					add 0,step_wid1,floor_hei
+					rotz 180
+				endif
+
+					for i=1 to loop_index
+						!鉄骨プレート
+						addz -2*step_thi-floor_thi	
+							material m_step
+							ruledsegmented{2} m_step,m_step,5,1+2+4+8+16+32,0,
+							0                 ,ssr1_thi          ,0       ,0,m_step_floor_down,
+							floor_len-ssr1_thi,ssr1_thi          ,0       ,0,m_step,
+							floor_len-ssr1_thi,ssr1_thi          ,step_thi,0,m_step,
+							0                 ,ssr1_thi          ,step_thi,0,m_step,
+							0                 ,ssr1_thi          ,0       ,0,m_step,
+							0                 ,step_wid1-ssr2_thi,0       ,
+							floor_len-ssr1_thi,step_wid1-ssr2_thi,0       ,
+							floor_len-ssr1_thi,step_wid1-ssr2_thi,step_thi,
+							0                 ,step_wid1-ssr2_thi,step_thi,
+							0                 ,step_wid1-ssr2_thi,0       
+
+						!コンクリート
+						addz step_thi
+							material m_landing
+							addy ssr1_thi
+								block floor_len-ssr1_thi,(step_wid1-ssr1_thi-ssr2_thi),floor_thi
+							del 1
+
+							!側面プレート
+							if j=2 then
+								material m_step
+								ruledsegmented{2} m_step,m_step,5,1+2+4+8+16+32,0,
+								0        ,step_wid1-ssr2_thi,-step_thi         ,0,m_step,
+								-step_thi,step_wid1-ssr2_thi,-step_thi         ,0,m_step_riser_down,
+								-step_thi,step_wid1-ssr2_thi,floor_thi+step_thi,0,m_step,
+								0        ,step_wid1-ssr2_thi,floor_thi+step_thi,0,m_step,
+								0        ,step_wid1-ssr2_thi,-step_thi         ,0,m_step,
+								0        ,ssr1_thi          ,-step_thi         ,
+								-step_thi,ssr1_thi          ,-step_thi         ,
+								-step_thi,ssr1_thi          ,floor_thi+step_thi,
+								0        ,ssr1_thi          ,floor_thi+step_thi,
+								0        ,ssr1_thi          ,-step_thi         
+							endif
+
+						!鉄骨プレート
+						addz floor_thi
+							material m_step
+							ruledsegmented{2} m_step,m_step,5,1+2+4+8+16+32,0,
+							0                 ,ssr1_thi          ,0       ,0,m_step,
+							floor_len-ssr1_thi,ssr1_thi          ,0       ,0,m_step,
+							floor_len-ssr1_thi,ssr1_thi          ,step_thi,0,m_step_floor,
+							0                 ,ssr1_thi          ,step_thi,0,m_step,
+							0                 ,ssr1_thi          ,0       ,0,m_step,
+							0                 ,step_wid1-ssr2_thi,0       ,
+							floor_len-ssr1_thi,step_wid1-ssr2_thi,0       ,
+							floor_len-ssr1_thi,step_wid1-ssr2_thi,step_thi,
+							0                 ,step_wid1-ssr2_thi,step_thi,
+							0                 ,step_wid1-ssr2_thi,0       
+						del 3
+
+						!hotspot
+						hotspot 0,0,0
+						hotspot 0,step_wid1,0
+						hotspot floor_len,0,0
+						hotspot floor_len,step_wid1,0
+
+						!==========================調整hotspot
+						!floor_len
+						hotspot 0        ,step_wid1/2,0,code,floor_len,1+128 : code=code+1
+						hotspot floor_len,step_wid1/2,0,code,floor_len,2     : code=code+1
+						hotspot -1       ,step_wid1/2,0,code,floor_len,3     : code=code+1
+					addz floor_hei
+					next i
+					del loop_index
+
+				del 2
+			next j
+		endif
+
+		if stair_mode<>1 then
+			if stair_mode=2 then !廻り階段
+				add floor_x,0,floor_hei
+				rotz 0
+			endif
+
+			if stair_mode=3 then !直線+廻り階段
+				add floor_x,step_wid_tot,floor_hei
+				rotz 180
+			endif
+
+				for i=1 to floor_num-1
+					!鉄骨プレート
+					m_ruled=m_step
+					ruled_start=0
+					ruled_end=-step_thi
+					if i=floor_num-1 then
+						gosub "最上階フロア踊り場"
+					else
+						gosub "廻り階段フロア踊り場"
+					endif
+
+					ruledsegmented{2} m_step,m_step_landing,cross_section_num,1+2+4+8+16,0,
+					get(cross_section_num*5),
+					get(cross_section_num*3)
+
+					!コンクリート
+					m_ruled=m_landing
+					ruled_start=-step_thi
+					ruled_end=-step_thi-floor_thi
+					if i=floor_num-1 then
+						gosub "最上階フロア踊り場"
+					else
+						gosub "廻り階段フロア踊り場"
+					endif
+
+					ruledsegmented{2} m_landing,m_step_landing,cross_section_num,1+2+4+8+16,0,
+					get(cross_section_num*5),
+					get(cross_section_num*3)
+
+					!鉄骨プレート
+					m_ruled=m_step
+					ruled_start=-step_thi-floor_thi
+					ruled_end=-2*step_thi-floor_thi
+					if i=floor_num-1 then
+						gosub "最上階フロア踊り場"
+					else
+						gosub "廻り階段フロア踊り場"
+					endif
+
+					ruledsegmented{2} m_step_landing_down,m_step,cross_section_num,1+2+4+8+16,0,
+					get(cross_section_num*5),
+					get(cross_section_num*3)
+
+					!側面プレート
+					if i<floor_num-1 then
+						add -floor_size1+floor_size2,ssr1_thi,-step_thi-floor_thi
+							material m_step
+							ruledsegmented{2} m_step,m_step,5,1+2+4+8+16+32,0,
+							0,step_wid1-ssr1_thi-ssr2_thi,-step_thi,0,m_step,
+							step_thi,step_wid1-ssr1_thi-ssr2_thi,-step_thi,0,m_step_riser_down,
+							step_thi,step_wid1-ssr1_thi-ssr2_thi,floor_thi+step_thi,0,m_step,
+							0,step_wid1-ssr1_thi-ssr2_thi,floor_thi+step_thi,0,m_step,
+							0,step_wid1-ssr1_thi-ssr2_thi,-step_thi,0,m_step,
+							0,0,-step_thi,
+							step_thi,0,-step_thi,
+							step_thi,0,floor_thi+step_thi,
+							0,0,floor_thi+step_thi,
+							0,0,-step_thi
+						del 1
+					endif
+
+					!hotspot
+					hotspot 0,step_wid1+landing_gap,0
+					hotspot 0,step_wid_tot,0
+					hotspot -floor_size1-floor_len,0,0
+					hotspot -floor_size1-floor_len,step_wid_tot,0
+					hotspot -floor_size1+floor_size2,0,0
+					hotspot -floor_size1+floor_size2,step_wid1,0
+
+					!==========================調整hotspot
+					!floor_size1
+					hotspot 0           ,step_wid_tot-step_wid2/2,0,code,floor_size1,1+128 : code=code+1
+					hotspot -floor_size1,step_wid_tot-step_wid2/2,0,code,floor_size1,2     : code=code+1
+					hotspot 1           ,step_wid_tot-step_wid2/2,0,code,floor_size1,3     : code=code+1
+
+					!floor_size2
+					if stair_mode=3 and i<floor_num-1 then
+						hotspot -floor_size1            ,step_wid1/2,0,code,floor_size2,1+128 : code=code+1
+						hotspot -floor_size1+floor_size2,step_wid1/2,0,code,floor_size2,2     : code=code+1
+						hotspot -floor_size1-1          ,step_wid1/2,0,code,floor_size2,3     : code=code+1
+					endif
+
+					!floor_len
+					hotspot -floor_size1          ,step_wid1+landing_gap/2,0,code,floor_len,1+128 : code=code+1
+					hotspot -floor_size1-floor_len,step_wid1+landing_gap/2,0,code,floor_len,2     : code=code+1
+					hotspot -floor_size1+1        ,step_wid1+landing_gap/2,0,code,floor_len,3     : code=code+1
+				addz floor_hei
+				next i
+				del floor_num-1
+
+			del 2
+		endif
+	endif
+endgroup
+
+if switch_floor then
+	placegroup "floor"
+endif
+
+
+!ササラ
+group "step_ssr"
+	material m_step_ssr_in
+
+	for i=1 to floor_num-1
+		!ササラ1(外側)
+		if switch_ssr1 then
+			!=============tubeルート設定
+			route_point=0
+
+			if stair_mode=1 then !直線階段
+				if i=1 then
+					route_point=route_point+1
+					put 0,0,-ssr_start_offset-1,0
+
+					route_point=route_point+1
+					put 0,0,-ssr_start_offset,0
+				else
+					if switch_floor then
+						route_point=route_point+1
+						put -floor_len+1,step_wid1,0,0
+
+						route_point=route_point+1
+						put -floor_len,step_wid1,0,0
+
+						route_point=route_point+1
+						put -floor_len,0,0,0
+					else
+						route_point=route_point+1
+						put 0,0,-1,0
+					endif
+
+					route_point=route_point+1
+					put 0,0,0,0
+				endif
+
+				route_point=route_point+1
+				put 0,0,step_riser,0
+				
+				route_point=route_point+1
+				put (step_num_tot-1)*step_tread,0,floor_hei,0
+
+				if switch_floor then
+					route_point=route_point+1
+					put floor_x+floor_len,0,floor_hei,0
+
+					route_point=route_point+1
+					put floor_x+floor_len,step_wid1,floor_hei,0
+
+					route_point=route_point+1
+					put floor_x+floor_len-1,step_wid1,floor_hei,0
+				else
+					route_point=route_point+1
+					put step_num_tot*step_tread,0,floor_hei,0
+
+					route_point=route_point+1
+					put step_num_tot*step_tread+1,0,floor_hei,0
+				endif
+			endif
+
+			if stair_mode=2 then !廻り階段
+				if i=1 then
+					route_point=route_point+1
+					put 0,0,-ssr_start_offset-1,0
+
+					route_point=route_point+1
+					put 0,0,-ssr_start_offset,0
+				else
+					if switch_floor then
+						route_point=route_point+1
+						put -1,0,0,0
+					else
+						route_point=route_point+1
+						put 0,0,-1,0
+					endif
+
+					route_point=route_point+1
+					put 0,0,0,0
+				endif
+
+				route_point=route_point+1
+				put 0,0,step_riser,0
+
+				route_point=route_point+1
+				put (step_num_down-1)*step_tread,0,step_num_down*step_riser,0
+
+				route_point=route_point+1
+				put landing_x+landing_size1+landing_len,0,step_num_down*step_riser,0
+
+				route_point=route_point+1
+				put landing_x+landing_size1+landing_len,step_wid_tot,step_num_down*step_riser,0
+
+				route_point=route_point+1
+				put landing_x+landing_size1-landing_size2,step_wid_tot,step_num_down*step_riser,0
+
+				route_point=route_point+1
+				put landing_x+landing_size1-landing_size2,step_wid_tot,(step_num_down+1)*step_riser,0
+
+				route_point=route_point+1
+				put floor_x+step_thi,step_wid_tot,floor_hei,0
+
+				if switch_floor then
+					route_point=route_point+1
+					put floor_x-floor_size1-floor_len,step_wid_tot,floor_hei,0
+
+					route_point=route_point+1
+					put floor_x-floor_size1-floor_len,0,floor_hei,0
+
+					if i=floor_num-1 then
+						route_point=route_point+1
+						put floor_x-floor_size1,0,floor_hei,0
+
+						route_point=route_point+1
+						put floor_x-floor_size1,1,floor_hei,0
+					else
+						route_point=route_point+1
+						put floor_x-floor_size1+floor_size2,0,floor_hei,0
+
+						route_point=route_point+1
+						put floor_x-floor_size1+floor_size2,0,floor_hei+1,0
+					endif
+				else
+					route_point=route_point+1
+					put floor_x+step_thi-step_tread,step_wid_tot,floor_hei,0
+
+					route_point=route_point+1
+					put floor_x+step_thi-step_tread-1,step_wid_tot,floor_hei,0
+				endif
+			endif
+
+			if stair_mode=3 then !直線+廻り階段
+				if i=1 then
+					route_point=route_point+1
+					put 0,0,-ssr_start_offset-1,0
+
+					route_point=route_point+1
+					put 0,0,-ssr_start_offset,0
+				else
+					if switch_floor then
+						route_point=route_point+1
+						put floor_x+floor_size1-floor_size2+1,step_wid_tot,0,0
+					else
+						route_point=route_point+1
+						put floor_x+floor_size1-floor_size2,step_wid_tot,-1,0
+					endif
+
+					route_point=route_point+1
+					put floor_x+floor_size1-floor_size2,step_wid_tot,0,0
+
+					route_point=route_point+1
+					put floor_x+floor_size1-floor_size2,step_wid_tot,step_riser,0
+
+					route_point=route_point+1
+					put landing_x+step_thi,step_wid_tot,step_num_down*step_riser,0
+
+					route_point=route_point+1
+					put landing_x-landing_size1-landing_len,step_wid_tot,step_num_down*step_riser,0
+
+					route_point=route_point+1
+					put landing_x-landing_size1-landing_len,0,step_num_down*step_riser,0
+
+					route_point=route_point+1
+					put landing_x-landing_size1+landing_size2,0,step_num_down*step_riser,0
+
+					route_point=route_point+1
+					put landing_x-landing_size1+landing_size2,0,(step_num_down+1)*step_riser,0
+				endif
+
+				route_point=route_point+1
+				put 0,0,step_riser,0
+
+				route_point=route_point+1
+				put (step_num_tot-1)*step_tread,0,floor_hei,0
+
+				if switch_floor then
+					route_point=route_point+1
+					put floor_x+floor_size1+floor_len,0,floor_hei,0
+
+					route_point=route_point+1
+					put floor_x+floor_size1+floor_len,step_wid_tot,floor_hei,0
+
+					if i=floor_num-1 then
+						route_point=route_point+1
+						put floor_x+floor_size1,step_wid_tot,floor_hei,0
+
+						route_point=route_point+1
+						put floor_x+floor_size1,step_wid_tot-1,floor_hei,0
+					else
+						route_point=route_point+1
+						put floor_x+floor_size1-floor_size2,step_wid_tot,floor_hei,0
+
+						route_point=route_point+1
+						put floor_x+floor_size1-floor_size2,step_wid_tot,floor_hei+1,0
+					endif
+				else
+					route_point=route_point+1
+					put step_num_tot*step_tread,0,floor_hei,0
+
+					route_point=route_point+1
+					put step_num_tot*step_tread+1,0,floor_hei,0
+				endif
+			endif
+
+			if route_point>=4 then
+				if stair_mode=3 and i>1 and switch_floor=0 then
+					tube{2} m_step_ssr_in,m_step_ssr_in,m_step_ssr_in,4,route_point,1+2+4+8+16+32,
+					0,-ssr_wid1,0,m_step_ssr_in,
+					-ssr_thi,-ssr_wid1,0,m_step_ssr_in,
+					-ssr_thi,ssr_wid+ssr_wid2,0,m_step_ssr_in,
+					0,ssr_wid+ssr_wid2,0,m_step_ssr_out,
+					get(route_point*4)
+				else
+					tube{2} m_step_ssr_in,m_step_ssr_in,m_step_ssr_in,4,route_point,1+2+4+8+16+32,
+					0,ssr_wid1,0,m_step_ssr_in,
+					ssr_thi,ssr_wid1,0,m_step_ssr_in,
+					ssr_thi,-ssr_wid-ssr_wid2,0,m_step_ssr_in,
+					0,-ssr_wid-ssr_wid2,0,m_step_ssr_out,
+					get(route_point*4)
+				endif
+			endif
+
+			for j=1 to nsp
+				data_delete=get(1)
+			next j
+		endif
+
+		!ササラ2(内側)
+		if switch_ssr2 then
+			!=============tubeルート設定			
+			if stair_mode=1 then !直線階段
+				route_point=0
+
+				if i=1 then
+					route_point=route_point+1
+					put 0,step_wid1,-ssr_start_offset-1,0
+
+					route_point=route_point+1
+					put 0,step_wid1,-ssr_start_offset,0
+				else
+					if switch_floor then
+						route_point=route_point+1
+						put -floor_len,step_wid1-1,0,0
+
+						route_point=route_point+1
+						put -floor_len,step_wid1,0,0
+					else
+						route_point=route_point+1
+						put 0,step_wid1,-1,0
+					endif
+
+					route_point=route_point+1
+					put 0,step_wid1,0,0
+				endif
+
+				route_point=route_point+1
+				put 0,step_wid1,step_riser,0
+				
+				route_point=route_point+1
+				put (step_num_tot-1)*step_tread,step_wid1,floor_hei,0
+
+				if switch_floor then
+					route_point=route_point+1
+					put floor_x+floor_len,step_wid1,floor_hei,0
+
+					route_point=route_point+1
+					put floor_x+floor_len,0,floor_hei,0
+				else
+					route_point=route_point+1
+					put step_num_tot*step_tread,step_wid1,floor_hei,0
+
+					route_point=route_point+1
+					put step_num_tot*step_tread+1,step_wid1,floor_hei,0
+				endif
+
+				if route_point>=4 then
+					tube{2} m_step_ssr_in,m_step_ssr_in,m_step_ssr_in,4,route_point,1+2+4+8+16+32,
+					0,ssr_wid1,0,m_step_ssr_in,
+					-ssr_thi,ssr_wid1,0,m_step_ssr_in,
+					-ssr_thi,-ssr_wid-ssr_wid2,0,m_step_ssr_in,
+					0,-ssr_wid-ssr_wid2,0,m_step_ssr_out,
+					get(route_point*4)
+				endif
+			endif
+
+			if stair_mode=2 then !廻り階段
+				route_point=0
+
+				if i=1 then
+					route_point=route_point+1
+					put 0,step_wid1,-ssr_start_offset-1,0
+
+					route_point=route_point+1
+					put 0,step_wid1,-ssr_start_offset,0
+				else
+					if switch_floor then
+						route_point=route_point+1
+						put 0,step_wid1,-(ssr_wid+ssr_wid2)-1,0
+
+						route_point=route_point+1
+						put 0,step_wid1,-(ssr_wid+ssr_wid2),0
+					else
+						route_point=route_point+1
+						put 0,step_wid1,-1,0
+
+						route_point=route_point+1
+						put 0,step_wid1,0,0
+					endif
+				endif
+
+				route_point=route_point+1
+				put 0,step_wid1,step_riser,0
+
+				route_point=route_point+1
+				put (step_num_down-1)*step_tread,step_wid1,step_num_down*step_riser,0
+
+				route_point=route_point+1
+				put landing_x+landing_size1,step_wid1,step_num_down*step_riser,0
+
+				route_point=route_point+1
+				put landing_x+landing_size1,step_wid1+landing_gap,step_num_down*step_riser,0
+
+				route_point=route_point+1
+				put landing_x+landing_size1-landing_size2+ssr_wid1,step_wid1+landing_gap,step_num_down*step_riser,0
+
+				route_point=route_point+1
+				put landing_x+landing_size1-landing_size2+ssr_wid1-1,step_wid1+landing_gap,step_num_down*step_riser,0
+
+				if route_point>=4 then
+					tube{2} m_step_ssr_in,m_step_ssr_in,m_step_ssr_in,4,route_point,1+2+4+8+16+32,
+					0,ssr_wid1,0,m_step_ssr_in,
+					-ssr_thi,ssr_wid1,0,m_step_ssr_in,
+					-ssr_thi,-ssr_wid-ssr_wid2,0,m_step_ssr_in,
+					0,-ssr_wid-ssr_wid2,0,m_step_ssr_out,
+					get(route_point*4)
+				endif
+
+				route_point=0
+
+				route_point=route_point+1
+				put landing_x+landing_size1-landing_size2,step_wid1+landing_gap,step_num_down*step_riser-(ssr_wid+ssr_wid2)-1,0
+
+				route_point=route_point+1
+				put landing_x+landing_size1-landing_size2,step_wid1+landing_gap,step_num_down*step_riser-(ssr_wid+ssr_wid2),0
+
+				route_point=route_point+1
+				put landing_x+landing_size1-landing_size2,step_wid1+landing_gap,(step_num_down+1)*step_riser,0
+
+				route_point=route_point+1
+				put floor_x+step_thi,step_wid1+landing_gap,floor_hei,0
+
+				if switch_floor then
+					route_point=route_point+1
+					put floor_x-floor_size1,step_wid1+landing_gap,floor_hei,0
+
+					route_point=route_point+1
+					put floor_x-floor_size1,step_wid1,floor_hei,0
+
+					if i=floor_num-1 then
+						route_point=route_point+1
+						put floor_x-floor_size1,0,floor_hei,0
+
+						route_point=route_point+1
+						put floor_x-floor_size1-1,0,floor_hei,0
+					else
+						route_point=route_point+1
+						put floor_x-floor_size1+floor_size2-ssr_wid1,step_wid1,floor_hei,0
+
+						route_point=route_point+1
+						put floor_x-floor_size1+floor_size2-ssr_wid1+1,step_wid1,floor_hei,0
+					endif
+				else
+					route_point=route_point+1
+					put floor_x+step_thi-step_tread,step_wid1+landing_gap,floor_hei,0
+
+					route_point=route_point+1
+					put floor_x+step_thi-step_tread-1,step_wid1+landing_gap,floor_hei,0
+				endif
+
+				if route_point>=4 then
+					tube{2} m_step_ssr_in,m_step_ssr_in,m_step_ssr_in,4,route_point,1+2+4+8+16+32,
+					0,-ssr_wid1,0,m_step_ssr_in,
+					ssr_thi,-ssr_wid1,0,m_step_ssr_in,
+					ssr_thi,ssr_wid+ssr_wid2,0,m_step_ssr_in,
+					0,ssr_wid+ssr_wid2,0,m_step_ssr_out,
+					get(route_point*4)
+				endif
+			endif
+
+			if stair_mode=3 then !直線+廻り階段
+				route_point=0
+
+				if i=1 then
+					route_point=route_point+1
+					put 0,step_wid1,-ssr_start_offset-1,0
+
+					route_point=route_point+1
+					put 0,step_wid1,-ssr_start_offset,0
+
+					route_point=route_point+1
+					put 0,step_wid1,step_riser,0
+				else
+					route_point=route_point+1
+					put step_num_down*step_tread,step_wid1,step_num_down*step_riser-(ssr_wid+ssr_wid2)-1,0
+
+					route_point=route_point+1
+					put step_num_down*step_tread,step_wid1,step_num_down*step_riser-(ssr_wid+ssr_wid2),0
+
+					route_point=route_point+1
+					put step_num_down*step_tread,step_wid1,(step_num_down+1)*step_riser,0
+				endif
+
+				route_point=route_point+1
+				put (step_num_tot-1)*step_tread,step_wid1,floor_hei,0
+
+				if switch_floor then
+					route_point=route_point+1
+					put floor_x+floor_size1,step_wid1,floor_hei,0
+
+					if i=floor_num-1 then
+						route_point=route_point+1
+						put floor_x+floor_size1,step_wid_tot,floor_hei,0
+
+						route_point=route_point+1
+						put floor_x+floor_size1+1,step_wid_tot,floor_hei,0
+					else
+						route_point=route_point+1
+						put floor_x+floor_size1,step_wid1+landing_gap,floor_hei,0
+
+						route_point=route_point+1
+						put floor_x+floor_size1-floor_size2+ssr_wid1,step_wid1+landing_gap,floor_hei,0
+
+						route_point=route_point+1
+						put floor_x+floor_size1-floor_size2+ssr_wid1-1,step_wid1+landing_gap,floor_hei,0
+					endif
+				else
+					route_point=route_point+1
+					put step_num_tot*step_tread,step_wid1,floor_hei,0
+
+					route_point=route_point+1
+					put step_num_tot*step_tread+1,step_wid1,floor_hei,0
+				endif
+
+				if route_point>=4 then
+					tube{2} m_step_ssr_in,m_step_ssr_in,m_step_ssr_in,4,route_point,1+2+4+8+16+32,
+					0,ssr_wid1,0,m_step_ssr_in,
+					-ssr_thi,ssr_wid1,0,m_step_ssr_in,
+					-ssr_thi,-ssr_wid-ssr_wid2,0,m_step_ssr_in,
+					0,-ssr_wid-ssr_wid2,0,m_step_ssr_out,
+					get(route_point*4)
+				endif
+
+				if i>1 then
+					route_point=0
+
+					if switch_floor then
+						route_point=route_point+1
+						put floor_x+floor_size1-floor_size2,step_wid1+landing_gap,-(ssr_wid+ssr_wid2)-1,0
+
+						route_point=route_point+1
+						put floor_x+floor_size1-floor_size2,step_wid1+landing_gap,-(ssr_wid+ssr_wid2),0
+					else
+						route_point=route_point+1
+						put floor_x+floor_size1-floor_size2,step_wid1+landing_gap,-1,0
+
+						route_point=route_point+1
+						put floor_x+floor_size1-floor_size2,step_wid1+landing_gap,0,0
+					endif
+
+					route_point=route_point+1
+					put floor_x+floor_size1-floor_size2,step_wid1+landing_gap,step_riser,0
+
+					route_point=route_point+1
+					put landing_x+step_thi,step_wid1+landing_gap,step_num_down*step_riser,0
+
+					route_point=route_point+1
+					put landing_x-landing_size1,step_wid1+landing_gap,step_num_down*step_riser,0
+
+					route_point=route_point+1
+					put landing_x-landing_size1,step_wid1,step_num_down*step_riser,0
+
+					route_point=route_point+1
+					put landing_x-landing_size1+landing_size2-ssr_wid1,step_wid1,step_num_down*step_riser,0
+
+					route_point=route_point+1
+					put landing_x-landing_size1+landing_size2-ssr_wid1+1,step_wid1,step_num_down*step_riser,0
+
+					if route_point>=4 then
+						tube{2} m_step_ssr_in,m_step_ssr_in,m_step_ssr_in,4,route_point,1+2+4+8+16+32,
+						0,-ssr_wid1,0,m_step_ssr_in,
+						ssr_thi,-ssr_wid1,0,m_step_ssr_in,
+						ssr_thi,ssr_wid+ssr_wid2,0,m_step_ssr_in,
+						0,ssr_wid+ssr_wid2,0,m_step_ssr_out,
+						get(route_point*4)
+					endif
+				endif
+			endif
+
+			for j=1 to nsp
+				data_delete=get(1)
+			next j
+		endif
+	addz floor_hei
+	next i
+	del floor_num-1
+endgroup
+
+
+if switch_ssr1+switch_ssr2>0 then
+	placegroup "step_ssr"
+endif
+
+
+!=============================手すり
+SDresol=8
+resol SDresol
+
+!外側手すり
+group "handrail_outside"
+	for i=1 to floor_num-1
+		if stair_mode=1 then
+			!縦支柱
+				material m_handrail
+
+				if i>1 and switch_floor then
+					add -floor_len,-column_r,-column_dep
+						cylind handrail_hei+column_dep+column_offset,column_r
+					del 1
+				endif
+
+				add 0,-column_r,-column_dep
+					cylind handrail_hei+column_dep+column_offset+step_riser,column_r
+				del 1
+
+				add (step_num_tot-1)*step_tread,-column_r,floor_hei-column_dep
+					cylind handrail_hei+column_dep+column_offset,column_r
+				del 1
+
+				if switch_floor then
+					add floor_x+floor_len,-column_r,floor_hei-column_dep
+				else
+					add step_num_tot*step_tread,-column_r,floor_hei-column_dep
+				endif
+					cylind handrail_hei+column_dep+column_offset,column_r
+				del 1
+
+			!横手すり
+				material m_handrail
+
+				add 0,-column_r,step_riser+handrail_hei
+				roty 90-step_a
+					cylind (step_num_tot-1)*step_tread/cos(step_a),handrail_r
+				del 2
+
+				if switch_floor then
+					if handrail_op=2 then
+						if i>1 then
+							add -floor_len,-column_r,handrail_hei
+							roty 90
+								cylind floor_len,handrail_r
+							del 2
+						endif
+
+						add (step_num_tot-1)*step_tread,-column_r,floor_hei+handrail_hei
+						roty 90
+							cylind floor_len+step_thi,handrail_r
+						del 2
+					endif
+					
+					if switch_handrail2 then
+						if i>1 then
+							add -floor_len,-column_r,handrail_hei
+							rotx -90
+								cylind step_wid1+2*column_r,handrail_r
+							del 2
+						endif
+
+						add floor_x+floor_len,-column_r,floor_hei+handrail_hei
+						rotx -90
+							cylind step_wid1+2*column_r,handrail_r
+						del 2
+					endif
+				else
+					add (step_num_tot-1)*step_tread,-column_r,floor_hei+handrail_hei
+					roty 90
+						cylind step_tread,handrail_r
+					del 2
+				endif
+
+			!ボード
+				material m_board
+
+				ruledsegmented 4,1+2+4+8+16+32,
+				0                          ,-column_r-handrail_r/2,step_riser+handrail_hei             ,0,
+				(step_num_tot-1)*step_tread,-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+				(step_num_tot-1)*step_tread,-column_r-handrail_r/2,floor_hei+board_offset,0,
+				0                          ,-column_r-handrail_r/2,step_riser+board_offset             ,0,
+				0                          ,-column_r+handrail_r/2,step_riser+handrail_hei             ,
+				(step_num_tot-1)*step_tread,-column_r+handrail_r/2,floor_hei+handrail_hei,
+				(step_num_tot-1)*step_tread,-column_r+handrail_r/2,floor_hei+board_offset,
+				0                          ,-column_r+handrail_r/2,step_riser+board_offset             
+
+				if switch_floor then
+					if handrail_op=2 then
+						if i>1 then
+							ruledsegmented 4,1+2+4+8+16+32,
+							-floor_len,-column_r-handrail_r/2,handrail_hei,0,
+							0         ,-column_r-handrail_r/2,handrail_hei,0,
+							0         ,-column_r-handrail_r/2,board_offset,0,
+							-floor_len,-column_r-handrail_r/2,board_offset,0,
+							-floor_len,-column_r+handrail_r/2,handrail_hei,
+							0         ,-column_r+handrail_r/2,handrail_hei,
+							0         ,-column_r+handrail_r/2,board_offset,
+							-floor_len,-column_r+handrail_r/2,board_offset
+						endif
+
+						ruledsegmented 4,1+2+4+8+16+32,
+						(step_num_tot-1)*step_tread,-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+						floor_x+floor_len          ,-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+						floor_x+floor_len          ,-column_r-handrail_r/2,floor_hei+board_offset,0,
+						(step_num_tot-1)*step_tread,-column_r-handrail_r/2,floor_hei+board_offset,0,
+						(step_num_tot-1)*step_tread,-column_r+handrail_r/2,floor_hei+handrail_hei,
+						floor_x+floor_len          ,-column_r+handrail_r/2,floor_hei+handrail_hei,
+						floor_x+floor_len          ,-column_r+handrail_r/2,floor_hei+board_offset,
+						(step_num_tot-1)*step_tread,-column_r+handrail_r/2,floor_hei+board_offset
+					endif
+					
+					if switch_handrail2 then
+						if i>1 then
+							ruledsegmented 4,1+2+4+8+16+32,
+							-floor_len-handrail_r/2,-column_r         ,handrail_hei,0,
+							-floor_len-handrail_r/2,step_wid1+column_r,handrail_hei,0,
+							-floor_len-handrail_r/2,step_wid1+column_r,board_offset,0,
+							-floor_len-handrail_r/2,-column_r         ,board_offset,0,
+							-floor_len+handrail_r/2,-column_r         ,handrail_hei,
+							-floor_len+handrail_r/2,step_wid1+column_r,handrail_hei,
+							-floor_len+handrail_r/2,step_wid1+column_r,board_offset,
+							-floor_len+handrail_r/2,-column_r         ,board_offset
+						endif
+
+						ruledsegmented 4,1+2+4+8+16+32,
+						floor_x+floor_len-handrail_r/2,-column_r         ,floor_hei+handrail_hei,0,
+						floor_x+floor_len-handrail_r/2,step_wid1+column_r,floor_hei+handrail_hei,0,
+						floor_x+floor_len-handrail_r/2,step_wid1+column_r,floor_hei+board_offset,0,
+						floor_x+floor_len-handrail_r/2,-column_r         ,floor_hei+board_offset,0,
+						floor_x+floor_len+handrail_r/2,-column_r         ,floor_hei+handrail_hei,
+						floor_x+floor_len+handrail_r/2,step_wid1+column_r,floor_hei+handrail_hei,
+						floor_x+floor_len+handrail_r/2,step_wid1+column_r,floor_hei+board_offset,
+						floor_x+floor_len+handrail_r/2,-column_r         ,floor_hei+board_offset
+					endif
+				else
+					ruledsegmented 4,1+2+4+8+16+32,
+					(step_num_tot-1)*step_tread,-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+					step_num_tot*step_tread    ,-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+					step_num_tot*step_tread    ,-column_r-handrail_r/2,floor_hei+board_offset,0,
+					(step_num_tot-1)*step_tread,-column_r-handrail_r/2,floor_hei+board_offset,0,
+					(step_num_tot-1)*step_tread,-column_r+handrail_r/2,floor_hei+handrail_hei,
+					step_num_tot*step_tread    ,-column_r+handrail_r/2,floor_hei+handrail_hei,
+					step_num_tot*step_tread    ,-column_r+handrail_r/2,floor_hei+board_offset,
+					(step_num_tot-1)*step_tread,-column_r+handrail_r/2,floor_hei+board_offset
+				endif
+		endif
+
+		if stair_mode=2 then
+			!縦支柱
+				material m_handrail
+
+				add 0,-column_r,-column_dep
+					cylind handrail_hei+column_dep+column_offset+step_riser,column_r
+				del 1
+
+				add (step_num_down-1)*step_tread,-column_r,step_num_down*step_riser-column_dep
+					cylind handrail_hei+column_dep+column_offset,column_r
+				del 1
+
+				add landing_x+landing_size1+landing_len,-column_r,step_num_down*step_riser-column_dep
+					cylind handrail_hei+column_dep+column_offset,column_r
+				del 1
+
+				add landing_x+landing_size1+landing_len,step_wid_tot+column_r,step_num_down*step_riser-column_dep
+					cylind handrail_hei+column_dep+column_offset,column_r
+				del 1
+
+				add landing_x+landing_size1-landing_size2,step_wid_tot+column_r,step_num_down*step_riser-column_dep
+					cylind handrail_hei+column_dep+column_offset+step_riser,column_r
+				del 1
+
+				add floor_x+step_thi,step_wid_tot+column_r,floor_hei-column_dep
+					cylind handrail_hei+column_dep+column_offset,column_r
+				del 1
+
+				if switch_floor then
+					add floor_x-floor_size1-floor_len,step_wid_tot+column_r,floor_hei-column_dep
+						cylind handrail_hei+column_dep+column_offset,column_r
+					del 1
+
+					add floor_x-floor_size1-floor_len,-column_r,floor_hei-column_dep
+						cylind handrail_hei+column_dep+column_offset,column_r
+					del 1
+
+					if i=floor_num-1 then
+						add floor_x-floor_size1,-column_r,floor_hei-column_dep
+							cylind handrail_hei+column_dep+column_offset,column_r
+						del 1
+					endif
+				else
+					add floor_x+step_thi-step_tread,step_wid_tot+column_r,floor_hei-column_dep
+						cylind handrail_hei+column_dep+column_offset,column_r
+					del 1
+				endif
+
+			!横手すり
+				material m_handrail
+
+				add 0,-column_r,step_riser+handrail_hei
+				roty 90-step_a
+					cylind (step_num_down-1)*step_tread/cos(step_a),handrail_r
+				del 2
+
+				!中間踊り場
+					if handrail_op=2 then
+						add (step_num_down-1)*step_tread,-column_r,step_num_down*step_riser+handrail_hei
+						roty 90
+							cylind landing_size1+landing_len+step_thi,handrail_r
+						del 2
+					endif
+
+					add landing_x+landing_size1+landing_len,-column_r,step_num_down*step_riser+handrail_hei
+					rotx -90
+						cylind step_wid_tot+2*column_r,handrail_r
+					del 2
+
+					if handrail_op=1 then
+						add landing_x+landing_size1+landing_len,step_wid_tot+column_r,step_num_down*step_riser+handrail_hei
+						roty -90
+							cylind landing_size2+landing_len,handrail_r
+						del 2
+					endif
+
+				add landing_x+landing_size1-landing_size2,step_wid_tot+column_r,(step_num_down+1)*step_riser+handrail_hei
+				roty -90+step_a
+					cylind (step_num_up-1)*step_tread/cos(step_a),handrail_r
+				del 2
+
+				!フロア踊り場
+					if switch_floor then
+						if handrail_op=1 then
+							add floor_x+step_thi,step_wid_tot+column_r,floor_hei+handrail_hei
+							roty -90
+								cylind floor_size1+floor_len+step_thi,handrail_r
+							del 2
+						endif
+
+						add floor_x-floor_size1-floor_len,step_wid_tot+column_r,floor_hei+handrail_hei
+						rotx 90
+							cylind step_wid_tot+2*column_r,handrail_r
+						del 2
+
+						if handrail_op=2 then
+							add floor_x-floor_size1-floor_len,-column_r,floor_hei+handrail_hei
+							roty 90
+								if i<floor_num-1 then
+									cylind floor_size2+floor_len,handrail_r
+								else
+									cylind floor_len,handrail_r
+								endif
+							del 2
+						endif
+					else
+						add floor_x+step_thi,step_wid_tot+column_r,floor_hei+handrail_hei
+						roty -90
+							cylind step_tread,handrail_r
+						del 2
+					endif
+
+			!ボード
+				material m_board
+
+				ruledsegmented 4,1+2+4+8+16+32,
+				0                           ,-column_r-handrail_r/2,step_riser+handrail_hei              ,0,
+				(step_num_down-1)*step_tread,-column_r-handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+				(step_num_down-1)*step_tread,-column_r-handrail_r/2,step_num_down*step_riser+board_offset,0,
+				0                           ,-column_r-handrail_r/2,step_riser+board_offset              ,0,
+				0                           ,-column_r+handrail_r/2,step_riser+handrail_hei              ,
+				(step_num_down-1)*step_tread,-column_r+handrail_r/2,step_num_down*step_riser+handrail_hei,
+				(step_num_down-1)*step_tread,-column_r+handrail_r/2,step_num_down*step_riser+board_offset,
+				0                           ,-column_r+handrail_r/2,step_riser+board_offset              
+
+				!中間踊り場
+					if handrail_op=2 then
+						ruledsegmented 4,1+2+4+8+16+32,
+						(step_num_down-1)*step_tread       ,-column_r-handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+						landing_x+landing_size1+landing_len,-column_r-handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+						landing_x+landing_size1+landing_len,-column_r-handrail_r/2,step_num_down*step_riser+board_offset,0,
+						(step_num_down-1)*step_tread       ,-column_r-handrail_r/2,step_num_down*step_riser+board_offset,0,
+						(step_num_down-1)*step_tread       ,-column_r+handrail_r/2,step_num_down*step_riser+handrail_hei,
+						landing_x+landing_size1+landing_len,-column_r+handrail_r/2,step_num_down*step_riser+handrail_hei,
+						landing_x+landing_size1+landing_len,-column_r+handrail_r/2,step_num_down*step_riser+board_offset,
+						(step_num_down-1)*step_tread       ,-column_r+handrail_r/2,step_num_down*step_riser+board_offset
+					endif
+
+					ruledsegmented 4,1+2+4+8+16+32,
+					landing_x+landing_size1+landing_len-handrail_r/2,-column_r            ,step_num_down*step_riser+handrail_hei,0,
+					landing_x+landing_size1+landing_len-handrail_r/2,step_wid_tot+column_r,step_num_down*step_riser+handrail_hei,0,
+					landing_x+landing_size1+landing_len-handrail_r/2,step_wid_tot+column_r,step_num_down*step_riser+board_offset,0,
+					landing_x+landing_size1+landing_len-handrail_r/2,-column_r            ,step_num_down*step_riser+board_offset,0,
+					landing_x+landing_size1+landing_len+handrail_r/2,-column_r            ,step_num_down*step_riser+handrail_hei,
+					landing_x+landing_size1+landing_len+handrail_r/2,step_wid_tot+column_r,step_num_down*step_riser+handrail_hei,
+					landing_x+landing_size1+landing_len+handrail_r/2,step_wid_tot+column_r,step_num_down*step_riser+board_offset,
+					landing_x+landing_size1+landing_len+handrail_r/2,-column_r            ,step_num_down*step_riser+board_offset
+
+					if handrail_op=1 then
+						ruledsegmented 4,1+2+4+8+16+32,
+						landing_x+landing_size1+landing_len  ,step_wid_tot+column_r-handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+						landing_x+landing_size1-landing_size2,step_wid_tot+column_r-handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+						landing_x+landing_size1-landing_size2,step_wid_tot+column_r-handrail_r/2,step_num_down*step_riser+board_offset,0,
+						landing_x+landing_size1+landing_len  ,step_wid_tot+column_r-handrail_r/2,step_num_down*step_riser+board_offset,0,
+						landing_x+landing_size1+landing_len  ,step_wid_tot+column_r+handrail_r/2,step_num_down*step_riser+handrail_hei,
+						landing_x+landing_size1-landing_size2,step_wid_tot+column_r+handrail_r/2,step_num_down*step_riser+handrail_hei,
+						landing_x+landing_size1-landing_size2,step_wid_tot+column_r+handrail_r/2,step_num_down*step_riser+board_offset,
+						landing_x+landing_size1+landing_len  ,step_wid_tot+column_r+handrail_r/2,step_num_down*step_riser+board_offset
+					endif
+
+				ruledsegmented 4,1+2+4+8+16+32,
+				landing_x+landing_size1-landing_size2,step_wid_tot+column_r-handrail_r/2,(step_num_down+1)*step_riser+handrail_hei,0,
+				floor_x+step_thi                     ,step_wid_tot+column_r-handrail_r/2,floor_hei+handrail_hei                   ,0,
+				floor_x+step_thi                     ,step_wid_tot+column_r-handrail_r/2,floor_hei+board_offset                   ,0,
+				landing_x+landing_size1-landing_size2,step_wid_tot+column_r-handrail_r/2,(step_num_down+1)*step_riser+board_offset,0,
+				landing_x+landing_size1-landing_size2,step_wid_tot+column_r+handrail_r/2,(step_num_down+1)*step_riser+handrail_hei,
+				floor_x+step_thi                     ,step_wid_tot+column_r+handrail_r/2,floor_hei+handrail_hei                   ,
+				floor_x+step_thi                     ,step_wid_tot+column_r+handrail_r/2,floor_hei+board_offset                   ,
+				landing_x+landing_size1-landing_size2,step_wid_tot+column_r+handrail_r/2,(step_num_down+1)*step_riser+board_offset
+
+				!フロア踊り場
+					if switch_floor then
+						if handrail_op=1 then
+							ruledsegmented 4,1+2+4+8+16+32,
+							floor_x+step_thi             ,step_wid_tot+column_r-handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x-floor_size1-floor_len,step_wid_tot+column_r-handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x-floor_size1-floor_len,step_wid_tot+column_r-handrail_r/2,floor_hei+board_offset,0,
+							floor_x+step_thi             ,step_wid_tot+column_r-handrail_r/2,floor_hei+board_offset,0,
+							floor_x+step_thi             ,step_wid_tot+column_r+handrail_r/2,floor_hei+handrail_hei,
+							floor_x-floor_size1-floor_len,step_wid_tot+column_r+handrail_r/2,floor_hei+handrail_hei,
+							floor_x-floor_size1-floor_len,step_wid_tot+column_r+handrail_r/2,floor_hei+board_offset,
+							floor_x+step_thi             ,step_wid_tot+column_r+handrail_r/2,floor_hei+board_offset
+						endif
+
+						ruledsegmented 4,1+2+4+8+16+32,
+						floor_x-floor_size1-floor_len-handrail_r/2,step_wid_tot+column_r,floor_hei+handrail_hei,0,
+						floor_x-floor_size1-floor_len-handrail_r/2,-column_r            ,floor_hei+handrail_hei,0,
+						floor_x-floor_size1-floor_len-handrail_r/2,-column_r            ,floor_hei+board_offset,0,
+						floor_x-floor_size1-floor_len-handrail_r/2,step_wid_tot+column_r,floor_hei+board_offset,0,
+						floor_x-floor_size1-floor_len+handrail_r/2,step_wid_tot+column_r,floor_hei+handrail_hei,
+						floor_x-floor_size1-floor_len+handrail_r/2,-column_r            ,floor_hei+handrail_hei,
+						floor_x-floor_size1-floor_len+handrail_r/2,-column_r            ,floor_hei+board_offset,
+						floor_x-floor_size1-floor_len+handrail_r/2,step_wid_tot+column_r,floor_hei+board_offset
+
+						if handrail_op=2 then
+							if i<floor_num-1 then
+								board_len=floor_size2+floor_len
+							else
+								board_len=floor_len
+							endif
+
+							ruledsegmented 4,1+2+4+8+16+32,
+							floor_x-floor_size1-floor_len          ,-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x-floor_size1-floor_len+board_len,-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x-floor_size1-floor_len+board_len,-column_r-handrail_r/2,floor_hei+board_offset,0,
+							floor_x-floor_size1-floor_len          ,-column_r-handrail_r/2,floor_hei+board_offset,0,
+							floor_x-floor_size1-floor_len          ,-column_r+handrail_r/2,floor_hei+handrail_hei,
+							floor_x-floor_size1-floor_len+board_len,-column_r+handrail_r/2,floor_hei+handrail_hei,
+							floor_x-floor_size1-floor_len+board_len,-column_r+handrail_r/2,floor_hei+board_offset,
+							floor_x-floor_size1-floor_len          ,-column_r+handrail_r/2,floor_hei+board_offset
+						endif
+					else
+						ruledsegmented 4,1+2+4+8+16+32,
+						floor_x+step_thi           ,step_wid_tot+column_r-handrail_r/2,floor_hei+handrail_hei,0,
+						floor_x+step_thi-step_tread,step_wid_tot+column_r-handrail_r/2,floor_hei+handrail_hei,0,
+						floor_x+step_thi-step_tread,step_wid_tot+column_r-handrail_r/2,floor_hei+board_offset,0,
+						floor_x+step_thi           ,step_wid_tot+column_r-handrail_r/2,floor_hei+board_offset,0,
+						floor_x+step_thi           ,step_wid_tot+column_r+handrail_r/2,floor_hei+handrail_hei,
+						floor_x+step_thi-step_tread,step_wid_tot+column_r+handrail_r/2,floor_hei+handrail_hei,
+						floor_x+step_thi-step_tread,step_wid_tot+column_r+handrail_r/2,floor_hei+board_offset,
+						floor_x+step_thi           ,step_wid_tot+column_r+handrail_r/2,floor_hei+board_offset
+					endif
+		endif
+
+		if stair_mode=3 then
+			!縦支柱
+				material m_handrail
+
+				if i=1 then
+					add 0,-column_r,-column_dep
+				else
+					add landing_x-landing_size1+landing_size2,-column_r,step_num_down*step_riser-column_dep
+				endif
+					cylind handrail_hei+column_dep+column_offset+step_riser,column_r
+				del 1
+
+				add (step_num_tot-1)*step_tread,-column_r,floor_hei-column_dep
+					cylind handrail_hei+column_dep+column_offset,column_r
+				del 1
+
+				if switch_floor then
+					add floor_x+floor_size1+floor_len,-column_r,floor_hei-column_dep
+						cylind handrail_hei+column_dep+column_offset,column_r
+					del 1
+
+					add floor_x+floor_size1+floor_len,step_wid_tot+column_r,floor_hei-column_dep
+						cylind handrail_hei+column_dep+column_offset,column_r
+					del 1
+
+					if i=floor_num-1 then
+						add floor_x+floor_size1,step_wid_tot+column_r,floor_hei-column_dep
+							cylind handrail_hei+column_dep+column_offset,column_r
+						del 1
+					endif
+				else
+					add step_num_tot*step_tread,-column_r,floor_hei-column_dep
+						cylind handrail_hei+column_dep+column_offset,column_r
+					del 1
+				endif
+
+				if i>1 then
+					add floor_x+floor_size1-floor_size2,step_wid_tot+column_r,-column_dep
+						cylind handrail_hei+column_dep+column_offset+step_riser,column_r
+					del 1
+
+					add landing_x+step_thi,step_wid_tot+column_r,step_num_down*step_riser-column_dep
+						cylind handrail_hei+column_dep+column_offset,column_r
+					del 1
+
+					add landing_x-landing_size1-landing_len,step_wid_tot+column_r,step_num_down*step_riser-column_dep
+						cylind handrail_hei+column_dep+column_offset,column_r
+					del 1
+
+					add landing_x-landing_size1-landing_len,-column_r,step_num_down*step_riser-column_dep
+						cylind handrail_hei+column_dep+column_offset,column_r
+					del 1
+				endif
+
+			!横手すり
+				material m_handrail
+
+				if i=1 then
+					add 0,-column_r,step_riser+handrail_hei
+					roty 90-step_a
+						cylind (step_num_tot-1)*step_tread/cos(step_a),handrail_r
+					del 2
+				else
+					add landing_x-landing_size1+landing_size2,-column_r,(step_num_down+1)*step_riser+handrail_hei
+					roty 90-step_a
+						cylind (step_num_up-1)*step_tread/cos(step_a),handrail_r
+					del 2
+				endif
+
+				!フロア踊り場
+					if switch_floor then
+						if handrail_op=2 then
+							add (step_num_tot-1)*step_tread,-column_r,floor_hei+handrail_hei
+							roty 90
+								cylind floor_size1+floor_len+step_thi,handrail_r
+							del 2
+						endif
+
+						add floor_x+floor_size1+floor_len,-column_r,floor_hei+handrail_hei
+						rotx -90
+							cylind step_wid_tot+2*column_r,handrail_r
+						del 2
+
+						if handrail_op=1 then
+							if i<floor_num-1 then
+								handrail_len=floor_len+floor_size2
+							else
+								handrail_len=floor_len
+							endif
+
+							add floor_x+floor_size1+floor_len,step_wid_tot+column_r,floor_hei+handrail_hei
+							roty -90
+								cylind handrail_len,handrail_r
+							del 2
+						endif
+					else
+						add (step_num_tot-1)*step_tread,-column_r,floor_hei+handrail_hei
+						roty 90
+							cylind step_tread,handrail_r
+						del 2
+					endif
+
+				if i>1 then
+					add floor_x+floor_size1-floor_size2,step_wid_tot+column_r,step_riser+handrail_hei
+					roty -90+step_a
+						cylind (step_num_down-1)*step_tread/cos(step_a),handrail_r
+					del 2
+				endif
+
+				!中間踊り場
+					if i>1 then
+						if handrail_op=1 then
+							add landing_x+step_thi,step_wid_tot+column_r,step_num_down*step_riser+handrail_hei
+							roty -90
+								cylind landing_size1+landing_len+step_thi,handrail_r
+							del 2
+						endif
+
+						add landing_x-landing_size1-landing_len,step_wid_tot+column_r,step_num_down*step_riser+handrail_hei
+						rotx 90
+							cylind step_wid_tot+2*column_r,handrail_r
+						del 2
+
+						if handrail_op=2 then
+							add landing_x-landing_size1-landing_len,-column_r,step_num_down*step_riser+handrail_hei
+							roty 90
+								cylind landing_len+landing_size2,handrail_r
+							del 2
+						endif
+					endif
+
+			!ボード
+				material m_board
+
+				if i=1 then
+					ruledsegmented 4,1+2+4+8+16+32,
+					0                          ,-column_r-handrail_r/2,step_riser+handrail_hei,0,
+					(step_num_tot-1)*step_tread,-column_r-handrail_r/2,floor_hei+handrail_hei ,0,
+					(step_num_tot-1)*step_tread,-column_r-handrail_r/2,floor_hei+board_offset ,0,
+					0                          ,-column_r-handrail_r/2,step_riser+board_offset,0,
+					0                          ,-column_r+handrail_r/2,step_riser+handrail_hei,
+					(step_num_tot-1)*step_tread,-column_r+handrail_r/2,floor_hei+handrail_hei ,
+					(step_num_tot-1)*step_tread,-column_r+handrail_r/2,floor_hei+board_offset ,
+					0                          ,-column_r+handrail_r/2,step_riser+board_offset             
+				else
+					ruledsegmented 4,1+2+4+8+16+32,
+					landing_x-landing_size1+landing_size2,-column_r-handrail_r/2,(step_num_down+1)*step_riser+handrail_hei,0,
+					(step_num_tot-1)*step_tread          ,-column_r-handrail_r/2,floor_hei+handrail_hei                   ,0,
+					(step_num_tot-1)*step_tread          ,-column_r-handrail_r/2,floor_hei+board_offset                   ,0,
+					landing_x-landing_size1+landing_size2,-column_r-handrail_r/2,(step_num_down+1)*step_riser+board_offset,0,
+					landing_x-landing_size1+landing_size2,-column_r+handrail_r/2,(step_num_down+1)*step_riser+handrail_hei,
+					(step_num_tot-1)*step_tread          ,-column_r+handrail_r/2,floor_hei+handrail_hei                   ,
+					(step_num_tot-1)*step_tread          ,-column_r+handrail_r/2,floor_hei+board_offset                   ,
+					landing_x-landing_size1+landing_size2,-column_r+handrail_r/2,(step_num_down+1)*step_riser+board_offset
+				endif
+
+				!フロア踊り場
+					if switch_floor then
+						if handrail_op=2 then
+							ruledsegmented 4,1+2+4+8+16+32,
+							(step_num_tot-1)*step_tread  ,-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x+floor_size1+floor_len,-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x+floor_size1+floor_len,-column_r-handrail_r/2,floor_hei+board_offset,0,
+							(step_num_tot-1)*step_tread  ,-column_r-handrail_r/2,floor_hei+board_offset,0,
+							(step_num_tot-1)*step_tread  ,-column_r+handrail_r/2,floor_hei+handrail_hei,
+							floor_x+floor_size1+floor_len,-column_r+handrail_r/2,floor_hei+handrail_hei,
+							floor_x+floor_size1+floor_len,-column_r+handrail_r/2,floor_hei+board_offset,
+							(step_num_tot-1)*step_tread  ,-column_r+handrail_r/2,floor_hei+board_offset
+						endif
+
+						ruledsegmented 4,1+2+4+8+16+32,
+						floor_x+floor_size1+floor_len-handrail_r/2,-column_r            ,floor_hei+handrail_hei,0,
+						floor_x+floor_size1+floor_len-handrail_r/2,step_wid_tot+column_r,floor_hei+handrail_hei,0,
+						floor_x+floor_size1+floor_len-handrail_r/2,step_wid_tot+column_r,floor_hei+board_offset,0,
+						floor_x+floor_size1+floor_len-handrail_r/2,-column_r            ,floor_hei+board_offset,0,
+						floor_x+floor_size1+floor_len+handrail_r/2,-column_r            ,floor_hei+handrail_hei,
+						floor_x+floor_size1+floor_len+handrail_r/2,step_wid_tot+column_r,floor_hei+handrail_hei,
+						floor_x+floor_size1+floor_len+handrail_r/2,step_wid_tot+column_r,floor_hei+board_offset,
+						floor_x+floor_size1+floor_len+handrail_r/2,-column_r            ,floor_hei+board_offset
+
+						if handrail_op=1 then
+							if i<floor_num-1 then
+								handrail_len=floor_len+floor_size2
+							else
+								handrail_len=floor_len
+							endif
+
+							ruledsegmented 4,1+2+4+8+16+32,
+							floor_x+floor_size1+floor_len             ,step_wid_tot+column_r-handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x+floor_size1+floor_len-handrail_len,step_wid_tot+column_r-handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x+floor_size1+floor_len-handrail_len,step_wid_tot+column_r-handrail_r/2,floor_hei+board_offset,0,
+							floor_x+floor_size1+floor_len             ,step_wid_tot+column_r-handrail_r/2,floor_hei+board_offset,0,
+							floor_x+floor_size1+floor_len             ,step_wid_tot+column_r+handrail_r/2,floor_hei+handrail_hei,
+							floor_x+floor_size1+floor_len-handrail_len,step_wid_tot+column_r+handrail_r/2,floor_hei+handrail_hei,
+							floor_x+floor_size1+floor_len-handrail_len,step_wid_tot+column_r+handrail_r/2,floor_hei+board_offset,
+							floor_x+floor_size1+floor_len             ,step_wid_tot+column_r+handrail_r/2,floor_hei+board_offset
+						endif
+					else
+						ruledsegmented 4,1+2+4+8+16+32,
+						(step_num_tot-1)*step_tread,-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+						step_num_tot*step_tread    ,-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+						step_num_tot*step_tread    ,-column_r-handrail_r/2,floor_hei+board_offset,0,
+						(step_num_tot-1)*step_tread,-column_r-handrail_r/2,floor_hei+board_offset,0,
+						(step_num_tot-1)*step_tread,-column_r+handrail_r/2,floor_hei+handrail_hei,
+						step_num_tot*step_tread    ,-column_r+handrail_r/2,floor_hei+handrail_hei,
+						step_num_tot*step_tread    ,-column_r+handrail_r/2,floor_hei+board_offset,
+						(step_num_tot-1)*step_tread,-column_r+handrail_r/2,floor_hei+board_offset
+					endif
+
+				if i>1 then
+					ruledsegmented 4,1+2+4+8+16+32,
+					floor_x+floor_size1-floor_size2,step_wid_tot+column_r-handrail_r/2,step_riser+handrail_hei              ,0,
+					landing_x+step_thi             ,step_wid_tot+column_r-handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+					landing_x+step_thi             ,step_wid_tot+column_r-handrail_r/2,step_num_down*step_riser+board_offset,0,
+					floor_x+floor_size1-floor_size2,step_wid_tot+column_r-handrail_r/2,step_riser+board_offset              ,0,
+					floor_x+floor_size1-floor_size2,step_wid_tot+column_r+handrail_r/2,step_riser+handrail_hei              ,
+					landing_x+step_thi             ,step_wid_tot+column_r+handrail_r/2,step_num_down*step_riser+handrail_hei,
+					landing_x+step_thi             ,step_wid_tot+column_r+handrail_r/2,step_num_down*step_riser+board_offset,
+					floor_x+floor_size1-floor_size2,step_wid_tot+column_r+handrail_r/2,step_riser+board_offset              
+				endif
+
+				!中間踊り場
+					if i>1 then
+						if handrail_op=1 then
+							ruledsegmented 4,1+2+4+8+16+32,
+							landing_x+step_thi                 ,step_wid_tot+column_r-handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+							landing_x-landing_size1-landing_len,step_wid_tot+column_r-handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+							landing_x-landing_size1-landing_len,step_wid_tot+column_r-handrail_r/2,step_num_down*step_riser+board_offset,0,
+							landing_x+step_thi                 ,step_wid_tot+column_r-handrail_r/2,step_num_down*step_riser+board_offset,0,
+							landing_x+step_thi                 ,step_wid_tot+column_r+handrail_r/2,step_num_down*step_riser+handrail_hei,
+							landing_x-landing_size1-landing_len,step_wid_tot+column_r+handrail_r/2,step_num_down*step_riser+handrail_hei,
+							landing_x-landing_size1-landing_len,step_wid_tot+column_r+handrail_r/2,step_num_down*step_riser+board_offset,
+							landing_x+step_thi                 ,step_wid_tot+column_r+handrail_r/2,step_num_down*step_riser+board_offset
+						endif
+
+						ruledsegmented 4,1+2+4+8+16+32,
+						landing_x-landing_size1-landing_len-handrail_r/2,step_wid_tot+column_r,step_num_down*step_riser+handrail_hei,0,
+						landing_x-landing_size1-landing_len-handrail_r/2,-column_r            ,step_num_down*step_riser+handrail_hei,0,
+						landing_x-landing_size1-landing_len-handrail_r/2,-column_r            ,step_num_down*step_riser+board_offset,0,
+						landing_x-landing_size1-landing_len-handrail_r/2,step_wid_tot+column_r,step_num_down*step_riser+board_offset,0,
+						landing_x-landing_size1-landing_len+handrail_r/2,step_wid_tot+column_r,step_num_down*step_riser+handrail_hei,
+						landing_x-landing_size1-landing_len+handrail_r/2,-column_r            ,step_num_down*step_riser+handrail_hei,
+						landing_x-landing_size1-landing_len+handrail_r/2,-column_r            ,step_num_down*step_riser+board_offset,
+						landing_x-landing_size1-landing_len+handrail_r/2,step_wid_tot+column_r,step_num_down*step_riser+board_offset
+
+						if handrail_op=2 then
+							ruledsegmented 4,1+2+4+8+16+32,
+							landing_x-landing_size1-landing_len  ,-column_r-handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+							landing_x-landing_size1+landing_size2,-column_r-handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+							landing_x-landing_size1+landing_size2,-column_r-handrail_r/2,step_num_down*step_riser+board_offset,0,
+							landing_x-landing_size1-landing_len  ,-column_r-handrail_r/2,step_num_down*step_riser+board_offset,0,
+							landing_x-landing_size1-landing_len  ,-column_r+handrail_r/2,step_num_down*step_riser+handrail_hei,
+							landing_x-landing_size1+landing_size2,-column_r+handrail_r/2,step_num_down*step_riser+handrail_hei,
+							landing_x-landing_size1+landing_size2,-column_r+handrail_r/2,step_num_down*step_riser+board_offset,
+							landing_x-landing_size1-landing_len  ,-column_r+handrail_r/2,step_num_down*step_riser+board_offset
+						endif
+					endif
+		endif
+	addz floor_hei
+	next i
+	del floor_num-1
+endgroup
+
+!内側手すり
+group "handrail_inside"
+	for i=1 to floor_num-1
+		if stair_mode=1 then
+			!縦支柱
+				material m_handrail
+
+				if i>1 and switch_floor then
+					add -floor_len,step_wid1+column_r,-column_dep
+						cylind handrail_hei+column_dep+column_offset,column_r
+					del 1
+				endif
+
+				add 0,step_wid1+column_r,-column_dep
+					cylind handrail_hei+column_dep+column_offset+step_riser,column_r
+				del 1
+
+				add (step_num_tot-1)*step_tread,step_wid1+column_r,floor_hei-column_dep
+					cylind handrail_hei+column_dep+column_offset,column_r
+				del 1
+
+				if switch_floor then
+					add floor_x+floor_len,step_wid1+column_r,floor_hei-column_dep
+				else
+					add step_num_tot*step_tread,step_wid1+column_r,floor_hei-column_dep
+				endif
+					cylind handrail_hei+column_dep+column_offset,column_r
+				del 1
+
+			!横手すり
+				material m_handrail
+
+				add 0,step_wid1+column_r,step_riser+handrail_hei
+				roty 90-step_a
+					cylind (step_num_tot-1)*step_tread/cos(step_a),handrail_r
+				del 2
+
+				if switch_floor then
+					if handrail_op=1 then
+						if i>1 then
+							add -floor_len,step_wid1+column_r,handrail_hei
+							roty 90
+								cylind floor_len,handrail_r
+							del 2
+						endif
+
+						add (step_num_tot-1)*step_tread,step_wid1+column_r,floor_hei+handrail_hei
+						roty 90
+							cylind floor_len+step_thi,handrail_r
+						del 2
+					endif
+				else
+					add (step_num_tot-1)*step_tread,step_wid1+column_r,floor_hei+handrail_hei
+					roty 90
+						cylind step_tread,handrail_r
+					del 2
+				endif
+
+			!ボード
+				material m_board
+
+				ruledsegmented 4,1+2+4+8+16+32,
+				0                          ,step_wid1+column_r-handrail_r/2,step_riser+handrail_hei             ,0,
+				(step_num_tot-1)*step_tread,step_wid1+column_r-handrail_r/2,floor_hei+handrail_hei,0,
+				(step_num_tot-1)*step_tread,step_wid1+column_r-handrail_r/2,floor_hei+board_offset,0,
+				0                          ,step_wid1+column_r-handrail_r/2,step_riser+board_offset             ,0,
+				0                          ,step_wid1+column_r+handrail_r/2,step_riser+handrail_hei             ,
+				(step_num_tot-1)*step_tread,step_wid1+column_r+handrail_r/2,floor_hei+handrail_hei,
+				(step_num_tot-1)*step_tread,step_wid1+column_r+handrail_r/2,floor_hei+board_offset,
+				0                          ,step_wid1+column_r+handrail_r/2,step_riser+board_offset
+
+				if switch_floor then
+					if handrail_op=1 then
+						if i>1 then
+							ruledsegmented 4,1+2+4+8+16+32,
+							-floor_len,step_wid1+column_r-handrail_r/2,handrail_hei,0,
+							0         ,step_wid1+column_r-handrail_r/2,handrail_hei,0,
+							0         ,step_wid1+column_r-handrail_r/2,board_offset,0,
+							-floor_len,step_wid1+column_r-handrail_r/2,board_offset,0,
+							-floor_len,step_wid1+column_r+handrail_r/2,handrail_hei,
+							0         ,step_wid1+column_r+handrail_r/2,handrail_hei,
+							0         ,step_wid1+column_r+handrail_r/2,board_offset,
+							-floor_len,step_wid1+column_r+handrail_r/2,board_offset
+						endif
+
+						ruledsegmented 4,1+2+4+8+16+32,
+						(step_num_tot-1)*step_tread,step_wid1+column_r-handrail_r/2,floor_hei+handrail_hei,0,
+						floor_x+floor_len          ,step_wid1+column_r-handrail_r/2,floor_hei+handrail_hei,0,
+						floor_x+floor_len          ,step_wid1+column_r-handrail_r/2,floor_hei+board_offset,0,
+						(step_num_tot-1)*step_tread,step_wid1+column_r-handrail_r/2,floor_hei+board_offset,0,
+						(step_num_tot-1)*step_tread,step_wid1+column_r+handrail_r/2,floor_hei+handrail_hei,
+						floor_x+floor_len          ,step_wid1+column_r+handrail_r/2,floor_hei+handrail_hei,
+						floor_x+floor_len          ,step_wid1+column_r+handrail_r/2,floor_hei+board_offset,
+						(step_num_tot-1)*step_tread,step_wid1+column_r+handrail_r/2,floor_hei+board_offset
+					endif
+				else
+					ruledsegmented 4,1+2+4+8+16+32,
+					(step_num_tot-1)*step_tread,step_wid1+column_r-handrail_r/2,floor_hei+handrail_hei,0,
+					step_num_tot*step_tread    ,step_wid1+column_r-handrail_r/2,floor_hei+handrail_hei,0,
+					step_num_tot*step_tread    ,step_wid1+column_r-handrail_r/2,floor_hei+board_offset,0,
+					(step_num_tot-1)*step_tread,step_wid1+column_r-handrail_r/2,floor_hei+board_offset,0,
+					(step_num_tot-1)*step_tread,step_wid1+column_r+handrail_r/2,floor_hei+handrail_hei,
+					step_num_tot*step_tread    ,step_wid1+column_r+handrail_r/2,floor_hei+handrail_hei,
+					step_num_tot*step_tread    ,step_wid1+column_r+handrail_r/2,floor_hei+board_offset,
+					(step_num_tot-1)*step_tread,step_wid1+column_r+handrail_r/2,floor_hei+board_offset
+				endif
+		endif
+
+		if stair_mode=2 then
+			!縦支柱
+				material m_handrail
+
+				add 0,step_wid1+column_r,-column_dep
+					cylind handrail_hei+column_dep+column_offset+step_riser,column_r
+				del 1
+
+				add (step_num_down-1)*step_tread,step_wid1+column_r,step_num_down*step_riser-column_dep
+					cylind handrail_hei+column_dep+column_offset,column_r
+				del 1
+
+				add landing_x+landing_size1-landing_size2,step_wid1+landing_gap-column_r,step_num_down*step_riser-column_dep
+					cylind handrail_hei+column_dep+column_offset+step_riser,column_r
+				del 1
+
+				add floor_x+step_thi,step_wid1+landing_gap-column_r,floor_hei-column_dep
+					cylind handrail_hei+column_dep+column_offset,column_r
+				del 1
+
+				if switch_floor=0 then
+					add floor_x+step_thi-step_tread,step_wid1+landing_gap-column_r,floor_hei-column_dep
+						cylind handrail_hei+column_dep+column_offset,column_r
+					del 1
+				endif
+
+			!横手すり
+				material m_handrail
+
+				add 0,step_wid1+column_r,step_riser+handrail_hei
+				roty 90-step_a
+					cylind (step_num_down-1)*step_tread/cos(step_a),handrail_r
+				del 2
+
+				!中間踊り場
+					tube_r=handrail_r
+					gosub "tube断面"
+
+					tube SDresol+1,6,1+2+4+8+16+32,
+					get((SDresol+1)*3),
+					(step_num_down-1)*step_tread-1,step_wid1+column_r,step_num_down*step_riser+handrail_hei,0,
+					(step_num_down-1)*step_tread,step_wid1+column_r,step_num_down*step_riser+handrail_hei,0,
+					landing_x+landing_size1,step_wid1+column_r,step_num_down*step_riser+handrail_hei,0,
+					landing_x+landing_size1,step_wid1+landing_gap-column_r,step_num_down*step_riser+handrail_hei,0,
+					landing_x+landing_size1-landing_size2,step_wid1+landing_gap-column_r,step_num_down*step_riser+handrail_hei,0,
+					landing_x+landing_size1-landing_size2-1,step_wid1+landing_gap-column_r,step_num_down*step_riser+handrail_hei,0
+
+				add landing_x+landing_size1-landing_size2,step_wid1+landing_gap-column_r,(step_num_down+1)*step_riser+handrail_hei
+				roty -90+step_a
+					cylind (step_num_up-1)*step_tread/cos(step_a),handrail_r
+				del 2
+				
+				!フロア踊り場
+					if switch_floor then
+						tube_r=handrail_r
+						gosub "tube断面"
+
+						if i<floor_num-1 then
+							tube SDresol+1,6,1+2+4+8+16+32,
+							get((SDresol+1)*3),
+							floor_x+step_thi+1,step_wid1+landing_gap-column_r,floor_hei+handrail_hei,0,
+							floor_x+step_thi,step_wid1+landing_gap-column_r,floor_hei+handrail_hei,0,
+							floor_x-floor_size1,step_wid1+landing_gap-column_r,floor_hei+handrail_hei,0,
+							floor_x-floor_size1,step_wid1+column_r,floor_hei+handrail_hei,0,
+							floor_x-floor_size1+floor_size2,step_wid1+column_r,floor_hei+handrail_hei,0,
+							floor_x-floor_size1+floor_size2+1,step_wid1+column_r,floor_hei+handrail_hei,0
+						else
+							tube SDresol+1,5,1+2+4+8+16+32,
+							get((SDresol+1)*3),
+							floor_x+step_thi+1,step_wid1+landing_gap-column_r,floor_hei+handrail_hei,0,
+							floor_x+step_thi,step_wid1+landing_gap-column_r,floor_hei+handrail_hei,0,
+							floor_x-floor_size1,step_wid1+landing_gap-column_r,floor_hei+handrail_hei,0,
+							floor_x-floor_size1,-column_r,floor_hei+handrail_hei,0,
+							floor_x-floor_size1,-column_r-1,floor_hei+handrail_hei,0
+						endif
+					else
+						add floor_x+step_thi,step_wid1+landing_gap-column_r,floor_hei+handrail_hei
+						roty -90
+							cylind step_tread,handrail_r
+						del 2
+					endif
+
+			!ボード
+				material m_board
+
+				ruledsegmented 4,1+2+4+8+16+32,
+				0                           ,step_wid1+column_r-handrail_r/2,step_riser+handrail_hei              ,0,
+				(step_num_down-1)*step_tread,step_wid1+column_r-handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+				(step_num_down-1)*step_tread,step_wid1+column_r-handrail_r/2,step_num_down*step_riser+board_offset,0,
+				0                           ,step_wid1+column_r-handrail_r/2,step_riser+board_offset              ,0,
+				0                           ,step_wid1+column_r+handrail_r/2,step_riser+handrail_hei              ,
+				(step_num_down-1)*step_tread,step_wid1+column_r+handrail_r/2,step_num_down*step_riser+handrail_hei,
+				(step_num_down-1)*step_tread,step_wid1+column_r+handrail_r/2,step_num_down*step_riser+board_offset,
+				0                           ,step_wid1+column_r+handrail_r/2,step_riser+board_offset              
+
+				!中間踊り場
+					ruledsegmented 8,1+2+4+8+16+32,
+					(step_num_down-1)*step_tread         ,step_wid1+column_r-handrail_r/2            ,step_num_down*step_riser+handrail_hei,0,
+					landing_x+landing_size1+handrail_r/2 ,step_wid1+column_r-handrail_r/2            ,step_num_down*step_riser+handrail_hei,0,
+					landing_x+landing_size1+handrail_r/2 ,step_wid1+landing_gap-column_r+handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+					landing_x+landing_size1-landing_size2,step_wid1+landing_gap-column_r+handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+					landing_x+landing_size1-landing_size2,step_wid1+landing_gap-column_r-handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+					landing_x+landing_size1-handrail_r/2 ,step_wid1+landing_gap-column_r-handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+					landing_x+landing_size1-handrail_r/2 ,step_wid1+column_r+handrail_r/2            ,step_num_down*step_riser+handrail_hei,0,
+					(step_num_down-1)*step_tread         ,step_wid1+column_r+handrail_r/2            ,step_num_down*step_riser+handrail_hei,0,
+					(step_num_down-1)*step_tread         ,step_wid1+column_r-handrail_r/2            ,step_num_down*step_riser+board_offset,
+					landing_x+landing_size1+handrail_r/2 ,step_wid1+column_r-handrail_r/2            ,step_num_down*step_riser+board_offset,
+					landing_x+landing_size1+handrail_r/2 ,step_wid1+landing_gap-column_r+handrail_r/2,step_num_down*step_riser+board_offset,
+					landing_x+landing_size1-landing_size2,step_wid1+landing_gap-column_r+handrail_r/2,step_num_down*step_riser+board_offset,
+					landing_x+landing_size1-landing_size2,step_wid1+landing_gap-column_r-handrail_r/2,step_num_down*step_riser+board_offset,
+					landing_x+landing_size1-handrail_r/2 ,step_wid1+landing_gap-column_r-handrail_r/2,step_num_down*step_riser+board_offset,
+					landing_x+landing_size1-handrail_r/2 ,step_wid1+column_r+handrail_r/2            ,step_num_down*step_riser+board_offset,
+					(step_num_down-1)*step_tread         ,step_wid1+column_r+handrail_r/2            ,step_num_down*step_riser+board_offset
+
+				ruledsegmented 4,1+2+4+8+16+32,
+				landing_x+landing_size1-landing_size2,step_wid1+landing_gap-column_r-handrail_r/2,(step_num_down+1)*step_riser+handrail_hei,0,
+				floor_x+step_thi                     ,step_wid1+landing_gap-column_r-handrail_r/2,floor_hei+handrail_hei                   ,0,
+				floor_x+step_thi                     ,step_wid1+landing_gap-column_r-handrail_r/2,floor_hei+board_offset                   ,0,
+				landing_x+landing_size1-landing_size2,step_wid1+landing_gap-column_r-handrail_r/2,(step_num_down+1)*step_riser+board_offset,0,
+				landing_x+landing_size1-landing_size2,step_wid1+landing_gap-column_r+handrail_r/2,(step_num_down+1)*step_riser+handrail_hei,
+				floor_x+step_thi                     ,step_wid1+landing_gap-column_r+handrail_r/2,floor_hei+handrail_hei                   ,
+				floor_x+step_thi                     ,step_wid1+landing_gap-column_r+handrail_r/2,floor_hei+board_offset                   ,
+				landing_x+landing_size1-landing_size2,step_wid1+landing_gap-column_r+handrail_r/2,(step_num_down+1)*step_riser+board_offset
+
+				!フロア踊り場
+					if switch_floor then
+						if i<floor_num-1 then
+							ruledsegmented 8,1+2+4+8+16+32,
+							floor_x+step_thi                ,step_wid1+landing_gap-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x-floor_size1+handrail_r/2,step_wid1+landing_gap-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x-floor_size1+handrail_r/2,step_wid1+column_r+handrail_r/2            ,floor_hei+handrail_hei,0,
+							floor_x-floor_size1+floor_size2 ,step_wid1+column_r+handrail_r/2            ,floor_hei+handrail_hei,0,
+							floor_x-floor_size1+floor_size2 ,step_wid1+column_r-handrail_r/2            ,floor_hei+handrail_hei,0,
+							floor_x-floor_size1-handrail_r/2,step_wid1+column_r-handrail_r/2            ,floor_hei+handrail_hei,0,
+							floor_x-floor_size1-handrail_r/2,step_wid1+landing_gap-column_r+handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x+step_thi                ,step_wid1+landing_gap-column_r+handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x+step_thi                ,step_wid1+landing_gap-column_r-handrail_r/2,floor_hei+board_offset,
+							floor_x-floor_size1+handrail_r/2,step_wid1+landing_gap-column_r-handrail_r/2,floor_hei+board_offset,
+							floor_x-floor_size1+handrail_r/2,step_wid1+column_r+handrail_r/2            ,floor_hei+board_offset,
+							floor_x-floor_size1+floor_size2 ,step_wid1+column_r+handrail_r/2            ,floor_hei+board_offset,
+							floor_x-floor_size1+floor_size2 ,step_wid1+column_r-handrail_r/2            ,floor_hei+board_offset,
+							floor_x-floor_size1-handrail_r/2,step_wid1+column_r-handrail_r/2            ,floor_hei+board_offset,
+							floor_x-floor_size1-handrail_r/2,step_wid1+landing_gap-column_r+handrail_r/2,floor_hei+board_offset,
+							floor_x+step_thi                ,step_wid1+landing_gap-column_r+handrail_r/2,floor_hei+board_offset
+						else
+							ruledsegmented 6,1+2+4+8+16+32,
+							floor_x+step_thi                ,step_wid1+landing_gap-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x-floor_size1+handrail_r/2,step_wid1+landing_gap-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x-floor_size1+handrail_r/2,-column_r                                  ,floor_hei+handrail_hei,0,
+							floor_x-floor_size1-handrail_r/2,-column_r                                  ,floor_hei+handrail_hei,0,
+							floor_x-floor_size1-handrail_r/2,step_wid1+landing_gap-column_r+handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x+step_thi                ,step_wid1+landing_gap-column_r+handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x+step_thi                ,step_wid1+landing_gap-column_r-handrail_r/2,floor_hei+board_offset,
+							floor_x-floor_size1+handrail_r/2,step_wid1+landing_gap-column_r-handrail_r/2,floor_hei+board_offset,
+							floor_x-floor_size1+handrail_r/2,-column_r                                  ,floor_hei+board_offset,
+							floor_x-floor_size1-handrail_r/2,-column_r                                  ,floor_hei+board_offset,
+							floor_x-floor_size1-handrail_r/2,step_wid1+landing_gap-column_r+handrail_r/2,floor_hei+board_offset,
+							floor_x+step_thi                ,step_wid1+landing_gap-column_r+handrail_r/2,floor_hei+board_offset
+						endif
+					else
+						ruledsegmented 4,1+2+4+8+16+32,
+						floor_x+step_thi           ,step_wid1+landing_gap-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+						floor_x+step_thi-step_tread,step_wid1+landing_gap-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+						floor_x+step_thi-step_tread,step_wid1+landing_gap-column_r-handrail_r/2,floor_hei+board_offset,0,
+						floor_x+step_thi           ,step_wid1+landing_gap-column_r-handrail_r/2,floor_hei+board_offset,0,
+						floor_x+step_thi           ,step_wid1+landing_gap-column_r+handrail_r/2,floor_hei+handrail_hei,
+						floor_x+step_thi-step_tread,step_wid1+landing_gap-column_r+handrail_r/2,floor_hei+handrail_hei,
+						floor_x+step_thi-step_tread,step_wid1+landing_gap-column_r+handrail_r/2,floor_hei+board_offset,
+						floor_x+step_thi           ,step_wid1+landing_gap-column_r+handrail_r/2,floor_hei+board_offset
+					endif
+		endif
+
+		if stair_mode=3 then
+			!縦支柱
+				material m_handrail
+
+				if i=1 then
+					add 0,step_wid1+column_r,-column_dep
+				else
+					add landing_x-landing_size1+landing_size2,step_wid1+column_r,step_num_down*step_riser-column_dep
+				endif
+					cylind handrail_hei+column_dep+column_offset+step_riser,column_r
+				del 1
+
+				add (step_num_tot-1)*step_tread,step_wid1+column_r,floor_hei-column_dep
+					cylind handrail_hei+column_dep+column_offset,column_r
+				del 1
+
+				if switch_floor=0 then
+					add step_num_tot*step_tread,step_wid1+column_r,floor_hei-column_dep
+						cylind handrail_hei+column_dep+column_offset,column_r
+					del 1
+				endif
+
+				if i>1 then
+					add floor_x+floor_size1-floor_size2,step_wid1+landing_gap-column_r,-column_dep
+						cylind handrail_hei+column_dep+column_offset+step_riser,column_r
+					del 1
+
+					add landing_x+step_thi,step_wid1+landing_gap-column_r,step_num_down*step_riser-column_dep
+						cylind handrail_hei+column_dep+column_offset,column_r
+					del 1
+				endif
+
+			!横手すり
+				material m_handrail
+
+				if i=1 then
+					add 0,step_wid1+column_r,step_riser+handrail_hei
+					roty 90-step_a
+						cylind (step_num_tot-1)*step_tread/cos(step_a),handrail_r
+					del 2
+				else
+					add landing_x-landing_size1+landing_size2,step_wid1+column_r,(step_num_down+1)*step_riser+handrail_hei
+					roty 90-step_a
+						cylind (step_num_up-1)*step_tread/cos(step_a),handrail_r
+					del 2
+				endif
+
+				!フロア踊り場
+					if switch_floor then
+						tube_r=handrail_r
+						gosub "tube断面"
+
+						if i<floor_num-1 then
+							tube SDresol+1,6,1+2+4+8+16+32,
+							get((SDresol+1)*3),
+							floor_x-step_thi-1,step_wid1+column_r,floor_hei+handrail_hei,0,
+							floor_x-step_thi,step_wid1+column_r,floor_hei+handrail_hei,0,
+							floor_x+floor_size1,step_wid1+column_r,floor_hei+handrail_hei,0,
+							floor_x+floor_size1,step_wid1+landing_gap-column_r,floor_hei+handrail_hei,0,
+							floor_x+floor_size1-floor_size2,step_wid1+landing_gap-column_r,floor_hei+handrail_hei,0,
+							floor_x+floor_size1-floor_size2-1,step_wid1+landing_gap-column_r,floor_hei+handrail_hei,0
+						else
+							tube SDresol+1,5,1+2+4+8+16+32,
+							get((SDresol+1)*3),
+							floor_x-step_thi-1,step_wid1+column_r,floor_hei+handrail_hei,0,
+							floor_x-step_thi,step_wid1+column_r,floor_hei+handrail_hei,0,
+							floor_x+floor_size1,step_wid1+column_r,floor_hei+handrail_hei,0,
+							floor_x+floor_size1,step_wid_tot+column_r,floor_hei+handrail_hei,0,
+							floor_x+floor_size1,step_wid_tot+column_r+1,floor_hei+handrail_hei,0
+						endif
+					else
+						add (step_num_tot-1)*step_tread,step_wid1+column_r,floor_hei+handrail_hei
+						roty 90
+							cylind step_tread,handrail_r
+						del 2
+					endif
+
+				if i>1 then
+					add floor_x+floor_size1-floor_size2,step_wid1+landing_gap-column_r,step_riser+handrail_hei
+					roty -90+step_a
+						cylind (step_num_down-1)*step_tread/cos(step_a),handrail_r
+					del 2
+				endif
+
+				!中間踊り場
+					if i>1 then
+						tube_r=handrail_r
+						gosub "tube断面"
+
+						tube SDresol+1,6,1+2+4+8+16+32,
+						get((SDresol+1)*3),
+						landing_x+step_thi+1,step_wid1+landing_gap-column_r,step_num_down*step_riser+handrail_hei,0,
+						landing_x+step_thi,step_wid1+landing_gap-column_r,step_num_down*step_riser+handrail_hei,0,
+						landing_x-landing_size1,step_wid1+landing_gap-column_r,step_num_down*step_riser+handrail_hei,0,
+						landing_x-landing_size1,step_wid1+column_r,step_num_down*step_riser+handrail_hei,0,
+						landing_x-landing_size1+landing_size2,step_wid1+column_r,step_num_down*step_riser+handrail_hei,0,
+						landing_x-landing_size1+landing_size2+1,step_wid1+column_r,step_num_down*step_riser+handrail_hei,0
+					endif
+
+			!ボード
+				material m_board
+
+				if i=1 then
+					ruledsegmented 4,1+2+4+8+16+32,
+					0                          ,step_wid1+column_r-handrail_r/2,step_riser+handrail_hei             ,0,
+					(step_num_tot-1)*step_tread,step_wid1+column_r-handrail_r/2,step_num_tot*step_riser+handrail_hei,0,
+					(step_num_tot-1)*step_tread,step_wid1+column_r-handrail_r/2,step_num_tot*step_riser+board_offset,0,
+					0                          ,step_wid1+column_r-handrail_r/2,step_riser+board_offset             ,0,
+					0                          ,step_wid1+column_r+handrail_r/2,step_riser+handrail_hei             ,
+					(step_num_tot-1)*step_tread,step_wid1+column_r+handrail_r/2,step_num_tot*step_riser+handrail_hei,
+					(step_num_tot-1)*step_tread,step_wid1+column_r+handrail_r/2,step_num_tot*step_riser+board_offset,
+					0                          ,step_wid1+column_r+handrail_r/2,step_riser+board_offset             
+				else
+					ruledsegmented 4,1+2+4+8+16+32,
+					landing_x-landing_size1+landing_size2,step_wid1+column_r-handrail_r/2,(step_num_down+1)*step_riser+handrail_hei,0,
+					(step_num_tot-1)*step_tread          ,step_wid1+column_r-handrail_r/2,step_num_tot*step_riser+handrail_hei     ,0,
+					(step_num_tot-1)*step_tread          ,step_wid1+column_r-handrail_r/2,step_num_tot*step_riser+board_offset     ,0,
+					landing_x-landing_size1+landing_size2,step_wid1+column_r-handrail_r/2,(step_num_down+1)*step_riser+board_offset,0,
+					landing_x-landing_size1+landing_size2,step_wid1+column_r+handrail_r/2,(step_num_down+1)*step_riser+handrail_hei,
+					(step_num_tot-1)*step_tread          ,step_wid1+column_r+handrail_r/2,step_num_tot*step_riser+handrail_hei     ,
+					(step_num_tot-1)*step_tread          ,step_wid1+column_r+handrail_r/2,step_num_tot*step_riser+board_offset     ,
+					landing_x-landing_size1+landing_size2,step_wid1+column_r+handrail_r/2,(step_num_down+1)*step_riser+board_offset
+				endif
+
+				!フロア踊り場
+					if switch_floor then
+						if i<floor_num-1 then
+							ruledsegmented 8,1+2+4+8+16+32,
+							floor_x-step_thi                ,step_wid1+column_r-handrail_r/2            ,floor_hei+handrail_hei,0,
+							floor_x+floor_size1+handrail_r/2,step_wid1+column_r-handrail_r/2            ,floor_hei+handrail_hei,0,
+							floor_x+floor_size1+handrail_r/2,step_wid1+landing_gap-column_r+handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x+floor_size1-floor_size2 ,step_wid1+landing_gap-column_r+handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x+floor_size1-floor_size2 ,step_wid1+landing_gap-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x+floor_size1-handrail_r/2,step_wid1+landing_gap-column_r-handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x+floor_size1-handrail_r/2,step_wid1+column_r+handrail_r/2            ,floor_hei+handrail_hei,0,
+							floor_x-step_thi                ,step_wid1+column_r+handrail_r/2            ,floor_hei+handrail_hei,0,
+							floor_x-step_thi                ,step_wid1+column_r-handrail_r/2            ,floor_hei+board_offset,
+							floor_x+floor_size1+handrail_r/2,step_wid1+column_r-handrail_r/2            ,floor_hei+board_offset,
+							floor_x+floor_size1+handrail_r/2,step_wid1+landing_gap-column_r+handrail_r/2,floor_hei+board_offset,
+							floor_x+floor_size1-floor_size2 ,step_wid1+landing_gap-column_r+handrail_r/2,floor_hei+board_offset,
+							floor_x+floor_size1-floor_size2 ,step_wid1+landing_gap-column_r-handrail_r/2,floor_hei+board_offset,
+							floor_x+floor_size1-handrail_r/2,step_wid1+landing_gap-column_r-handrail_r/2,floor_hei+board_offset,
+							floor_x+floor_size1-handrail_r/2,step_wid1+column_r+handrail_r/2            ,floor_hei+board_offset,
+							floor_x-step_thi                ,step_wid1+column_r+handrail_r/2            ,floor_hei+board_offset
+						else
+							ruledsegmented 6,1+2+4+8+16+32,
+							floor_x-step_thi                ,step_wid1+column_r-handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x+floor_size1+handrail_r/2,step_wid1+column_r-handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x+floor_size1+handrail_r/2,step_wid_tot+column_r          ,floor_hei+handrail_hei,0,
+							floor_x+floor_size1-handrail_r/2,step_wid_tot+column_r          ,floor_hei+handrail_hei,0,
+							floor_x+floor_size1-handrail_r/2,step_wid1+column_r+handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x-step_thi                ,step_wid1+column_r+handrail_r/2,floor_hei+handrail_hei,0,
+							floor_x-step_thi                ,step_wid1+column_r-handrail_r/2,floor_hei+board_offset,
+							floor_x+floor_size1+handrail_r/2,step_wid1+column_r-handrail_r/2,floor_hei+board_offset,
+							floor_x+floor_size1+handrail_r/2,step_wid_tot+column_r          ,floor_hei+board_offset,
+							floor_x+floor_size1-handrail_r/2,step_wid_tot+column_r          ,floor_hei+board_offset,
+							floor_x+floor_size1-handrail_r/2,step_wid1+column_r+handrail_r/2,floor_hei+board_offset,
+							floor_x-step_thi                ,step_wid1+column_r+handrail_r/2,floor_hei+board_offset
+						endif
+					else
+						ruledsegmented 4,1+2+4+8+16+32,
+						(step_num_tot-1)*step_tread,step_wid1+column_r-handrail_r/2,floor_hei+handrail_hei,0,
+						step_num_tot*step_tread    ,step_wid1+column_r-handrail_r/2,floor_hei+handrail_hei,0,
+						step_num_tot*step_tread    ,step_wid1+column_r-handrail_r/2,floor_hei+board_offset,0,
+						(step_num_tot-1)*step_tread,step_wid1+column_r-handrail_r/2,floor_hei+board_offset,0,
+						(step_num_tot-1)*step_tread,step_wid1+column_r+handrail_r/2,floor_hei+handrail_hei,
+						step_num_tot*step_tread    ,step_wid1+column_r+handrail_r/2,floor_hei+handrail_hei,
+						step_num_tot*step_tread    ,step_wid1+column_r+handrail_r/2,floor_hei+board_offset,
+						(step_num_tot-1)*step_tread,step_wid1+column_r+handrail_r/2,floor_hei+board_offset
+					endif
+
+				if i>1 then
+					ruledsegmented 4,1+2+4+8+16+32,
+					floor_x+floor_size1-floor_size2,step_wid1+landing_gap-column_r-handrail_r/2,step_riser+handrail_hei              ,0,
+					landing_x+step_thi             ,step_wid1+landing_gap-column_r-handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+					landing_x+step_thi             ,step_wid1+landing_gap-column_r-handrail_r/2,step_num_down*step_riser+board_offset,0,
+					floor_x+floor_size1-floor_size2,step_wid1+landing_gap-column_r-handrail_r/2,step_riser+board_offset              ,0,
+					floor_x+floor_size1-floor_size2,step_wid1+landing_gap-column_r+handrail_r/2,step_riser+handrail_hei              ,
+					landing_x+step_thi             ,step_wid1+landing_gap-column_r+handrail_r/2,step_num_down*step_riser+handrail_hei,
+					landing_x+step_thi             ,step_wid1+landing_gap-column_r+handrail_r/2,step_num_down*step_riser+board_offset,
+					floor_x+floor_size1-floor_size2,step_wid1+landing_gap-column_r+handrail_r/2,step_riser+board_offset              
+				endif
+
+				!中間踊り場
+					if i>1 then
+						ruledsegmented 8,1+2+4+8+16+32,
+						landing_x+step_thi                   ,step_wid1+landing_gap-column_r+handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+						landing_x-landing_size1-handrail_r/2 ,step_wid1+landing_gap-column_r+handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+						landing_x-landing_size1-handrail_r/2 ,step_wid1+column_r-handrail_r/2            ,step_num_down*step_riser+handrail_hei,0,
+						landing_x-landing_size1+landing_size2,step_wid1+column_r-handrail_r/2            ,step_num_down*step_riser+handrail_hei,0,
+						landing_x-landing_size1+landing_size2,step_wid1+column_r+handrail_r/2            ,step_num_down*step_riser+handrail_hei,0,
+						landing_x-landing_size1+handrail_r/2 ,step_wid1+column_r+handrail_r/2            ,step_num_down*step_riser+handrail_hei,0,
+						landing_x-landing_size1+handrail_r/2 ,step_wid1+landing_gap-column_r-handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+						landing_x+step_thi                   ,step_wid1+landing_gap-column_r-handrail_r/2,step_num_down*step_riser+handrail_hei,0,
+						landing_x+step_thi                   ,step_wid1+landing_gap-column_r+handrail_r/2,step_num_down*step_riser+board_offset,
+						landing_x-landing_size1-handrail_r/2 ,step_wid1+landing_gap-column_r+handrail_r/2,step_num_down*step_riser+board_offset,
+						landing_x-landing_size1-handrail_r/2 ,step_wid1+column_r-handrail_r/2            ,step_num_down*step_riser+board_offset,
+						landing_x-landing_size1+landing_size2,step_wid1+column_r-handrail_r/2            ,step_num_down*step_riser+board_offset,
+						landing_x-landing_size1+landing_size2,step_wid1+column_r+handrail_r/2            ,step_num_down*step_riser+board_offset,
+						landing_x-landing_size1+handrail_r/2 ,step_wid1+column_r+handrail_r/2            ,step_num_down*step_riser+board_offset,
+						landing_x-landing_size1+handrail_r/2 ,step_wid1+landing_gap-column_r-handrail_r/2,step_num_down*step_riser+board_offset,
+						landing_x+step_thi                   ,step_wid1+landing_gap-column_r-handrail_r/2,step_num_down*step_riser+board_offset
+					endif
+		endif
+	addz floor_hei
+	next i
+	del floor_num-1
+endgroup
+
+if switch_handrail1 then placegroup "handrail_outside"
+if switch_handrail2 then placegroup "handrail_inside"
+
+
+!=============================階段仕上げ
+!ノンスリップ
+group "step_nonslip"
+	material m_nonslip
+
+	if step_fin_type=1 then
+		for i=1 to step_num_sum
+			add _step_pos[i][x],_step_pos[i][y],_step_pos[i][z]
+			rotz _step_rtz[i]
+				add -step_nosing,ssr1_thi,step_riser
+					block nonslip_wid,step_wid1-ssr1_thi-ssr2_thi,nonslip_thi
+				del 1
+			del 2
+		next i
+	endif
+endgroup
+
+if step_fin_type=1 then
+	placegroup "step_nonslip"
+endif
+
+
+!タキステップ・タキシール
+group "step_taki"
+	if step_fin_type=2 then
+		!階段タキ
+		for i=1 to step_num_sum
+			add _step_pos[i][x],_step_pos[i][y],_step_pos[i][z]
+			rotz _step_rtz[i]
+				for j=1 to 3
+					!タキステップ
+					if j=1 then
+						material m_taki
+					
+						ruled_start=ssr1_thi+seal_thi
+						ruled_end=step_wid1-ssr2_thi-seal_thi
+					endif
+
+					!タキシール(両側)1
+					if j=2 then
+						material m_seal
+					
+						ruled_start=ssr1_thi
+						ruled_end=ssr1_thi+seal_thi
+					endif
+
+					!タキシール(両側)2
+					if j=3 then
+						material m_seal
+					
+						ruled_start=step_wid1-ssr2_thi-seal_thi
+						ruled_end=step_wid1-ssr2_thi
+					endif
+
+					!タキステップ蹴上
+					if _step_flag[i]=-1 then
+						gosub 202
+						ruledsegmented cross_section_num,1+2+4+8+16+32,
+						get(cross_section_num*4),
+						get(cross_section_num*3)
+
+						gosub 201
+						ruledsegmented cross_section_num,1+2+4+8+16+32,
+						get(cross_section_num*4),
+						get(cross_section_num*3)
+					endif
+
+					if _step_flag[i]=0 then
+						gosub 201
+						ruledsegmented cross_section_num,1+2+4+8+16+32,
+						get(cross_section_num*4),
+						get(cross_section_num*3)
+					endif
+
+					if _step_flag[i]=1 then
+						gosub 204
+						ruledsegmented cross_section_num,1+2+4+8+16+32,
+						get(cross_section_num*4),
+						get(cross_section_num*3)
+					endif
+
+					if _step_flag[i]=2 then
+						gosub 206
+						ruledsegmented cross_section_num,1+2+4+8+16+32,
+						get(cross_section_num*4),
+						get(cross_section_num*3)
+					endif
+				next j
+
+				!タキシール(継目)
+				material m_seal
+
+				gosub 205
+				ruledsegmented cross_section_num,1+2+4+8+16+32,
+				get(cross_section_num*4),
+				get(cross_section_num*3)
+			del 2
+		next i
+
+		!中間踊り場タキ
+		if switch_landing then
+			if stair_mode=2 then !廻り階段
+				add landing_x,0,step_num_down*step_riser
+				rotz 0
+			endif
+
+			if stair_mode=3 then !直接+廻り階段
+				add landing_x,step_wid_tot,step_num_down*step_riser+floor_hei
+				rotz 180
+			endif	
+				for i=1 to landing_num
+					!タキシート
+					material m_taki
+
+					extrude 9,0,0,taki_thi,1+2+4+16+32,
+					0,ssr1_thi+seal_thi,0,
+					landing_size1+landing_len-ssr1_thi-seal_thi,ssr1_thi+seal_thi,0,
+					landing_size1+landing_len-ssr1_thi-seal_thi,step_wid_tot-ssr1_thi-seal_thi,0,
+					landing_size1-landing_size2+seal_thi,step_wid_tot-ssr1_thi-seal_thi,0,
+					landing_size1-landing_size2+seal_thi,step_wid1+landing_gap+ssr2_thi+seal_thi,0,
+					landing_size1+ssr2_thi+seal_thi,step_wid1+landing_gap+ssr2_thi+seal_thi,0,
+					landing_size1+ssr2_thi+seal_thi,step_wid1-ssr2_thi-seal_thi,0,
+					0,step_wid1-ssr2_thi-seal_thi,0,
+					0,ssr1_thi+seal_thi,-1
+		
+					!タキシール
+					material m_seal
+		
+					tube 5,10,1+2+16+32,
+					0,0,0,
+					seal_thi,0,0,
+					seal_thi,taki_thi,0,
+					0,taki_thi,0,
+					0,0,0,
+					-1,ssr1_thi,0,0,
+					0,ssr1_thi,0,0,
+					landing_size1+landing_len-ssr1_thi,ssr1_thi,0,0,
+					landing_size1+landing_len-ssr1_thi,step_wid_tot-ssr1_thi,0,0,
+					landing_size1-landing_size2,step_wid_tot-ssr1_thi,0,0,
+					landing_size1-landing_size2,step_wid1+landing_gap+ssr2_thi,0,0,
+					landing_size1+ssr2_thi,step_wid1+landing_gap+ssr2_thi,0,0,
+					landing_size1+ssr2_thi,step_wid1-ssr2_thi,0,0,
+					0,step_wid1-ssr2_thi,0,0,
+					-1,step_wid1-ssr2_thi,0,0
+				addz floor_hei
+				next i
+				del landing_num
+			del 2
+		endif
+
+		!フロア踊り場
+		if switch_floor then
+			if stair_mode=1 then !直線階段
+				for j=1 to 2
+					if j=1 then
+						loop_index=floor_num-1
+						add floor_x,0,floor_hei
+						rotz 0
+					endif
+
+					if j=2 then
+						loop_index=floor_num-2
+						add 0,step_wid1,floor_hei
+						rotz 180
+					endif
+
+						for i=1 to loop_index
+							!タキシート
+							material m_taki
+
+							extrude 5,0,0,taki_thi,1+2+4+8+16+32,
+							0,ssr1_thi+seal_thi,0,
+							floor_len-ssr1_thi-seal_thi,ssr1_thi+seal_thi,0,
+							floor_len-ssr1_thi-seal_thi,step_wid1-ssr2_thi-seal_thi,0,
+							0,step_wid1-ssr2_thi-seal_thi,0,
+							0,ssr1_thi+seal_thi,0
+
+							!タキシール
+							material m_seal
+
+							tube 5,6,1+2+16+32,
+							0,0,0,
+							seal_thi,0,0,
+							seal_thi,taki_thi,0,
+							0,taki_thi,0,
+							0,0,0,
+							-1,ssr1_thi,0,0,
+							0,ssr1_thi,0,0,
+							floor_len-ssr1_thi,ssr1_thi,0,0,
+							floor_len-ssr1_thi,step_wid1-ssr2_thi,0,0,
+							0,step_wid1-ssr2_thi,0,0,
+							-1,step_wid1-ssr2_thi,0,0
+						addz floor_hei
+						next i
+						del loop_index
+					del 2
+				next j
+			endif
+
+			if stair_mode<>1 then
+				if stair_mode=2 then !廻り階段
+					add floor_x,0,floor_hei
+					rotz 0
+				endif
+
+				if stair_mode=3 then !直線+廻り階段
+					add floor_x,step_wid_tot,floor_hei
+					rotz 180
+				endif
+
+					for i=1 to floor_num-1
+						!タキシート
+						material m_taki
+
+						if i=floor_num-1 then
+							cross_section_num=7
+
+							put 0,step_wid_tot-ssr1_thi-seal_thi,0
+							put -floor_size1-floor_len+ssr1_thi+seal_thi,step_wid_tot-ssr1_thi-seal_thi,0
+							put -floor_size1-floor_len+ssr1_thi+seal_thi,ssr1_thi+seal_thi,0
+							put -floor_size1-ssr2_thi-seal_thi,ssr1_thi+seal_thi,0
+							put -floor_size1-ssr2_thi-seal_thi,step_wid1+landing_gap+ssr2_thi+seal_thi,0
+							put 0,step_wid1+landing_gap+ssr2_thi+seal_thi,0
+							put 0,step_wid_tot-ssr1_thi-seal_thi,0
+						else
+							cross_section_num=9
+
+							put 0,step_wid_tot-ssr1_thi-seal_thi,0
+							put -floor_size1-floor_len+ssr1_thi+seal_thi,step_wid_tot-ssr1_thi-seal_thi,0
+							put -floor_size1-floor_len+ssr1_thi+seal_thi,ssr1_thi+seal_thi,0
+							put -floor_size1+floor_size2-seal_thi,ssr1_thi+seal_thi,0
+							put -floor_size1+floor_size2-seal_thi,step_wid1-ssr2_thi-seal_thi,0
+							put -floor_size1-ssr2_thi-seal_thi,step_wid1-ssr2_thi-seal_thi,0
+							put -floor_size1-ssr2_thi-seal_thi,step_wid1+landing_gap+ssr2_thi+seal_thi,0
+							put 0,step_wid1+landing_gap+ssr2_thi+seal_thi,0
+							put 0,step_wid_tot-ssr1_thi-seal_thi,0
+						endif
+
+						extrude cross_section_num,0,0,taki_thi,1+2+4+8+16+32,
+						get(cross_section_num*3)
+
+						!タキシール
+						material m_seal
+
+						if i=floor_num-1 then
+							cross_section_num=6
+
+							put 0,step_wid_tot-ssr1_thi,0,0
+							put -floor_size1-floor_len+ssr1_thi,step_wid_tot-ssr1_thi,0,0
+							put -floor_size1-floor_len+ssr1_thi,ssr1_thi,0,0
+							put -floor_size1-ssr2_thi,ssr1_thi,0,0
+							put -floor_size1-ssr2_thi,step_wid1+landing_gap+ssr2_thi,0,0
+							put 0,step_wid1+landing_gap+ssr2_thi,0,0
+						else
+							cross_section_num=8
+
+							put 0,step_wid_tot-ssr1_thi,0,0
+							put -floor_size1-floor_len+ssr1_thi,step_wid_tot-ssr1_thi,0,0
+							put -floor_size1-floor_len+ssr1_thi,ssr1_thi,0,0
+							put -floor_size1+floor_size2,ssr1_thi,0,0
+							put -floor_size1+floor_size2,step_wid1-ssr2_thi,0,0
+							put -floor_size1-ssr2_thi,step_wid1-ssr2_thi,0,0
+							put -floor_size1-ssr2_thi,step_wid1+landing_gap+ssr2_thi,0,0
+							put 0,step_wid1+landing_gap+ssr2_thi,0,0
+						endif
+
+						tube 5,cross_section_num+2,1+2+16+32,
+						0,0,0,
+						seal_thi,0,0,
+						seal_thi,taki_thi,0,
+						0,taki_thi,0,
+						0,0,0,
+						1,step_wid_tot-ssr1_thi,0,0,					
+						get(cross_section_num*4),
+						1,step_wid1+landing_gap+ssr2_thi,0,0
+					addz floor_hei
+					next i
+					del floor_num-1
+
+				del 2
+			endif
+		endif
+	endif
+endgroup
+
+
+if step_fin_type=2 then
+	placegroup "step_taki"
+endif
+
+
+
+
+
+if turn_left_right then del 1
+if turn_up_down then del 1
+
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+!======================================================sub
+!=====================階段パーツ2
+100:
+	ruledsegmented{2} m_step,m_step,5,1+2+4+16+32,0,
+	0,ssr1_thi,0,0,m_step,
+	step_thi,ssr1_thi,0,0,m_step_riser_down,
+	step_thi,ssr1_thi,-step_plus_z,0,m_step_tread_down,
+	0,ssr1_thi,-step_plus_z,0,m_step,
+	0,ssr1_thi,0,-1,m_step,
+	0,step_wid-ssr2_thi,0,
+	step_thi,step_wid-ssr2_thi,0,
+	step_thi,step_wid-ssr2_thi,-step_plus_z,
+	0,step_wid-ssr2_thi,-step_plus_z,
+	0,step_wid-ssr2_thi,0
+return
+
+
+!=====================DYS-P階段断面
+101:
+	cross_section_num=8
+
+	put 0,ssr1_thi,0,0,m_step_riser
+	put -step_nosing,ssr1_thi,step_riser,0,m_step_tread
+	put step_tread,ssr1_thi,step_riser,0,m_step
+	put step_tread,ssr1_thi,step_riser-step_thi,0,m_step_tread_down
+	put step_thi-step_nosing*(step_riser-step_thi)/step_riser+step_t1_size,ssr1_thi,step_riser-step_thi,0,m_step_tread_down
+	put step_thi-step_nosing*(step_riser-step_thi)/step_riser+step_t1_size*sin(nosing_a),ssr1_thi,step_riser-step_thi-step_t1_size*cos(nosing_a),0,m_step_riser_down
+	put step_thi,ssr1_thi,0,0,m_step
+	put 0,ssr1_thi,0,-1,m_step
+	put 0,(step_wid-ssr2_thi),0
+	put -step_nosing,(step_wid-ssr2_thi),step_riser
+	put step_tread,(step_wid-ssr2_thi),step_riser
+	put step_tread,(step_wid-ssr2_thi),step_riser-step_thi
+	put step_thi-step_nosing*(step_riser-step_thi)/step_riser+step_t1_size,(step_wid-ssr2_thi),step_riser-step_thi
+	put step_thi-step_nosing*(step_riser-step_thi)/step_riser+step_t1_size*sin(nosing_a),(step_wid-ssr2_thi),step_riser-step_thi-step_t1_size*cos(nosing_a)
+	put step_thi,(step_wid-ssr2_thi),0
+	put 0,(step_wid-ssr2_thi),0
+return
+
+
+!=====================DYS-M階段断面
+102:
+	cross_section_num=7
+
+	put 0,ssr1_thi,0,0,m_step_riser
+	put -step_nosing,ssr1_thi,step_riser,0,m_step_tread
+	put step_tread,ssr1_thi,step_riser,0,m_step
+	put step_tread,ssr1_thi,step_riser-step_t2_size,0,m_step_tread_down
+	put step_thi-step_nosing*(step_riser-step_t2_size)/step_riser,ssr1_thi,step_riser-step_t2_size,0,m_step_riser_down
+	put step_thi,ssr1_thi,0,0,m_step
+	put 0,ssr1_thi,0,-1,m_step
+	put 0,(step_wid-ssr2_thi),0
+	put -step_nosing,(step_wid-ssr2_thi),step_riser
+	put step_tread,(step_wid-ssr2_thi),step_riser
+	put step_tread,(step_wid-ssr2_thi),step_riser-step_t2_size
+	put step_thi-step_nosing*(step_riser-step_t2_size)/step_riser,(step_wid-ssr2_thi),step_riser-step_t2_size
+	put step_thi,(step_wid-ssr2_thi),0
+	put 0,(step_wid-ssr2_thi),0
+return
+
+
+!=====================タキステップ・タキシール断面
+!蹴込部
+201:
+	cross_section_num=9
+
+	put -step_nosing,ruled_start,step_riser,0
+	put step_tread,ruled_start,step_riser,0
+	put step_tread-(step_nosing-(taki_size+seal_thi)*sin(nosing_a)),ruled_start,step_riser+(step_riser-(taki_size+seal_thi)*cos(nosing_a)),0
+	put step_tread-(step_nosing-(taki_size+seal_thi)*sin(nosing_a))-taki_thi*cos(nosing_a),ruled_start,step_riser+(step_riser-(taki_size+seal_thi)*cos(nosing_a))-taki_thi*sin(nosing_a),0
+	put step_tread-taki_thi/cos(nosing_a),ruled_start,step_riser+taki_thi,0
+	put -step_nosing-taki_thi/cos(nosing_a),ruled_start,step_riser+taki_thi,0
+	put -step_nosing+taki_size*sin(nosing_a)-taki_thi*cos(nosing_a),ruled_start,step_riser-taki_size*cos(nosing_a)-taki_thi*sin(nosing_a),0
+	put -step_nosing+taki_size*sin(nosing_a),ruled_start,step_riser-taki_size*cos(nosing_a),0
+	put -step_nosing,ruled_start,step_riser,0
+	put -step_nosing,ruled_end,step_riser
+	put step_tread,ruled_end,step_riser
+	put step_tread-(step_nosing-(taki_size+seal_thi)*sin(nosing_a)),ruled_end,step_riser+(step_riser-(taki_size+seal_thi)*cos(nosing_a))
+	put step_tread-(step_nosing-(taki_size+seal_thi)*sin(nosing_a))-taki_thi*cos(nosing_a),ruled_end,step_riser+(step_riser-(taki_size+seal_thi)*cos(nosing_a))-taki_thi*sin(nosing_a)
+	put step_tread-taki_thi/cos(nosing_a),ruled_end,step_riser+taki_thi
+	put -step_nosing-taki_thi/cos(nosing_a),ruled_end,step_riser+taki_thi
+	put -step_nosing+taki_size*sin(nosing_a)-taki_thi*cos(nosing_a),ruled_end,step_riser-taki_size*cos(nosing_a)-taki_thi*sin(nosing_a)
+	put -step_nosing+taki_size*sin(nosing_a),ruled_end,step_riser-taki_size*cos(nosing_a)
+	put -step_nosing,ruled_end,step_riser
+return
+
+206:
+	cross_section_num=7
+
+	put -step_nosing,ruled_start,step_riser,0
+	put step_tread,ruled_start,step_riser,0
+	put step_tread,ruled_start,step_riser+taki_thi,0
+	put -step_nosing-taki_thi/cos(nosing_a),ruled_start,step_riser+taki_thi,0
+	put -step_nosing+taki_size*sin(nosing_a)-taki_thi*cos(nosing_a),ruled_start,step_riser-taki_size*cos(nosing_a)-taki_thi*sin(nosing_a),0
+	put -step_nosing+taki_size*sin(nosing_a),ruled_start,step_riser-taki_size*cos(nosing_a),0
+	put -step_nosing,ruled_start,step_riser,0
+	put -step_nosing,ruled_end,step_riser
+	put step_tread,ruled_end,step_riser
+	put step_tread,ruled_end,step_riser+taki_thi
+	put -step_nosing-taki_thi/cos(nosing_a),ruled_end,step_riser+taki_thi
+	put -step_nosing+taki_size*sin(nosing_a)-taki_thi*cos(nosing_a),ruled_end,step_riser-taki_size*cos(nosing_a)-taki_thi*sin(nosing_a)
+	put -step_nosing+taki_size*sin(nosing_a),ruled_end,step_riser-taki_size*cos(nosing_a)
+	put -step_nosing,ruled_end,step_riser
+return
+
+
+!蹴上部
+202:
+	cross_section_num=5
+
+	put 0,ruled_start,seal_thi,0
+	put -(step_nosing-(taki_size+seal_thi)*sin(nosing_a)),ruled_start,(step_riser-(taki_size+seal_thi)*cos(nosing_a)),0
+	put -(step_nosing-(taki_size+seal_thi)*sin(nosing_a))-taki_thi*cos(nosing_a),ruled_start,(step_riser-(taki_size+seal_thi)*cos(nosing_a))-taki_thi*sin(nosing_a),0
+	put -taki_thi*cos(nosing_a),ruled_start,seal_thi,0
+	put 0,ruled_start,seal_thi,0
+	put 0,ruled_end,seal_thi
+	put -(step_nosing-(taki_size+seal_thi)*sin(nosing_a)),ruled_end,(step_riser-(taki_size+seal_thi)*cos(nosing_a))
+	put -(step_nosing-(taki_size+seal_thi)*sin(nosing_a))-taki_thi*cos(nosing_a),ruled_end,(step_riser-(taki_size+seal_thi)*cos(nosing_a))-taki_thi*sin(nosing_a)
+	put -taki_thi*cos(nosing_a),ruled_end,seal_thi
+	put 0,ruled_end,seal_thi
+return
+
+
+!踏面部
+203:
+	cross_section_num=7
+
+	put -step_nosing,ruled_start,step_riser,0
+	put step_tread,ruled_start,step_riser,0
+	put step_tread,ruled_start,step_riser+taki_thi,0
+	put -step_nosing-taki_thi/cos(nosing_a),ruled_start,step_riser+taki_thi,0
+	put -step_nosing+taki_size*sin(nosing_a)-taki_thi*cos(nosing_a),ruled_start,step_riser-taki_size*cos(nosing_a)-taki_thi*sin(nosing_a),0
+	put -step_nosing+taki_size*sin(nosing_a),ruled_start,step_riser-taki_size*cos(nosing_a),0
+	put -step_nosing,ruled_start,step_riser,0
+	put -step_nosing,ruled_end,step_riser
+	put step_tread,ruled_end,step_riser
+	put step_tread,ruled_end,step_riser+taki_thi
+	put -step_nosing-taki_thi/cos(nosing_a),ruled_end,step_riser+taki_thi
+	put -step_nosing+taki_size*sin(nosing_a)-taki_thi*cos(nosing_a),ruled_end,step_riser-taki_size*cos(nosing_a)-taki_thi*sin(nosing_a)
+	put -step_nosing+taki_size*sin(nosing_a),ruled_end,step_riser-taki_size*cos(nosing_a)
+	put -step_nosing,ruled_end,step_riser
+return
+
+
+!踊り場
+204:
+	cross_section_num=7
+
+	put -step_nosing,ruled_start,step_riser,0
+	put step_thi,ruled_start,step_riser,0
+	put step_thi,ruled_start,step_riser+taki_thi,0
+	put -step_nosing-taki_thi/cos(nosing_a),ruled_start,step_riser+taki_thi,0
+	put -step_nosing+taki_size*sin(nosing_a)-taki_thi*cos(nosing_a),ruled_start,step_riser-taki_size*cos(nosing_a)-taki_thi*sin(nosing_a),0
+	put -step_nosing+taki_size*sin(nosing_a),ruled_start,step_riser-taki_size*cos(nosing_a),0
+	put -step_nosing,ruled_start,step_riser,0
+	put -step_nosing,ruled_end,step_riser
+	put step_thi,ruled_end,step_riser
+	put step_thi,ruled_end,step_riser+taki_thi
+	put -step_nosing-taki_thi/cos(nosing_a),ruled_end,step_riser+taki_thi
+	put -step_nosing+taki_size*sin(nosing_a)-taki_thi*cos(nosing_a),ruled_end,step_riser-taki_size*cos(nosing_a)-taki_thi*sin(nosing_a)
+	put -step_nosing+taki_size*sin(nosing_a),ruled_end,step_riser-taki_size*cos(nosing_a)
+	put -step_nosing,ruled_end,step_riser
+return
+
+
+!タキシール(継目)
+205:
+	cross_section_num=5
+
+	put -(step_nosing-(taki_size+seal_thi)*sin(nosing_a)),ssr1_thi,(step_riser-(taki_size+seal_thi)*cos(nosing_a)),0
+	put -(step_nosing-taki_size*sin(nosing_a)),ssr1_thi,(step_riser-taki_size*cos(nosing_a)),0
+	put -(step_nosing-taki_size*sin(nosing_a))-taki_thi*cos(nosing_a),ssr1_thi,(step_riser-taki_size*cos(nosing_a))-taki_thi*sin(nosing_a),0
+	put -(step_nosing-(taki_size+seal_thi)*sin(nosing_a))-taki_thi*cos(nosing_a),ssr1_thi,(step_riser-(taki_size+seal_thi)*cos(nosing_a))-taki_thi*sin(nosing_a),0
+	put -(step_nosing-(taki_size+seal_thi)*sin(nosing_a)),ssr1_thi,(step_riser-(taki_size+seal_thi)*cos(nosing_a)),0
+	put -(step_nosing-(taki_size+seal_thi)*sin(nosing_a)),step_wid-ssr2_thi,(step_riser-(taki_size+seal_thi)*cos(nosing_a))
+	put -(step_nosing-taki_size*sin(nosing_a)),step_wid-ssr2_thi,(step_riser-taki_size*cos(nosing_a))
+	put -(step_nosing-taki_size*sin(nosing_a))-taki_thi*cos(nosing_a),step_wid-ssr2_thi,(step_riser-taki_size*cos(nosing_a))-taki_thi*sin(nosing_a)
+	put -(step_nosing-(taki_size+seal_thi)*sin(nosing_a))-taki_thi*cos(nosing_a),step_wid-ssr2_thi,(step_riser-(taki_size+seal_thi)*cos(nosing_a))-taki_thi*sin(nosing_a)
+	put -(step_nosing-(taki_size+seal_thi)*sin(nosing_a)),step_wid-ssr2_thi,(step_riser-(taki_size+seal_thi)*cos(nosing_a))
+return
+
+
+!廻り階段中間踊り場
+"廻り階段中間踊り場":
+	cross_section_num=9
+
+	put 0,ssr1_thi,ruled_start,0,m_ruled
+	put landing_size1+landing_len-ssr1_thi,ssr1_thi,ruled_start,0,m_ruled
+	put landing_size1+landing_len-ssr1_thi,step_wid_tot-ssr1_thi,ruled_start,0,m_ruled
+	put landing_size1-landing_size2,step_wid_tot-ssr1_thi,ruled_start,0,m_ruled
+	put landing_size1-landing_size2,step_wid1+landing_gap+ssr2_thi,ruled_start,0,m_ruled
+	put landing_size1+ssr2_thi,step_wid1+landing_gap+ssr2_thi,ruled_start,0,m_ruled
+	put landing_size1+ssr2_thi,step_wid1-ssr2_thi,ruled_start,0,m_ruled
+	put 0,step_wid1-ssr2_thi,ruled_start,0,m_ruled
+	put 0,ssr1_thi,ruled_start,0,m_ruled
+	put 0,ssr1_thi,ruled_end
+	put landing_size1+landing_len-ssr1_thi,ssr1_thi,ruled_end
+	put landing_size1+landing_len-ssr1_thi,step_wid_tot-ssr1_thi,ruled_end
+	put landing_size1-landing_size2,step_wid_tot-ssr1_thi,ruled_end
+	put landing_size1-landing_size2,step_wid1+landing_gap+ssr2_thi,ruled_end
+	put landing_size1+ssr2_thi,step_wid1+landing_gap+ssr2_thi,ruled_end
+	put landing_size1+ssr2_thi,step_wid1-ssr2_thi,ruled_end
+	put 0,step_wid1-ssr2_thi,ruled_end
+	put 0,ssr1_thi,ruled_end
+return
+
+
+!廻り階段フロア踊り場
+"廻り階段フロア踊り場":
+	cross_section_num=9
+
+	put 0,step_wid_tot-ssr1_thi,ruled_start,0,m_ruled
+	put -floor_size1-floor_len+ssr1_thi,step_wid_tot-ssr1_thi,ruled_start,0,m_ruled
+	put -floor_size1-floor_len+ssr1_thi,ssr1_thi,ruled_start,0,m_ruled
+	put -floor_size1+floor_size2,ssr1_thi,ruled_start,0,m_ruled
+	put -floor_size1+floor_size2,step_wid1-ssr2_thi,ruled_start,0,m_ruled
+	put -floor_size1-ssr2_thi,step_wid1-ssr2_thi,ruled_start,0,m_ruled
+	put -floor_size1-ssr2_thi,step_wid1+landing_gap+ssr2_thi,ruled_start,0,m_ruled
+	put 0,step_wid1+landing_gap+ssr2_thi,ruled_start,0,m_ruled
+	put 0,step_wid_tot-ssr1_thi,ruled_start,0,m_ruled
+	put 0,step_wid_tot-ssr1_thi,ruled_end
+	put -floor_size1-floor_len+ssr1_thi,step_wid_tot-ssr1_thi,ruled_end
+	put -floor_size1-floor_len+ssr1_thi,ssr1_thi,ruled_end
+	put -floor_size1+floor_size2,ssr1_thi,ruled_end
+	put -floor_size1+floor_size2,step_wid1-ssr2_thi,ruled_end
+	put -floor_size1-ssr2_thi,step_wid1-ssr2_thi,ruled_end
+	put -floor_size1-ssr2_thi,step_wid1+landing_gap+ssr2_thi,ruled_end
+	put 0,step_wid1+landing_gap+ssr2_thi,ruled_end
+	put 0,step_wid_tot-ssr1_thi,ruled_end
+return
+
+
+"最上階フロア踊り場":
+	cross_section_num=7
+
+	put 0,step_wid_tot-ssr1_thi,ruled_start,0,m_ruled
+	put -floor_size1-floor_len+ssr1_thi,step_wid_tot-ssr1_thi,ruled_start,0,m_ruled
+	put -floor_size1-floor_len+ssr1_thi,ssr1_thi,ruled_start,0,m_ruled
+	put -floor_size1-ssr2_thi,ssr1_thi,ruled_start,0,m_ruled
+	put -floor_size1-ssr2_thi,step_wid1+landing_gap+ssr2_thi,ruled_start,0,m_ruled
+	put 0,step_wid1+landing_gap+ssr2_thi,ruled_start,0,m_ruled
+	put 0,step_wid_tot-ssr1_thi,ruled_start,0,m_ruled
+
+	put 0,step_wid_tot-ssr1_thi,ruled_end
+	put -floor_size1-floor_len+ssr1_thi,step_wid_tot-ssr1_thi,ruled_end
+	put -floor_size1-floor_len+ssr1_thi,ssr1_thi,ruled_end
+	put -floor_size1-ssr2_thi,ssr1_thi,ruled_end
+	put -floor_size1-ssr2_thi,step_wid1+landing_gap+ssr2_thi,ruled_end
+	put 0,step_wid1+landing_gap+ssr2_thi,ruled_end
+	put 0,step_wid_tot-ssr1_thi,ruled_end
+return
+
+
+"tube断面":
+    for j=1 to SDresol
+        put tube_r*cos((1-j)*360/SDresol),tube_r*sin((1-j)*360/SDresol),1
+    next j
+    put tube_r,0,1
+return
+
+

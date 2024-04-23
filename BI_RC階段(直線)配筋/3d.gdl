@@ -1,0 +1,561 @@
+hotspot 0,0,0
+hotspot 0,stairWid,0
+
+
+!====================================================================================階段
+group "stair_part1"
+    !材質
+    top_material=stairMat
+    bottom_material=stairMat
+    mat1=stairMat
+    mat2=stairMat
+    mat3=stairMat
+
+    !躯体
+    for i=1 to stairNum
+        ruledsegmented{2} top_material,bottom_material,3,1+2+4+8+16+32,0,
+        0           ,stairStart,0                  ,0,mat1,
+        stairTread  ,stairStart,stairRiser         ,0,mat2,
+        -stairNosing,stairStart,stairRiser-stairRat,0,mat3,
+        0           ,stairEnd  ,0                  ,
+        stairTread  ,stairEnd  ,stairRiser         ,
+        -stairNosing,stairEnd  ,stairRiser-stairRat
+    add stairTread,0,stairRiser
+    next i
+    del stairNum
+endgroup
+
+
+group "stair_part2"
+    !材質
+    top_material=stairMat
+    bottom_material=stairMat
+    mat1=stairMat
+    mat2=stairMat
+    mat3=stairMat
+    mat4=stairMat
+
+    !躯体
+    if switchLanding then
+        ruledsegmented{2} top_material,bottom_material,4,1+2+4+8+16+32,0,
+        0                                           ,stairStart,0                             ,0,mat1,
+        stairNum*stairTread                         ,stairStart,stairNum*stairRiser           ,0,mat2,
+        (stairNum*stairRiser-landingThi-equB1)/equK1,stairStart,stairNum*stairRiser-landingThi,0,mat3,
+        -equB1/equK1                                ,stairStart,0                             ,0,mat4,
+        0                                           ,stairEnd  ,0                             ,
+        stairNum*stairTread                         ,stairEnd  ,stairNum*stairRiser           ,
+        (stairNum*stairRiser-landingThi-equB1)/equK1,stairEnd  ,stairNum*stairRiser-landingThi,
+        -equB1/equK1                                ,stairEnd  ,0
+    else
+        ruledsegmented{2} top_material,bottom_material,4,1+2+4+8+16+32,0,
+        0                  ,stairStart,0                                ,0,mat1,
+        stairNum*stairTread,stairStart,stairNum*stairRiser              ,0,mat2,
+        stairNum*stairTread,stairStart,equK1*(stairNum*stairTread)+equB1,0,mat3,
+        -equB1/equK1       ,stairStart,0                                ,0,mat1,
+        0                  ,stairEnd  ,0                                ,
+        stairNum*stairTread,stairEnd  ,stairNum*stairRiser              ,
+        stairNum*stairTread,stairEnd  ,equK1*(stairNum*stairTread)+equB1,
+        -equB1/equK1       ,stairEnd  ,0
+    endif
+endgroup
+
+
+!====================================================================================踊り場
+group "landing"
+    !材質
+    top_material=stairMat
+    bottom_material=stairMat
+    mat1=stairMat
+    mat2=stairMat
+    mat3=stairMat
+    mat4=stairMat
+
+    !躯体
+    if switchLanding then
+        ruledsegmented{2} top_material,bottom_material,4,1+2+4+8+16+32,0,
+        stairNum*stairTread                         ,stairStart,stairNum*stairRiser                          ,0,mat1,
+        stairNum*stairTread+landingDep              ,stairStart,stairNum*stairRiser-landingDep*landingRat/100,0,mat2,
+        stairNum*stairTread+landingDep              ,stairStart,stairNum*stairRiser-landingThi               ,0,mat3,
+        (stairNum*stairRiser-landingThi-equB1)/equK1,stairStart,stairNum*stairRiser-landingThi               ,0,mat4,
+        stairNum*stairTread                         ,stairEnd  ,stairNum*stairRiser                          ,
+        stairNum*stairTread+landingDep              ,stairEnd  ,stairNum*stairRiser-landingDep*landingRat/100,
+        stairNum*stairTread+landingDep              ,stairEnd  ,stairNum*stairRiser-landingThi               ,
+        (stairNum*stairRiser-landingThi-equB1)/equK1,stairEnd  ,stairNum*stairRiser-landingThi               
+    endif
+endgroup
+
+stair_body1 = addgroup ("stair_part1","stair_part2")
+stair_body2 = addgroup (stair_body1,"landing")
+placegroup stair_body2
+
+
+!====================================================================================ノンスリップ
+!group "nonslip"
+!    !材質
+!    material nonslipFinMat
+!
+!    !ノンスリップ
+!    if switchFin and stepFinType=1 then
+!        for i=1 to stairNum
+!            add -stairNosing,stairStart,stairRiser-stairRat
+!            roty -atn(stairRat/(stairTread+stairNosing))
+!                block nonslipWid,stairEnd-stairStart,0.005
+!            del 2
+!        add stairTread,0,stairRiser
+!        next i
+!        del stairNum
+!    endif
+!endgroup
+!
+!placegroup "nonslip"
+
+
+!====================================================================================立上り
+!外部立上り
+group "handrail1"
+    !材質
+    top_material=stairMat
+    bottom_material=stairMat
+    mat1=stairMat
+    mat2=stairMat
+    mat3=stairMat
+    mat4=stairMat
+    mat5=stairMat
+    mat6=stairMat
+    mat7=stairMat
+
+    !躯体
+    if switchRail1 then
+        if switchLanding then
+            ruledsegmented{2} top_material,bottom_material,7,1+2+4+8+16+32,0,
+            -stairTread                                     ,0       ,stairRailHei                      ,0,mat1,
+            -stairTread                                     ,0       ,0                                 ,0,mat2,
+            -equB1/equK1                                    ,0       ,0                                 ,0,mat3,
+            (stairNum*stairRiser-landingThi-equB1)/equK1    ,0       ,stairNum*stairRiser-landingThi    ,0,mat4,
+            stairNum*stairTread+landingDep                  ,0       ,stairNum*stairRiser-landingThi    ,0,mat5,
+            stairNum*stairTread+landingDep                  ,0       ,stairNum*stairRiser+landingRailHei,0,mat6,
+            (stairNum*stairRiser+landingRailHei-equB2)/equK2,0       ,stairNum*stairRiser+landingRailHei,0,mat7,
+            -stairTread                                     ,rail1Wid,stairRailHei                      ,
+            -stairTread                                     ,rail1Wid,0                                 ,
+            -equB1/equK1                                    ,rail1Wid,0                                 ,
+            (stairNum*stairRiser-landingThi-equB1)/equK1    ,rail1Wid,stairNum*stairRiser-landingThi    ,
+            stairNum*stairTread+landingDep                  ,rail1Wid,stairNum*stairRiser-landingThi    ,
+            stairNum*stairTread+landingDep                  ,rail1Wid,stairNum*stairRiser+landingRailHei,
+            (stairNum*stairRiser+landingRailHei-equB2)/equK2,rail1Wid,stairNum*stairRiser+landingRailHei
+        else
+            ruledsegmented{2} top_material,bottom_material,6,1+2+4+8+16+32,0,
+            -stairTread                                   ,0       ,stairRailHei                     ,0,mat1,
+            -stairTread                                   ,0       ,0                                ,0,mat2,
+            -equB1/equK1                                  ,0       ,0                                ,0,mat3,
+            stairNum*stairTread                           ,0       ,equK1*(stairNum*stairTread)+equB1,0,mat5,
+            stairNum*stairTread                           ,0       ,stairNum*stairRiser+stairRailHei ,0,mat6,
+            (stairNum*stairRiser+stairRailHei-equB2)/equK2,0       ,stairNum*stairRiser+stairRailHei ,0,mat7,
+            -stairTread                                   ,rail1Wid,stairRailHei                     ,
+            -stairTread                                   ,rail1Wid,0                                ,
+            -equB1/equK1                                  ,rail1Wid,0                                ,
+            stairNum*stairTread                           ,rail1Wid,equK1*(stairNum*stairTread)+equB1,
+            stairNum*stairTread                           ,rail1Wid,stairNum*stairRiser+stairRailHei ,
+            (stairNum*stairRiser+stairRailHei-equB2)/equK2,rail1Wid,stairNum*stairRiser+stairRailHei 
+        endif
+    endif
+endgroup
+
+if switchRail1 then
+    placegroup "handrail1"
+endif
+
+
+!内部立上り
+group "handrail2"
+    !材質
+    top_material=stairMat
+    bottom_material=stairMat
+    mat1=stairMat
+    mat2=stairMat
+    mat3=stairMat
+    mat4=stairMat
+    mat5=stairMat
+    mat6=stairMat
+    mat7=stairMat
+
+    !躯体
+    if switchRail2 then
+        if switchLanding then
+            ruledsegmented{2} top_material,bottom_material,7,1+2+4+8+16+32,0,
+            -stairTread                                     ,stairWid         ,stairRailHei                      ,0,mat1,
+            -stairTread                                     ,stairWid         ,0                                 ,0,mat2,
+            -equB1/equK1                                    ,stairWid         ,0                                 ,0,mat3,
+            (stairNum*stairRiser-landingThi-equB1)/equK1    ,stairWid         ,stairNum*stairRiser-landingThi    ,0,mat4,
+            stairNum*stairTread+landingDep                  ,stairWid         ,stairNum*stairRiser-landingThi    ,0,mat5,
+            stairNum*stairTread+landingDep                  ,stairWid         ,stairNum*stairRiser+landingRailHei,0,mat6,
+            (stairNum*stairRiser+landingRailHei-equB2)/equK2,stairWid         ,stairNum*stairRiser+landingRailHei,0,mat7,
+            -stairTread                                     ,stairWid-rail2Wid,stairRailHei                      ,
+            -stairTread                                     ,stairWid-rail2Wid,0                                 ,
+            -equB1/equK1                                    ,stairWid-rail2Wid,0                                 ,
+            (stairNum*stairRiser-landingThi-equB1)/equK1    ,stairWid-rail2Wid,stairNum*stairRiser-landingThi    ,
+            stairNum*stairTread+landingDep                  ,stairWid-rail2Wid,stairNum*stairRiser-landingThi    ,
+            stairNum*stairTread+landingDep                  ,stairWid-rail2Wid,stairNum*stairRiser+landingRailHei,
+            (stairNum*stairRiser+landingRailHei-equB2)/equK2,stairWid-rail2Wid,stairNum*stairRiser+landingRailHei
+        else
+            ruledsegmented{2} top_material,bottom_material,6,1+2+4+8+16+32,0,
+            -stairTread                                   ,stairWid         ,stairRailHei                     ,0,mat1,
+            -stairTread                                   ,stairWid         ,0                                ,0,mat2,
+            -equB1/equK1                                  ,stairWid         ,0                                ,0,mat3,
+            stairNum*stairTread                           ,stairWid         ,equK1*(stairNum*stairTread)+equB1,0,mat5,
+            stairNum*stairTread                           ,stairWid         ,stairNum*stairRiser+stairRailHei ,0,mat6,
+            (stairNum*stairRiser+stairRailHei-equB2)/equK2,stairWid         ,stairNum*stairRiser+stairRailHei ,0,mat7,
+            -stairTread                                   ,stairWid-rail2Wid,stairRailHei                     ,
+            -stairTread                                   ,stairWid-rail2Wid,0                                ,
+            -equB1/equK1                                  ,stairWid-rail2Wid,0                                ,
+            stairNum*stairTread                           ,stairWid-rail2Wid,equK1*(stairNum*stairTread)+equB1,
+            stairNum*stairTread                           ,stairWid-rail2Wid,stairNum*stairRiser+stairRailHei ,
+            (stairNum*stairRiser+stairRailHei-equB2)/equK2,stairWid-rail2Wid,stairNum*stairRiser+stairRailHei 
+        endif
+    endif
+endgroup
+
+if switchRail2 then
+    placegroup "handrail2"
+endif
+
+
+!====================================================================================鉄筋
+!=====================================流し筋
+if ngs_num>0 then
+	for i=1 to ngs_num
+		!頂点
+		if disPOINT then
+			for j=1 to ngs_point[i]
+				hotspot ngs_pos[i][3*j-2],ngs_pos[i][3*j-1],ngs_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and ngs_point[i]>1 then
+			pen ngs_pen
+	
+			for j=1 to ngs_point[i]-1
+				lin_ ngs_pos[i][3*j-2],ngs_pos[i][3*j-1],ngs_pos[i][3*j],ngs_pos[i][3*(j+1)-2],ngs_pos[i][3*(j+1)-1],ngs_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and ngs_point[i]>1 then
+			material ngs_mat
+	
+			tube_r=ngs_r
+			gosub "鉄筋断面計算sub"
+	
+			put 2*ngs_pos[i][1]-ngs_pos[i][4],2*ngs_pos[i][2]-ngs_pos[i][5],2*ngs_pos[i][3]-ngs_pos[i][6],0
+			for j=1 to ngs_point[i]
+				put ngs_pos[i][3*j-2],ngs_pos[i][3*j-1],ngs_pos[i][3*j],0
+			next j
+			put 2*ngs_pos[i][3*ngs_point[i]-2]-ngs_pos[i][3*ngs_point[i]-5],2*ngs_pos[i][3*ngs_point[i]-1]-\
+				ngs_pos[i][3*ngs_point[i]-4],2*ngs_pos[i][3*ngs_point[i]]-ngs_pos[i][3*ngs_point[i]-3],0
+	
+			tube SDresol+1,ngs_point[i]+2,1+2+16+32+64,
+			get (nsp)
+		endif
+	next i
+endif
+
+
+!=====================================稲妻筋
+if inzm_num>0 then
+	for i=1 to inzm_num
+		!頂点
+		if disPOINT then
+			for j=1 to inzm_point[i]
+				hotspot inzm_pos[i][3*j-2],inzm_pos[i][3*j-1],inzm_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and inzm_point[i]>1 then
+			pen inzm_pen
+	
+			for j=1 to inzm_point[i]-1
+				lin_ inzm_pos[i][3*j-2],inzm_pos[i][3*j-1],inzm_pos[i][3*j],inzm_pos[i][3*(j+1)-2],inzm_pos[i][3*(j+1)-1],inzm_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and inzm_point[i]>1 then
+			material inzm_mat
+	
+			tube_r=inzm_r
+			gosub "鉄筋断面計算sub"
+	
+			put 2*inzm_pos[i][1]-inzm_pos[i][4],2*inzm_pos[i][2]-inzm_pos[i][5],2*inzm_pos[i][3]-inzm_pos[i][6],0
+			for j=1 to inzm_point[i]
+				put inzm_pos[i][3*j-2],inzm_pos[i][3*j-1],inzm_pos[i][3*j],0
+			next j
+			put 2*inzm_pos[i][3*inzm_point[i]-2]-inzm_pos[i][3*inzm_point[i]-5],2*inzm_pos[i][3*inzm_point[i]-1]-\
+				inzm_pos[i][3*inzm_point[i]-4],2*inzm_pos[i][3*inzm_point[i]]-inzm_pos[i][3*inzm_point[i]-3],0
+	
+			tube SDresol+1,inzm_point[i]+2,1+2+16+32+64,
+			get (nsp)
+		endif
+	next i
+endif
+
+
+!=====================================段押え筋
+if dose_num>0 then
+	for i=1 to dose_num
+		!頂点
+		if disPOINT then
+			for j=1 to dose_point[i]
+				hotspot dose_pos[i][3*j-2],dose_pos[i][3*j-1],dose_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and dose_point[i]>1 then
+			pen dose_pen
+	
+			for j=1 to dose_point[i]-1
+				lin_ dose_pos[i][3*j-2],dose_pos[i][3*j-1],dose_pos[i][3*j],dose_pos[i][3*(j+1)-2],dose_pos[i][3*(j+1)-1],dose_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and dose_point[i]>1 then
+			material dose_mat
+	
+			tube_r=dose_r
+			gosub "鉄筋断面計算sub"
+	
+			put 2*dose_pos[i][1]-dose_pos[i][4],2*dose_pos[i][2]-dose_pos[i][5],2*dose_pos[i][3]-dose_pos[i][6],0
+			for j=1 to dose_point[i]
+				put dose_pos[i][3*j-2],dose_pos[i][3*j-1],dose_pos[i][3*j],0
+			next j
+			put 2*dose_pos[i][3*dose_point[i]-2]-dose_pos[i][3*dose_point[i]-5],2*dose_pos[i][3*dose_point[i]-1]-\
+				dose_pos[i][3*dose_point[i]-4],2*dose_pos[i][3*dose_point[i]]-dose_pos[i][3*dose_point[i]-3],0
+	
+			tube SDresol+1,dose_point[i]+2,1+2+16+32+64,
+			get (nsp)
+		endif
+	next i
+endif
+
+
+!=====================================段鼻筋
+if dbn_num>0 then
+	for i=1 to dbn_num
+		!頂点
+		if disPOINT then
+			for j=1 to dbn_point[i]
+				hotspot dbn_pos[i][3*j-2],dbn_pos[i][3*j-1],dbn_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and dbn_point[i]>1 then
+			pen dbn_pen
+	
+			for j=1 to dbn_point[i]-1
+				lin_ dbn_pos[i][3*j-2],dbn_pos[i][3*j-1],dbn_pos[i][3*j],dbn_pos[i][3*(j+1)-2],dbn_pos[i][3*(j+1)-1],dbn_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and dbn_point[i]>1 then
+			material dbn_mat
+	
+			tube_r=dbn_r
+			gosub "鉄筋断面計算sub"
+	
+			put 2*dbn_pos[i][1]-dbn_pos[i][4],2*dbn_pos[i][2]-dbn_pos[i][5],2*dbn_pos[i][3]-dbn_pos[i][6],0
+			for j=1 to dbn_point[i]
+				put dbn_pos[i][3*j-2],dbn_pos[i][3*j-1],dbn_pos[i][3*j],0
+			next j
+			put 2*dbn_pos[i][3*dbn_point[i]-2]-dbn_pos[i][3*dbn_point[i]-5],2*dbn_pos[i][3*dbn_point[i]-1]-\
+				dbn_pos[i][3*dbn_point[i]-4],2*dbn_pos[i][3*dbn_point[i]]-dbn_pos[i][3*dbn_point[i]-3],0
+	
+			tube SDresol+1,dbn_point[i]+2,1+2+16+32+64,
+			get (nsp)
+		endif
+	next i
+endif
+
+
+!=====================================踊り場配筋
+!横筋
+if lhor_num>0 then
+	for i=1 to lhor_num
+		!頂点
+		if disPOINT then
+			for j=1 to lhor_point[i]
+				hotspot lhor_pos[i][3*j-2],lhor_pos[i][3*j-1],lhor_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and lhor_point[i]>1 then
+			pen lhor_pen
+	
+			for j=1 to lhor_point[i]-1
+				lin_ lhor_pos[i][3*j-2],lhor_pos[i][3*j-1],lhor_pos[i][3*j],lhor_pos[i][3*(j+1)-2],lhor_pos[i][3*(j+1)-1],lhor_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and lhor_point[i]>1 then
+			material lhor_mat
+	
+			tube_r=lhor_r
+			gosub "鉄筋断面計算sub"
+	
+			put 2*lhor_pos[i][1]-lhor_pos[i][4],2*lhor_pos[i][2]-lhor_pos[i][5],2*lhor_pos[i][3]-lhor_pos[i][6],0
+			for j=1 to lhor_point[i]
+				put lhor_pos[i][3*j-2],lhor_pos[i][3*j-1],lhor_pos[i][3*j],0
+			next j
+			put 2*lhor_pos[i][3*lhor_point[i]-2]-lhor_pos[i][3*lhor_point[i]-5],2*lhor_pos[i][3*lhor_point[i]-1]-\
+				lhor_pos[i][3*lhor_point[i]-4],2*lhor_pos[i][3*lhor_point[i]]-lhor_pos[i][3*lhor_point[i]-3],0
+	
+			tube SDresol+1,lhor_point[i]+2,1+2+16+32+64,
+			get (nsp)
+		endif
+	next i
+endif
+
+!縦筋
+if lver_num>0 then
+	for i=1 to lver_num
+		!頂点
+		if disPOINT then
+			for j=1 to lver_point[i]
+				hotspot lver_pos[i][3*j-2],lver_pos[i][3*j-1],lver_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and lver_point[i]>1 then
+			pen lver_pen[i]
+	
+			for j=1 to lver_point[i]-1
+				lin_ lver_pos[i][3*j-2],lver_pos[i][3*j-1],lver_pos[i][3*j],lver_pos[i][3*(j+1)-2],lver_pos[i][3*(j+1)-1],lver_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and lver_point[i]>1 then
+			material lver_mat[i]
+	
+			tube_r=lver_r[i]
+			gosub "鉄筋断面計算sub"
+	
+			put 2*lver_pos[i][1]-lver_pos[i][4],2*lver_pos[i][2]-lver_pos[i][5],2*lver_pos[i][3]-lver_pos[i][6],0
+			for j=1 to lver_point[i]
+				put lver_pos[i][3*j-2],lver_pos[i][3*j-1],lver_pos[i][3*j],0
+			next j
+			put 2*lver_pos[i][3*lver_point[i]-2]-lver_pos[i][3*lver_point[i]-5],2*lver_pos[i][3*lver_point[i]-1]-\
+				lver_pos[i][3*lver_point[i]-4],2*lver_pos[i][3*lver_point[i]]-lver_pos[i][3*lver_point[i]-3],0
+	
+			tube SDresol+1,lver_point[i]+2,1+2+16+32+64,
+			get (nsp)
+		endif
+	next i
+endif
+
+
+!=====================================立上り配筋
+!縦筋
+if pver_num>0 then
+	for i=1 to pver_num
+		!頂点
+		if disPOINT then
+			for j=1 to pver_point[i]
+				hotspot pver_pos[i][3*j-2],pver_pos[i][3*j-1],pver_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and pver_point[i]>1 then
+			pen pver_pen
+	
+			for j=1 to pver_point[i]-1
+				lin_ pver_pos[i][3*j-2],pver_pos[i][3*j-1],pver_pos[i][3*j],pver_pos[i][3*(j+1)-2],pver_pos[i][3*(j+1)-1],pver_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and pver_point[i]>1 then
+			material pver_mat
+	
+			tube_r=pver_r
+			gosub "鉄筋断面計算sub"
+	
+			put 2*pver_pos[i][1]-pver_pos[i][4],2*pver_pos[i][2]-pver_pos[i][5],2*pver_pos[i][3]-pver_pos[i][6],0
+			for j=1 to pver_point[i]
+				put pver_pos[i][3*j-2],pver_pos[i][3*j-1],pver_pos[i][3*j],0
+			next j
+			put 2*pver_pos[i][3*pver_point[i]-2]-pver_pos[i][3*pver_point[i]-5],2*pver_pos[i][3*pver_point[i]-1]-\
+				pver_pos[i][3*pver_point[i]-4],2*pver_pos[i][3*pver_point[i]]-pver_pos[i][3*pver_point[i]-3],0
+	
+			tube SDresol+1,pver_point[i]+2,1+2+16+32+64,
+			get (nsp)
+		endif
+	next i
+endif
+
+
+!横筋
+if phor_num>0 then
+	for i=1 to phor_num
+		!頂点
+		if disPOINT then
+			for j=1 to phor_point[i]
+				hotspot phor_pos[i][3*j-2],phor_pos[i][3*j-1],phor_pos[i][3*j]
+			next j
+		endif
+
+		!中心線
+		if disCL and phor_point[i]>1 then
+			pen phor_pen[i]
+	
+			for j=1 to phor_point[i]-1
+				lin_ phor_pos[i][3*j-2],phor_pos[i][3*j-1],phor_pos[i][3*j],phor_pos[i][3*(j+1)-2],phor_pos[i][3*(j+1)-1],phor_pos[i][3*(j+1)]
+			next j
+		endif
+
+		!鉄筋
+		if disSD and phor_point[i]>1 then
+			material phor_mat[i]
+	
+			tube_r=phor_r[i]
+			gosub "鉄筋断面計算sub"
+	
+			put 2*phor_pos[i][1]-phor_pos[i][4],2*phor_pos[i][2]-phor_pos[i][5],2*phor_pos[i][3]-phor_pos[i][6],0
+			for j=1 to phor_point[i]
+				put phor_pos[i][3*j-2],phor_pos[i][3*j-1],phor_pos[i][3*j],0
+			next j
+			put 2*phor_pos[i][3*phor_point[i]-2]-phor_pos[i][3*phor_point[i]-5],2*phor_pos[i][3*phor_point[i]-1]-\
+				phor_pos[i][3*phor_point[i]-4],2*phor_pos[i][3*phor_point[i]]-phor_pos[i][3*phor_point[i]-3],0
+	
+			tube SDresol+1,phor_point[i]+2,1+2+16+32+64,
+			get (nsp)
+		endif
+	next i
+endif
+
+
+
+
+
+
+end
+
+
+
+!==========================================鉄筋断面座標リスト
+"鉄筋断面計算sub":
+
+	for t=1 to SDresol
+		put tube_r*cos((1-t)*360/SDresol),tube_r*sin((1-t)*360/SDresol),0
+	next t
+	
+	put tube_r,0,0
+
+return

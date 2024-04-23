@@ -1,0 +1,993 @@
+!====================================================================布基礎躯体
+hotspot vertexPos[1][x],vertexPos[1][y],0
+hotspot vertexPos[2][x],vertexPos[2][y],0
+
+for i=1 to 2
+    hotspot 0              ,vertexPos[i][y],0,code,vertexPos[i][x],1+128:code=code+1
+    hotspot vertexPos[i][x],vertexPos[i][y],0,code,vertexPos[i][x],2    :code=code+1
+    hotspot -1             ,vertexPos[i][y],0,code,vertexPos[i][x],3    :code=code+1
+
+    hotspot vertexPos[i][x],0              ,0,code,vertexPos[i][y],1+128:code=code+1
+    hotspot vertexPos[i][x],vertexPos[i][y],0,code,vertexPos[i][y],2    :code=code+1
+    hotspot vertexPos[i][x],-1             ,0,code,vertexPos[i][y],3    :code=code+1
+next i
+
+!lin_ vertexPos[1][x],vertexPos[1][y],0,vertexPos[2][x],vertexPos[2][y],0
+hotline vertexPos[1][x],vertexPos[1][y],0,vertexPos[2][x],vertexPos[2][y],0,code:code=code+1
+
+group "basePart"
+    material footingMat
+
+    tube 5,4,1+2+4+8+16+32,
+    baseWid/2,footingLevel-footingHei,0,
+    baseWid/2,footingLevel-footingHei-baseHei,0,
+    -baseWid/2,footingLevel-footingHei-baseHei,0,
+    -baseWid/2,footingLevel-footingHei,0,
+    baseWid/2,footingLevel-footingHei,0,
+    2*_basePos[1][x]-_basePos[2][x],2*_basePos[1][y]-_basePos[2][y],0,0,
+    _basePos[1][x],_basePos[1][y],0,0,
+    _basePos[2][x],_basePos[2][y],0,0,
+    2*_basePos[2][x]-_basePos[1][x],2*_basePos[2][y]-_basePos[1][y],0,0
+endgroup
+
+
+group "footingPart"
+    material footingMat
+
+    tube 5,4,1+2+4+8+16+32,
+    footingWid/2,footingLevel,0,
+    footingWid/2,footingLevel-footingHei,0,
+    -footingWid/2,footingLevel-footingHei,0,
+    -footingWid/2,footingLevel,0,
+    footingWid/2,footingLevel,0,
+    2*_footingPos[1][x]-_footingPos[2][x],2*_footingPos[1][y]-_footingPos[2][y],0,0,
+    _footingPos[1][x],_footingPos[1][y],0,0,
+    _footingPos[2][x],_footingPos[2][y],0,0,
+    2*_footingPos[2][x]-_footingPos[1][x],2*_footingPos[2][y]-_footingPos[1][y],0,0
+endgroup
+
+
+group "footingOp"
+    material footingMat
+
+    add vertexPos[1][x],vertexPos[1][y],0
+    rotz vertexRtz
+        for i=1 to opNum
+            add opPos[i][1],0,downLevel+opPos[i][2]
+                if opShape[i]=1 then
+                    rotx 90
+                    add -opSize[i][1]/2,-opSize[i][2]/2,-footingWid/2
+                        block opSize[i][1],opSize[i][2],footingWid
+                    del 2
+                else
+                    rotx 90
+                    addz -footingWid/2
+                        cylind footingWid,opSize[i][1]/2
+                    del 2
+                endif
+            del 1
+        next i
+    del 2
+endgroup
+
+footingPart= subgroup ("footingPart","footingOp")
+footingBody= addgroup ("basePart",footingPart)
+
+if disFooting then
+    placegroup footingBody
+endif
+
+add vertexPos[1][x],vertexPos[1][y],0
+rotz vertexRtz
+    !ベース
+    hotspot -startBaseWid/2,-baseWid/2,downLevel
+    hotspot -startBaseWid/2,baseWid/2 ,downLevel
+    hotspot -startBaseWid/2,-baseWid/2,downLevel+baseHei
+    hotspot -startBaseWid/2,baseWid/2 ,downLevel+baseHei
+
+    hotspot vertexLen+endBaseWid/2,-baseWid/2,downLevel
+    hotspot vertexLen+endBaseWid/2,baseWid/2 ,downLevel
+    hotspot vertexLen+endBaseWid/2,-baseWid/2,downLevel+baseHei
+    hotspot vertexLen+endBaseWid/2,baseWid/2 ,downLevel+baseHei
+
+    !基礎梁
+    hotspot -startFootingWid/2,-footingWid/2,downLevel+baseHei
+    hotspot -startFootingWid/2,footingWid/2 ,downLevel+baseHei
+    hotspot -startFootingWid/2,-footingWid/2,footingLevel
+    hotspot -startFootingWid/2,footingWid/2 ,footingLevel
+
+    hotspot vertexLen+endFootingWid/2,-footingWid/2,downLevel+baseHei
+    hotspot vertexLen+endFootingWid/2,footingWid/2 ,downLevel+baseHei
+    hotspot vertexLen+endFootingWid/2,-footingWid/2,footingLevel
+    hotspot vertexLen+endFootingWid/2,footingWid/2 ,footingLevel
+del 2
+
+
+!====================================================================鉄筋
+!ベース主筋
+if baseMbarTotnum>0 then
+    for i=1 to baseMbarTotnum
+        !頂点表示
+        if disPoint then 
+            for j=1 to baseMbarPoint[i]
+                hotspot baseMbarPos[i][3*j-2],baseMbarPos[i][3*j-1],baseMbarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen baseMbarPen
+
+            for j=1 to baseMbarPoint[i]-1
+                lin_ baseMbarPos[i][3*j-2],baseMbarPos[i][3*j-1],baseMbarPos[i][3*j],baseMbarPos[i][3*j+1],baseMbarPos[i][3*j+2],baseMbarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            dim _vertices[][]
+
+            for j=1 to baseMbarPoint[i]
+                _vertices[j][x]=baseMbarPos[i][x+3*(j-1)]
+                _vertices[j][y]=baseMbarPos[i][y+3*(j-1)]
+                _vertices[j][z]=baseMbarPos[i][z+3*(j-1)]
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=0,
+            detail=SDresol,
+            elbowRad=elbowRad*baseMbarOd,
+            nVertex=baseMbarPoint[i],
+            vertices=_vertices,
+            pipeRad=baseMbarOd/2,
+            matPipe=baseMbarMat
+        endif
+    next i
+endif
+
+
+!ベース上端主筋(ダブル配筋)
+if baseTopMbarTotnum>0 then
+    for i=1 to baseTopMbarTotnum
+        !頂点表示
+        if disPoint then 
+            for j=1 to baseTopMbarPoint[i]
+                hotspot baseTopMbarPos[i][3*j-2],baseTopMbarPos[i][3*j-1],baseTopMbarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen baseTopMbarPen
+
+            for j=1 to baseTopMbarPoint[i]-1
+                lin_ baseTopMbarPos[i][3*j-2],baseTopMbarPos[i][3*j-1],baseTopMbarPos[i][3*j],baseTopMbarPos[i][3*j+1],baseTopMbarPos[i][3*j+2],baseTopMbarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            dim _vertices[][]
+
+            for j=1 to baseTopMbarPoint[i]
+                _vertices[j][x]=baseTopMbarPos[i][x+3*(j-1)]
+                _vertices[j][y]=baseTopMbarPos[i][y+3*(j-1)]
+                _vertices[j][z]=baseTopMbarPos[i][z+3*(j-1)]
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=0,
+            detail=SDresol,
+            elbowRad=elbowRad*baseTopMbarOd,
+            nVertex=baseTopMbarPoint[i],
+            vertices=_vertices,
+            pipeRad=baseTopMbarOd/2,
+            matPipe=baseTopMbarMat
+        endif
+    next i
+endif
+
+
+!ベース配力筋
+if baseDbarTotnum>0 then
+    for i=1 to baseDbarTotnum
+        !頂点表示
+        if disPoint then 
+            for j=1 to baseDbarPoint[i]
+                hotspot baseDbarPos[i][3*j-2],baseDbarPos[i][3*j-1],baseDbarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen baseDbarPen
+
+            for j=1 to baseDbarPoint[i]-1
+                lin_ baseDbarPos[i][3*j-2],baseDbarPos[i][3*j-1],baseDbarPos[i][3*j],baseDbarPos[i][3*j+1],baseDbarPos[i][3*j+2],baseDbarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            dim _vertices[][]
+
+            for j=1 to baseDbarPoint[i]
+                _vertices[j][x]=baseDbarPos[i][x+3*(j-1)]
+                _vertices[j][y]=baseDbarPos[i][y+3*(j-1)]
+                _vertices[j][z]=baseDbarPos[i][z+3*(j-1)]
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=0,
+            detail=SDresol,
+            elbowRad=elbowRad*baseDbarOd,
+            nVertex=baseDbarPoint[i],
+            vertices=_vertices,
+            pipeRad=baseDbarOd/2,
+            matPipe=baseDbarMat
+        endif
+    next i
+endif
+
+
+!ベース上端配力筋(ダブル配筋)
+if baseTopDbarTotnum>0 then
+    for i=1 to baseTopDbarTotnum
+        !頂点表示
+        if disPoint then 
+            for j=1 to baseTopDbarPoint[i]
+                hotspot baseTopDbarPos[i][3*j-2],baseTopDbarPos[i][3*j-1],baseTopDbarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen baseTopDbarPen
+
+            for j=1 to baseTopDbarPoint[i]-1
+                lin_ baseTopDbarPos[i][3*j-2],baseTopDbarPos[i][3*j-1],baseTopDbarPos[i][3*j],baseTopDbarPos[i][3*j+1],baseTopDbarPos[i][3*j+2],baseTopDbarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            dim _vertices[][]
+
+            for j=1 to baseTopDbarPoint[i]
+                _vertices[j][x]=baseTopDbarPos[i][x+3*(j-1)]
+                _vertices[j][y]=baseTopDbarPos[i][y+3*(j-1)]
+                _vertices[j][z]=baseTopDbarPos[i][z+3*(j-1)]
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=0,
+            detail=SDresol,
+            elbowRad=elbowRad*baseTopDbarOd,
+            nVertex=baseTopDbarPoint[i],
+            vertices=_vertices,
+            pipeRad=baseTopDbarOd/2,
+            matPipe=baseTopDbarMat
+        endif
+    next i
+endif
+
+
+!stp
+if stpTotnum>0 then
+    for i=1 to stpTotnum
+        !頂点表示
+        if disPoint then 
+            for j=1 to stpPoint[i]
+                hotspot stpPos[i][3*j-2],stpPos[i][3*j-1],stpPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen stpPen
+
+            for j=1 to stpPoint[i]-1
+                lin_ stpPos[i][3*j-2],stpPos[i][3*j-1],stpPos[i][3*j],stpPos[i][3*j+1],stpPos[i][3*j+2],stpPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            dim _vertices[][]
+
+            for j=1 to stpPoint[i]
+                _vertices[j][x]=stpPos[i][x+3*(j-1)]
+                _vertices[j][y]=stpPos[i][y+3*(j-1)]
+                _vertices[j][z]=stpPos[i][z+3*(j-1)]
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=0,
+            detail=max(SDresol,8),
+            elbowRad=elbowRad*stpOd,
+            nVertex=stpPoint[i],
+            vertices=_vertices,
+            pipeRad=stpOd/2,
+            matPipe=stpMat
+        endif
+    next i
+endif
+
+
+!上端筋
+if topbarTotnum>0 then
+    for i=1 to topbarTotnum
+        !頂点表示
+        if disPoint then 
+            for j=1 to topbarPoint[i]
+                hotspot topbarPos[i][3*j-2],topbarPos[i][3*j-1],topbarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen topbarPen
+
+            for j=1 to topbarPoint[i]-1
+                lin_ topbarPos[i][3*j-2],topbarPos[i][3*j-1],topbarPos[i][3*j],topbarPos[i][3*j+1],topbarPos[i][3*j+2],topbarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            dim _vertices[][]
+
+            for j=1 to topbarPoint[i]
+                _vertices[j][x]=topbarPos[i][x+3*(j-1)]
+                _vertices[j][y]=topbarPos[i][y+3*(j-1)]
+                _vertices[j][z]=topbarPos[i][z+3*(j-1)]
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=0,
+            detail=SDresol,
+            elbowRad=elbowRad*topbarOd,
+            nVertex=topbarPoint[i],
+            vertices=_vertices,
+            pipeRad=topbarOd/2,
+            matPipe=topbarMat
+        endif
+    next i
+
+    !定着金物
+    material topbarMat
+
+    add vertexPos[1][x],vertexPos[1][y],0
+    rotz vertexRtz
+        if switchStartUnit and disSD then
+            add topbarStartOffset,(footingWid/2-footingSideCover-stpOd-topbarOd/2),footingLevel-footingTopCover-stpOd/2-elbowRad*stpOd
+            roty -90
+                cylind hardware_thi[topbarNd],hardware_od[topbarNd]/2
+            del 2
+
+            add topbarStartOffset,-(footingWid/2-footingSideCover-stpOd-topbarOd/2),footingLevel-footingTopCover-stpOd/2-elbowRad*stpOd
+            roty -90
+                cylind hardware_thi[topbarNd],hardware_od[topbarNd]/2
+            del 2
+
+            if topbarNum>=3 then
+                add topbarStartOffset,(footingWid/2-footingSideCover-stpOd-topbarOd/2),footingLevel-footingTopCover-stpOd/2-elbowRad*stpOd-2*topbarOd
+                roty -90
+                    cylind hardware_thi[topbarNd],hardware_od[topbarNd]/2
+                del 2
+            endif
+
+            if topbarNum>=4 then
+                add topbarStartOffset,-(footingWid/2-footingSideCover-stpOd-topbarOd/2),footingLevel-footingTopCover-stpOd/2-elbowRad*stpOd-2*topbarOd
+                roty -90
+                    cylind hardware_thi[topbarNd],hardware_od[topbarNd]/2
+                del 2
+            endif
+        endif
+
+        if switchEndUnit and disSD then
+            add vertexLen-topbarEndOffset,(footingWid/2-footingSideCover-stpOd-topbarOd/2),footingLevel-footingTopCover-stpOd/2-elbowRad*stpOd-(1-topbarConnectNum%2)*topbarOd
+            roty 90
+                cylind hardware_thi[topbarNd],hardware_od[topbarNd]/2
+            del 2
+
+            add vertexLen-topbarEndOffset,-(footingWid/2-footingSideCover-stpOd-topbarOd/2),footingLevel-footingTopCover-stpOd/2-elbowRad*stpOd-(1-topbarConnectNum%2)*topbarOd
+            roty 90
+                cylind hardware_thi[topbarNd],hardware_od[topbarNd]/2
+            del 2
+
+            if topbarNum>=3 then
+                add vertexLen-topbarEndOffset,(footingWid/2-footingSideCover-stpOd-topbarOd/2),footingLevel-footingTopCover-stpOd/2-elbowRad*stpOd-2*topbarOd-(1-topbarConnectNum%2)*topbarOd
+                roty 90
+                    cylind hardware_thi[topbarNd],hardware_od[topbarNd]/2
+                del 2
+            endif
+
+            if topbarNum>=4 then
+                add vertexLen-topbarEndOffset,-(footingWid/2-footingSideCover-stpOd-topbarOd/2),footingLevel-footingTopCover-stpOd/2-elbowRad*stpOd-2*topbarOd-(1-topbarConnectNum%2)*topbarOd
+                roty 90
+                    cylind hardware_thi[topbarNd],hardware_od[topbarNd]/2
+                del 2
+            endif
+        endif
+    del 2
+endif
+
+
+!下端筋
+if downbarTotnum>0 then
+    for i=1 to downbarTotnum
+        !頂点表示
+        if disPoint then 
+            for j=1 to downbarPoint[i]
+                hotspot downbarPos[i][3*j-2],downbarPos[i][3*j-1],downbarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen downbarPen
+
+            for j=1 to downbarPoint[i]-1
+                lin_ downbarPos[i][3*j-2],downbarPos[i][3*j-1],downbarPos[i][3*j],downbarPos[i][3*j+1],downbarPos[i][3*j+2],downbarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            dim _vertices[][]
+
+            for j=1 to downbarPoint[i]
+                _vertices[j][x]=downbarPos[i][x+3*(j-1)]
+                _vertices[j][y]=downbarPos[i][y+3*(j-1)]
+                _vertices[j][z]=downbarPos[i][z+3*(j-1)]
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=0,
+            detail=SDresol,
+            elbowRad=elbowRad*downbarOd,
+            nVertex=downbarPoint[i],
+            vertices=_vertices,
+            pipeRad=downbarOd/2,
+            matPipe=downbarMat
+        endif
+    next i
+
+    !定着金物
+    material topbarMat
+
+    add vertexPos[1][x],vertexPos[1][y],0
+    rotz vertexRtz
+        if switchStartUnit then
+            add downbarStartOffset,(footingWid/2-footingSideCover-stpOd-downbarOd/2),downLevel+baseDownCover+baseMbarOd+stpOd/2+elbowRad*stpOd
+            roty -90
+                cylind hardware_thi[downbarNd],hardware_od[downbarNd]/2
+            del 2
+
+            add downbarStartOffset,-(footingWid/2-footingSideCover-stpOd-downbarOd/2),downLevel+baseDownCover+baseMbarOd+stpOd/2+elbowRad*stpOd
+            roty -90
+                cylind hardware_thi[downbarNd],hardware_od[downbarNd]/2
+            del 2
+
+            if downbarNum>=3 then
+                add downbarStartOffset,(footingWid/2-footingSideCover-stpOd-downbarOd/2),downLevel+baseDownCover+baseMbarOd+stpOd/2+elbowRad*stpOd+2*downbarOd
+                roty -90
+                    cylind hardware_thi[downbarNd],hardware_od[downbarNd]/2
+                del 2
+            endif
+
+            if downbarNum>=4 then
+                add downbarStartOffset,-(footingWid/2-footingSideCover-stpOd-downbarOd/2),downLevel+baseDownCover+baseMbarOd+stpOd/2+elbowRad*stpOd+2*downbarOd
+                roty -90
+                    cylind hardware_thi[downbarNd],hardware_od[downbarNd]/2
+                del 2
+            endif
+        endif
+
+        if switchEndUnit then
+            add vertexLen-downbarEndOffset,(footingWid/2-footingSideCover-stpOd-downbarOd/2),downLevel+baseDownCover+baseMbarOd+stpOd/2+elbowRad*stpOd+(1-downbarConnectNum%2)*downbarOd
+            roty 90
+                cylind hardware_thi[downbarNd],hardware_od[downbarNd]/2
+            del 2
+
+            add vertexLen-downbarEndOffset,-(footingWid/2-footingSideCover-stpOd-downbarOd/2),downLevel+baseDownCover+baseMbarOd+stpOd/2+elbowRad*stpOd+(1-downbarConnectNum%2)*downbarOd
+            roty 90
+                cylind hardware_thi[downbarNd],hardware_od[downbarNd]/2
+            del 2
+
+            if downbarNum>=3 then
+                add vertexLen-downbarEndOffset,(footingWid/2-footingSideCover-stpOd-downbarOd/2),downLevel+baseDownCover+baseMbarOd+stpOd/2+elbowRad*stpOd+2*downbarOd+(1-downbarConnectNum%2)*downbarOd
+                roty 90
+                    cylind hardware_thi[downbarNd],hardware_od[downbarNd]/2
+                del 2
+            endif
+
+            if downbarNum>=4 then
+                add vertexLen-downbarEndOffset,-(footingWid/2-footingSideCover-stpOd-downbarOd/2),downLevel+baseDownCover+baseMbarOd+stpOd/2+elbowRad*stpOd+2*downbarOd+(1-downbarConnectNum%2)*downbarOd
+                roty 90
+                    cylind hardware_thi[downbarNd],hardware_od[downbarNd]/2
+                del 2
+            endif
+        endif
+    del 2
+endif
+
+
+!腹筋
+if sidebarTotnum>0 then
+    for i=1 to sidebarTotnum
+        !頂点表示
+        if disPoint then 
+            for j=1 to sidebarPoint[i]
+                hotspot sidebarPos[i][3*j-2],sidebarPos[i][3*j-1],sidebarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen sidebarPen
+
+            for j=1 to sidebarPoint[i]-1
+                lin_ sidebarPos[i][3*j-2],sidebarPos[i][3*j-1],sidebarPos[i][3*j],sidebarPos[i][3*j+1],sidebarPos[i][3*j+2],sidebarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            dim _vertices[][]
+
+            for j=1 to sidebarPoint[i]
+                _vertices[j][x]=sidebarPos[i][x+3*(j-1)]
+                _vertices[j][y]=sidebarPos[i][y+3*(j-1)]
+                _vertices[j][z]=sidebarPos[i][z+3*(j-1)]
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=0,
+            detail=SDresol,
+            elbowRad=elbowRad*sidebarOd,
+            nVertex=sidebarPoint[i],
+            vertices=_vertices,
+            pipeRad=sidebarOd/2,
+            matPipe=sidebarMat
+        endif
+    next i
+endif
+
+
+!幅止め筋
+if sprbarTotnum>0 then
+    for i=1 to sprbarTotnum
+        !頂点表示
+        if disPoint then 
+            for j=1 to sprbarPoint[i]
+                hotspot sprbarPos[i][3*j-2],sprbarPos[i][3*j-1],sprbarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen sprbarPen
+
+            for j=1 to sprbarPoint[i]-1
+                lin_ sprbarPos[i][3*j-2],sprbarPos[i][3*j-1],sprbarPos[i][3*j],sprbarPos[i][3*j+1],sprbarPos[i][3*j+2],sprbarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            dim _vertices[][]
+
+            for j=1 to sprbarPoint[i]
+                _vertices[j][x]=sprbarPos[i][x+3*(j-1)]
+                _vertices[j][y]=sprbarPos[i][y+3*(j-1)]
+                _vertices[j][z]=sprbarPos[i][z+3*(j-1)]
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=0,
+            detail=max(SDresol,8),
+            elbowRad=elbowRad*sprbarOd,
+            nVertex=sprbarPoint[i],
+            vertices=_vertices,
+            pipeRad=sprbarOd/2,
+            matPipe=sprbarMat
+        endif
+    next i
+endif
+
+
+!ユニット横補強筋
+if horbarTotnum>0 then
+    for i=1 to horbarTotnum
+        !頂点表示
+        if disPoint then 
+            for j=1 to horbarPoint[i]
+                hotspot horbarPos[i][3*j-2],horbarPos[i][3*j-1],horbarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen horbarPen
+
+            for j=1 to horbarPoint[i]-1
+                lin_ horbarPos[i][3*j-2],horbarPos[i][3*j-1],horbarPos[i][3*j],horbarPos[i][3*j+1],horbarPos[i][3*j+2],horbarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            dim _vertices[][]
+
+            for j=1 to horbarPoint[i]
+                _vertices[j][x]=horbarPos[i][x+3*(j-1)]
+                _vertices[j][y]=horbarPos[i][y+3*(j-1)]
+                _vertices[j][z]=horbarPos[i][z+3*(j-1)]
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=0,
+            detail=SDresol,
+            elbowRad=elbowRad*horbarOd,
+            nVertex=horbarPoint[i],
+            vertices=_vertices,
+            pipeRad=horbarOd/2,
+            matPipe=horbarMat
+        endif
+    next i
+endif
+
+
+!ユニット縦補強筋
+if verbarTotnum>0 then
+    for i=1 to verbarTotnum
+        !頂点表示
+        if disPoint then 
+            for j=1 to verbarPoint[i]
+                hotspot verbarPos[i][3*j-2],verbarPos[i][3*j-1],verbarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen verbarPen
+
+            for j=1 to verbarPoint[i]-1
+                lin_ verbarPos[i][3*j-2],verbarPos[i][3*j-1],verbarPos[i][3*j],verbarPos[i][3*j+1],verbarPos[i][3*j+2],verbarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            dim _vertices[][]
+
+            for j=1 to verbarPoint[i]
+                _vertices[j][x]=verbarPos[i][x+3*(j-1)]
+                _vertices[j][y]=verbarPos[i][y+3*(j-1)]
+                _vertices[j][z]=verbarPos[i][z+3*(j-1)]
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=0,
+            detail=SDresol,
+            elbowRad=elbowRad*verbarOd,
+            nVertex=verbarPoint[i],
+            vertices=_vertices,
+            pipeRad=verbarOd/2,
+            matPipe=verbarMat
+        endif
+    next i
+endif
+
+
+!開口縦補強筋
+if verRefTotnum>0 then
+    for i=1 to verRefTotnum
+        !頂点表示
+        if disPoint then 
+            for j=1 to verRefPoint[i]
+                hotspot verRefPos[i][3*j-2],verRefPos[i][3*j-1],verRefPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen verRefPen
+
+            for j=1 to verRefPoint[i]-1
+                lin_ verRefPos[i][3*j-2],verRefPos[i][3*j-1],verRefPos[i][3*j],verRefPos[i][3*j+1],verRefPos[i][3*j+2],verRefPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            dim _vertices[][]
+
+            for j=1 to verRefPoint[i]
+                _vertices[j][x]=verRefPos[i][x+3*(j-1)]
+                _vertices[j][y]=verRefPos[i][y+3*(j-1)]
+                _vertices[j][z]=verRefPos[i][z+3*(j-1)]
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=0,
+            detail=SDresol,
+            elbowRad=elbowRad*verRefOd,
+            nVertex=verRefPoint[i],
+            vertices=_vertices,
+            pipeRad=verRefOd/2,
+            matPipe=verRefMat
+        endif
+    next i
+endif
+
+
+!開口横補強筋
+if horRefTotnum>0 then
+    for i=1 to horRefTotnum
+        !頂点表示
+        if disPoint then 
+            for j=1 to horRefPoint[i]
+                hotspot horRefPos[i][3*j-2],horRefPos[i][3*j-1],horRefPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen horRefPen
+
+            for j=1 to horRefPoint[i]-1
+                lin_ horRefPos[i][3*j-2],horRefPos[i][3*j-1],horRefPos[i][3*j],horRefPos[i][3*j+1],horRefPos[i][3*j+2],horRefPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            dim _vertices[][]
+
+            for j=1 to horRefPoint[i]
+                _vertices[j][x]=horRefPos[i][x+3*(j-1)]
+                _vertices[j][y]=horRefPos[i][y+3*(j-1)]
+                _vertices[j][z]=horRefPos[i][z+3*(j-1)]
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=0,
+            detail=SDresol,
+            elbowRad=elbowRad*horRefOd,
+            nVertex=horRefPoint[i],
+            vertices=_vertices,
+            pipeRad=horRefOd/2,
+            matPipe=horRefMat
+        endif
+    next i
+endif
+
+
+!開口斜め補強筋
+if diaRefTotnum>0 then
+    for i=1 to diaRefTotnum
+        !頂点表示
+        if disPoint then 
+            for j=1 to diaRefPoint[i]
+                hotspot diaRefPos[i][3*j-2],diaRefPos[i][3*j-1],diaRefPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen diaRefPen
+
+            for j=1 to diaRefPoint[i]-1
+                lin_ diaRefPos[i][3*j-2],diaRefPos[i][3*j-1],diaRefPos[i][3*j],diaRefPos[i][3*j+1],diaRefPos[i][3*j+2],diaRefPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            dim _vertices[][]
+
+            for j=1 to diaRefPoint[i]
+                _vertices[j][x]=diaRefPos[i][x+3*(j-1)]
+                _vertices[j][y]=diaRefPos[i][y+3*(j-1)]
+                _vertices[j][z]=diaRefPos[i][z+3*(j-1)]
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=0,
+            detail=SDresol,
+            elbowRad=elbowRad*diaRefOd,
+            nVertex=diaRefPoint[i],
+            vertices=_vertices,
+            pipeRad=diaRefOd/2,
+            matPipe=diaRefMat
+        endif
+    next i
+endif
+
+
+!開口補強STP
+if stpRefTotnum>0 then
+    for i=1 to stpRefTotnum
+        !頂点表示
+        if disPoint then 
+            for j=1 to stpRefPoint[i]
+                hotspot stpRefPos[i][3*j-2],stpRefPos[i][3*j-1],stpRefPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen stpRefPen
+
+            for j=1 to stpRefPoint[i]-1
+                lin_ stpRefPos[i][3*j-2],stpRefPos[i][3*j-1],stpRefPos[i][3*j],stpRefPos[i][3*j+1],stpRefPos[i][3*j+2],stpRefPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            dim _vertices[][]
+
+            for j=1 to stpRefPoint[i]
+                _vertices[j][x]=stpRefPos[i][x+3*(j-1)]
+                _vertices[j][y]=stpRefPos[i][y+3*(j-1)]
+                _vertices[j][z]=stpRefPos[i][z+3*(j-1)]
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=0,
+            detail=SDresol,
+            elbowRad=elbowRad*stpRefOd,
+            nVertex=stpRefPoint[i],
+            vertices=_vertices,
+            pipeRad=stpRefOd/2,
+            matPipe=stpRefMat
+        endif
+    next i
+endif
+
+
+!段取り筋
+if supportbarTotnum>0 then
+    for i=1 to supportbarTotnum
+        !頂点表示
+        if disPoint then 
+            for j=1 to supportbarPoint[i]
+                hotspot supportbarPos[i][3*j-2],supportbarPos[i][3*j-1],supportbarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen supportbarPen
+
+            for j=1 to supportbarPoint[i]-1
+                lin_ supportbarPos[i][3*j-2],supportbarPos[i][3*j-1],supportbarPos[i][3*j],supportbarPos[i][3*j+1],supportbarPos[i][3*j+2],supportbarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            dim _vertices[][]
+
+            for j=1 to supportbarPoint[i]
+                _vertices[j][x]=supportbarPos[i][x+3*(j-1)]
+                _vertices[j][y]=supportbarPos[i][y+3*(j-1)]
+                _vertices[j][z]=supportbarPos[i][z+3*(j-1)]
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=0,
+            detail=SDresol,
+            elbowRad=elbowRad*supportbarOd,
+            nVertex=supportbarPoint[i],
+            vertices=_vertices,
+            pipeRad=supportbarOd/2,
+            matPipe=supportbarMat
+        endif
+    next i
+endif
+
+
+!====================================================================型枠
+group "frame"
+    material frameMat
+
+    !外側ベース型枠
+    add vertexPos[1][x],vertexPos[1][y],0
+    rotz vertexRtz
+    add -startOutBaseOffset,-baseWid/2-frameThi,downLevel
+        block vertexLen+startOutBaseOffset+endOutBaseOffset,frameThi,baseHei
+    del 3
+
+    !内側ベース型枠
+    add vertexPos[1][x],vertexPos[1][y],0
+    rotz vertexRtz
+    add -startInBaseOffset,baseWid/2,downLevel
+        block vertexLen+startInBaseOffset+endInBaseOffset,frameThi,baseHei
+    del 3
+
+    !外側基礎梁型枠
+    add vertexPos[1][x],vertexPos[1][y],0
+    rotz vertexRtz
+    add -startOutFootingOffset,-footingWid/2-frameThi,downLevel+baseHei
+        block vertexLen+startOutFootingOffset+endOutFootingOffset,frameThi,footingHei
+    del 3
+
+    !内側基礎梁型枠
+    add vertexPos[1][x],vertexPos[1][y],0
+    rotz vertexRtz
+    add -startInFootingOffset,footingWid/2,downLevel+baseHei
+        block vertexLen+startInFootingOffset+endInFootingOffset,frameThi,footingHei
+    del 3
+endgroup
+
+if disFrame then
+    placegroup "frame"
+
+    add vertexPos[1][x],vertexPos[1][y],0
+    rotz vertexRtz
+        !外側ベース型枠
+        hotspot 0                  ,-baseWid/2-frameThi,downLevel+baseHei/2,code,startOutBaseOffset,1+128:code=code+1
+        hotspot -startOutBaseOffset,-baseWid/2-frameThi,downLevel+baseHei/2,code,startOutBaseOffset,2    :code=code+1
+        hotspot 1                  ,-baseWid/2-frameThi,downLevel+baseHei/2,code,startOutBaseOffset,3    :code=code+1
+
+        hotspot vertexLen                 ,-baseWid/2-frameThi,downLevel+baseHei/2,code,endOutBaseOffset,1+128:code=code+1
+        hotspot vertexLen+endOutBaseOffset,-baseWid/2-frameThi,downLevel+baseHei/2,code,endOutBaseOffset,2    :code=code+1
+        hotspot vertexLen-1               ,-baseWid/2-frameThi,downLevel+baseHei/2,code,endOutBaseOffset,3    :code=code+1
+
+        hotspot -startOutBaseOffset,-baseWid/2-frameThi,downLevel
+        hotspot -startOutBaseOffset,-baseWid/2-frameThi,downLevel+baseHei
+
+        hotspot vertexLen+endOutBaseOffset,-baseWid/2-frameThi,downLevel
+        hotspot vertexLen+endOutBaseOffset,-baseWid/2-frameThi,downLevel+baseHei
+
+        !内側ベース型枠
+        hotspot 0                  ,baseWid/2+frameThi,downLevel+baseHei/2,code,startInBaseOffset,1+128:code=code+1
+        hotspot -startInBaseOffset ,baseWid/2+frameThi,downLevel+baseHei/2,code,startInBaseOffset,2    :code=code+1
+        hotspot 1                  ,baseWid/2+frameThi,downLevel+baseHei/2,code,startInBaseOffset,3    :code=code+1
+
+        hotspot vertexLen                 ,baseWid/2+frameThi,downLevel+baseHei/2,code,endInBaseOffset,1+128:code=code+1
+        hotspot vertexLen+endInBaseOffset ,baseWid/2+frameThi,downLevel+baseHei/2,code,endInBaseOffset,2    :code=code+1
+        hotspot vertexLen-1               ,baseWid/2+frameThi,downLevel+baseHei/2,code,endInBaseOffset,3    :code=code+1
+
+        hotspot -startInBaseOffset ,baseWid/2+frameThi,downLevel
+        hotspot -startInBaseOffset ,baseWid/2+frameThi,downLevel+baseHei
+
+        hotspot vertexLen+endInBaseOffset ,baseWid/2+frameThi,downLevel
+        hotspot vertexLen+endInBaseOffset ,baseWid/2+frameThi,downLevel+baseHei
+
+        !外側基礎梁型枠
+        hotspot 0                     ,-footingWid/2-frameThi,footingLevel-footingHei/2,code,startOutFootingOffset,1+128:code=code+1
+        hotspot -startOutFootingOffset,-footingWid/2-frameThi,footingLevel-footingHei/2,code,startOutFootingOffset,2    :code=code+1
+        hotspot 1                     ,-footingWid/2-frameThi,footingLevel-footingHei/2,code,startOutFootingOffset,3    :code=code+1
+
+        hotspot vertexLen                    ,-footingWid/2-frameThi,footingLevel-footingHei/2,code,endOutFootingOffset,1+128:code=code+1
+        hotspot vertexLen+endOutFootingOffset,-footingWid/2-frameThi,footingLevel-footingHei/2,code,endOutFootingOffset,2    :code=code+1
+        hotspot vertexLen-1                  ,-footingWid/2-frameThi,footingLevel-footingHei/2,code,endOutFootingOffset,3    :code=code+1
+
+        hotspot -startOutFootingOffset,-footingWid/2-frameThi,footingLevel
+        hotspot -startOutFootingOffset,-footingWid/2-frameThi,footingLevel-footingHei
+
+        hotspot vertexLen+endOutFootingOffset,-footingWid/2-frameThi,footingLevel
+        hotspot vertexLen+endOutFootingOffset,-footingWid/2-frameThi,footingLevel-footingHei
+
+        !内側基礎梁型枠
+        hotspot 0                    ,footingWid/2+frameThi,footingLevel-footingHei/2,code,startInFootingOffset,1+128:code=code+1
+        hotspot -startInFootingOffset,footingWid/2+frameThi,footingLevel-footingHei/2,code,startInFootingOffset,2    :code=code+1
+        hotspot 1                    ,footingWid/2+frameThi,footingLevel-footingHei/2,code,startInFootingOffset,3    :code=code+1
+
+        hotspot vertexLen                   ,footingWid/2+frameThi,footingLevel-footingHei/2,code,endInFootingOffset,1+128:code=code+1
+        hotspot vertexLen+endInFootingOffset,footingWid/2+frameThi,footingLevel-footingHei/2,code,endInFootingOffset,2    :code=code+1
+        hotspot vertexLen-1                 ,footingWid/2+frameThi,footingLevel-footingHei/2,code,endInFootingOffset,3    :code=code+1
+
+        hotspot -startInFootingOffset,footingWid/2+frameThi,footingLevel
+        hotspot -startInFootingOffset,footingWid/2+frameThi,footingLevel-footingHei
+
+        hotspot vertexLen+endInFootingOffset,footingWid/2+frameThi,footingLevel
+        hotspot vertexLen+endInFootingOffset,footingWid/2+frameThi,footingLevel-footingHei
+    del 2
+endif

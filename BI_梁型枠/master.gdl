@@ -1,0 +1,355 @@
+code=1
+
+beam_len=sqr((line_pos[2][1]-line_pos[1][1])^2+(line_pos[2][2]-line_pos[1][2])^2)
+parameters beam_len=beam_len
+
+beam_len_xyz=sqr((line_pos[2][1]-line_pos[1][1])^2+(line_pos[2][2]-line_pos[1][2])^2+(line_pos[2][3]-line_pos[1][3])^2)
+parameters beam_len_xyz=beam_len_xyz
+
+beam_rtz=0
+if line_pos[2][2]=line_pos[1][2] then
+	if line_pos[2][1]>=line_pos[1][1] then
+		beam_rtz=0
+	else
+		beam_rtz=180
+	endif
+else
+	if line_pos[2][2]>line_pos[1][2] then
+		beam_rtz=acs((line_pos[2][1]-line_pos[1][1])/beam_len)
+	else
+		beam_rtz=360-acs((line_pos[2][1]-line_pos[1][1])/beam_len)
+	endif
+endif
+parameters beam_rtz=beam_rtz
+
+rat=acs(beam_len/beam_len_xyz) !仰角
+
+slab_thi[1]=slab_thi[1]/cos(rat)
+slab_thi[2]=slab_thi[2]/cos(rat)
+
+
+!ピーコン表示フラグ
+if (switch_slab[1] and (beam_hei+beam_down_thi)+slab_offset[1]-(slab_thi[1]+form_thi*switch_slab_form_offset)/cos(rat)<=pcon_z_offset) or\
+	(switch_slab[2] and (beam_hei+beam_down_thi)+slab_offset[2]-(slab_thi[2]+form_thi*switch_slab_form_offset)/cos(rat)<=pcon_z_offset) then
+	switch_pcon_z1=0
+else
+	switch_pcon_z1=1
+endif
+
+if (switch_slab[1] and -slab_offset[1]-form_thi*switch_slab_form_offset<=pcon_z_offset) or\
+	(switch_slab[2] and -slab_offset[2]-form_thi*switch_slab_form_offset<=pcon_z_offset) then
+	switch_pcon_z2=0
+else
+	switch_pcon_z2=1
+endif
+
+if switch_slab[1] and switch_slab[2] then
+	switch_pcon_z2=1
+endif
+
+if switch_slab[1] and switch_slab[2] then
+	pcon_z2=-beam_top_thi+max(slab_thi[1]/cos(rat)-slab_offset[1],slab_thi[2]/cos(rat)-slab_offset[2],pcon_z_offset)+form_thi+pcon_z_offset
+else
+	pcon_z2=-beam_top_thi+pcon_z_offset
+endif
+
+
+!スラブ引き表示フラグ
+if switch_slab[1]=0 and switch_slab[2]=0 then
+	switch_link=0
+endif
+
+if switch_slab[1] and switch_slab[2]=0 then
+	switch_link=1
+	link_z=slab_offset[1]-slab_thi[1]/cos(rat)+pcon_r2+beam_top_thi
+	link_rtz=180
+endif
+
+if switch_slab[1]=0 and switch_slab[2] then
+	switch_link=1
+	link_z=slab_offset[2]-slab_thi[2]/cos(rat)+pcon_r2+beam_top_thi
+	link_rtz=0
+endif
+
+if switch_slab[1] and switch_slab[2] then
+	switch_link=0
+endif
+
+
+!============================================梁設定
+values "beam_wid" range(0,]
+values "beam_out_thi" range[0,]
+values "beam_in_thi" range[0,]
+
+values "beam_hei" range(0,]
+values "beam_down_thi" range[0,]
+values "beam_top_thi" range[0,]
+
+values "column_x" range[0,]
+values "column_y" range[0,]
+
+values "foun_x" range[0,]
+values "foun_y" range[0,]
+values "foun_z" range[0,]
+
+values{2} "edgeBeam_dir" 1,"外面",2,"内面"
+values "edgeBeam_wid" range[0,]
+
+if switch_foun[1]+switch_foun[2]>0 then
+	parameters switch_form_down=0
+endif
+
+values "wall_thi" range[0,]
+
+values "slab_thi" range[0,]
+
+dim _sbeam_out_pos[]
+dim _sbeam_out_wid[]
+dim _sbeam_out_hei[]
+dim _sbeam_out_offset[]
+
+values "sbeam_out_num" range[0,]
+if sbeam_out_num>0 then
+	values "sbeam_out_pos" range[0,beam_len]
+	values "sbeam_out_wid" range[0,]
+	values "sbeam_out_hei" range[0,]
+
+	for i=1 to sbeam_out_num
+		if sbeam_out_pos[i]=0 then _sbeam_out_pos[i]=0 else _sbeam_out_pos[i]=sbeam_out_pos[i]
+	next i
+	parameters sbeam_out_pos=_sbeam_out_pos
+
+	for i=1 to sbeam_out_num
+		if sbeam_out_wid[i]=0 then _sbeam_out_wid[i]=0 else _sbeam_out_wid[i]=sbeam_out_wid[i]
+	next i
+	parameters sbeam_out_wid=_sbeam_out_wid
+
+	for i=1 to sbeam_out_num
+		if sbeam_out_hei[i]=0 then _sbeam_out_hei[i]=0 else _sbeam_out_hei[i]=sbeam_out_hei[i]
+	next i
+	parameters sbeam_out_hei=_sbeam_out_hei
+
+	for i=1 to sbeam_out_num
+		if sbeam_out_offset[i]=0 then _sbeam_out_offset[i]=0 else _sbeam_out_offset[i]=sbeam_out_offset[i]
+	next i
+	parameters sbeam_out_offset=_sbeam_out_offset
+else
+	hideparameter "sbeam_out_pos","sbeam_out_wid","sbeam_out_hei","sbeam_out_offset"
+endif
+
+
+dim _sbeam_in_pos[]
+dim _sbeam_in_wid[]
+dim _sbeam_in_hei[]
+dim _sbeam_in_offset[]
+
+values "sbeam_in_num" range[0,]
+if sbeam_in_num>0 then
+	values "sbeam_in_pos" range[0,beam_len]
+	values "sbeam_in_wid" range[0,]
+	values "sbeam_in_hei" range[0,]
+
+	for i=1 to sbeam_in_num
+		if sbeam_in_pos[i]=0 then _sbeam_in_pos[i]=0 else _sbeam_in_pos[i]=sbeam_in_pos[i]
+	next i
+	parameters sbeam_in_pos=_sbeam_in_pos
+
+	for i=1 to sbeam_in_num
+		if sbeam_in_wid[i]=0 then _sbeam_in_wid[i]=0 else _sbeam_in_wid[i]=sbeam_in_wid[i]
+	next i
+	parameters sbeam_in_wid=_sbeam_in_wid
+
+	for i=1 to sbeam_in_num
+		if sbeam_in_hei[i]=0 then _sbeam_in_hei[i]=0 else _sbeam_in_hei[i]=sbeam_in_hei[i]
+	next i
+	parameters sbeam_in_hei=_sbeam_in_hei
+
+	for i=1 to sbeam_in_num
+		if sbeam_in_offset[i]=0 then _sbeam_in_offset[i]=0 else _sbeam_in_offset[i]=sbeam_in_offset[i]
+	next i
+	parameters sbeam_in_offset=_sbeam_in_offset
+else
+	hideparameter "sbeam_in_pos","sbeam_in_wid","sbeam_in_hei","sbeam_in_offset"
+endif
+
+
+values "haunch_x" range[0,beam_len/2]
+values "haunch_z" range[0,]
+
+
+values "orthwall_out_num" range[0,]
+dim _orthwall_out_pos[]
+dim _orthwall_out_thi[]
+dim _orthwall_out_down_offset[]
+dim _orthwall_out_top_offset[]
+
+if orthwall_out_num>0 then
+	for i=1 to orthwall_out_num 
+		_orthwall_out_pos[i]=orthwall_out_pos[i]
+		_orthwall_out_thi[i]=orthwall_out_thi[i]
+		_orthwall_out_down_offset[i]=orthwall_out_down_offset[i]
+		_orthwall_out_top_offset[i]=orthwall_out_top_offset[i]
+	next i
+else
+	hideparameter "orthwall_out_pos","orthwall_out_thi","orthwall_out_down_offset","orthwall_out_top_offset"
+	_orthwall_out_pos[1]=0
+	_orthwall_out_thi[1]=0
+	_orthwall_out_down_offset[1]=0
+	_orthwall_out_top_offset[1]=0
+endif
+
+parameters orthwall_out_pos=_orthwall_out_pos
+parameters orthwall_out_thi=_orthwall_out_thi
+parameters orthwall_out_down_offset=_orthwall_out_down_offset
+parameters orthwall_out_top_offset=_orthwall_out_top_offset
+
+
+values "orthwall_in_num" range[0,]
+dim _orthwall_in_pos[]
+dim _orthwall_in_thi[]
+dim _orthwall_in_down_offset[]
+dim _orthwall_in_top_offset[]
+
+if orthwall_in_num>0 then
+	for i=1 to orthwall_in_num 
+		_orthwall_in_pos[i]=orthwall_in_pos[i]
+		_orthwall_in_thi[i]=orthwall_in_thi[i]
+		_orthwall_in_down_offset[i]=orthwall_in_down_offset[i]
+		_orthwall_in_top_offset[i]=orthwall_in_top_offset[i]
+	next i
+else
+	hideparameter "orthwall_in_pos","orthwall_in_thi","orthwall_in_down_offset","orthwall_in_top_offset"
+	_orthwall_in_pos[1]=0
+	_orthwall_in_thi[1]=0
+	_orthwall_in_down_offset[1]=0
+	_orthwall_in_top_offset[1]=0
+endif
+
+parameters orthwall_in_pos=_orthwall_in_pos
+parameters orthwall_in_thi=_orthwall_in_thi
+parameters orthwall_in_down_offset=_orthwall_in_down_offset
+parameters orthwall_in_top_offset=_orthwall_in_top_offset
+
+
+
+!============================================型枠設定
+values{2} "form_out_type" 1,"一般型枠",2,"化粧型枠",3,"ラス型枠",4,"断熱型枠"
+values{2} "form_in_type" 1,"一般型枠",2,"化粧型枠",3,"ラス型枠",4,"断熱型枠"
+values{2} "form_down_type" 1,"一般型枠",2,"化粧型枠",3,"ラス型枠",4,"断熱型枠"
+values{2} "form_top_type" 1,"一般型枠",2,"化粧型枠",3,"ラス型枠",4,"断熱型枠"
+
+if form_out_type<>1 and form_in_type<>1 and form_down_type<>1 and form_top_type<>1 then
+	hideparameter "m_normal_form"
+endif
+
+if form_out_type<>2 and form_in_type<>2 and form_down_type<>2 and form_top_type<>2 then
+	hideparameter "m_finish_form"
+endif
+
+if form_out_type<>3 and form_in_type<>3 and form_down_type<>3 and form_top_type<>3 then
+	hideparameter "m_rath_form","pen_rath_mesh"
+endif
+
+if form_out_type<>4 and form_in_type<>4 and form_down_type<>4 and form_top_type<>4 then
+	hideparameter "m_insulation_form"
+endif
+
+values "form_x_pitch" range[0.1,]
+
+if auto_split then
+	split_x_num=ceil(beam_len/form_x_pitch)-1
+	
+	if split_x_num>0 then
+		for i=1 to split_x_num
+			split_x_pos[i]=i*form_x_pitch
+		next i
+	endif
+
+	hideparameter "dis_split_hotspot"
+	lock "split_x_num","split_x_pos"
+else
+	values "split_x_num" range[0,]
+	
+	if split_x_num>0 then
+		for i=1 to split_x_num
+			split_x_pos[i]=split_x_pos[i]
+		
+			if split_x_pos[i]<0 then split_x_pos[i]=0
+			if split_x_pos[i]>beam_len then split_x_pos[i]=beam_len
+		next i
+	endif
+endif
+
+parameters split_x_num=split_x_num
+parameters split_x_pos=split_x_pos
+
+if switch_form_start=0 then
+	hideparameter "form_start_down_offset","form_start_top_offset"
+endif
+
+if switch_form_end=0 then
+	hideparameter "form_end_down_offset","form_end_top_offset"
+endif
+
+dim m_form_list[]
+m_form_list[1]=m_normal_form
+m_form_list[2]=m_finish_form
+m_form_list[3]=m_rath_form
+m_form_list[4]=m_insulation_form
+
+!端部隣接梁あり
+!始点
+if switch_edgeBeam[1] then
+	if edgeBeam_dir[1]=1 then
+		form_out_start_offset=-edgeBeam_wid[1]/2
+		form_in_start_offset=edgeBeam_wid[1]/2+form_thi
+	else
+		form_out_start_offset=edgeBeam_wid[1]/2+form_thi
+		form_in_start_offset=-edgeBeam_wid[1]/2
+	endif
+
+	form_down_start_offset=0
+	form_top_start_offset=0
+endif
+
+!終点
+if switch_edgeBeam[2] then
+	if edgeBeam_dir[2]=1 then
+		form_out_end_offset=-edgeBeam_wid[2]/2
+		form_in_end_offset=edgeBeam_wid[2]/2+form_thi
+	else
+		form_out_end_offset=edgeBeam_wid[2]/2+form_thi
+		form_in_end_offset=-edgeBeam_wid[2]/2
+	endif
+
+	form_down_end_offset=0
+	form_top_end_offset=0
+endif
+
+
+!============================================ピーコン穴
+values "pcon_z_offset" range(0,]
+values "pcon_x_offset" range(0,]
+values "pcon_x_pitch" range[0.1,]
+
+if auto_pcon then
+	pcon_x_num=int((beam_len-max(column_x[1],column_y[1])/2*switch_column[1]-max(column_x[2],column_y[2])/2*switch_column[2])/pcon_x_pitch)
+
+	for i=1 to pcon_x_num
+		pcon_x_pos[i]=max(column_x[1],column_y[1])/2*switch_column[1]+pcon_x_offset+(i-1)*pcon_x_pitch
+	next i
+
+	lock "pcon_x_num","pcon_x_pos"
+	hideparameter "dis_pcon_hotspot"
+else
+	values "pcon_x_num" range[1,]
+
+	for i=1 to pcon_x_num
+		pcon_x_pos[i]=pcon_x_pos[i]
+		if pcon_x_pos[i]<max(column_x[1],column_y[1])/2*switch_column[1] then pcon_x_pos[i]=max(column_x[1],column_y[1])/2*switch_column[1]
+		if pcon_x_pos[i]>beam_len-max(column_x[2],column_y[2])/2*switch_column[2] then pcon_x_pos[i]=beam_len-max(column_x[2],column_y[2])/2*switch_column[2]
+	next i
+endif
+
+parameters pcon_x_num=pcon_x_num
+parameters pcon_x_pos=pcon_x_pos

@@ -1,0 +1,1002 @@
+code=1
+x=1
+y=2
+z=3
+eps=1e-5
+
+
+!=================================================================スラブ設定
+!勾配基準線回転角
+base_rtz=0
+if base_pos[2][2]>base_pos[1][2] then
+	base_rtz=acs((base_pos[2][1]-base_pos[1][1])/(sqr((base_pos[2][1]-base_pos[1][1])^2+(base_pos[2][2]-base_pos[1][2])^2)+eps))
+endif
+if base_pos[2][2]=base_pos[1][2] then
+	if base_pos[2][1]>=base_pos[1][1] then
+		base_rtz=0
+	else
+		base_rtz=180
+	endif
+endif
+if base_pos[2][2]<base_pos[1][2] then
+	base_rtz=360-acs((base_pos[2][1]-base_pos[1][1])/(sqr((base_pos[2][1]-base_pos[1][1])^2+(base_pos[2][2]-base_pos[1][2])^2)+eps))
+endif
+
+!勾配基準線方程式
+base_a=base_pos[2][2]-base_pos[1][2]
+base_b=base_pos[1][1]-base_pos[2][1]
+base_c=base_pos[2][1]*base_pos[1][2]-base_pos[1][1]*base_pos[2][2]
+
+values "base_dir" 1,-1
+values "rat" range[0,60]
+
+
+
+
+
+
+
+
+dim _sidePos[][]
+_sidePos[1][2]=0
+
+values{2} "disHotspot" 0,"なし",1,"スラブ頂点",2,"開口頂点",3,"割り付け芯",4,"段差頂点"
+values "slabVertexNum" range[3,]
+
+dim _slabVertexPos[][],_slabVertexZ[]
+for i=1 to slabVertexNum
+    for j=1 to 2
+        _slabVertexPos[i][j]=slabVertexPos[i][j]
+    next j
+
+	_slabVertexZ[i]=(base_a*_slabVertexPos[i][1]+base_b*_slabVertexPos[i][2]+base_c)/sqr(base_a^2+base_b^2)*tan(rat)*base_dir
+next i
+parameters slabVertexPos=_slabVertexPos
+
+!基準線を軸にして平らにする頂点座標
+dim _slabNewPos[][]
+for i=1 to slabVertexNum
+    !頂点から基準線までの垂直交点
+    a1=base_a
+    b1=base_b
+    c1=base_c
+    a2=base_b
+    b2=-base_a
+    c2=(base_a*_slabVertexPos[i][y]-base_b*_slabVertexPos[i][x])
+
+    verticalX=(c2*b1-c1*b2)/(a1*b2-a2*b1)
+    verticalY=(c1*a2-c2*a1)/(a1*b2-a2*b1)
+    _slabNewPos[i][x]=verticalX+(_slabVertexPos[i][x]-verticalX)/cos(rat)
+    _slabNewPos[i][y]=verticalY+(_slabVertexPos[i][y]-verticalY)/cos(rat)
+next i
+
+for i=1 to slabVertexNum
+    put _slabNewPos[i][x]
+next i
+
+minx=min(use(nsp))
+maxx=max(get(nsp))
+
+for i=1 to slabVertexNum
+    put _slabNewPos[i][y]
+next i
+
+miny=min(use(nsp))
+maxy=max(get(nsp))
+
+
+!=================================================================開口設定
+values "opNum" range[0,]
+
+dim _opVertexNum[],_opVertexPos[][],_opVertexZ[][],_opNewPos[][],_opMinx[],_opMaxx[],_opMiny[],_opMaxy[]
+_opVertexNum[1]=0
+_opVertexPos[1][1]=0 : _opVertexPos[1][2]=0
+_opVertexZ[1][1]=0 : _opVertexZ[1][2]=0
+_opNewPos[1][1]=0 : _opNewPos[1][2]=0
+_opMinx[1]=0
+_opMaxx[1]=0
+_opMiny[1]=0
+_opMaxy[1]=0
+
+for i=1 to opNum
+    _opVertexNum[i]=opVertexNum[i]
+
+    for j=1 to _opVertexNum[i]
+        _opVertexPos[i][2*j-1]=opVertexPos[i][2*j-1]
+        _opVertexPos[i][2*j]=opVertexPos[i][2*j]
+        _opVertexZ[i][j]=(base_a*_opVertexPos[i][2*j-1]+base_b*_opVertexPos[i][2*j]+base_c)/sqr(base_a^2+base_b^2)*tan(rat)*base_dir
+
+        a1=base_a
+        b1=base_b
+        c1=base_c
+        a2=base_b
+        b2=-base_a
+        c2=(base_a*_opVertexPos[i][2*j]-base_b*_opVertexPos[i][2*j-1])
+
+        verticalX=(c2*b1-c1*b2)/(a1*b2-a2*b1)
+        verticalY=(c1*a2-c2*a1)/(a1*b2-a2*b1)
+        _opNewPos[i][2*j-1]=verticalX+(_opVertexPos[i][2*j-1]-verticalX)/cos(rat)
+        _opNewPos[i][2*j]=verticalY+(_opVertexPos[i][2*j]-verticalY)/cos(rat)
+    next j
+
+    for j=1 to _opVertexNum[i]
+        put _opNewPos[i][2*j-1]
+    next j
+    _opMinx[i]=min(use(nsp))
+    _opMaxx[i]=max(get(nsp))
+
+    for j=1 to _opVertexNum[i]
+        put _opNewPos[i][2*j]
+    next j
+    _opMiny[i]=min(use(nsp))
+    _opMaxy[i]=max(get(nsp))
+next i
+
+parameters \
+opVertexNum=_opVertexNum,
+opVertexPos=_opVertexPos
+
+values "opVertexNum" range[3,]
+if opNum=0 then hideparameter "opVertexNum","opVertexPos"
+
+
+!=================================================================段差設定
+values "stepVertexNum" range[3,]
+values "stepHei" range[,slabHei-furringHei-furringRecHei]
+
+dim _stepVertexPos[][],_stepVertexZ[],_stepNewPos[][]
+_stepVertexPos[1][1]=0 : _stepVertexPos[1][2]=0
+_stepVertexZ[1]=0
+_stepNewPos[1][1]=0 : _stepNewPos[1][2]=0
+
+for i=1 to stepVertexNum
+    _stepVertexPos[i][x]=stepVertexPos[i][x]
+    _stepVertexPos[i][y]=stepVertexPos[i][y]
+	_stepVertexZ[i]=(base_a*_stepVertexPos[i][1]+base_b*_stepVertexPos[i][2]+base_c)/sqr(base_a^2+base_b^2)*tan(rat)*base_dir
+
+    a1=base_a
+    b1=base_b
+    c1=base_c
+    a2=base_b
+    b2=-base_a
+    c2=(base_a*_stepVertexPos[i][y]-base_b*_stepVertexPos[i][x])
+
+    verticalX=(c2*b1-c1*b2)/(a1*b2-a2*b1)
+    verticalY=(c1*a2-c2*a1)/(a1*b2-a2*b1)
+    _stepNewPos[i][x]=verticalX+(_stepVertexPos[i][x]-verticalX)/cos(rat)
+    _stepNewPos[i][y]=verticalY+(_stepVertexPos[i][y]-verticalY)/cos(rat)
+next i
+
+for i=1 to stepVertexNum
+    put _stepNewPos[i][x]
+next i
+stepMinx=min(use(nsp))
+stepMaxx=max(get(nsp))
+
+for i=1 to stepVertexNum
+    put _stepNewPos[i][y]
+next i
+stepMiny=min(use(nsp))
+stepMaxy=max(get(nsp))
+
+parameters stepVertexPos=_stepVertexPos
+
+if switchStep=0 then hideparameter "stepVertexNum","stepVertexPos","stepHei"
+
+stepRefWoodNum=0
+dim _stepRefWoodPos[][],_stepRefWoodWid[]
+_stepRefWoodPos[1][1]=0
+_stepRefWoodPos[1][2]=0
+_stepRefWoodWid[1]=0
+
+
+!=================================================================ボード
+values "boardThi" 0.005,0.0055,0.006,0.0075,0.009,0.012,0.015,0.018,0.024,0.028,0.03
+values{2} "boardSizeSet" 1,"3x6版",2,"3x8版",3,"3x9版",4,"3x10版",0,"カスタム"
+
+if boardSizeSet=1 then
+    boardSize1=0.910
+    boardSize2=1.820
+    hideparameter "boardSize1","boardSize2"
+endif
+
+if boardSizeSet=2 then
+    boardSize1=0.910
+    boardSize2=1.820/6*8
+    hideparameter "boardSize1","boardSize2"
+endif
+
+if boardSizeSet=3 then
+    boardSize1=0.910
+    boardSize2=1.820/6*9
+    hideparameter "boardSize1","boardSize2"
+endif
+
+if boardSizeSet=4 then
+    boardSize1=0.910
+    boardSize2=1.820/6*10
+    hideparameter "boardSize1","boardSize2"
+endif
+
+if boardSizeSet=0 then
+    values "boardSize1" range[0.455,]
+    values "boardSize2" range[0.455,]
+endif
+
+values{2} "pattern" 1,"通し目地",2,"たて通し目地",3,"馬踏み目地",4,"たて馬踏み目地"
+
+
+!割り付け芯移動モード
+values "centerX" range[minx,maxx]
+values "centerY" range[miny,maxy]
+
+if center455Move then
+    movePitch=0.455
+    if fra((centerX-minx)/movePitch)<=0.5 then
+        centerX=minx+int((centerX-minx)/movePitch)*movePitch
+    else
+        centerX=minx+ceil((centerX-minx)/movePitch)*movePitch
+    endif
+
+    if fra((centerY-miny)/movePitch)<=0.5 then
+        centerY=miny+int((centerY-miny)/movePitch)*movePitch
+    else
+        centerY=miny+ceil((centerY-miny)/movePitch)*movePitch
+    endif
+
+    parameters centerX=centerX,centerY=centerY
+endif
+
+
+!ボードループ数
+for i=1 to slabVertexNum
+    put sqr((_slabNewPos[i][x]-centerX)^2+(_slabNewPos[i][y]-centerY)^2)
+next i
+
+maxDistance=max(get(nsp))
+
+if pattern=1 then
+    boardLoopX=ceil(maxDistance/boardSize1)
+    boardLoopY=ceil(maxDistance/boardSize2)
+endif
+
+if pattern=2 then
+    boardLoopX=ceil(maxDistance/boardSize2)
+    boardLoopY=ceil(maxDistance/boardSize1)
+endif
+
+if pattern=3 then
+    boardLoopX=ceil(maxDistance/boardSize1)+1
+    boardLoopY=ceil(maxDistance/boardSize2/2)*2
+endif
+
+if pattern=4 then
+    boardLoopX=ceil(maxDistance/boardSize2)+1
+    boardLoopY=ceil(maxDistance/boardSize1/2)*2
+endif
+
+
+!=================================================================木軸設定
+values{2} "furringDir" 1,"Y方向",2,"X方向"
+values "furringPitch" range[0.2,]
+values "furringRecPitch" range[0.2,]
+values "hangingPitch" range[0.2,]
+
+if furringDir=1 then
+    verWoodPitch=furringPitch
+    verWoodWid=furringWid
+    verWoodHei=furringHei
+    horWoodPitch=furringRecPitch
+    horWoodWid=furringRecWid
+    horWoodHei=furringRecHei
+else
+    verWoodPitch=furringRecPitch
+    verWoodWid=furringRecWid
+    verWoodHei=furringRecHei
+    horWoodPitch=furringPitch
+    horWoodWid=furringWid
+    horWoodHei=furringHei
+endif
+
+!Y方向木材
+    verWoodXNum=ceil((maxx-minx)/verWoodPitch)
+    verWoodStartPos=minx+((maxx-minx)-(verWoodXNum-1)*verWoodPitch)/2
+
+    verWoodNum=0
+    dim _verWoodPos[][]
+    _verWoodPos[1][2]=0
+
+    !Z座標
+    if furringDir=1 then
+        tempZPos=boardThi
+    else
+        tempZPos=boardThi+furringHei
+    endif
+
+    for i=1 to verWoodXNum
+        !X座標
+        tempXPos=verWoodStartPos+(i-1)*verWoodPitch
+
+        !スラブとの交点
+        intNum=0
+        dim _intPos[]
+        _intPos[1]=0
+
+        for j=1 to slabVertexNum
+            if j<slabVertexNum then
+                j2=j+1
+            else
+                j2=1
+            endif
+
+            if tempXPos>=min(_slabNewPos[j][x],_slabNewPos[j2][x]) and tempXPos<max(_slabNewPos[j][x],_slabNewPos[j2][x]) then
+                intNum=intNum+1
+                _intPos[intNum]=_slabNewPos[j][y]+(_slabNewPos[j2][y]-_slabNewPos[j][y])*(tempXPos-_slabNewPos[j][x])/(_slabNewPos[j2][x]-_slabNewPos[j][x])
+            endif
+        next j
+
+        !交点の順番
+        for j=1 to intNum-1
+            for n=1 to intNum-j
+                if _intPos[n]>_intPos[n+1] then
+                    tempValue=_intPos[n]
+                    _intPos[n]=_intPos[n+1]
+                    _intPos[n+1]=tempValue
+                endif
+            next n
+        next j
+
+        for j=1 to intNum/2
+            tempY1Pos=_intPos[2*j-1]
+            tempY2Pos=_intPos[2*j]
+
+            crossOpNum=0
+            dim _crossOpY1[],_crossOpY2[]
+            _crossOpY1[1]=0 : _crossOpY2[1]=0
+        
+            if opNum>0 then
+                !通す開口数
+                for n=1 to opNum
+                    if tempXPos+verWoodWid/2>_opMinx[n] and tempXPos-verWoodWid/2<_opMaxx[n] and tempY1Pos<_opMaxy[n] and tempY2Pos>_opMiny[n] then
+                        for m=1 to _opVertexNum[n]
+                            if m<_opVertexNum[n] then
+                                m2=m+1
+                            else
+                                m2=1
+                            endif
+
+                            tempX1=_opNewPos[n][2*m-1]
+                            tempX2=_opNewPos[n][2*m2-1]
+                            tempY1=_opNewPos[n][2*m]
+                            tempY2=_opNewPos[n][2*m2]
+
+                            if tempXPos+verWoodWid/2>=min(tempX1,tempX2) and tempXPos+verWoodWid/2<max(tempX1,tempX2) then
+                                put tempY1+(tempY2-tempY1)*((tempXPos+verWoodWid/2)-tempX1)/(tempX2-tempX1)
+                            endif
+
+                            if tempXPos-verWoodWid/2>=min(tempX1,tempX2) and tempXPos-verWoodWid/2<max(tempX1,tempX2) then
+                                put tempY1+(tempY2-tempY1)*((tempXPos-verWoodWid/2)-tempX1)/(tempX2-tempX1)
+                            endif
+                        next m
+
+                        intMiny=min(use(nsp))
+                        intMaxy=max(get(nsp))
+
+                        if intMiny<tempY2Pos and intMaxy>tempY1Pos then
+                            crossOpNum=crossOpNum+1
+                            _crossOpY1[crossOpNum]=intMiny
+                            _crossOpY2[crossOpNum]=intMaxy
+                        endif
+                    endif
+                next n
+
+                !通す開口順番
+                for n=1 to crossOpNum-1
+                    for m=1 to crossOpNum-n
+                        if _crossOpY1[m]>_crossOpY1[m+1] then
+                            tempY1=_crossOpY1[m]
+                            tempY2=_crossOpY2[m]
+                            _crossOpY1[m]=_crossOpY1[m+1]
+                            _crossOpY2[m]=_crossOpY2[m+1]
+                            _crossOpY1[m+1]=tempY1
+                            _crossOpY2[m+1]=tempY2
+                        endif
+                    next m
+                next n
+            endif
+
+            put tempY1Pos
+
+            for n=1 to crossOpNum
+                put _crossOpY1[n]
+                put _crossOpY2[n]
+            next n
+
+            put tempY2Pos
+
+            for n=1 to 1+crossOpNum
+                countFlag=1
+
+                if n=1 and crossOpNum>0 then
+                    if _crossOpY1[1]<=tempY1Pos then
+                        countFlag=0
+                        deleteData=get(1)
+                        deleteData=get(1)
+                    endif
+                endif
+
+                if n=1+crossOpNum and crossOpNum>0 then
+                    if _crossOpY2[crossOpNum]>=tempY2Pos then
+                        countFlag=0
+                        deleteData=get(1)
+                        deleteData=get(1)
+                    endif
+                endif
+
+                if countFlag=1 then
+                    theoY1Pos=get(1)
+                    theoY2Pos=get(1)
+
+                    !通す段差
+                    crossStepFlag=0
+
+                    if switchStep then
+                        if tempXPos+verWoodWid/2>stepMinx and tempXPos-verWoodWid/2<stepMaxx and theoY1Pos<stepMaxy and theoY2Pos>stepMiny then
+                            for m=1 to stepVertexNum
+                                if m<stepVertexNum then
+                                    m2=m+1
+                                else
+                                    m2=1
+                                endif
+
+                                tempX1=_stepNewPos[m][x]
+                                tempX2=_stepNewPos[m2][x]
+                                tempY1=_stepNewPos[m][y]
+                                tempY2=_stepNewPos[m2][y]
+
+                                if tempXPos+verWoodWid/2>=min(tempX1,tempX2) and tempXPos+verWoodWid/2<max(tempX1,tempX2) then
+                                    put tempY1+(tempY2-tempY1)*((tempXPos+verWoodWid/2)-tempX1)/(tempX2-tempX1)
+                                endif
+
+                                if tempXPos-verWoodWid/2>=min(tempX1,tempX2) and tempXPos-verWoodWid/2<max(tempX1,tempX2) then
+                                    put tempY1+(tempY2-tempY1)*((tempXPos-verWoodWid/2)-tempX1)/(tempX2-tempX1)
+                                endif
+                            next m
+
+                            stepIntMiny=min(use(nsp))
+                            stepIntMaxy=max(get(nsp))
+
+                            if stepHei>0 then
+                                stepIntMiny=stepIntMiny-boardThi
+                                stepIntMaxy=stepIntMaxy+boardThi
+                            endif
+
+                            if stepIntMiny<theoY2Pos and stepIntMaxy>theoY1Pos then
+                                crossStepFlag=1
+                            endif
+                        endif
+                    endif
+
+                    put theoY1Pos
+
+                    if crossStepFlag=1 then
+                        put stepIntMiny
+                        put stepIntMiny
+                        put stepIntMaxy
+                        put stepIntMaxy
+                    endif
+
+                    put theoY2Pos
+
+                    for m=1 to 1+2*crossStepFlag
+                        countFlag=1
+
+                        if m=1 and crossStepFlag=1 then
+                            if stepIntMiny<=theoY1Pos then
+                                countFlag=0
+                                deleteData=get(1)
+                                deleteData=get(1)
+                            endif
+                        endif
+
+                        if m=3 and crossStepFlag=1 then
+                            if stepIntMaxy>=theoY2Pos then
+                                countFlag=0
+                                deleteData=get(1)
+                                deleteData=get(1)
+                            endif
+                        endif
+
+                        if crossStepFlag=1 and m=2 then
+                            factZPos=tempZPos+stepHei
+                        else
+                            factZPos=tempZPos
+                        endif
+
+                        if countFlag=1 then
+                            verWoodNum=verWoodNum+1
+                            _verWoodPos[verWoodNum][1]=tempXPos
+                            _verWoodPos[verWoodNum][2]=get(1)
+                            _verWoodPos[verWoodNum][3]=factZPos
+                            _verWoodPos[verWoodNum][4]=tempXPos
+                            _verWoodPos[verWoodNum][5]=get(1)
+                            _verWoodPos[verWoodNum][6]=factZPos
+                        endif
+                    next m
+
+                    !段差補強木材
+                    if crossStepFlag=1 then
+                        downRefWoodFlag=1
+                        upRefWoodFlag=1
+
+                        if stepIntMiny<=theoY1Pos then
+                            downRefWoodFlag=0
+                        endif
+
+                        if stepIntMaxy>=theoY2Pos then
+                            upRefWoodFlag=0
+                        endif
+
+                        if downRefWoodFlag=1 then
+                            stepRefWoodNum=stepRefWoodNum+1
+                            _stepRefWoodWid[stepRefWoodNum]=verWoodWid
+                            _stepRefWoodPos[stepRefWoodNum][x]=tempXPos
+                            if stepHei<0 then
+                                _stepRefWoodPos[stepRefWoodNum][y]=stepIntMiny+verWoodWid/2
+                            else
+                                _stepRefWoodPos[stepRefWoodNum][y]=stepIntMiny-verWoodWid/2
+                            endif
+                            _stepRefWoodPos[stepRefWoodNum][z]=tempZPos+stepHei+verWoodHei
+                        endif
+
+                        if upRefWoodFlag=1 then
+                            stepRefWoodNum=stepRefWoodNum+1
+                            _stepRefWoodWid[stepRefWoodNum]=verWoodWid
+                            _stepRefWoodPos[stepRefWoodNum][x]=tempXPos
+                            if stepHei<0 then
+                                _stepRefWoodPos[stepRefWoodNum][y]=stepIntMaxy-verWoodWid/2
+                            else
+                                _stepRefWoodPos[stepRefWoodNum][y]=stepIntMaxy+verWoodWid/2
+                            endif
+                            _stepRefWoodPos[stepRefWoodNum][z]=tempZPos+stepHei+verWoodHei
+                        endif
+                    endif
+                endif
+            next n
+        next j
+    next i
+
+
+!X方向木材
+    horWoodYNum=ceil((maxy-miny)/horWoodPitch)
+    horWoodStartPos=miny+((maxy-miny)-(horWoodYNum-1)*horWoodPitch)/2
+
+    horWoodNum=0
+    dim _horWoodPos[][]
+    _horWoodPos[1][2]=0
+
+    !Z座標
+    if furringDir=1 then
+        tempZPos=boardThi+furringHei
+    else
+        tempZPos=boardThi
+    endif
+
+    for i=1 to horWoodYNum
+        !Y座標
+        tempYPos=horWoodStartPos+(i-1)*horWoodPitch
+
+        !スラブとの交点
+        intNum=0
+        dim _intPos[]
+        _intPos[1]=0
+
+        for j=1 to slabvertexNum
+            if j<slabvertexNum then
+                j2=j+1
+            else
+                j2=1
+            endif
+
+            if tempYPos>=min(_slabNewPos[j][y],_slabNewPos[j2][y]) and tempYPos<max(_slabNewPos[j][y],_slabNewPos[j2][y]) then
+                intNum=intNum+1
+                _intPos[intNum]=_slabNewPos[j][x]+(_slabNewPos[j2][x]-_slabNewPos[j][x])*(tempYPos-_slabNewPos[j][y])/(_slabNewPos[j2][y]-_slabNewPos[j][y])
+            endif
+        next j
+
+        !交点の順番
+        for j=1 to intNum-1
+            for n=1 to intNum-j
+                if _intPos[n]>_intPos[n+1] then
+                    tempValue=_intPos[n]
+                    _intPos[n]=_intPos[n+1]
+                    _intPos[n+1]=tempValue
+                endif
+            next n
+        next j
+
+        for j=1 to intNum/2
+            tempX1Pos=_intPos[2*j-1]
+            tempX2Pos=_intPos[2*j]
+
+            crossOpNum=0
+            dim _crossOpX1[],_crossOpX2[]
+            _crossOpX1[1]=0 : _crossOpX2[1]=0
+
+            if opNum>0 then
+                !通す開口数
+                for n=1 to opNum
+                    if tempYPos+horWoodWid/2>_opMiny[n] and tempYPos-horWoodWid/2<_opMaxy[n] and tempX1Pos<_opMaxx[n] and tempX2Pos>_opMinx[n] then
+                        for m=1 to _opVertexNum[n]
+                            if m<_opVertexNum[n] then
+                                m2=m+1
+                            else
+                                m2=1
+                            endif
+
+                            tempX1=_opNewPos[n][2*m-1]
+                            tempX2=_opNewPos[n][2*m2-1]
+                            tempY1=_opNewPos[n][2*m]
+                            tempY2=_opNewPos[n][2*m2]
+
+                            if tempYPos+horWoodWid/2>=min(tempY1,tempY2) and tempYPos+horWoodWid/2<max(tempY1,tempY2) then
+                                put tempX1+(tempX2-tempX1)*((tempYPos+horWoodWid/2)-tempY1)/(tempY2-tempY1)
+                            endif
+
+                            if tempYPos-horWoodWid/2>=min(tempY1,tempY2) and tempYPos-horWoodWid/2<max(tempY1,tempY2) then
+                                put tempX1+(tempX2-tempX1)*((tempYPos-horWoodWid/2)-tempY1)/(tempY2-tempY1)
+                            endif
+                        next m
+
+                        intMinx=min(use(nsp))
+                        intMaxx=max(get(nsp))
+
+                        if intMinx<tempX2Pos and intMaxx>tempX1Pos then
+                            crossOpNum=crossOpNum+1
+                            _crossOpX1[crossOpNum]=intMinx
+                            _crossOpX2[crossOpNum]=intMaxx
+                        endif
+                    endif
+                next n
+
+                !通す開口順番
+                for n=1 to crossOpNum-1
+                    for m=1 to crossOpNum-n
+                        if _crossOpX1[m]>_crossOpX1[m+1] then
+                            tempX1=_crossOpX1[m]
+                            tempX2=_crossOpX2[m]
+                            _crossOpX1[m]=_crossOpX1[m+1]
+                            _crossOpX2[m]=_crossOpX2[m+1]
+                            _crossOpX1[m+1]=tempX1
+                            _crossOpX2[m+1]=tempX2
+                        endif
+                    next m
+                next n
+            endif
+
+            put tempX1Pos
+
+            for n=1 to crossOpNum
+                put _crossOpX1[n]
+                put _crossOpX2[n]
+            next n
+
+            put tempX2Pos
+
+            for n=1 to 1+crossOpNum
+                countFlag=1
+
+                if n=1 and crossOpNum>0 then
+                    if _crossOpX1[1]<=tempX1Pos then
+                        countFlag=0
+                        deleteData=get(1)
+                        deleteData=get(1)
+                    endif
+                endif
+
+                if n=1+crossOpNum and crossOpNum>0 then
+                    if _crossOpX2[crossOpNum]>=tempX2Pos then
+                        countFlag=0
+                        deleteData=get(1)
+                        deleteData=get(1)
+                    endif
+                endif
+
+                if countFlag=1 then
+                    theoX1Pos=get(1)
+                    theoX2Pos=get(1)
+
+                    !通す段差
+                    crossStepFlag=0
+
+                    if switchStep then
+                        if tempYPos+horWoodWid/2>stepMiny and tempYPos-horWoodWid/2<stepMaxy and theoX1Pos<stepMaxx and theoX2Pos>stepMinx then
+                            for m=1 to stepVertexNum
+                                if m<stepVertexNum then
+                                    m2=m+1
+                                else
+                                    m2=1
+                                endif
+
+                                tempX1=_stepNewPos[m][x]
+                                tempX2=_stepNewPos[m2][x]
+                                tempY1=_stepNewPos[m][y]
+                                tempY2=_stepNewPos[m2][y]
+
+                                if tempYPos+horWoodWid/2>=min(tempY1,tempY2) and tempYPos+horWoodWid/2<max(tempY1,tempY2) then
+                                    put tempX1+(tempX2-tempX1)*((tempYPos+horWoodWid/2)-tempY1)/(tempY2-tempY1)
+                                endif
+
+                                if tempYPos-horWoodWid/2>=min(tempY1,tempY2) and tempYPos-horWoodWid/2<max(tempY1,tempY2) then
+                                    put tempX1+(tempX2-tempX1)*((tempYPos-horWoodWid/2)-tempY1)/(tempY2-tempY1)
+                                endif
+                            next m
+
+                            stepIntMinx=min(use(nsp))
+                            stepIntMaxx=max(get(nsp))
+
+                            if stepHei>0 then
+                                stepIntMinx=stepIntMinx-boardThi
+                                stepIntMaxx=stepIntMaxx+boardThi
+                            endif
+
+                            if stepIntMinx<theoX2Pos and stepIntMaxx>theoX1Pos then
+                                crossStepFlag=1
+                            endif
+                        endif
+                    endif
+
+                    put theoX1Pos
+
+                    if crossStepFlag=1 then
+                        put stepIntMinx
+                        put stepIntMinx
+                        put stepIntMaxx
+                        put stepIntMaxx
+                    endif
+
+                    put theoX2Pos
+
+                    for m=1 to 1+2*crossStepFlag
+                        countFlag=1
+
+                        if m=1 and crossStepFlag=1 then
+                            if stepIntMinx<=theoX1Pos then
+                                countFlag=0
+                                deleteData=get(1)
+                                deleteData=get(1)
+                            endif
+                        endif
+
+                        if m=3 and crossStepFlag=1 then
+                            if stepIntMaxx>=theoX2Pos then
+                                countFlag=0
+                                deleteData=get(1)
+                                deleteData=get(1)
+                            endif
+                        endif
+
+                        if crossStepFlag=1 and m=2 then
+                            factZPos=tempZPos+stepHei
+                        else
+                            factZPos=tempZPos
+                        endif
+
+                        if countFlag=1 then
+                            horWoodNum=horWoodNum+1
+                            _horWoodPos[horWoodNum][1]=get(1)
+                            _horWoodPos[horWoodNum][2]=tempYPos
+                            _horWoodPos[horWoodNum][3]=factZPos
+                            _horWoodPos[horWoodNum][4]=get(1)
+                            _horWoodPos[horWoodNum][5]=tempYPos
+                            _horWoodPos[horWoodNum][6]=factZPos
+                        endif
+                    next m
+
+                    !段差補強木材
+                    if crossStepFlag=1 then
+                        leftRefWoodFlag=1
+                        rightRefWoodFlag=1
+
+                        if stepIntMinx<=theoX1Pos then
+                            leftRefWoodFlag=0
+                        endif
+
+                        if stepIntMaxx>=theoX2Pos then
+                            rightRefWoodFlag=0
+                        endif
+
+                        if leftRefWoodFlag=1 then
+                            stepRefWoodNum=stepRefWoodNum+1
+                            _stepRefWoodWid[stepRefWoodNum]=horWoodWid
+                            if stepHei<0 then
+                                _stepRefWoodPos[stepRefWoodNum][x]=stepIntMinx+horWoodWid/2
+                            else
+                                _stepRefWoodPos[stepRefWoodNum][x]=stepIntMinx-horWoodWid/2
+                            endif
+                            _stepRefWoodPos[stepRefWoodNum][y]=tempYPos
+                            _stepRefWoodPos[stepRefWoodNum][z]=tempZPos+stepHei+horWoodHei
+                        endif
+
+                        if rightRefWoodFlag=1 then
+                            stepRefWoodNum=stepRefWoodNum+1
+                            _stepRefWoodWid[stepRefWoodNum]=horWoodWid
+                            if stepHei<0 then
+                                _stepRefWoodPos[stepRefWoodNum][x]=stepIntMaxx-horWoodWid/2
+                            else
+                                _stepRefWoodPos[stepRefWoodNum][x]=stepIntMaxx+horWoodWid/2
+                            endif
+                            _stepRefWoodPos[stepRefWoodNum][y]=tempYPos
+                            _stepRefWoodPos[stepRefWoodNum][z]=tempZPos+stepHei+horWoodHei
+                        endif
+                    endif
+                endif
+            next n
+        next j
+    next i
+
+
+!胴縁
+    furringNum=0
+    dim _furringPos[][]
+    _furringPos[1][2]=0
+
+    if furringDir=1 then
+        furringNum=verWoodNum
+        _furringPos=_verWoodPos
+    else
+        furringNum=horWoodNum
+        _furringPos=_horWoodPos
+    endif
+
+
+!胴縁受け
+    furringRecNum=0
+    dim _furringRecPos[][]
+    _furringRecPos[1][2]=0
+
+    if furringDir=1 then
+        furringRecNum=horWoodNum
+        _furringRecPos=_horWoodPos
+    else
+        furringRecNum=verWoodNum
+        _furringRecPos=_verWoodPos
+    endif
+
+
+!吊り木
+    hangingNum=0
+    dim _hangingPos[][],_hangingHei[]
+    _hangingPos[1][2]=0
+    _hangingHei[1]=0
+
+    if furringDir=1 then
+        hangingXNum=ceil((maxx-minx)/hangingPitch)
+        hangingStartPos=minx+((maxx-minx)-(hangingXNum-1)*hangingPitch)/2
+
+        for i=1 to horWoodYNum
+            spotY=horWoodStartPos+(i-1)*horWoodPitch+horWoodWid/2+hangingSize/2
+
+            for j=1 to hangingXNum
+                spotX=hangingStartPos+(j-1)*hangingPitch
+
+                !吊り木座標がスラブの内にあるか
+                sideNum=slabVertexNum
+                _sidePos=_slabNewPos
+                gosub "judgeSpotInRange"
+                slabRangeFlag=inRangeFlag
+
+                !吊り木座標が開口の外にあるか
+                opRangeFlag=0
+                if slabRangeFlag=1 and opNum>0 then
+                    for n=1 to opNum
+                        sideNum=_opVertexNum[n]
+                        for m=1 to sideNum
+                            _sidePos[m][x]=_opNewPos[n][2*m-1]
+                            _sidePos[m][y]=_opNewPos[n][2*m]
+                        next m
+                        gosub "judgeSpotInRange"
+                        opRangeFlag=opRangeFlag+inRangeFlag
+                    next n
+                endif
+
+                if slabRangeFlag=1 and opRangeFlag=0 then
+                    hangingNum=hangingNum+1
+
+                    stepRangeFlag=0
+
+                    if switchStep then
+                        sideNum=stepVertexNum
+                        _sidePos=_stepNewPos
+                        gosub "judgeSpotInRange"
+                        stepRangeFlag=inRangeFlag
+                    endif
+
+                    if stepRangeFlag=0 then
+                        hangingZPos=boardThi+furringHei
+                        _hangingHei[hangingNum]=slabHei-boardThi-furringHei
+                    else
+                        hangingZPos=boardThi+furringHei+stepHei
+                        _hangingHei[hangingNum]=slabHei-boardThi-furringHei-stepHei
+                    endif
+
+                    _hangingPos[hangingNum][x]=spotX
+                    _hangingPos[hangingNum][y]=spotY
+                    _hangingPos[hangingNum][z]=hangingZPos
+                endif
+            next j
+        next i
+    else
+        hangingYNum=ceil((maxy-miny)/hangingPitch)
+        hangingStartPos=miny+((maxy-miny)-(hangingYNum-1)*hangingPitch)/2
+
+        for i=1 to verWoodXNum
+            spotX=verWoodStartPos+(i-1)*verWoodPitch+verWoodWid/2+hangingSize/2
+
+            for j=1 to hangingYNum
+                spotY=hangingStartPos+(j-1)*hangingPitch
+
+                !吊り木座標がスラブの内にあるか
+                sideNum=slabVertexNum
+                _sidePos=_slabNewPos
+                gosub "judgeSpotInRange"
+                slabRangeFlag=inRangeFlag
+
+                !吊り木座標が開口の外にあるか
+                opRangeFlag=0
+                if slabRangeFlag=1 and opNum>0 then
+                    for n=1 to opNum
+                        sideNum=_opVertexNum[n]
+                        for m=1 to sideNum
+                            _sidePos[m][x]=_opNewPos[n][2*m-1]
+                            _sidePos[m][y]=_opNewPos[n][2*m]
+                        next m
+                        gosub "judgeSpotInRange"
+                        opRangeFlag=opRangeFlag+inRangeFlag
+                    next n
+                endif
+
+                if slabRangeFlag=1 and opRangeFlag=0 then
+                    hangingNum=hangingNum+1
+                    _hangingPos[hangingNum][x]=spotX
+                    _hangingPos[hangingNum][y]=spotY
+                endif
+            next j
+        next i
+    endif
+
+
+
+goto "master_end"
+
+end
+
+
+
+"judgeSpotInRange":
+    intNum=0
+
+    for p=1 to sideNum
+        if p<sideNum then
+            p2=p+1
+        else
+            p2=1
+        endif
+
+        if spotX>=min(_sidePos[p][x],_sidePos[p2][x]) and spotX<max(_sidePos[p][x],_sidePos[p2][x]) then
+            intPos=_sidePos[p][y]+(_sidePos[p2][y]-_sidePos[p][y])*(spotX-_sidePos[p][x])/(_sidePos[p2][x]-_sidePos[p][x])
+            if intPos>spotY then
+                intNum=intNum+1
+            endif
+        endif
+    next p
+
+    if fra(intNum/2)=0 then
+        inRangeFlag=0
+    else
+        inRangeFlag=1
+    endif
+return
+
+
+"master_end":

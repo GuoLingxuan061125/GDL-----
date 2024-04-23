@@ -1,0 +1,526 @@
+!====================================================================鳩小屋躯体
+!躯体
+group "house"
+    material m_house
+    
+    add -down_x/2,-down_y/2,0
+        block down_x,down_y,down_z
+    del 1
+
+    add -eaves_x/2,-eaves_y/2,down_z
+        block eaves_x,eaves_y,eaves_z1
+    del 1
+
+    addz down_z+eaves_z1
+        ruledsegmented 4,1+2+4+8+16+32,
+        -eaves_x/2,-eaves_y/2,0,0,
+        eaves_x/2,-eaves_y/2,0,0,
+        eaves_x/2,eaves_y/2,0,0,
+        -eaves_x/2,eaves_y/2,0,0,
+        -top_x/2,-top_y/2,eaves_z2,
+        top_x/2,-top_y/2,eaves_z2,
+        top_x/2,top_y/2,eaves_z2,
+        -top_x/2,top_y/2,eaves_z2
+    del 1
+
+    add -top_x/2,-top_y/2,down_z+eaves_z1+eaves_z2
+        block top_x,top_y,top_z
+    del 1
+
+    !ルーフ
+    if roof_type=1 then !片流れ
+        addz down_z+eaves_z1+eaves_z2+top_z
+            ruledsegmented 4,1+2+4+8+16+32,
+            -roof_x/2,-roof_y/2,0,0,
+            roof_x/2,-roof_y/2,0,0,
+            roof_x/2,roof_y/2,0,0,
+            -roof_x/2,roof_y/2,0,0,
+            -roof_x/2,-roof_y/2,2*roof_z2-roof_z1,
+            roof_x/2,-roof_y/2,2*roof_z2-roof_z1,
+            roof_x/2,roof_y/2,roof_z1,
+            -roof_x/2,roof_y/2,roof_z1
+        del 1
+    endif
+
+    if roof_type=2 then !切妻
+        addz down_z+eaves_z1+eaves_z2+top_z
+            ruledsegmented 5,1+2+4+8+16+32,
+            -roof_x/2,-roof_y/2,0,0,
+            -roof_x/2,roof_y/2,0,0,
+            -roof_x/2,roof_y/2,roof_z1,0,
+            -roof_x/2,0,roof_z2,0,
+            -roof_x/2,-roof_y/2,roof_z1,0,
+            roof_x/2,-roof_y/2,0,
+            roof_x/2,roof_y/2,0,
+            roof_x/2,roof_y/2,roof_z1,
+            roof_x/2,0,roof_z2,
+            roof_x/2,-roof_y/2,roof_z1
+        del 1
+    endif
+
+    if roof_type=3 then !寄棟
+        addz down_z+eaves_z1+eaves_z2+top_z
+            ruledsegmented 4,1+2+4+8+16+32,
+            -roof_x/2,-roof_y/2,0,0,
+            roof_x/2,-roof_y/2,0,0,
+            roof_x/2,roof_y/2,0,0,
+            -roof_x/2,roof_y/2,0,0,
+            -roof_x/2,-roof_y/2,roof_z1,
+            roof_x/2,-roof_y/2,roof_z1,
+            roof_x/2,roof_y/2,roof_z1,
+            -roof_x/2,roof_y/2,roof_z1
+
+            addz roof_z1
+                pyramid 4,roof_z2-roof_z1,1+4+16,
+                -roof_x/2,-roof_y/2,0,
+                roof_x/2,-roof_y/2,0,
+                roof_x/2,roof_y/2,0,
+                -roof_x/2,roof_y/2,0
+            del 1
+        del 1
+    endif
+endgroup
+
+
+group "house_minus"
+    material m_house
+
+    add -down_x/2+thi,-down_y/2+thi,0
+        block down_x-2*thi,down_y-2*thi,down_z
+    del 1
+
+    add -top_x/2+thi,-top_y/2+thi,down_z
+        block top_x-2*thi,top_y-2*thi,eaves_z1+eaves_z2+top_z
+    del 1
+endgroup
+
+house_1=subgroup("house","house_minus")
+
+if dis_house then
+    placegroup house_1
+endif
+
+!ホットスポット
+hotspot 0,0,0
+hotspot 0,0,hei_top
+
+hotspot -down_x/2,-down_y/2,0
+hotspot down_x/2,-down_y/2,0
+hotspot down_x/2,down_y/2,0
+hotspot -down_x/2,down_y/2,0
+
+hotspot -down_x/2+thi,-down_y/2+thi,0
+hotspot down_x/2-thi,-down_y/2+thi,0
+hotspot down_x/2-thi,down_y/2-thi,0
+hotspot -down_x/2+thi,down_y/2-thi,0
+
+for i=1 to 2
+    hotspot -eaves_x/2,-eaves_y/2,down_z
+    hotspot eaves_x/2,-eaves_y/2,down_z
+    hotspot eaves_x/2,eaves_y/2,down_z
+    hotspot -eaves_x/2,eaves_y/2,down_z
+    addz eaves_z1
+next i
+del 2
+
+
+hotspot -roof_x/2,-roof_y/2,down_z+eaves_z1+eaves_z2+top_z
+hotspot roof_x/2,-roof_y/2,down_z+eaves_z1+eaves_z2+top_z
+hotspot roof_x/2,roof_y/2,down_z+eaves_z1+eaves_z2+top_z
+hotspot -roof_x/2,roof_y/2,down_z+eaves_z1+eaves_z2+top_z
+
+if roof_type=1 then
+    hotspot -roof_x/2,-roof_y/2,down_z+eaves_z1+eaves_z2+top_z+2*roof_z2-roof_z1
+    hotspot roof_x/2,-roof_y/2,down_z+eaves_z1+eaves_z2+top_z+2*roof_z2-roof_z1
+else
+    hotspot -roof_x/2,-roof_y/2,down_z+eaves_z1+eaves_z2+top_z+roof_z1
+    hotspot roof_x/2,-roof_y/2,down_z+eaves_z1+eaves_z2+top_z+roof_z1
+endif
+hotspot roof_x/2,roof_y/2,down_z+eaves_z1+eaves_z2+top_z+roof_z1
+hotspot -roof_x/2,roof_y/2,down_z+eaves_z1+eaves_z2+top_z+roof_z1
+
+
+!=======================================================================鉄筋
+!=====================================立上り横筋
+if fhor_num>0 then
+    for i=1 to fhor_num
+        !頂点
+        if disPOINT then
+            for j=1 to fhor_point[i]
+                hotspot fhor_pos[i][3*j-2],fhor_pos[i][3*j-1],fhor_pos[i][3*j]
+            next j
+        endif
+
+        !中心線
+        if disCL and fhor_point[i]>1 then
+            pen fhor_pen
+    
+            for j=1 to fhor_point[i]-1
+                lin_ fhor_pos[i][3*j-2],fhor_pos[i][3*j-1],fhor_pos[i][3*j],fhor_pos[i][3*(j+1)-2],fhor_pos[i][3*(j+1)-1],fhor_pos[i][3*(j+1)]
+            next j
+        endif
+
+        !鉄筋
+        if disSD and fhor_point[i]>1 then
+            material fhor_mat
+    
+            tube_r=fhor_r
+            gosub "鉄筋断面計算sub"
+    
+            put 2*fhor_pos[i][1]-fhor_pos[i][4],2*fhor_pos[i][2]-fhor_pos[i][5],2*fhor_pos[i][3]-fhor_pos[i][6],0
+            for j=1 to fhor_point[i]
+                put fhor_pos[i][3*j-2],fhor_pos[i][3*j-1],fhor_pos[i][3*j],0
+            next j
+            put 2*fhor_pos[i][3*fhor_point[i]-2]-fhor_pos[i][3*fhor_point[i]-5],2*fhor_pos[i][3*fhor_point[i]-1]-\
+                fhor_pos[i][3*fhor_point[i]-4],2*fhor_pos[i][3*fhor_point[i]]-fhor_pos[i][3*fhor_point[i]-3],0
+    
+            tube SDresol+1,fhor_point[i]+2,1+2+16+32+64,
+            get (nsp)
+        endif
+    next i
+endif
+
+
+!=====================================立上り縦筋
+if fver_num>0 then
+    for i=1 to fver_num
+        !頂点
+        if disPOINT then
+            for j=1 to fver_point[i]
+                hotspot fver_pos[i][3*j-2],fver_pos[i][3*j-1],fver_pos[i][3*j]
+            next j
+        endif
+
+        !中心線
+        if disCL and fver_point[i]>1 then
+            pen fver_pen
+    
+            for j=1 to fver_point[i]-1
+                lin_ fver_pos[i][3*j-2],fver_pos[i][3*j-1],fver_pos[i][3*j],fver_pos[i][3*(j+1)-2],fver_pos[i][3*(j+1)-1],fver_pos[i][3*(j+1)]
+            next j
+        endif
+
+        !鉄筋
+        if disSD and fver_point[i]>1 then
+            material fver_mat
+    
+            tube_r=fver_r
+            gosub "鉄筋断面計算sub"
+    
+            put 2*fver_pos[i][1]-fver_pos[i][4],2*fver_pos[i][2]-fver_pos[i][5],2*fver_pos[i][3]-fver_pos[i][6],0
+            for j=1 to fver_point[i]
+                put fver_pos[i][3*j-2],fver_pos[i][3*j-1],fver_pos[i][3*j],0
+            next j
+            put 2*fver_pos[i][3*fver_point[i]-2]-fver_pos[i][3*fver_point[i]-5],2*fver_pos[i][3*fver_point[i]-1]-\
+                fver_pos[i][3*fver_point[i]-4],2*fver_pos[i][3*fver_point[i]]-fver_pos[i][3*fver_point[i]-3],0
+    
+            tube SDresol+1,fver_point[i]+2,1+2+16+32+64,
+            get (nsp)
+        endif
+    next i
+endif
+
+
+!=====================================あご部配筋
+!L型縦筋
+if ever_num>0 then
+    for i=1 to ever_num
+        !頂点
+        if disPOINT then
+            for j=1 to ever_point[i]
+                hotspot ever_pos[i][3*j-2],ever_pos[i][3*j-1],ever_pos[i][3*j]
+            next j
+        endif
+
+        !中心線
+        if disCL and ever_point[i]>1 then
+            pen ever_pen
+    
+            for j=1 to ever_point[i]-1
+                lin_ ever_pos[i][3*j-2],ever_pos[i][3*j-1],ever_pos[i][3*j],ever_pos[i][3*(j+1)-2],ever_pos[i][3*(j+1)-1],ever_pos[i][3*(j+1)]
+            next j
+        endif
+
+        !鉄筋
+        if disSD and ever_point[i]>1 then
+            material ever_mat
+    
+            tube_r=ever_r
+            gosub "鉄筋断面計算sub"
+    
+            put 2*ever_pos[i][1]-ever_pos[i][4],2*ever_pos[i][2]-ever_pos[i][5],2*ever_pos[i][3]-ever_pos[i][6],0
+            for j=1 to ever_point[i]
+                put ever_pos[i][3*j-2],ever_pos[i][3*j-1],ever_pos[i][3*j],0
+            next j
+            put 2*ever_pos[i][3*ever_point[i]-2]-ever_pos[i][3*ever_point[i]-5],2*ever_pos[i][3*ever_point[i]-1]-\
+                ever_pos[i][3*ever_point[i]-4],2*ever_pos[i][3*ever_point[i]]-ever_pos[i][3*ever_point[i]-3],0
+    
+            tube SDresol+1,ever_point[i]+2,1+2+16+32+64,
+            get (nsp)
+        endif
+    next i
+endif
+
+!外周横筋
+if ehor_num>0 then
+    for i=1 to ehor_num
+        !頂点
+        if disPOINT then
+            for j=1 to ehor_point[i]
+                hotspot ehor_pos[i][3*j-2],ehor_pos[i][3*j-1],ehor_pos[i][3*j]
+            next j
+        endif
+
+        !中心線
+        if disCL and ehor_point[i]>1 then
+            pen ehor_pen
+    
+            for j=1 to ehor_point[i]-1
+                lin_ ehor_pos[i][3*j-2],ehor_pos[i][3*j-1],ehor_pos[i][3*j],ehor_pos[i][3*(j+1)-2],ehor_pos[i][3*(j+1)-1],ehor_pos[i][3*(j+1)]
+            next j
+        endif
+
+        !鉄筋
+        if disSD and ehor_point[i]>1 then
+            material ehor_mat
+    
+            tube_r=ehor_r
+            gosub "鉄筋断面計算sub"
+    
+            put 2*ehor_pos[i][1]-ehor_pos[i][4],2*ehor_pos[i][2]-ehor_pos[i][5],2*ehor_pos[i][3]-ehor_pos[i][6],0
+            for j=1 to ehor_point[i]
+                put ehor_pos[i][3*j-2],ehor_pos[i][3*j-1],ehor_pos[i][3*j],0
+            next j
+            put 2*ehor_pos[i][3*ehor_point[i]-2]-ehor_pos[i][3*ehor_point[i]-5],2*ehor_pos[i][3*ehor_point[i]-1]-\
+                ehor_pos[i][3*ehor_point[i]-4],2*ehor_pos[i][3*ehor_point[i]]-ehor_pos[i][3*ehor_point[i]-3],0
+    
+            tube SDresol+1,ehor_point[i]+2,1+2+16+32+64,
+            get (nsp)
+        endif
+    next i
+endif
+
+
+!=====================================天端縦筋
+if rver_num>0 then
+    for i=1 to rver_num
+        !頂点
+        if disPOINT then
+            for j=1 to rver_point[i]
+                hotspot rver_pos[i][3*j-2],rver_pos[i][3*j-1],rver_pos[i][3*j]
+            next j
+        endif
+
+        !中心線
+        if disCL and rver_point[i]>1 then
+            pen rver_pen
+    
+            for j=1 to rver_point[i]-1
+                lin_ rver_pos[i][3*j-2],rver_pos[i][3*j-1],rver_pos[i][3*j],rver_pos[i][3*(j+1)-2],rver_pos[i][3*(j+1)-1],rver_pos[i][3*(j+1)]
+            next j
+        endif
+
+        !鉄筋
+        if disSD and rver_point[i]>1 then
+            material rver_mat
+    
+            tube_r=rver_r
+            gosub "鉄筋断面計算sub"
+    
+            put 2*rver_pos[i][1]-rver_pos[i][4],2*rver_pos[i][2]-rver_pos[i][5],2*rver_pos[i][3]-rver_pos[i][6],0
+            for j=1 to rver_point[i]
+                put rver_pos[i][3*j-2],rver_pos[i][3*j-1],rver_pos[i][3*j],0
+            next j
+            put 2*rver_pos[i][3*rver_point[i]-2]-rver_pos[i][3*rver_point[i]-5],2*rver_pos[i][3*rver_point[i]-1]-\
+                rver_pos[i][3*rver_point[i]-4],2*rver_pos[i][3*rver_point[i]]-rver_pos[i][3*rver_point[i]-3],0
+    
+            tube SDresol+1,rver_point[i]+2,1+2+16+32+64,
+            get (nsp)
+        endif
+    next i
+endif
+
+
+!=====================================天端横筋
+if rhor_num>0 then
+    for i=1 to rhor_num
+        !頂点
+        if disPOINT then
+            for j=1 to rhor_point[i]
+                hotspot rhor_pos[i][3*j-2],rhor_pos[i][3*j-1],rhor_pos[i][3*j]
+            next j
+        endif
+
+        !中心線
+        if disCL and rhor_point[i]>1 then
+            pen rhor_pen
+    
+            for j=1 to rhor_point[i]-1
+                lin_ rhor_pos[i][3*j-2],rhor_pos[i][3*j-1],rhor_pos[i][3*j],rhor_pos[i][3*(j+1)-2],rhor_pos[i][3*(j+1)-1],rhor_pos[i][3*(j+1)]
+            next j
+        endif
+
+        !鉄筋
+        if disSD and rhor_point[i]>1 then
+            material rhor_mat
+    
+            tube_r=rhor_r
+            gosub "鉄筋断面計算sub"
+    
+            put 2*rhor_pos[i][1]-rhor_pos[i][4],2*rhor_pos[i][2]-rhor_pos[i][5],2*rhor_pos[i][3]-rhor_pos[i][6],0
+            for j=1 to rhor_point[i]
+                put rhor_pos[i][3*j-2],rhor_pos[i][3*j-1],rhor_pos[i][3*j],0
+            next j
+            put 2*rhor_pos[i][3*rhor_point[i]-2]-rhor_pos[i][3*rhor_point[i]-5],2*rhor_pos[i][3*rhor_point[i]-1]-\
+                rhor_pos[i][3*rhor_point[i]-4],2*rhor_pos[i][3*rhor_point[i]]-rhor_pos[i][3*rhor_point[i]-3],0
+    
+            tube SDresol+1,rhor_point[i]+2,1+2+16+32+64,
+            get (nsp)
+        endif
+    next i
+endif
+
+    
+!==========================================型枠
+if dis_board then
+        for i=2 to 5
+            add -down_x/2,-down_y/2,0
+                material m_board 
+                TUBE 8,4,1+2+4+8+16+32,
+                thi,offset_cemb,0,				
+                thi+board_thi,offset_cemb,0,				
+                thi+board_thi,hei_bot-hei_botedge-board_thi,0,			
+                thi+pitch_botchin+board_thi,hei_bot-hei_botedge-board_thi,0,
+                thi+pitch_botchin+board_thi,hei_bot,2,			
+                thi+pitch_botchin,hei_bot,2,			
+                thi,hei_bot,2,			
+                thi,offset_cemb,0,				
+                point_x[i-1],point_y[i-1],0,0,
+                point_x[i],point_y[i],0,0,
+                point_x[i+1],point_y[i+1],0,0,
+                point_x[i+2],point_y[i+2],0,0
+
+                TUBE 4,4,1+2+4+8+16+32,
+                0,offset_cemb,0, 				
+                -board_thi,offset_cemb,0,				
+                -board_thi,hei_top-hei_topedge-dz_top,0,
+                0,hei_top-hei_topedge-dz_top,0,			
+                point_x[i-1],point_y[i-1],0,0,
+                point_x[i],point_y[i],0,0,
+                point_x[i+1],point_y[i+1],0,0,
+                point_x[i+2],point_y[i+2],0,0
+
+                addz hei_bot+thi*slope_top/100
+                    TUBE{2} m_board,m_board,m_board,7,4,1+2+4+8+16+32,
+                    0,-hei_botedge,0,m_board,
+                    board_thi,-hei_botedge,0,m_board,
+                    board_thi,hei_top-hei_topedge-dz_top-hei_bot-board_thi,0,m_board,
+                    pitch_topchin+board_thi,hei_top-hei_topedge-dz_top-hei_bot-board_thi,0,m_board,
+                    pitch_topchin+board_thi,hei_top-hei_topedge-dz_top-hei_bot,0,m_board,
+                    0,hei_top-dz_top-hei_bot-hei_topedge,0,m_board,
+                    0,-hei_botedge,0,m_board,
+                    root_x[i-1],root_y[i-1],0,0,
+                    root_x[i],root_y[i],0,0,
+                    root_x[i+1],root_y[i+1],0,0,
+                    root_x[i+2],root_y[i+2],0,0
+                del 1
+            del 1
+
+            !ルーフ
+            if roof_type=1 then !片流れ
+                add -roof_x/2-board_thi,-roof_y/2-board_thi,hei_top-roof_z2
+                    block roof_x+2*board_thi,board_thi,2*roof_z2-roof_z1
+                del 1
+
+                add -roof_x/2-board_thi,roof_y/2,hei_top-roof_z2
+                    block roof_x+2*board_thi,board_thi,roof_z1
+                del 1
+
+                for j=1 to 2
+                    add -roof_x/2-board_thi,-roof_y/2,hei_top-roof_z2
+                        ruledsegmented 4,1+2+4+8+16+32,
+                        0,0,0,0,
+                        0,roof_y,0,0,
+                        0,roof_y,roof_z1,0,
+                        0,0,2*roof_z2-roof_z1,0,
+                        board_thi,0,0,
+                        board_thi,roof_y,0,
+                        board_thi,roof_y,roof_z1,
+                        board_thi,0,2*roof_z2-roof_z1
+                    del 1 
+                addx roof_x+board_thi
+                next j
+                del 2
+            endif
+
+            if roof_type=2 then !切妻
+                for j=1 to 2
+                    add -roof_x/2-board_thi,-roof_y/2-board_thi,hei_top-roof_z2
+                        block roof_x+2*board_thi,board_thi,roof_z1
+                    del 1
+                addy roof_y+board_thi
+                next j
+                del 2
+
+                for j=1 to 2
+                    add -roof_x/2-board_thi,-roof_y/2,hei_top-roof_z2
+                        ruledsegmented 5,1+2+4+8+16+32,
+                        0,0,0,0,
+                        0,roof_y,0,0,
+                        0,roof_y,roof_z1,0,
+                        0,roof_y/2,roof_z2,0,
+                        0,0,roof_z1,0,
+                        board_thi,0,0,
+                        board_thi,roof_y,0,
+                        board_thi,roof_y,roof_z1,
+                        board_thi,roof_y/2,roof_z2,
+                        board_thi,0,roof_z1
+                    del 1 
+                addx roof_x+board_thi
+                next j
+                del 2
+            endif
+
+            if roof_type=3 then !寄棟
+                for j=1 to 2
+                    add -roof_x/2-board_thi,-roof_y/2-board_thi,hei_top-roof_z2
+                        block roof_x+2*board_thi,board_thi,roof_z1
+                    del 1
+                addy roof_y+board_thi
+                next j
+                del 2
+
+                for j=1 to 2
+                    add -roof_x/2-board_thi,-roof_y/2,hei_top-roof_z2
+                        block board_thi,roof_y,roof_z1
+                    del 1 
+                addx roof_x+board_thi
+                next j
+                del 2
+            endif
+        next i
+
+    add -len_bot/2+thi,-wid_bot/2+thi,hei_top-hei_topedge-dz_top
+        block len_bot-2*thi,wid_bot-2*thi,board_thi
+    del 1
+endif
+
+
+
+end
+
+
+
+
+!==========================================鉄筋断面座標リスト
+"鉄筋断面計算sub":
+
+    for t=1 to SDresol
+        put tube_r*cos((1-t)*360/SDresol),tube_r*sin((1-t)*360/SDresol),0
+    next t
+    
+    put tube_r,0,0
+
+return
+
+

@@ -1,0 +1,65 @@
+project2{3} 3,270,1,1+2+4+8+16+32,parameters disPoint=0,disSD=0
+
+set fill cslabFill
+
+poly2 4,1+2+4,
+-cslabX1,-cslabY1,
+cslabX2,-cslabY1,
+cslabX2,cslabY2,
+-cslabX1,cslabY2
+
+!隣接柱ホットスポット
+if switchColumn then
+    if columnDir=1 then
+        hotspot2 0,-cslabY1,code,columnPos,1+128:code=code+1
+        hotspot2 columnPos,-cslabY1,code,columnPos,2:code=code+1
+        hotspot2 -1,-cslabY1,code,columnPos,3:code=code+1
+
+        hotspot2 columnPos-columnSize/2,-cslabY1,0
+        hotspot2 columnPos+columnSize/2,-cslabY1,0
+    endif
+
+    if columnDir=2 then
+        hotspot2 cslabX2,0,code,columnPos,1+128:code=code+1
+        hotspot2 cslabX2,columnPos,code,columnPos,2:code=code+1
+        hotspot2 cslabX2,-1,code,columnPos,3:code=code+1
+
+        hotspot2 cslabX2,columnPos-columnSize/2,0
+        hotspot2 cslabX2,columnPos+columnSize/2,0
+    endif
+
+    if columnDir=3 then
+        hotspot2 0,cslabY2,code,columnPos,1+128:code=code+1
+        hotspot2 columnPos,cslabY2,code,columnPos,2:code=code+1
+        hotspot2 -1,cslabY2,code,columnPos,3:code=code+1
+
+        hotspot2 columnPos-columnSize/2,cslabY2,0
+        hotspot2 columnPos+columnSize/2,cslabY2,0
+    endif
+
+    if columnDir=4 then
+        hotspot2 -cslabX1,0,code,columnPos,1+128:code=code+1
+        hotspot2 -cslabX1,columnPos,code,columnPos,2:code=code+1
+        hotspot2 -cslabX1,-1,code,columnPos,3:code=code+1
+
+        hotspot2 -cslabX1,columnPos-columnSize/2,0
+        hotspot2 -cslabX1,columnPos+columnSize/2,0
+    endif
+endif
+
+!中央柱ホットスポット
+if switchCentColumn then
+    hotspot2 0,centColumnPos[1][2],code,centColumnPos[1][1],1+128:code=code+1
+    hotspot2 centColumnPos[1][1],centColumnPos[1][2],code,centColumnPos[1][1],2:code=code+1
+    hotspot2 -1,centColumnPos[1][2],code,centColumnPos[1][1],3:code=code+1
+
+    hotspot2 centColumnPos[1][1],0,code,centColumnPos[1][2],1+128:code=code+1
+    hotspot2 centColumnPos[1][1],centColumnPos[1][2],code,centColumnPos[1][2],2:code=code+1
+    hotspot2 centColumnPos[1][1],-1,code,centColumnPos[1][2],3:code=code+1
+
+    hotspot2 centColumnPos[1][1]-centColumnX/2,centColumnPos[1][2]-centColumnY/2
+    hotspot2 centColumnPos[1][1]+centColumnX/2,centColumnPos[1][2]-centColumnY/2
+    hotspot2 centColumnPos[1][1]+centColumnX/2,centColumnPos[1][2]+centColumnY/2
+    hotspot2 centColumnPos[1][1]-centColumnX/2,centColumnPos[1][2]+centColumnY/2
+endif
+

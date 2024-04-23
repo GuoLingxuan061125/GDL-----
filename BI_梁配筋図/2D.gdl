@@ -1,0 +1,836 @@
+
+define style "title_style" fonttype,title_size*100/glob_scale,4,0
+define style "rebarline_style" fonttype,rebarline_size*100/glob_scale,5,0
+
+pen base_color
+
+!===========================================================タイトル
+style "title_style"
+text2 columnPos[1][1],2*rebarline_size/10+title_size/10,"● "+building_text+"  "+floor_text+"  "+position_text
+
+
+!===========================================================柱寸法
+style "rebarline_style"
+for i=1 to beamNum+1
+    hotspot2 columnPos[i][1],-4*rebarline_size/10
+    hotspot2 columnPos[i][2],-4*rebarline_size/10
+    text2 (columnPos[i][1]+columnPos[i][2])/2,-3*rebarline_size/10,columnSize[i]*1000
+next i
+
+
+!===========================================================梁配筋断面図
+for i=1 to beamNum
+    beamCrossSectionMul=beamCrossSectionZ/2/(beamSize[i][2]+eps)
+
+    !中央部
+    add2 columnPos[i][2]+beamLen[i]/2,-6*rebarline_size/10
+        !番号
+        pen rebar_detail_color
+        add2 0,-beamCrossSectionZ/4+2.2*rebarline_size/10
+            text2 0,0,beamTypeNum[i]
+        del 1
+
+        !レベル
+        pen rebar_detail_color
+        add2 0,-beamCrossSectionZ/4+rebarline_size/10
+            text2 0,0,"("+str(beamLevel[i]*1000,1,0)+")"
+        del 1
+
+        !梁配筋本数
+        add2 0,-beamCrossSectionZ/4
+            !上端
+            for j=1 to 3
+                if beamCenterNum[i][j]>0 then
+                    text2 0,-0.6*rebarline_size/10-1.1*(j-1)*rebarline_size/10,beamCenterNum[i][j]
+                endif
+            next j
+            !下端
+            for j=4 to 6
+                if beamCenterNum[i][j]>0 then
+                    text2 0,-beamCrossSectionZ/2+0.7*rebarline_size/10+1.1*(6-j)*rebarline_size/10,beamCenterNum[i][j]
+                endif
+            next j
+        del 1
+
+        !断面寸法
+        add2 0,-beamCrossSectionZ*3/4-0.7*rebarline_size/10
+            text2 0,0,str(beamSize[i][1]*1000,1,0)+"x"+str(beamSize[i][2]*1000,1,0)
+        del 1
+
+        !枠線
+        pen base_color
+        add2 0,-beamCrossSectionZ/4
+            rect2 -beamSize[i][1]/2*beamCrossSectionMul,0,beamSize[i][1]/2*beamCrossSectionMul,-beamCrossSectionZ/2
+        del 1
+    del 1
+
+    !端部
+    if beamSectionType[i]=3 then
+        !枠線
+        pen base_color
+
+        for j=1 to 2
+            add2 columnPos[i][2]+beamPartLen[i][1]/2,-6*rebarline_size/10
+                add2 0,-beamCrossSectionZ/4
+                    rect2 -beamSize[i][1]/2*beamCrossSectionMul,0,beamSize[i][1]/2*beamCrossSectionMul,-beamCrossSectionZ/2
+                del 1
+            del 1
+            add2 beamPartLen[i][1]/2+beamPartLen[i][2]+beamPartLen[i][3]/2,0
+        next j
+        del 2
+
+        !梁配筋本数
+        pen rebar_detail_color
+        
+        !左端
+        add2 columnPos[i][2]+beamPartLen[i][1]/2,-6*rebarline_size/10-beamCrossSectionZ/4
+            !上端
+            for j=1 to 3
+                if beamLeftNum[i][j]>0 then
+                    text2 0,-0.6*rebarline_size/10-1.1*(j-1)*rebarline_size/10,beamLeftNum[i][j]
+                endif
+            next j
+            !下端
+            for j=4 to 6
+                if beamLeftNum[i][j]>0 then
+                    text2 0,-beamCrossSectionZ/2+0.7*rebarline_size/10+1.1*(6-j)*rebarline_size/10,beamLeftNum[i][j]
+                endif
+            next j
+        del 1
+
+        !右端
+        add2 columnPos[i][2]+beamPartLen[i][1]+beamPartLen[i][2]+beamPartLen[i][3]/2,-6*rebarline_size/10-beamCrossSectionZ/4
+            !上端
+            for j=1 to 3
+                if beamRightNum[i][j]>0 then
+                    text2 0,-0.6*rebarline_size/10-1.1*(j-1)*rebarline_size/10,beamRightNum[i][j]
+                endif
+            next j
+            !下端
+            for j=4 to 6
+                if beamRightNum[i][j]>0 then
+                    text2 0,-beamCrossSectionZ/2+0.7*rebarline_size/10+1.1*(6-j)*rebarline_size/10,beamRightNum[i][j]
+                endif
+            next j
+        del 1
+    endif
+
+    !肋筋形状
+    add2 columnPos[i][2]+beamLen[i]/2,-6*rebarline_size/10-beamCrossSectionZ-rebarline_size/10
+        rect2 -beamCrossSectionZ/12,0,beamCrossSectionZ/12,beamCrossSectionZ/6
+
+        coreBarPitch=(beamCrossSectionZ/6)/max(beamCenterNum[i][1],beamLeftNum[i][1],beamRightNum[i][1],1)
+
+        for j=1 to nStp[i]-2
+            if j%2=1 then
+                add2 beamCrossSectionZ/12-ceil(j/2)*coreBarPitch,0
+                    line2 0,0,0,beamCrossSectionZ/6
+                del 1
+            else
+                add2 -beamCrossSectionZ/12+(j/2)*coreBarPitch,0
+                    line2 0,0,0,beamCrossSectionZ/6
+                del 1
+            endif
+        next j
+    del 1
+next i
+
+
+!======================================================================================================================配筋図
+rebarStandardZ=-8*rebarline_size/10-beamCrossSectionZ
+
+!===========================================================分割線1
+if rebar1LineNum>0 then disSectionLine=1 else disSectionLine=0
+gosub "sectionLine"
+
+
+!===========================================================上端1段筋
+set line_type straightline_type
+
+if rebar1LineNum>0 then
+    add2 0,rebarStandardZ
+        !マーク
+        style "rebarline_style"
+        pen base_color
+
+        text2 columnPos[1][1]-2+stw("上端1")/2/1000*glob_scale,-rebarline_size/10,"上端1"
+        text2 columnPos[beamNum+1][2]+2-stw("上端1")/2/1000*glob_scale,-rebarline_size/10,"上端1"
+
+        !鉄筋線
+        for i=1 to rebar1LineNum
+            pen rebar1LinePen[i]
+
+            !頂点
+            if disRebarSpot then
+                for j=1 to rebar1LinePoint[i]
+                    hotspot2 rebar1LinePos[i][2*j-1],rebar1LinePos[i][2*j]
+                next j
+            endif
+
+            !鉄筋線
+            for j=1 to rebar1LinePoint[i]-1
+                line2 rebar1LinePos[i][2*j-1],rebar1LinePos[i][2*j],rebar1LinePos[i][2*j+1],rebar1LinePos[i][2*j+2]
+            next j
+        next i
+
+        !圧接点
+        pen rebar_detail_color
+        fill connectFill
+        
+        for i=1 to connectNum[1]
+            poly2_ 2,2+4,
+            connectPos[1][2*i-1],connectPos[1][2*i],900,
+            0.1,360,4000+1
+        next i
+
+        !詳細情報
+        pen rebar_detail_color
+
+        for i=1 to rebar1LineNum
+            text2 (rebar1LinePos[i][2*1-1]+rebar1LinePos[i][2*rebar1LinePoint[i]-1])/2,rebar1LinePos[i][2*2]+rebarline_size/12,"D"+str(rebar1LineDia[i],1,0)+"-"+str(rebar1LineLen[i]*1000,1,0)
+        next i
+
+        !定着情報
+        pen rebar_detail_color
+
+        for i=1 to beamNum
+            !左
+            if leftAnchorType[i][1]=2 or leftAnchorType[i][1]=3 then
+                add2 beamPos[i][1]-columnSize[i]+leftConCover[i],-_tempSpace[1]
+                    text2 -stw(str(leftAnchorLen[i][1]*1000,1,0))/2/1000*glob_scale,lineGap/2,str(leftAnchorLen[i][1]*1000,1,0)
+                    text2 -stw("ニゲ"+str(leftConCover[i]*1000,1,0))/2/1000*glob_scale,-lineGap/2,"ニゲ"+str(leftConCover[i]*1000,1,0)
+                del 1
+            endif
+
+            !右
+            if rightAnchorType[i][1]=2 or rightAnchorType[i][1]=3 then
+                add2 beamPos[i][2]+columnSize[i+1]-rightConCover[i],-_tempSpace[1]
+                    text2 stw(str(rightAnchorLen[i][1]*1000,1,0))/2/1000*glob_scale,lineGap/2,str(rightAnchorLen[i][1]*1000,1,0)
+                    text2 stw("ニゲ"+str(rightConCover[i]*1000,1,0))/2/1000*glob_scale,-lineGap/2,"ニゲ"+str(rightConCover[i]*1000,1,0)
+                del 1
+            endif
+        next i
+    del 1
+endif
+
+if rebar1LineNum>0 then
+    rebar1Z=(_tempLineNum[1]+1)*_tempSpace[1]
+else
+    rebar1Z=0
+endif
+
+rebarStandardZ=rebarStandardZ-rebar1Z
+
+
+!===========================================================分割線2
+if rebar2LineNum>0 then disSectionLine=1 else disSectionLine=0
+gosub "sectionLine"
+
+
+!===========================================================上端2段筋
+set line_type straightline_type
+
+if rebar2LineNum>0 then
+    add2 0,rebarStandardZ
+        !マーク
+        style "rebarline_style"
+        pen base_color
+
+        text2 columnPos[1][1]-2+stw("上端2")/2/1000*glob_scale,-rebarline_size/10,"上端2"
+        text2 columnPos[beamNum+1][2]+2-stw("上端2")/2/1000*glob_scale,-rebarline_size/10,"上端2"
+
+        !鉄筋線
+        for i=1 to rebar2LineNum
+            pen rebar2LinePen[i]
+
+            !頂点
+            if disRebarSpot then
+                for j=1 to rebar2LinePoint[i]
+                    hotspot2 rebar2LinePos[i][2*j-1],rebar2LinePos[i][2*j]
+                next j
+            endif
+
+            !鉄筋線
+            for j=1 to rebar2LinePoint[i]-1
+                line2 rebar2LinePos[i][2*j-1],rebar2LinePos[i][2*j],rebar2LinePos[i][2*j+1],rebar2LinePos[i][2*j+2]
+            next j
+        next i
+
+        !圧接点
+        pen rebar_detail_color
+        fill connectFill
+        
+        for i=1 to connectNum[2]
+            poly2_ 2,2+4,
+            connectPos[2][2*i-1],connectPos[2][2*i],900,
+            0.1,360,4000+1
+        next i
+
+        !詳細情報
+        pen rebar_detail_color
+
+        for i=1 to rebar2LineNum
+            text2 (rebar2LinePos[i][2*1-1]+rebar2LinePos[i][2*rebar2LinePoint[i]-1])/2,rebar2LinePos[i][2*2]+rebarline_size/12,"D"+str(rebar2LineDia[i],1,0)+"-"+str(rebar2LineLen[i]*1000,1,0)
+        next i
+
+        !定着情報
+        pen rebar_detail_color
+
+        for i=1 to beamNum
+            !左
+            if leftAnchorType[i][1]=2 or leftAnchorType[i][1]=3 then
+                add2 beamPos[i][1]-columnSize[i]+leftConCover[i],-_tempSpace[2]
+                    text2 -stw(str(leftAnchorLen[i][2]*1000,1,0))/2/1000*glob_scale,lineGap/2,str(leftAnchorLen[i][2]*1000,1,0)
+                    text2 -stw("ニゲ"+str(leftConCover[i]*1000,1,0))/2/1000*glob_scale,-lineGap/2,"ニゲ"+str(leftConCover[i]*1000,1,0)
+                del 1
+            endif
+
+            !右
+            if rightAnchorType[i][1]=2 or rightAnchorType[i][1]=3 then
+                add2 beamPos[i][2]+columnSize[i+1]-rightConCover[i],-_tempSpace[2]
+                    text2 stw(str(rightAnchorLen[i][2]*1000,1,0))/2/1000*glob_scale,lineGap/2,str(rightAnchorLen[i][2]*1000,1,0)
+                    text2 stw("ニゲ"+str(rightConCover[i]*1000,1,0))/2/1000*glob_scale,-lineGap/2,"ニゲ"+str(rightConCover[i]*1000,1,0)
+                del 1
+            endif
+        next i
+    del 1
+endif
+
+if rebar2LineNum>0 then
+    rebar2Z=(_tempLineNum[2]+1)*_tempSpace[2]
+else
+    rebar2Z=0
+endif
+
+rebarStandardZ=rebarStandardZ-rebar2Z
+
+
+!===========================================================分割線3
+if rebar3LineNum>0 then disSectionLine=1 else disSectionLine=0
+gosub "sectionLine"
+
+!===========================================================上端3段筋
+set line_type straightline_type
+
+if rebar3LineNum>0 then
+    add2 0,rebarStandardZ
+        !マーク
+        style "rebarline_style"
+        pen base_color
+
+        text2 columnPos[1][1]-2+stw("上端3")/2/1000*glob_scale,-rebarline_size/10,"上端3"
+        text2 columnPos[beamNum+1][2]+2-stw("上端3")/2/1000*glob_scale,-rebarline_size/10,"上端3"
+
+        !鉄筋線
+        for i=1 to rebar3LineNum
+            pen rebar3LinePen[i]
+
+            !頂点
+            if disRebarSpot then
+                for j=1 to rebar3LinePoint[i]
+                    hotspot2 rebar3LinePos[i][2*j-1],rebar3LinePos[i][2*j]
+                next j
+            endif
+
+            !鉄筋線
+            for j=1 to rebar3LinePoint[i]-1
+                line2 rebar3LinePos[i][2*j-1],rebar3LinePos[i][2*j],rebar3LinePos[i][2*j+1],rebar3LinePos[i][2*j+2]
+            next j
+        next i
+
+        !圧接点
+        pen rebar_detail_color
+        fill connectFill
+        
+        for i=1 to connectNum[3]
+            poly2_ 2,2+4,
+            connectPos[3][2*i-1],connectPos[3][2*i],900,
+            0.1,360,4000+1
+        next i
+
+        !詳細情報
+        pen rebar_detail_color
+
+        for i=1 to rebar3LineNum
+            text2 (rebar3LinePos[i][2*1-1]+rebar3LinePos[i][2*rebar3LinePoint[i]-1])/2,rebar3LinePos[i][2*2]+rebarline_size/12,"D"+str(rebar3LineDia[i],1,0)+"-"+str(rebar3LineLen[i]*1000,1,0)
+        next i
+
+        !定着情報
+        pen rebar_detail_color
+
+        for i=1 to beamNum
+            !左
+            if leftAnchorType[i][1]=2 or leftAnchorType[i][1]=3 then
+                add2 beamPos[i][1]-columnSize[i]+leftConCover[i],-_tempSpace[3]
+                    text2 -stw(str(leftAnchorLen[i][3]*1000,1,0))/2/1000*glob_scale,lineGap/2,str(leftAnchorLen[i][3]*1000,1,0)
+                    text2 -stw("ニゲ"+str(leftConCover[i]*1000,1,0))/2/1000*glob_scale,-lineGap/2,"ニゲ"+str(leftConCover[i]*1000,1,0)
+                del 1
+            endif
+
+            !右
+            if rightAnchorType[i][1]=2 or rightAnchorType[i][1]=3 then
+                add2 beamPos[i][2]+columnSize[i+1]-rightConCover[i],-_tempSpace[3]
+                    text2 stw(str(rightAnchorLen[i][3]*1000,1,0))/2/1000*glob_scale,lineGap/2,str(rightAnchorLen[i][3]*1000,1,0)
+                    text2 stw("ニゲ"+str(rightConCover[i]*1000,1,0))/2/1000*glob_scale,-lineGap/2,"ニゲ"+str(rightConCover[i]*1000,1,0)
+                del 1
+            endif
+        next i
+    del 1
+endif
+
+if rebar3LineNum>0 then
+    rebar3Z=(_tempLineNum[3]+1)*_tempSpace[3]
+else
+    rebar3Z=0
+endif
+
+rebarStandardZ=rebarStandardZ-rebar3Z
+
+
+!===========================================================分割線4
+if rebar4LineNum>0 then disSectionLine=1 else disSectionLine=0
+gosub "sectionLine"
+
+
+!===========================================================下端3段筋
+set line_type straightline_type
+
+if rebar4LineNum>0 then
+    add2 0,rebarStandardZ
+        !マーク
+        style "rebarline_style"
+        pen base_color
+
+        text2 columnPos[1][1]-2+stw("下端3")/2/1000*glob_scale,-rebarline_size/10,"下端3"
+        text2 columnPos[beamNum+1][2]+2-stw("下端3")/2/1000*glob_scale,-rebarline_size/10,"下端3"
+
+        !鉄筋線
+        for i=1 to rebar4LineNum
+            pen rebar4LinePen[i]
+
+            !頂点
+            if disRebarSpot then
+                for j=1 to rebar4LinePoint[i]
+                    hotspot2 rebar4LinePos[i][2*j-1],rebar4LinePos[i][2*j]
+                next j
+            endif
+
+            !鉄筋線
+            for j=1 to rebar4LinePoint[i]-1
+                line2 rebar4LinePos[i][2*j-1],rebar4LinePos[i][2*j],rebar4LinePos[i][2*j+1],rebar4LinePos[i][2*j+2]
+            next j
+        next i
+
+        !圧接点
+        pen rebar_detail_color
+        fill connectFill
+        
+        for i=1 to connectNum[4]
+            poly2_ 2,2+4,
+            connectPos[4][2*i-1],connectPos[4][2*i],900,
+            0.1,360,4000+1
+        next i
+
+        !詳細情報
+        pen rebar_detail_color
+
+        for i=1 to rebar4LineNum
+            text2 (rebar4LinePos[i][2*1-1]+rebar4LinePos[i][2*rebar4LinePoint[i]-1])/2,rebar4LinePos[i][2*2]+rebarline_size/12,"D"+str(rebar4LineDia[i],1,0)+"-"+str(rebar4LineLen[i]*1000,1,0)
+        next i
+
+        !定着情報
+        pen rebar_detail_color
+
+        for i=1 to beamNum
+            !左
+            if leftAnchorType[i][2]=2 or leftAnchorType[i][2]=3 then
+                add2 beamPos[i][1]-columnSize[i]+leftConCover[i],-_tempSpace[4]
+                    text2 -stw(str(leftAnchorLen[i][4]*1000,1,0))/2/1000*glob_scale,lineGap/2,str(leftAnchorLen[i][4]*1000,1,0)
+                    text2 -stw("ニゲ"+str(leftConCover[i]*1000,1,0))/2/1000*glob_scale,-lineGap/2,"ニゲ"+str(leftConCover[i]*1000,1,0)
+                del 1
+            endif
+
+            !右
+            if rightAnchorType[i][2]=2 or rightAnchorType[i][2]=3 then
+                add2 beamPos[i][2]+columnSize[i+1]-rightConCover[i],-_tempSpace[4]
+                    text2 stw(str(rightAnchorLen[i][4]*1000,1,0))/2/1000*glob_scale,lineGap/2,str(rightAnchorLen[i][4]*1000,1,0)
+                    text2 stw("ニゲ"+str(rightConCover[i]*1000,1,0))/2/1000*glob_scale,-lineGap/2,"ニゲ"+str(rightConCover[i]*1000,1,0)
+                del 1
+            endif
+        next i
+    del 1
+endif
+
+if rebar4LineNum>0 then
+    rebar4Z=(_tempLineNum[4]+1)*_tempSpace[4]
+else
+    rebar4Z=0
+endif
+
+rebarStandardZ=rebarStandardZ-rebar4Z
+
+
+!===========================================================分割線5
+if rebar5LineNum>0 then disSectionLine=1 else disSectionLine=0
+gosub "sectionLine"
+
+
+!===========================================================下端2段筋
+set line_type straightline_type
+
+if rebar5LineNum>0 then
+    add2 0,rebarStandardZ
+        !マーク
+        style "rebarline_style"
+        pen base_color
+
+        text2 columnPos[1][1]-2+stw("下端2")/2/1000*glob_scale,-rebarline_size/10,"下端2"
+        text2 columnPos[beamNum+1][2]+2-stw("下端2")/2/1000*glob_scale,-rebarline_size/10,"下端2"
+
+        !鉄筋線
+        for i=1 to rebar5LineNum
+            pen rebar5LinePen[i]
+
+            !頂点
+            if disRebarSpot then
+                for j=1 to rebar5LinePoint[i]
+                    hotspot2 rebar5LinePos[i][2*j-1],rebar5LinePos[i][2*j]
+                next j
+            endif
+
+            !鉄筋線
+            for j=1 to rebar5LinePoint[i]-1
+                line2 rebar5LinePos[i][2*j-1],rebar5LinePos[i][2*j],rebar5LinePos[i][2*j+1],rebar5LinePos[i][2*j+2]
+            next j
+        next i
+
+        !圧接点
+        pen rebar_detail_color
+        fill connectFill
+        
+        for i=1 to connectNum[5]
+            poly2_ 2,2+4,
+            connectPos[5][2*i-1],connectPos[5][2*i],900,
+            0.1,360,4000+1
+        next i
+
+        !詳細情報
+        pen rebar_detail_color
+
+        for i=1 to rebar5LineNum
+            text2 (rebar5LinePos[i][2*1-1]+rebar5LinePos[i][2*rebar5LinePoint[i]-1])/2,rebar5LinePos[i][2*2]+rebarline_size/12,"D"+str(rebar5LineDia[i],1,0)+"-"+str(rebar5LineLen[i]*1000,1,0)
+        next i
+
+        !定着情報
+        pen rebar_detail_color
+
+        for i=1 to beamNum
+            !左
+            if leftAnchorType[i][2]=2 or leftAnchorType[i][2]=3 then
+                add2 beamPos[i][1]-columnSize[i]+leftConCover[i],-_tempSpace[5]
+                    text2 -stw(str(leftAnchorLen[i][5]*1000,1,0))/2/1000*glob_scale,lineGap/2,str(leftAnchorLen[i][5]*1000,1,0)
+                    text2 -stw("ニゲ"+str(leftConCover[i]*1000,1,0))/2/1000*glob_scale,-lineGap/2,"ニゲ"+str(leftConCover[i]*1000,1,0)
+                del 1
+            endif
+
+            !右
+            if rightAnchorType[i][2]=2 or rightAnchorType[i][2]=3 then
+                add2 beamPos[i][2]+columnSize[i+1]-rightConCover[i],-_tempSpace[5]
+                    text2 stw(str(rightAnchorLen[i][5]*1000,1,0))/2/1000*glob_scale,lineGap/2,str(rightAnchorLen[i][5]*1000,1,0)
+                    text2 stw("ニゲ"+str(rightConCover[i]*1000,1,0))/2/1000*glob_scale,-lineGap/2,"ニゲ"+str(rightConCover[i]*1000,1,0)
+                del 1
+            endif
+        next i
+    del 1
+endif
+
+if rebar5LineNum>0 then
+    rebar5Z=(_tempLineNum[5]+1)*_tempSpace[5]
+else
+    rebar5Z=0
+endif
+
+rebarStandardZ=rebarStandardZ-rebar5Z
+
+
+!===========================================================分割線6
+if rebar6LineNum>0 then disSectionLine=1 else disSectionLine=0
+gosub "sectionLine"
+
+
+!===========================================================下端1段筋
+set line_type straightline_type
+
+if rebar6LineNum>0 then
+    add2 0,rebarStandardZ
+        !マーク
+        style "rebarline_style"
+        pen base_color
+
+        text2 columnPos[1][1]-2+stw("下端1")/2/1000*glob_scale,-rebarline_size/10,"下端1"
+        text2 columnPos[beamNum+1][2]+2-stw("下端1")/2/1000*glob_scale,-rebarline_size/10,"下端1"
+
+        !鉄筋線
+        for i=1 to rebar6LineNum
+            pen rebar6LinePen[i]
+
+            !頂点
+            if disRebarSpot then
+                for j=1 to rebar6LinePoint[i]
+                    hotspot2 rebar6LinePos[i][2*j-1],rebar6LinePos[i][2*j]
+                next j
+            endif
+
+            !鉄筋線
+            for j=1 to rebar6LinePoint[i]-1
+                line2 rebar6LinePos[i][2*j-1],rebar6LinePos[i][2*j],rebar6LinePos[i][2*j+1],rebar6LinePos[i][2*j+2]
+            next j
+        next i
+
+        !圧接点
+        pen rebar_detail_color
+        fill connectFill
+        
+        for i=1 to connectNum[6]
+            poly2_ 2,2+4,
+            connectPos[6][2*i-1],connectPos[6][2*i],900,
+            0.1,360,4000+1
+        next i
+
+        !詳細情報
+        pen rebar_detail_color
+
+        for i=1 to rebar6LineNum
+            text2 (rebar6LinePos[i][2*1-1]+rebar6LinePos[i][2*rebar6LinePoint[i]-1])/2,rebar6LinePos[i][2*2]+rebarline_size/12,"D"+str(rebar6LineDia[i],1,0)+"-"+str(rebar6LineLen[i]*1000,1,0)
+        next i
+
+        !定着情報
+        pen rebar_detail_color
+
+        for i=1 to beamNum
+            !左
+            if leftAnchorType[i][2]=2 or leftAnchorType[i][2]=3 then
+                add2 beamPos[i][1]-columnSize[i]+leftConCover[i],-_tempSpace[6]
+                    text2 -stw(str(leftAnchorLen[i][6]*1000,1,0))/2/1000*glob_scale,lineGap/2,str(leftAnchorLen[i][6]*1000,1,0)
+                    text2 -stw("ニゲ"+str(leftConCover[i]*1000,1,0))/2/1000*glob_scale,-lineGap/2,"ニゲ"+str(leftConCover[i]*1000,1,0)
+                del 1
+            endif
+
+            !右
+            if rightAnchorType[i][2]=2 or rightAnchorType[i][2]=3 then
+                add2 beamPos[i][2]+columnSize[i+1]-rightConCover[i],-_tempSpace[6]
+                    text2 stw(str(rightAnchorLen[i][6]*1000,1,0))/2/1000*glob_scale,lineGap/2,str(rightAnchorLen[i][6]*1000,1,0)
+                    text2 stw("ニゲ"+str(rightConCover[i]*1000,1,0))/2/1000*glob_scale,-lineGap/2,"ニゲ"+str(rightConCover[i]*1000,1,0)
+                del 1
+            endif
+        next i
+    del 1
+endif
+
+if rebar6LineNum>0 then
+    rebar6Z=(_tempLineNum[6]+1)*_tempSpace[6]
+else
+    rebar6Z=0
+endif
+
+rebarStandardZ=rebarStandardZ-rebar6Z
+
+
+!===========================================================分割線7
+disSectionLine=1
+gosub "sectionLine"
+
+
+!===========================================================腹筋
+set line_type straightline_type
+
+if sideBarLineNum>0 then
+    add2 0,rebarStandardZ
+        !マーク
+        style "rebarline_style"
+        pen base_color
+
+        text2 columnPos[1][1]-2+stw("腹筋")/2/1000*glob_scale,-rebarline_size/10,"腹筋"
+        text2 columnPos[beamNum+1][2]+2-stw("腹筋")/2/1000*glob_scale,-rebarline_size/10,"腹筋"
+
+        !配筋線
+        for i=1 to sideBarLineNum
+            pen sideBarLinePen[i]
+
+            !頂点
+            if disRebarSpot then
+                for j=1 to sideBarLinePoint[i]
+                    hotspot2 sideBarLinePos[i][2*j-1],sideBarLinePos[i][2*j]
+                next j
+            endif
+
+            !線
+            for j=1 to sideBarLinePoint[i]-1
+                line2 sideBarLinePos[i][2*j-1],sideBarLinePos[i][2*j],sideBarLinePos[i][2*j+1],sideBarLinePos[i][2*j+2]
+            next j
+        next i
+    del 1
+endif
+
+!腹筋作図エリアのz寸法
+if sideBarLineNum>0 then
+    for i=1 to sideBarLineNum
+        put sideBarLinePos[i][2*j]
+    next i
+
+    sideBarZ=abs(min(get(nsp))-2*lineGap)
+else
+    sideBarZ=0
+endif
+rebarStandardZ=rebarStandardZ-sideBarZ
+
+
+!===========================================================肋筋
+add2 0,rebarStandardZ
+    !マーク
+    style "rebarline_style"
+    pen base_color
+
+    text2 columnPos[1][1]-2+stw("STP")/2/1000*glob_scale,-rebarline_size/10,"STP"
+    text2 columnPos[beamNum+1][2]+2-stw("STP")/2/1000*glob_scale,-rebarline_size/10,"STP"
+
+    for i=1 to beamNum
+        add2 columnPos[i][2]+beamLen[i]/2,0
+            !縮略図
+            pen SDpen[_diaCode[stpDia[i]]]
+
+            if stpShape[i]=0 then
+                rect2 -beamCrossSectionZ/12,0,beamCrossSectionZ/12,-beamCrossSectionZ/3
+            endif
+
+            if stpShape[i]=1 then
+                poly2_ 8,1,\
+                beamCrossSectionZ/12-(sqr(2)/2)*beamCrossSectionZ/96,-(2+3*sqr(2))/2*beamCrossSectionZ/96,1,
+                beamCrossSectionZ/12-(-sqr(2)/2)*beamCrossSectionZ/96,-(2+sqr(2))/2*beamCrossSectionZ/96,1,
+                beamCrossSectionZ/12,-beamCrossSectionZ/96,900,
+                0,135,1+4000,
+                -beamCrossSectionZ/12,0,1,
+                -beamCrossSectionZ/12,-beamCrossSectionZ/96,900,
+                0,135,1+4000,
+                -beamCrossSectionZ/12+(sqr(2)/2)*beamCrossSectionZ/96,-(2+3*sqr(2))/2*beamCrossSectionZ/96,1
+
+                poly2_ 10,1,\
+                -beamCrossSectionZ/12+beamCrossSectionZ/48,-beamCrossSectionZ/48-beamCrossSectionZ/48,1,
+                -beamCrossSectionZ/12+beamCrossSectionZ/48,-beamCrossSectionZ/48,1,
+                -beamCrossSectionZ/12+beamCrossSectionZ/96,-beamCrossSectionZ/48,900,
+                -beamCrossSectionZ/12,-beamCrossSectionZ/48,1+1000,
+                -beamCrossSectionZ/12,-beamCrossSectionZ/3,1,
+                beamCrossSectionZ/12,-beamCrossSectionZ/3,1,
+                beamCrossSectionZ/12,-beamCrossSectionZ/48,1,
+                beamCrossSectionZ/12-beamCrossSectionZ/96,-beamCrossSectionZ/48,900,
+                beamCrossSectionZ/12-beamCrossSectionZ/48,-beamCrossSectionZ/48,1+1000,
+                beamCrossSectionZ/12-beamCrossSectionZ/48,-beamCrossSectionZ/48-beamCrossSectionZ/48,1
+            endif
+
+            !寸法
+            pen rebar_detail_color
+    
+            add2 0,-beamCrossSectionZ/3-lineGap-0.7*rebarline_size/10
+                text2 0,0,str(stpSize[i][1]*1000,1,0)+"x"+str(stpSize[i][2]*1000,1,0)
+            del 1
+
+            !呼び径・ピッチ
+            add2 0,-beamCrossSectionZ/3-lineGap-2.1*rebarline_size/10
+                text2 0,0,SDsizestr[_diaCode[stpDia[i]]]+"@"+str(stpPitch[i]*1000,1,0)
+            del 1
+        del 1
+    next i
+del 1
+
+stpZ=beamCrossSectionZ/3+lineGap+2*1.4*rebarline_size/10+lineGap
+rebarStandardZ=rebarStandardZ-stpZ
+
+
+!===========================================================幅止め筋
+add2 0,rebarStandardZ
+    !マーク
+    style "rebarline_style"
+    pen base_color
+
+    text2 columnPos[1][1]-2+stw("幅止め筋")/2/1000*glob_scale,-rebarline_size/10,"幅止め筋"
+    text2 columnPos[beamNum+1][2]+2-stw("幅止め筋")/2/1000*glob_scale,-rebarline_size/10,"幅止め筋"
+
+    for i=1 to beamNum
+        add2 columnPos[i][2]+beamLen[i]/2,0
+            !寸法
+            pen rebar_detail_color
+
+            add2 0,-0.7*rebarline_size/10
+                text2 0,0,str(stpSize[i][1]*1000,1,0)
+            del 1
+
+            !呼び径・ピッチ
+            add2 0,-2.1*rebarline_size/10
+                text2 0,0,SDsizestr[_diaCode[widthbarDia[i]]]+"@"+str(widthbarPitch[i]*1000,1,0)
+            del 1
+        del 1
+    next i
+del 1
+
+widthbarZ=2*1.4*rebarline_size/10+lineGap
+rebarStandardZ=rebarStandardZ-widthbarZ
+
+
+!===========================================================柱輪郭線
+lineZ=rebarStandardZ
+
+pen base_color
+set line_type straightline_type
+
+for i=1 to beamNum+1
+    line2 columnPos[i][1],0,columnPos[i][1],lineZ
+    line2 columnPos[i][2],0,columnPos[i][2],lineZ
+next i
+
+
+!===========================================================梁長さ
+line2 columnPos[1][1],-4*rebarline_size/10,columnPos[beamNum+1][2],-4*rebarline_size/10
+
+for i=1 to beamNum
+    !総長さ
+    text2 columnPos[i][2]+beamLen[i]/2,-3*rebarline_size/10,beamLen[i]*1000
+
+    !端部・中央
+    line2 columnPos[i][2],-6*rebarline_size/10,columnPos[i][2]+beamLen[i],-6*rebarline_size/10
+    line2 columnPos[i][2]+beamPartLen[i][1],-6*rebarline_size/10,columnPos[i][2]+beamPartLen[i][1],lineZ
+    line2 columnPos[i][2]+beamPartLen[i][1]+beamPartLen[i][2],-6*rebarline_size/10,columnPos[i][2]+beamPartLen[i][1]+beamPartLen[i][2],lineZ
+    hotspot2 columnPos[i][2],-6*rebarline_size/10
+    hotspot2 columnPos[i][2]+beamPartLen[i][1],-6*rebarline_size/10
+    hotspot2 columnPos[i][2]+beamPartLen[i][1]+beamPartLen[i][2],-6*rebarline_size/10
+    hotspot2 columnPos[i][2]+beamPartLen[i][1]+beamPartLen[i][2]+beamPartLen[i][3],-6*rebarline_size/10
+    text2 columnPos[i][2]+beamPartLen[i][1]/2,-5*rebarline_size/10,beamPartLen[i][1]*1000
+    text2 columnPos[i][2]+beamPartLen[i][1]+beamPartLen[i][2]/2,-5*rebarline_size/10,beamPartLen[i][2]*1000
+    text2 columnPos[i][2]+beamPartLen[i][1]+beamPartLen[i][2]+beamPartLen[i][3]/2,-5*rebarline_size/10,beamPartLen[i][3]*1000
+next i
+
+
+
+end
+
+
+
+
+
+"sectionLine":
+    set line_type dashdotline_type
+    pen base_color
+
+    if disSectionLine>0 then
+        line2 columnPos[1][1]-2,rebarStandardZ,columnPos[beamNum+1][2]+2,rebarStandardZ
+
+        for i=1 to beamNum+1
+            hotspot2 columnPos[i][1],rebarStandardZ
+            hotspot2 columnPos[i][2],rebarStandardZ
+
+            if i<beamNum+1 then
+                hotspot2 beamPos[i][1]+beamPartLen[i][1],rebarStandardZ
+                hotspot2 beamPos[i][1]+beamPartLen[i][1]+beamPartLen[i][2],rebarStandardZ
+            endif
+        next i
+    endif
+return

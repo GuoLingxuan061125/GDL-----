@@ -1,0 +1,131 @@
+!========================================================================傾斜基準線
+if slabType=2 then
+    pen basePen
+
+    for i=1 to 2
+        if disHotspot=10 then
+            hotspot2 0             ,basePos[i][y] ,code ,basePos[i][x] ,1+128 :code=code+1
+            hotspot2 basePos[i][x] ,basePos[i][y] ,code ,basePos[i][x] ,2     :code=code+1
+            hotspot2 -1            ,basePos[i][y] ,code ,basePos[i][x] ,3     :code=code+1
+
+            hotspot2 basePos[i][x] ,0             ,code ,basePos[i][y] ,1+128 :code=code+1
+            hotspot2 basePos[i][x] ,basePos[i][y] ,code ,basePos[i][y] ,2     :code=code+1
+            hotspot2 basePos[i][x] ,-1            ,code ,basePos[i][y] ,3     :code=code+1
+        else
+            hotspot2 basePos[i][x] ,basePos[i][y]
+        endif
+    next i
+
+    line2 basePos[1][x] ,basePos[1][y] ,basePos[2][x] ,basePos[2][y]
+    
+
+    add2 (basePos[1][x]+basePos[2][x])/2 ,(basePos[1][y]+basePos[2][y])/2
+    rot2 baseRtz
+        line2 0 ,0 ,0 ,-0.2*baseDir
+
+        if disHotspot=10 then
+            hotspot2 0 ,0            ,code ,baseDir ,1+128 :code=code+1
+            hotspot2 0 ,-0.2*baseDir ,code ,baseDir ,2     :code=code+1
+            hotspot2 0 ,1            ,code ,baseDir ,3     :code=code+1
+        else 
+            hotspot2 0 ,-0.2*baseDir
+        endif
+    del 2
+endif
+
+
+!========================================================================スラブ
+pen normalPen
+
+for i=1 to slabVertexNum
+    if disHotspot=1 then
+        hotspot2 0                   ,slabVertexPos[i][y] ,code ,slabVertexPos[i][x] ,1+128 :code=code+1
+        hotspot2 slabVertexPos[i][x] ,slabVertexPos[i][y] ,code ,slabVertexPos[i][x] ,2     :code=code+1
+        hotspot2 -1                  ,slabVertexPos[i][y] ,code ,slabVertexPos[i][x] ,3     :code=code+1
+
+        hotspot2 slabVertexPos[i][x] ,0                   ,code ,slabVertexPos[i][y] ,1+128 :code=code+1
+        hotspot2 slabVertexPos[i][x] ,slabVertexPos[i][y] ,code ,slabVertexPos[i][y] ,2     :code=code+1
+        hotspot2 slabVertexPos[i][x] ,-1                  ,code ,slabVertexPos[i][y] ,3     :code=code+1
+    else
+        hotspot2 slabVertexPos[i][x] ,slabVertexPos[i][y]
+    endif
+
+    if i<slabVertexNum then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    line2 slabVertexPos[i][x] ,slabVertexPos[i][y] ,slabVertexPos[i2][x] ,slabVertexPos[i2][y]
+next i    
+
+
+!========================================================================開口
+for i=1 to opNum
+    for j=1 to opVertexNum[i]
+        if disHotspot=2 then
+            hotspot2 0                     ,opVertexPos[i][2*j] ,code ,opVertexPos[i][2*j-1] ,1+128 :code=code+1
+            hotspot2 opVertexPos[i][2*j-1] ,opVertexPos[i][2*j] ,code ,opVertexPos[i][2*j-1] ,2     :code=code+1
+            hotspot2 -1                    ,opVertexPos[i][2*j] ,code ,opVertexPos[i][2*j-1] ,3     :code=code+1
+
+            hotspot2 opVertexPos[i][2*j-1] ,0                   ,code ,opVertexPos[i][2*j] ,1+128 :code=code+1
+            hotspot2 opVertexPos[i][2*j-1] ,opVertexPos[i][2*j] ,code ,opVertexPos[i][2*j] ,2     :code=code+1
+            hotspot2 opVertexPos[i][2*j-1] ,-1                  ,code ,opVertexPos[i][2*j] ,3     :code=code+1
+        else
+            hotspot2 opVertexPos[i][2*j-1] ,opVertexPos[i][2*j]
+        endif
+
+        if j<opVertexNum[i] then
+            j2=j+1
+        else
+            j2=1
+        endif
+
+        line2 opVertexPos[i][2*j-1] ,opVertexPos[i][2*j] ,opVertexPos[i][2*j2-1] ,opVertexPos[i][2*j2]
+    next j
+next i
+
+
+!========================================================================割り付け芯
+if disCenter then
+    !ホットスポット
+    if disHotspot=3 then
+        hotspot2 0       ,centerY ,code ,centerX ,1+128 :code=code+1
+        hotspot2 centerX ,centerY ,code ,centerX ,2     :code=code+1
+        hotspot2 -1      ,centerY ,code ,centerX ,3     :code=code+1
+
+        hotspot2 centerX ,0       ,code ,centerY ,1+128 :code=code+1
+        hotspot2 centerX ,centerY ,code ,centerY ,2     :code=code+1
+        hotspot2 centerX ,-1      ,code ,centerY ,3     :code=code+1
+  
+        hotspot2 centerX+0.2                ,centerY                    ,code ,centerRtz ,4+128 :code=code+1
+        hotspot2 centerX+0.2*cos(centerRtz) ,centerY+0.2*sin(centerRtz) ,code ,centerRtz ,5     :code=code+1
+        hotspot2 centerX                    ,centerY                    ,code ,centerRtz ,6     :code=code+1
+    else   
+        hotspot2 centerX ,centerY
+    endif
+
+    !矢印
+    poly2_ 2 ,1 ,
+    centerX ,centerY ,900 ,
+    0.1 ,360 ,4001
+
+    add2 centerX ,centerY
+    rot2 centerRtz
+        line2 -0.2 ,0    ,0.2       ,0
+        line2 0    ,-0.2 ,0         ,0.2
+        line2 -0.2 ,0    ,-0.2+0.05 ,0.05
+        line2 -0.2 ,0    ,-0.2+0.05 ,-0.05
+        line2 0.2  ,0    ,0.2-0.05  ,0.05
+        line2 0.2  ,0    ,0.2-0.05  ,-0.05
+        line2 0    ,-0.2 ,0.05      ,-0.2+0.05
+        line2 0    ,-0.2 ,-0.05     ,-0.2+0.05
+        line2 0    ,0.2  ,0.05      ,0.2-0.05
+        line2 0    ,0.2  ,-0.05     ,0.2-0.05
+    del 2
+endif
+
+
+!========================================================================分割線
+project2{3} 3,270,1,1+2+4+8+16+32,parameters disLine3D1=disLine2D,disLine3D2=0,disBoard3D=0,disCenter=0
+

@@ -1,0 +1,1627 @@
+code=1
+x=1
+y=2
+z=3
+eps=1e-5
+
+!設定
+gosub "鉄筋リスト"
+gosub "壁長さ・回転角"
+gosub "開口設定"
+gosub "開口並び替え(始点から終点)"
+gosub "開口並び替え(下端から上端)"
+gosub "配筋設定"
+gosub "呼び径・ピッチ設定"
+
+!座標計算
+gosub "座標変換sub初期化"
+gosub "鉄筋関係変数初期化"
+gosub "横筋座標計算"
+gosub "縦筋座標計算"
+gosub "コの字筋・差し筋data upload"
+gosub "開口補強筋座標計算"
+
+goto "master_end"
+end
+
+
+"鉄筋リスト":
+    !=================================外径半径リスト
+        dim dr_list[]
+        dr_list[10]=0.0055 !d10
+        dr_list[13]=0.007 !d13
+        dr_list[16]=0.009 !d16
+        dr_list[19]=0.0105 !d19
+        dr_list[22]=0.0125 !d22
+        dr_list[25]=0.014 !d25
+        dr_list[29]=0.0165 !d29
+        dr_list[32]=0.018 !d32
+        dr_list[35]=0.02 !d35
+        dr_list[38]=0.0215 !d38
+        dr_list[41]=0.023 !d41
+
+    !=================================コードリスト
+        dim code_list[]
+        code_list[10]=1
+        code_list[13]=2
+        code_list[16]=3
+        code_list[19]=4
+        code_list[22]=5
+        code_list[25]=6
+        code_list[29]=7
+        code_list[32]=8
+        code_list[35]=9
+        code_list[38]=10
+        code_list[41]=11
+
+    !=================================継ぎ手定着長さL1
+        dim l1_list[][]
+        l1_list[1][18]=45
+        l1_list[1][21]=40
+        l1_list[1][24]=35
+        l1_list[1][27]=35
+        l1_list[1][30]=35
+        l1_list[1][33]=35
+        l1_list[1][36]=35
+        l1_list[1][39]=30
+        l1_list[1][42]=30
+        l1_list[1][45]=30
+        l1_list[1][48]=30
+        l1_list[1][51]=30
+        l1_list[1][54]=30
+        l1_list[1][57]=30
+        l1_list[1][60]=30
+        l1_list[2][18]=50
+        l1_list[2][21]=45
+        l1_list[2][24]=40
+        l1_list[2][27]=40
+        l1_list[2][30]=35
+        l1_list[2][33]=35
+        l1_list[2][36]=35
+        l1_list[2][39]=35
+        l1_list[2][42]=35
+        l1_list[2][45]=35
+        l1_list[2][48]=30
+        l1_list[2][51]=30
+        l1_list[2][54]=30
+        l1_list[2][57]=30
+        l1_list[2][60]=30
+        l1_list[3][18]=0
+        l1_list[3][21]=50
+        l1_list[3][24]=45
+        l1_list[3][27]=45
+        l1_list[3][30]=40
+        l1_list[3][33]=40
+        l1_list[3][36]=40
+        l1_list[3][39]=40
+        l1_list[3][42]=40
+        l1_list[3][45]=40
+        l1_list[3][48]=35
+        l1_list[3][51]=35
+        l1_list[3][54]=35
+        l1_list[3][57]=35
+        l1_list[3][60]=35
+        l1_list[4][18]=0
+        l1_list[4][21]=0
+        l1_list[4][24]=55
+        l1_list[4][27]=55
+        l1_list[4][30]=50
+        l1_list[4][33]=50
+        l1_list[4][36]=50
+        l1_list[4][39]=45
+        l1_list[4][42]=45
+        l1_list[4][45]=45
+        l1_list[4][48]=40
+        l1_list[4][51]=40
+        l1_list[4][54]=40
+        l1_list[4][57]=40
+        l1_list[4][60]=40
+
+    !=================================定着長さL2
+        dim l2_list[][]
+        l2_list[1][18]=40
+        l2_list[1][21]=35
+        l2_list[1][24]=30
+        l2_list[1][27]=30
+        l2_list[1][30]=30
+        l2_list[1][33]=30
+        l2_list[1][36]=30
+        l2_list[1][39]=25
+        l2_list[1][42]=25
+        l2_list[1][45]=25
+        l2_list[1][48]=25
+        l2_list[1][51]=25
+        l2_list[1][54]=25
+        l2_list[1][57]=25
+        l2_list[1][60]=25
+        l2_list[2][18]=40
+        l2_list[2][21]=35
+        l2_list[2][24]=35
+        l2_list[2][27]=35
+        l2_list[2][30]=30
+        l2_list[2][33]=30
+        l2_list[2][36]=30
+        l2_list[2][39]=30
+        l2_list[2][42]=30
+        l2_list[2][45]=30
+        l2_list[2][48]=25
+        l2_list[2][51]=25
+        l2_list[2][54]=25
+        l2_list[2][57]=25
+        l2_list[2][60]=25
+        l2_list[3][18]=0
+        l2_list[3][21]=40
+        l2_list[3][24]=40
+        l2_list[3][27]=40
+        l2_list[3][30]=35
+        l2_list[3][33]=35
+        l2_list[3][36]=35
+        l2_list[3][39]=35
+        l2_list[3][42]=35
+        l2_list[3][45]=35
+        l2_list[3][48]=30
+        l2_list[3][51]=30
+        l2_list[3][54]=30
+        l2_list[3][57]=30
+        l2_list[3][60]=30
+        l2_list[4][18]=0
+        l2_list[4][21]=0
+        l2_list[4][24]=45
+        l2_list[4][27]=45
+        l2_list[4][30]=40
+        l2_list[4][33]=40
+        l2_list[4][36]=40
+        l2_list[4][39]=40
+        l2_list[4][42]=40
+        l2_list[4][45]=40
+        l2_list[4][48]=35
+        l2_list[4][51]=35
+        l2_list[4][54]=35
+        l2_list[4][57]=35
+        l2_list[4][60]=35
+return
+
+
+"壁長さ・回転角":
+    !壁長さ
+    wall_len=sqr((wall_pos[2][1]-wall_pos[1][1])^2+(wall_pos[2][2]-wall_pos[1][2])^2)
+    parameters wall_len=wall_len
+    lock "wall_len"
+
+    !壁回転角
+    wall_rtz=0
+
+    if wall_pos[2][2]>wall_pos[1][2]+eps then
+        wall_rtz=acs((wall_pos[2][1]-wall_pos[1][1])/wall_len)
+    endif
+
+    if wall_pos[2][2]<=wall_pos[1][2]+eps and wall_pos[2][2]>=wall_pos[1][2]-eps then
+        if wall_pos[2][1]>=wall_pos[1][1] then
+            wall_rtz=0
+        else
+            wall_rtz=180
+        endif
+    endif
+
+    if wall_pos[2][2]<wall_pos[1][2]-eps then
+        wall_rtz=360-acs((wall_pos[2][1]-wall_pos[1][1])/wall_len)
+    endif
+return
+
+
+"開口設定":
+    dim _op_pos[][],_op_shape[],_op_wid[],_op_hei[]
+    _op_pos[1][1]=0 : _op_pos[1][2]=0
+    _op_shape[1]=0
+    _op_wid[1]=0
+    _op_hei[1]=0
+
+    for i=1 to op_num
+        _op_pos[i][1]=op_pos[i][1]
+        _op_pos[i][2]=op_pos[i][2]
+        _op_shape[i]=op_shape[i]
+        _op_wid[i]=op_wid[i]
+        if _op_shape[i]=1 then
+            _op_hei[i]=op_hei[i]
+        else
+            _op_hei[i]=op_wid[i]
+        endif
+    next i
+
+    op_pos=_op_pos
+    op_shape=_op_shape
+    op_wid=_op_wid
+    op_hei=_op_hei
+
+    parameters \
+    op_pos=_op_pos,
+    op_shape=_op_shape,
+    op_wid=_op_wid,
+    op_hei=_op_hei
+
+    values "op_num" range[0,]
+    values "op_pos" range[0,]
+    values{2} "op_shape" 1,"四角形",2,"円形"
+    values "op_wid" range(0,)
+    values "op_hei" range(0,)
+return
+
+
+"開口並び替え(始点から終点)":
+    temp1_op_num=op_num
+    dim _temp1_op_pos[][],_temp1_op_wid[],_temp1_op_hei[]
+    _temp1_op_pos[1][1]=0 : _temp1_op_pos[1][2]=0
+    _temp1_op_wid[1]=0
+    _temp1_op_hei[1]=0
+
+    for i=1 to op_num
+        _temp1_op_pos[i][1]=op_pos[i][1]-op_cover
+        _temp1_op_pos[i][2]=op_pos[i][2]-op_cover
+        _temp1_op_wid[i]=op_wid[i]+2*op_cover
+        _temp1_op_hei[i]=op_hei[i]+2*op_cover
+    next i
+
+    if temp1_op_num>1 then
+        for i=1 to temp1_op_num-1
+            for j=1 to temp1_op_num-i
+                if _temp1_op_pos[j][1]>_temp1_op_pos[j+1][1] then
+                    temp_pos1=_temp1_op_pos[j][1]
+                    temp_pos2=_temp1_op_pos[j][2]
+                    temp_wid=_temp1_op_wid[j]
+                    temp_hei=_temp1_op_hei[j]
+
+                    _temp1_op_pos[j][1]=_temp1_op_pos[j+1][1]
+                    _temp1_op_pos[j][2]=_temp1_op_pos[j+1][2]
+                    _temp1_op_wid[j]=_temp1_op_wid[j+1]
+                    _temp1_op_hei[j]=_temp1_op_hei[j+1]
+
+                    _temp1_op_pos[j+1][1]=temp_pos1
+                    _temp1_op_pos[j+1][2]=temp_pos2
+                    _temp1_op_wid[j+1]=temp_wid
+                    _temp1_op_hei[j+1]=temp_hei
+                endif
+            next j
+        next i
+    endif
+return
+
+
+"開口並び替え(下端から上端)":
+    temp2_op_num=op_num
+    dim _temp2_op_pos[][],_temp2_op_wid[],_temp2_op_hei[]
+    _temp2_op_pos[1][1]=0 : _temp2_op_pos[1][2]=0
+    _temp2_op_wid[1]=0
+    _temp2_op_hei[1]=0
+
+    for i=1 to op_num
+        _temp2_op_pos[i][1]=op_pos[i][1]-op_cover-opcap_row*dr_list[opcap_steel]
+        _temp2_op_pos[i][2]=op_pos[i][2]-op_cover
+        _temp2_op_wid[i]=op_wid[i]+2*op_cover+2*opcap_row*dr_list[opcap_steel]
+        _temp2_op_hei[i]=op_hei[i]+2*op_cover
+    next i
+
+    if temp2_op_num>1 then
+        for i=1 to temp2_op_num-1
+            for j=1 to temp2_op_num-i
+                if _temp2_op_pos[j][2]>_temp2_op_pos[j+1][2] then
+                    temp_pos1=_temp2_op_pos[j][1]
+                    temp_pos2=_temp2_op_pos[j][2]
+                    temp_wid=_temp2_op_wid[j]
+                    temp_hei=_temp2_op_hei[j]
+
+                    _temp2_op_pos[j][1]=_temp2_op_pos[j+1][1]
+                    _temp2_op_pos[j][2]=_temp2_op_pos[j+1][2]
+                    _temp2_op_wid[j]=_temp2_op_wid[j+1]
+                    _temp2_op_hei[j]=_temp2_op_hei[j+1]
+
+                    _temp2_op_pos[j+1][1]=temp_pos1
+                    _temp2_op_pos[j+1][2]=temp_pos2
+                    _temp2_op_wid[j+1]=temp_wid
+                    _temp2_op_hei[j+1]=temp_hei
+                endif
+            next j
+        next i
+    endif
+return
+
+
+"配筋設定":
+    values "SDresol" range[3,]
+
+    values{2} "conFc" 18,"18 N/㎟",21,"21 N/㎟",24,"24 N/㎟",27,"27 N/㎟",30,"30 N/㎟",33,"33 N/㎟",36,"36 N/㎟",39,"39 N/㎟",42,"42 N/㎟",45,"45 N/㎟",\
+                    48,"48 N/㎟",51,"51 N/㎟",54,"54 N/㎟",57,"57 N/㎟",60,"60 N/㎟"
+
+    if conFc=18 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345"
+    if conFc=21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390"
+    if conFc>21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390",4,"SD490"
+
+    l1=l1_list[sdType][conFc]
+    l2=l2_list[sdType][conFc]
+
+    parameters l1=l1,l2=l2
+    lock "L1","L2"
+
+    values "L1Plus" range[0,]
+    values "L2Plus" range[0,]
+
+    l1=l1+L1Plus
+    l2=l2+L2Plus
+
+    values{2} "hor_pattern" 1,"下端",2,"上端"
+    values{2} "ver_pattern" 1,"始点",2,"終点"
+    values{2} "hor_l_pos" 1,"外側",2,"内側"
+    values{2} "hor_r_pos" 1,"外側",2,"内側"
+
+    values "left_cover" range[0,]
+    values "right_cover" range[0,]
+    values "top_cover" range[0,]
+    values "down_cover" range[0,]
+    values "start_cover" range[0,]
+    values "end_cover" range[0,]
+    values "cnt_limit" range[5,]
+
+    values{2} "down_anc"  1,"直線定着(L1)",2,"直線定着(L2)",3,"差し筋直線定着(L2)",4,"差し筋折り曲げ定着",10,"かぶり厚"
+    values{2} "top_anc"   1,"直線定着(L1)",2,"直線定着(L2)",10,"かぶり厚"
+    values{2} "start_anc"  1,"直線定着(L1)",2,"直線定着(L2)",3,"自由調整(縦筋追従)",10,"かぶり厚"
+    values{2} "end_anc" 1,"直線定着(L1)",2,"直線定着(L2)",3,"自由調整(縦筋追従)",10,"かぶり厚"
+
+    values "down_expbar_len1"    range[0,]
+    values "hor1_l_start_offset" range[0,]
+    values "hor1_l_end_offset"   range[0,]
+    values "hor1_r_start_offset" range[0,]
+    values "hor1_r_end_offset"   range[0,]
+    values "hor2_l_start_offset" range[0,]
+    values "hor2_l_end_offset"   range[0,]
+    values "hor2_r_start_offset" range[0,]
+    values "hor2_r_end_offset"   range[0,]
+    values "hor3_l_start_offset" range[0,]
+    values "hor3_l_end_offset"   range[0,]
+    values "hor3_r_start_offset" range[0,]
+    values "hor3_r_end_offset"   range[0,]
+return
+
+
+"呼び径・ピッチ設定":
+    values{2} "hor1_steel"     10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+    values{2} "hor2_steel"     10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+    values{2} "hor3_steel"     10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+    values{2} "ver1_steel"     10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+    values{2} "ver2_steel"     10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+    values{2} "ver3_steel"     10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+    values{2} "capbar_steel"   10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+    values{2} "ver_edge_steel" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+    values{2} "opver_steel"    10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+    values{2} "ophor_steel"    10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+    values{2} "opdia_steel"    10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+    values{2} "opcap_steel"    10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+
+    values "hor1_pitch" range[0.1,]
+    values "hor2_pitch" range[0.1,]
+    values "hor3_pitch" range[0.1,]
+    values "ver1_pitch" range[0.1,]
+    values "ver2_pitch" range[0.1,]
+    values "ver3_pitch" range[0.1,]
+    values "ver_edge_num" range[0,]
+
+    values "opref_row" range[1,]
+    values "opref_tier" range[1,]
+    values "opcap_row" range[1,3]
+    values "opref_gap" range[0,]
+    values "opref_fra_len" range[0,1]
+
+    if switch_rebar1=0 then hideparameter "hor1_steel","hor1_pitch","ver1_steel","ver1_pitch"
+    if switch_rebar2=0 then hideparameter "hor2_steel","hor2_pitch","ver2_steel","ver2_pitch"
+    if switch_rebar3=0 then hideparameter "hor3_steel","hor3_pitch","ver3_steel","ver3_pitch"
+    if op_num=0 then hideparameter "ophor_steel","opver_steel","opdia_steel","opcap_steel","opref_row","opref_tier","opref_gap","opref_fra_len"
+
+    hor1_steel=max(hor1_steel,10)
+    hor2_steel=max(hor2_steel,10)
+    hor3_steel=max(hor3_steel,10)
+    ver1_steel=max(ver1_steel,10)
+    ver2_steel=max(ver2_steel,10)
+    ver3_steel=max(ver3_steel,10)
+    opver_steel=max(opver_steel,13)
+    ophor_steel=max(ophor_steel,13)
+    opdia_steel=max(opdia_steel,13)
+return
+
+
+"座標変換sub初期化":
+    inputNum=0
+    dim _inputSpnum[],_inputCoor[][],_outputCoor[][]
+    _inputSpnum[1]=0
+    _inputCoor[1][1]=0 : _inputCoor[1][2]=0
+    _outputCoor[1][1]=0 : _outputCoor[1][2]=0
+return
+
+
+"鉄筋関係変数初期化":
+    !横筋
+        hor_tot_num=0
+        dim _hor_tot_pen[],_hor_tot_mat[],_hor_tot_r[],_hor_tot_spnum[],_hor_tot_coor[][]
+        _hor_tot_pen[1]=0
+        _hor_tot_mat[1]=0
+        _hor_tot_r[1]=0
+        _hor_tot_spnum[1]=0
+        _hor_tot_coor[1][1]=0 : _hor_tot_coor[1][2]=0
+
+    !縦筋
+        ver_all_num=0
+        dim _ver_all_pen[],_ver_all_mat[],_ver_all_r[],_ver_all_spnum[],_ver_all_coor[][]
+        _ver_all_pen[1]=0
+        _ver_all_mat[1]=0
+        _ver_all_r[1]=0
+        _ver_all_spnum[1]=0
+        _ver_all_coor[1][1]=0 : _ver_all_coor[1][2]=0
+
+    !開口補強筋
+        ophor_num=0
+        opver_num=0
+        opdia_num=0
+        dim _ophor_spnum[],_ophor_coor[][],_opver_spnum[],_opver_coor[][],_opdia_spnum[],_opdia_coor[][]
+        _ophor_spnum[1]=0
+        _ophor_coor[1][1]=0 : _ophor_coor[1][2]=0
+        _opver_spnum[1]=0
+        _opver_coor[1][1]=0 : _opver_coor[1][2]=0
+        _opdia_spnum[1]=0
+        _opdia_coor[1][1]=0 : _opdia_coor[1][2]=0
+
+    !差し筋
+        expbar_num=0
+        dim _expbar_pen[],_expbar_mat[],_expbar_r[],_expbar_spnum[],_expbar_coor[][]
+        _expbar_pen[1]=0
+        _expbar_mat[1]=0
+        _expbar_r[1]=0
+        _expbar_spnum[1]=0
+        _expbar_coor[1][1]=0 : _expbar_coor[1][2]=0
+
+    !コの字筋
+        capbar_num=0
+        dim _capbar_pen[],_capbar_mat[],_capbar_r[],_capbar_spnum[],_capbar_coor[][]
+        _capbar_pen[1]=0
+        _capbar_mat[1]=0
+        _capbar_r[1]=0
+        _capbar_spnum[1]=0
+        _capbar_coor[1][1]=0 : _capbar_coor[1][2]=0
+return
+
+
+"横筋座標計算":
+    !ypos
+        !左側
+            if hor_l_pos=1 then
+                hor1_l_y_pos=wall_thi/2-(left_cover+dr_list[hor1_steel])
+                hor2_l_y_pos=wall_thi/2-(left_cover+2*dr_list[hor1_steel]+2*dr_list[ver1_steel]+dr_list[hor2_steel])
+                hor3_l_y_pos=wall_thi/2-(left_cover+2*dr_list[hor1_steel]+2*dr_list[ver1_steel]+2*dr_list[hor2_steel]+2*dr_list[ver2_steel]+dr_list[hor3_steel])
+            else
+                hor1_l_y_pos=wall_thi/2-(left_cover+2*dr_list[ver1_steel]+dr_list[hor1_steel])
+                hor2_l_y_pos=wall_thi/2-(left_cover+2*dr_list[ver1_steel]+2*dr_list[hor1_steel]+2*dr_list[ver2_steel]+dr_list[hor2_steel])
+                hor3_l_y_pos=wall_thi/2-(left_cover+2*dr_list[ver1_steel]+2*dr_list[hor1_steel]+2*dr_list[ver2_steel]+2*dr_list[hor2_steel]+2*dr_list[ver3_steel]+dr_list[hor3_steel])
+            endif
+
+        !右側
+            if hor_r_pos=1 then
+                hor1_r_y_pos=-wall_thi/2+(right_cover+dr_list[hor1_steel])
+                hor2_r_y_pos=-wall_thi/2+(right_cover+2*dr_list[hor1_steel]+2*dr_list[ver1_steel]+dr_list[hor2_steel])
+                hor3_r_y_pos=-wall_thi/2+(right_cover+2*dr_list[hor1_steel]+2*dr_list[ver1_steel]+2*dr_list[hor2_steel]+2*dr_list[ver2_steel]+dr_list[hor3_steel])
+            else
+                hor1_r_y_pos=-wall_thi/2+(right_cover+2*dr_list[ver1_steel]+dr_list[hor1_steel])
+                hor2_r_y_pos=-wall_thi/2+(right_cover+2*dr_list[ver1_steel]+2*dr_list[hor1_steel]+2*dr_list[ver2_steel]+dr_list[hor2_steel])
+                hor3_r_y_pos=-wall_thi/2+(right_cover+2*dr_list[ver1_steel]+2*dr_list[hor1_steel]+2*dr_list[ver2_steel]+2*dr_list[hor2_steel]+2*dr_list[ver3_steel]+dr_list[hor3_steel])
+            endif
+
+    for row=1 to 3
+        if (row=1 and switch_rebar1=1) or (row=2 and switch_rebar2=1) or (row=3 and switch_rebar3=1) then
+            if row=1 then !1段目配筋
+                hor_pitch=hor1_pitch
+                hor_steel=hor1_steel
+                hor_l_start_offset=hor1_l_start_offset
+                hor_l_end_offset=hor1_l_end_offset
+                hor_r_start_offset=hor1_r_start_offset
+                hor_r_end_offset=hor1_r_end_offset
+            endif
+
+            if row=2 then !2段目配筋
+                hor_pitch=hor2_pitch
+                hor_steel=hor2_steel
+                hor_l_start_offset=hor2_l_start_offset
+                hor_l_end_offset=hor2_l_end_offset
+                hor_r_start_offset=hor2_r_start_offset
+                hor_r_end_offset=hor2_r_end_offset
+            endif
+
+            if row=3 then !3段目配筋
+                hor_pitch=hor3_pitch
+                hor_steel=hor3_steel
+                hor_l_start_offset=hor3_l_start_offset
+                hor_l_end_offset=hor3_l_end_offset
+                hor_r_start_offset=hor3_r_start_offset
+                hor_r_end_offset=hor3_r_end_offset
+            endif
+
+            !横筋段数
+                hor_z_row=int((wall_hei-2*hor_start_pos)/hor_pitch)+1+plus_steel_down+plus_steel_top
+
+            for i=1 to hor_z_row
+                capbar_offset_flag=-1
+
+                !zpos
+                    if i<=int((wall_hei-hor_start_pos)/hor_pitch)+1 then
+                        if hor_pattern=1 then
+                            hor_z_pos=hor_start_pos+(i-1)*hor_pitch
+                        else
+                            hor_z_pos=(wall_hei-hor_start_pos)-(i-1)*hor_pitch
+                        endif
+                    endif
+
+                    if plus_steel_down=1 and i=int((wall_hei-hor_start_pos)/hor_pitch)+1+plus_steel_down then !下端部プラス鉄筋
+                        hor_z_pos=0
+                    endif
+
+                    if plus_steel_top=1 and i=int((wall_hei-hor_start_pos)/hor_pitch)+1+plus_steel_down+plus_steel_top then !上端部プラス鉄筋
+                        hor_z_pos=wall_hei
+                    endif
+
+                for j=1 to 2
+                    !ypos
+                        if j=1 then !左側
+                            if row=1 then hor_y_pos=hor1_l_y_pos
+                            if row=2 then hor_y_pos=hor2_l_y_pos
+                            if row=3 then hor_y_pos=hor3_l_y_pos
+                        endif
+
+                        if j=2 then !右側
+                            if row=1 then hor_y_pos=hor1_r_y_pos
+                            if row=2 then hor_y_pos=hor2_r_y_pos
+                            if row=3 then hor_y_pos=hor3_r_y_pos
+                        endif
+
+                    !端部位置
+                        if start_anc=1 then !直線定着(L1)
+                            hor_x_start=-l1*hor_steel/1000
+                        endif
+
+                        if start_anc=2 then !直線定着(L2)
+                            hor_x_start=-l2*hor_steel/1000
+                        endif
+
+                        if start_anc=3 then !自由調整(縦筋追従)
+                            if j=1 then
+                                hor_x_start=-hor_l_start_offset
+                            else
+                                hor_x_start=-hor_r_start_offset
+                            endif
+                        endif
+
+                        if start_anc=10 then !かぶり厚
+                            hor_x_start=start_cover
+                        endif
+
+                        if end_anc=1 then !直線定着(L1)
+                            hor_x_end=wall_len+l1*hor_steel/1000
+                        endif
+
+                        if end_anc=2 then !直線定着(L2)
+                            hor_x_end=wall_len+l2*hor_steel/1000
+                        endif
+
+                        if end_anc=3 then !自由調整(縦筋追従)
+                            if j=1 then
+                                hor_x_end=wall_len+hor_l_end_offset
+                            else
+                                hor_x_end=wall_len+hor_r_end_offset
+                            endif
+                        endif
+
+                        if end_anc=10 then !かぶり厚
+                            hor_x_end=wall_len-end_cover
+                        endif
+
+                    !開口の場合
+                        bar_count=1
+
+                        put hor_x_start
+                        if temp1_op_num>0 then
+                            for n=1 to temp1_op_num
+                                if hor_z_pos-dr_list[hor_steel]<_temp1_op_pos[n][2]+_temp1_op_hei[n] and hor_z_pos+dr_list[hor_steel]>_temp1_op_pos[n][2] then
+                                    bar_count=bar_count+1
+                                    put _temp1_op_pos[n][1]
+                                    put _temp1_op_pos[n][1]+_temp1_op_wid[n]
+                                endif
+                            next n
+                        endif
+                        put hor_x_end
+
+                        dim _temp_pos[][]
+                        _temp_pos[1][1]=0 : _temp_pos[1][2]=0
+
+                        for n=1 to bar_count
+                            _temp_pos[n][1]=get(1)
+                            _temp_pos[n][2]=get(1)
+                        next n
+
+                    for p=1 to bar_count
+                        hor_x_edge1=_temp_pos[p][1]
+                        hor_x_edge2=_temp_pos[p][2]
+
+                        !継手定尺分割
+                            cnt_num=ceil((hor_x_edge2-hor_x_edge1)/cnt_limit)
+                            cnt_num=ceil(((hor_x_edge2-hor_x_edge1)+(cnt_num-1)*l1*hor_steel/1000)/cnt_limit)
+                            cnt_unit=(hor_x_edge2-hor_x_edge1)/cnt_num
+
+                        !開口コの字筋
+                            if bar_count>1 and j=1 then
+                                !ypos
+                                    if row=1 then
+                                        opcap_y1_pos=hor1_l_y_pos
+                                        opcap_y2_pos=hor1_r_y_pos
+                                    endif
+                                    if row=2 then
+                                        opcap_y1_pos=hor2_l_y_pos
+                                        opcap_y2_pos=hor2_r_y_pos
+                                    endif
+                                    if row=3 then
+                                        opcap_y1_pos=hor3_l_y_pos
+                                        opcap_y2_pos=hor3_r_y_pos
+                                    endif
+
+                                if (row=1 and opcap_row>=1) or (row=2 and opcap_row>=2) or (row=3 and opcap_row>=3) then
+                                    if p<bar_count then
+                                        !xpos
+                                            opcap_x1_pos=hor_x_edge2-(2*row-1)*dr_list[opcap_steel]
+                                            opcap_x2_pos=opcap_x1_pos-(4*dr_list[opcap_steel]+l1*opcap_steel/1000)
+
+                                        !zpos
+                                            opcap_z_pos=hor_z_pos+dr_list[hor_steel]+dr_list[opcap_steel]*(4*fra(cnt_num/2)-1)
+
+                                        capbar_num=capbar_num+1
+                                        _capbar_pen[capbar_num]=SDpen[code_list[opcap_steel]]
+                                        _capbar_mat[capbar_num]=SDmat[code_list[opcap_steel]]
+                                        _capbar_r[capbar_num]=dr_list[opcap_steel]
+                                        _capbar_spnum[capbar_num]=4
+
+                                        put opcap_x2_pos
+                                        put opcap_y1_pos
+                                        put opcap_z_pos
+
+                                        put opcap_x1_pos
+                                        put opcap_y1_pos
+                                        put opcap_z_pos
+
+                                        put opcap_x1_pos
+                                        put opcap_y2_pos
+                                        put opcap_z_pos
+
+                                        put opcap_x2_pos
+                                        put opcap_y2_pos
+                                        put opcap_z_pos
+
+                                        for n=1 to 3*_capbar_spnum[capbar_num]
+                                            _capbar_coor[capbar_num][n]=get(1)
+                                        next n
+                                    endif
+
+                                    if p>1 then
+                                        !xpos
+                                            opcap_x1_pos=hor_x_edge1+(2*row-1)*dr_list[opcap_steel]
+                                            opcap_x2_pos=opcap_x1_pos+(4*dr_list[opcap_steel]+l1*opcap_steel/1000)
+
+                                        !zpos
+                                            opcap_z_pos=hor_z_pos+dr_list[hor_steel]+dr_list[opcap_steel]
+
+                                        capbar_num=capbar_num+1
+                                        _capbar_pen[capbar_num]=SDpen[code_list[opcap_steel]]
+                                        _capbar_mat[capbar_num]=SDmat[code_list[opcap_steel]]
+                                        _capbar_r[capbar_num]=dr_list[opcap_steel]
+                                        _capbar_spnum[capbar_num]=4
+
+                                        put opcap_x2_pos
+                                        put opcap_y1_pos
+                                        put opcap_z_pos
+
+                                        put opcap_x1_pos
+                                        put opcap_y1_pos
+                                        put opcap_z_pos
+
+                                        put opcap_x1_pos
+                                        put opcap_y2_pos
+                                        put opcap_z_pos
+
+                                        put opcap_x2_pos
+                                        put opcap_y2_pos
+                                        put opcap_z_pos
+
+                                        for n=1 to 3*_capbar_spnum[capbar_num]
+                                            _capbar_coor[capbar_num][n]=get(1)
+                                        next n
+                                    endif
+                                endif
+                            endif
+
+                        for n=1 to cnt_num
+                            if j=1 and p=bar_count then capbar_offset_flag=capbar_offset_flag*(-1)
+
+                            !xpos
+                                if n=1 then
+                                    hor_x1_pos=hor_x_edge1
+                                else
+                                    hor_x1_pos=hor_x_edge1+(n-1)*cnt_unit-l1/2*hor_steel/1000
+                                endif
+
+                                if n=cnt_num then
+                                    hor_x2_pos=hor_x_edge2
+                                else
+                                    hor_x2_pos=hor_x_edge1+n*cnt_unit+l1/2*hor_steel/1000
+                                endif
+
+                            hor_tot_num=hor_tot_num+1
+                            _hor_tot_pen[hor_tot_num]=SDpen[code_list[hor_steel]]
+                            _hor_tot_mat[hor_tot_num]=SDmat[code_list[hor_steel]]
+                            _hor_tot_r[hor_tot_num]=dr_list[hor_steel]
+                            _hor_tot_spnum[hor_tot_num]=2
+
+                            put hor_x1_pos
+                            put hor_y_pos
+                            put hor_z_pos+(1-2*fra(n/2))*2*dr_list[hor_steel]
+
+                            put hor_x2_pos
+                            put hor_y_pos
+                            put hor_z_pos+(1-2*fra(n/2))*2*dr_list[hor_steel]
+
+                            for m=1 to 3*_hor_tot_spnum[hor_tot_num]
+                                _hor_tot_coor[hor_tot_num][m]=get(1)
+                            next m
+                        next n
+                    next p
+                next j
+
+                !端部コの字筋
+                    if row=1 then
+                        for j=1 to 2
+                            if (j=1 and dis_start_cap) or (j=2 and dis_end_cap) then
+                                !xpos
+                                    if j=1 then !始点側
+                                        capbar_x1_pos=start_cover+dr_list[capbar_steel]
+                                        capbar_x2_pos=capbar_x1_pos+(4*dr_list[capbar_steel]+l1*capbar_steel/1000)
+                                    else !終点側
+                                        capbar_x1_pos=wall_len-end_cover-dr_list[capbar_steel]
+                                        capbar_x2_pos=capbar_x1_pos-(4*dr_list[capbar_steel]+l1*capbar_steel/1000)
+                                    endif
+
+                                !ypos
+                                    capbar_y1_pos=hor1_l_y_pos
+                                    capbar_y2_pos=hor1_r_y_pos
+
+                                !zpos
+                                    if j=1 then !始点側
+                                        capbar_z_pos=hor_z_pos+dr_list[hor1_steel]+dr_list[capbar_steel]
+                                    else !終点側
+                                        capbar_z_pos=hor_z_pos+dr_list[hor1_steel]+dr_list[capbar_steel]*capbar_offset_flag
+                                    endif
+
+                                capbar_num=capbar_num+1
+                                _capbar_spnum[capbar_num]=4
+
+                                put capbar_x2_pos
+                                put capbar_y1_pos
+                                put capbar_z_pos
+
+                                put capbar_x1_pos
+                                put capbar_y1_pos
+                                put capbar_z_pos
+
+                                put capbar_x1_pos
+                                put capbar_y2_pos
+                                put capbar_z_pos
+
+                                put capbar_x2_pos
+                                put capbar_y2_pos
+                                put capbar_z_pos
+
+                                for n=1 to 3*_capbar_spnum[capbar_num]
+                                    _capbar_coor[capbar_num][n]=get(1)
+                                next n
+                            endif
+                        next j
+                    endif
+            next i
+        endif
+    next row
+
+    !座標変換
+        inputNum=hor_tot_num
+        _inputSpnum=_hor_tot_spnum
+        _inputCoor=_hor_tot_coor
+        gosub "座標変換"
+        _hor_tot_coor=_outputCoor
+
+    !data upload
+        hor_tot_pen=_hor_tot_pen
+        hor_tot_mat=_hor_tot_mat
+        hor_tot_r=_hor_tot_r
+        hor_tot_spnum=_hor_tot_spnum
+        hor_tot_coor=_hor_tot_coor
+
+        parameters \
+        hor_tot_num=hor_tot_num,
+        hor_tot_pen=hor_tot_pen,
+        hor_tot_mat=hor_tot_mat,
+        hor_tot_r=hor_tot_r,
+        hor_tot_spnum=hor_tot_spnum,
+        hor_tot_coor=hor_tot_coor
+return
+
+
+"縦筋座標計算":
+    !ypos
+        !左側
+            if hor_l_pos=1 then
+                ver1_l_y_pos=wall_thi/2-(left_cover+2*dr_list[hor1_steel]+dr_list[ver1_steel])
+                ver2_l_y_pos=wall_thi/2-(left_cover+2*dr_list[hor1_steel]+2*dr_list[ver1_steel]+2*dr_list[hor2_steel]+dr_list[ver2_steel])
+                ver3_l_y_pos=wall_thi/2-(left_cover+2*dr_list[hor1_steel]+2*dr_list[ver1_steel]+2*dr_list[hor2_steel]+2*dr_list[ver2_steel]+2*dr_list[hor3_steel]+dr_list[ver3_steel])
+            else
+                ver1_l_y_pos=wall_thi/2-(left_cover+dr_list[ver1_steel])
+                ver2_l_y_pos=wall_thi/2-(left_cover+2*dr_list[ver1_steel]+2*dr_list[hor1_steel]+dr_list[ver2_steel])
+                ver3_l_y_pos=wall_thi/2-(left_cover+2*dr_list[ver1_steel]+2*dr_list[hor1_steel]+2*dr_list[ver2_steel]+2*dr_list[hor2_steel]+dr_list[ver3_steel])
+            endif
+
+        !右側
+            if hor_r_pos=1 then
+                ver1_r_y_pos=-wall_thi/2+(right_cover+2*dr_list[hor1_steel]+dr_list[ver1_steel])
+                ver2_r_y_pos=-wall_thi/2+(right_cover+2*dr_list[hor1_steel]+2*dr_list[ver1_steel]+2*dr_list[hor2_steel]+dr_list[ver2_steel])
+                ver3_r_y_pos=-wall_thi/2+(right_cover+2*dr_list[hor1_steel]+2*dr_list[ver1_steel]+2*dr_list[hor2_steel]+2*dr_list[ver2_steel]+2*dr_list[hor3_steel]+dr_list[ver3_steel])
+            else
+                ver1_r_y_pos=-wall_thi/2+(right_cover+dr_list[ver1_steel])
+                ver2_r_y_pos=-wall_thi/2+(right_cover+2*dr_list[ver1_steel]+2*dr_list[hor1_steel]+dr_list[ver2_steel])
+                ver3_r_y_pos=-wall_thi/2+(right_cover+2*dr_list[ver1_steel]+2*dr_list[hor1_steel]+2*dr_list[ver2_steel]+2*dr_list[hor2_steel]+dr_list[ver3_steel])
+            endif
+
+    for row=1 to 3
+        if (row=1 and switch_rebar1) or (row=2 and switch_rebar2) or (row=3 and switch_rebar3) then
+            if row=1 then !1段目配筋
+                ver_pitch=ver1_pitch
+                ver_steel=ver1_steel
+            endif
+
+            if row=2 then !2段目配筋
+                ver_pitch=ver2_pitch
+                ver_steel=ver2_steel
+            endif
+
+            if row=3 then !3段目配筋
+                ver_pitch=ver3_pitch
+                ver_steel=ver3_steel
+            endif
+
+            !端部位置
+                if down_anc=1 then !直線定着(L1)
+                    ver_z_start=-l1*ver_steel/1000
+                endif
+
+                if down_anc=2 then !直線定着(L2)
+                    ver_z_start=-l2*ver_steel/1000
+                endif
+
+                if down_anc=3 then !差し筋直線定着(L2)
+                    ver_z_start=0
+                endif
+
+                if down_anc=4 then !差し筋折り曲げ定着
+                    ver_z_start=0
+                endif
+
+                if down_anc=10 then !かぶり厚
+                    ver_z_start=down_cover
+                endif
+
+                if top_anc=1 then !直線定着(L1)
+                    ver_z_end=wall_hei+l1*ver_steel/1000
+                endif
+
+                if top_anc=2 then !直線定着(L2)
+                    ver_z_end=wall_hei+l2*ver_steel/1000
+                endif
+
+                if top_anc=10 then !かぶり厚
+                    ver_z_end=wall_hei-top_cover
+                endif            
+
+            for j=1 to 2
+                !ypos
+                    if j=1 then !左側
+                        if row=1 then ver_y_pos=ver1_l_y_pos
+                        if row=2 then ver_y_pos=ver2_l_y_pos
+                        if row=3 then ver_y_pos=ver3_l_y_pos
+                    endif
+
+                    if j=2 then !右側
+                        if row=1 then ver_y_pos=ver1_r_y_pos
+                        if row=2 then ver_y_pos=ver2_r_y_pos
+                        if row=3 then ver_y_pos=ver3_r_y_pos
+                    endif
+
+                !横筋端部自由調整パターン
+                    if start_anc=3 then
+                        if j=1 then
+                            if row=1 then hor_start_offset=hor1_l_start_offset
+                            if row=2 then hor_start_offset=hor2_l_start_offset
+                            if row=3 then hor_start_offset=hor3_l_start_offset
+                        else
+                            if row=1 then hor_start_offset=hor1_r_start_offset
+                            if row=2 then hor_start_offset=hor2_r_start_offset
+                            if row=3 then hor_start_offset=hor3_r_start_offset
+                        endif
+                    endif
+
+                    if end_anc=3 then
+                        if j=1 then
+                            if row=1 then hor_end_offset=hor1_l_end_offset
+                            if row=2 then hor_end_offset=hor2_l_end_offset
+                            if row=3 then hor_end_offset=hor3_l_end_offset
+                        else
+                            if row=1 then hor_end_offset=hor1_r_end_offset
+                            if row=2 then hor_end_offset=hor2_r_end_offset
+                            if row=3 then hor_end_offset=hor3_r_end_offset
+                        endif
+                    endif
+
+                !縦筋段数
+                    if start_anc<>3 then
+                        x_start_pos=ver_start_pos
+                    else
+                        x_start_pos=-hor_start_offset+ver_start_pos
+                        if ver_pattern=1 then x_start_pos=x_start_pos+fra((ver_start_pos-x_start_pos)/ver_pitch)*ver_pitch
+                    endif
+
+                    if end_anc<>3 then
+                        x_end_pos=wall_len-ver_start_pos
+                    else
+                        x_end_pos=wall_len+hor_end_offset-ver_start_pos
+                        if ver_pattern=2 then x_end_pos=x_end_pos-fra((x_end_pos+ver_start_pos)/ver_pitch)*ver_pitch
+                    endif
+
+                    ver_x_row=int((x_end_pos-x_start_pos)/ver_pitch)+1+plus_steel_start+plus_steel_end
+
+                for i=1 to ver_x_row
+                    capbar_offset_flag=-1
+
+                    !xpos
+                        if i<=int((x_end_pos-x_start_pos)/ver_pitch)+1 then
+                            if ver_pattern=1 then
+                                ver_x_pos=x_start_pos+(i-1)*ver_pitch
+                            else
+                                ver_x_pos=x_end_pos-(i-1)*ver_pitch
+                            endif
+                        endif
+
+                        if plus_steel_start=1 and i=int((x_end_pos-x_start_pos)/ver_pitch)+1+plus_steel_start then !始点端部プラス鉄筋
+                            if start_anc<>3 then
+                                ver_x_pos=0
+                            else
+                                ver_x_pos=-hor_start_offset+dr_list[ver_steel]
+                            endif
+                        endif
+
+                        if plus_steel_end=1 and i=int((x_end_pos-x_start_pos)/ver_pitch)+1+plus_steel_start+plus_steel_end then !終点端部プラス鉄筋
+                            if end_anc<>3 then
+                                ver_x_pos=wall_len
+                            else
+                                ver_x_pos=wall_len+hor_end_offset-dr_list[ver_steel]
+                            endif
+                        endif
+
+                    !差し筋定着の場合
+                        if down_anc=3 or down_anc=4 then
+                            expbar_num=expbar_num+1
+                            _expbar_pen[expbar_num]=SDpen[code_list[ver_steel]]
+                            _expbar_mat[expbar_num]=SDmat[code_list[ver_steel]]
+                            _expbar_r[expbar_num]=dr_list[ver_steel]
+
+                            if down_anc=3 then !差し筋直線定着
+                                _expbar_spnum[expbar_num]=2
+                            else !差し筋折り曲げ定着
+                                _expbar_spnum[expbar_num]=3
+                            endif
+
+                            put ver_x_pos+2*dr_list[ver_steel]
+                            put ver_y_pos
+                            put expbar_up_len
+
+                            if down_anc=3 then
+                                put ver_x_pos+2*dr_list[ver_steel]
+                                put ver_y_pos
+                                put -l2*ver_steel/1000
+                            else
+                                if row=3 then expbar_down_len=expbar_down_deep-dr_list[ver_steel]
+                                if row=2 then expbar_down_len=expbar_down_deep-dr_list[ver_steel]*(1+2*switch_rebar3)
+                                if row=1 then expbar_down_len=expbar_down_deep-dr_list[ver_steel]*(1+2*switch_rebar3+2*switch_rebar2)
+                                expbar_fra_len=l2*ver_steel/1000-expbar_down_len
+
+                                put ver_x_pos+2*dr_list[ver_steel]
+                                put ver_y_pos
+                                put -expbar_down_len
+
+                                if j=1 then
+                                    put ver_x_pos+2*dr_list[ver_steel]
+                                    put ver_y_pos+(4*dr_list[ver_steel]+expbar_fra_len)
+                                    put -expbar_down_len
+                                else
+                                    put ver_x_pos+2*dr_list[ver_steel]
+                                    put ver_y_pos-(4*dr_list[ver_steel]+expbar_fra_len)
+                                    put -expbar_down_len
+                                endif
+                            endif
+
+                            for n=1 to 3*_expbar_spnum[expbar_num]
+                                _expbar_coor[expbar_num][n]=get(1)
+                            next n
+                        endif
+
+                    !開口の場合
+                        bar_count=1
+
+                        put ver_z_start
+                        if temp2_op_num>0 then
+                            for n=1 to temp2_op_num
+                                if ver_x_pos-dr_list[hor_steel]<_temp2_op_pos[n][1]+_temp2_op_wid[n] and ver_x_pos+dr_list[hor_steel]>_temp2_op_pos[n][1] then
+                                    bar_count=bar_count+1
+                                    put _temp2_op_pos[n][2]
+                                    put _temp2_op_pos[n][2]+_temp2_op_hei[n]
+                                endif
+                            next n
+                        endif
+                        put ver_z_end
+
+                        dim _temp_pos[][]
+                        _temp_pos[1][1]=0 : _temp_pos[1][2]=0
+
+                        for n=1 to bar_count
+                            _temp_pos[n][1]=get(1)
+                            _temp_pos[n][2]=get(1)
+                        next n
+
+                    for p=1 to bar_count
+                        ver_z_edge1=_temp_pos[p][1]
+                        ver_z_edge2=_temp_pos[p][2]
+
+                        !継手定尺分割
+                            cnt_num=ceil((ver_z_edge2-ver_z_edge1)/cnt_limit)
+                            cnt_num=ceil(((ver_z_edge2-ver_z_edge1)+(cnt_num-1)*l1*ver_steel/1000)/cnt_limit)
+                            cnt_unit=(ver_z_edge2-ver_z_edge1)/cnt_num
+
+                        for n=1 to cnt_num
+                            if j=1 and p=bar_count then capbar_offset_flag=capbar_offset_flag*(-1)
+
+                            !zpos
+                                if n=1 then
+                                    ver_z1_pos=ver_z_edge1
+                                else
+                                    ver_z1_pos=ver_z_edge1+(n-1)*cnt_unit-l1/2*ver_steel/1000
+                                endif
+
+                                if n=cnt_num then
+                                    ver_z2_pos=ver_z_edge2
+                                else
+                                    ver_z2_pos=ver_z_edge1+n*cnt_unit+l1/2*ver_steel/1000
+                                endif
+
+                            ver_all_num=ver_all_num+1
+                            _ver_all_pen[ver_all_num]=SDpen[code_list[ver_steel]]
+                            _ver_all_mat[ver_all_num]=SDmat[code_list[ver_steel]]
+                            _ver_all_r[ver_all_num]=dr_list[ver_steel]
+                            _ver_all_spnum[ver_all_num]=2
+
+                            put ver_x_pos+(1-2*fra(n/2))*2*dr_list[ver_steel]
+                            put ver_y_pos
+                            put ver_z1_pos
+
+                            put ver_x_pos+(1-2*fra(n/2))*2*dr_list[ver_steel]
+                            put ver_y_pos
+                            put ver_z2_pos
+
+                            for m=1 to 3*_ver_all_spnum[ver_all_num]
+                                _ver_all_coor[ver_all_num][m]=get(1)
+                            next m
+                        next n
+                    next p
+                    
+                    !上端コの字筋
+                        if dis_top_cap then
+                        if row=1 and j=1 then
+                        if ver_x_pos>=ver_start_pos and ver_x_pos<=wall_len-ver_start_pos then
+                            !xpos
+                                capbar_x_pos=ver_x_pos+dr_list[ver1_steel]+dr_list[capbar_steel]*capbar_offset_flag
+
+                            !ypos
+                                capbar_y1_pos=ver1_l_y_pos
+                                capbar_y2_pos=ver1_r_y_pos
+
+                            !zpos
+                                capbar_z1_pos=wall_hei-top_cover-dr_list[ver_steel]
+                                capbar_z2_pos=capbar_z1_pos-(4*dr_list[capbar_steel]+l1*capbar_steel/1000)
+
+                            capbar_num=capbar_num+1
+                            _capbar_spnum[capbar_num]=4
+                
+                            put capbar_x_pos
+                            put capbar_y1_pos
+                            put capbar_z2_pos
+                
+                            put capbar_x_pos
+                            put capbar_y1_pos
+                            put capbar_z1_pos
+                
+                            put capbar_x_pos
+                            put capbar_y2_pos
+                            put capbar_z1_pos
+                
+                            put capbar_x_pos
+                            put capbar_y2_pos
+                            put capbar_z2_pos
+
+                            for n=1 to 3*_capbar_spnum[capbar_num]
+                                _capbar_coor[capbar_num][n]=get(1)
+                            next n
+                        endif
+                        endif
+                        endif
+                next i
+            next j
+        endif
+    next row
+
+    !始点・終点コの字筋ある場合
+        if dis_start_cap or dis_end_cap then
+            !端部位置
+                if down_anc=1 then !直線定着(L1)
+                    ver_edge_z_start=-l1*ver_edge_steel/1000
+                endif
+
+                if down_anc=2 then !直線定着(L2)
+                    ver_edge_z_start=-l2*ver_edge_steel/1000
+                endif
+
+                if down_anc=3 then !差し筋直線定着(L2)
+                    ver_edge_z_start=0
+                endif
+
+                if down_anc=4 then !差し筋折り曲げ定着
+                    ver_edge_z_start=0
+                endif
+
+                if down_anc=10 then !かぶり厚
+                    ver_edge_z_start=down_cover
+                endif
+
+                if top_anc=1 then !直線定着(L1)
+                    ver_edge_z_end=wall_hei+l1*ver_edge_steel/1000
+                endif
+
+                if top_anc=2 then !直線定着(L2)
+                    ver_edge_z_end=wall_hei+l2*ver_edge_steel/1000
+                endif
+
+                if top_anc=10 then !かぶり厚
+                    ver_edge_z_end=wall_hei-top_cover
+                endif
+
+            for row=1 to 2
+                if (row=1 and dis_start_cap) or (row=2 and dis_end_cap) then
+                    !xpos
+                        if row=1 then !始点側
+                            ver_edge_x_pos=start_cover+(2*dr_list[capbar_steel]+dr_list[ver_edge_steel])
+                        endif
+
+                        if row=2 then !終点側
+                            ver_edge_x_pos=wall_len-end_cover-(2*dr_list[capbar_steel]+dr_list[ver_edge_steel])
+                        endif
+
+                    !pitch
+                        y_start_pos=wall_thi/2-(left_cover+2*dr_list[hor1_steel]+2*dr_list[ver1_steel]+2*dr_list[hor2_steel]+2*dr_list[ver2_steel]+2*dr_list[hor3_steel]+dr_list[ver3_steel])
+                        y_end_pos=-wall_thi/2+(right_cover+2*dr_list[hor1_steel]+2*dr_list[ver1_steel]+2*dr_list[hor2_steel]+2*dr_list[ver2_steel]+2*dr_list[hor3_steel]+dr_list[ver3_steel])
+                        y_pitch=(y_start_pos-y_end_pos)/(ver_edge_num+1)
+
+                    for i=1 to ver_edge_num
+                        !ypos
+                            ver_edge_y_pos=y_start_pos-i*y_pitch
+
+                        !継手定尺分割
+                            cnt_num=ceil((ver_edge_z_end-ver_edge_z_start)/cnt_limit)
+                            cnt_num=ceil(((ver_edge_z_end-ver_edge_z_start)+(cnt_num-1)*l1*ver_edge_steel/1000)/cnt_limit)
+                            cnt_unit=(ver_edge_z_end-ver_edge_z_start)/cnt_num
+
+                        for j=1 to cnt_num
+                            !zpos
+                                if j=1 then
+                                    ver_edge_z1_pos=ver_edge_z_start
+                                else
+                                    ver_edge_z1_pos=ver_edge_z_start+(j-1)*cnt_unit-l1/2*ver_edge_steel/1000
+                                endif
+
+                                if j=cnt_num then
+                                    ver_edge_z2_pos=ver_edge_z_end
+                                else
+                                    ver_edge_z2_pos=ver_edge_z_start+j*cnt_unit+l1/2*ver_edge_steel/1000
+                                endif
+
+                            ver_all_num=ver_all_num+1
+                            _ver_all_pen[ver_all_num]=SDpen[code_list[ver_edge_steel]]
+                            _ver_all_mat[ver_all_num]=SDmat[code_list[ver_edge_steel]]
+                            _ver_all_r[ver_all_num]=dr_list[ver_edge_steel]
+                            _ver_all_spnum[ver_all_num]=2
+
+                            put ver_edge_x_pos
+                            put ver_edge_y_pos+(1-2*fra(j/2))*2*dr_list[ver_edge_steel]
+                            put ver_edge_z1_pos
+
+                            put ver_edge_x_pos
+                            put ver_edge_y_pos+(1-2*fra(j/2))*2*dr_list[ver_edge_steel]
+                            put ver_edge_z2_pos
+
+                            for n=1 to 3*_ver_all_spnum[ver_all_num]
+                                _ver_all_coor[ver_all_num][n]=get(1)
+                            next n
+                        next j
+
+                        !差し筋定着の場合
+                            if down_anc=3 or down_anc=4 then
+                                expbar_num=expbar_num+1
+                                _expbar_pen[expbar_num]=SDpen[code_list[ver_edge_steel]]
+                                _expbar_mat[expbar_num]=SDmat[code_list[ver_edge_steel]]
+                                _expbar_r[expbar_num]=dr_list[ver_edge_steel]
+
+                                if down_anc=3 then !差し筋直線定着
+                                    _expbar_spnum[expbar_num]=2
+                                else !差し筋折り曲げ定着
+                                    _expbar_spnum[expbar_num]=3
+                                endif
+
+                                put ver_edge_x_pos
+                                put ver_edge_y_pos+2*dr_list[ver_edge_steel]
+                                put expbar_up_len
+
+                                if down_anc=3 then
+                                    put ver_edge_x_pos
+                                    put ver_edge_y_pos+2*dr_list[ver_edge_steel]
+                                    put -l2*ver_edge_steel/1000
+                                else
+                                    expbar_fra_len=l2*ver_edge_steel/1000-expbar_down_deep
+
+                                    put ver_edge_x_pos+2*dr_list[ver_edge_steel]
+                                    put ver_edge_y_pos
+                                    put -expbar_down_len
+
+                                    if row=1 then
+                                        put ver_edge_x_pos-(4*dr_list[ver_edge_steel]+expbar_fra_len)
+                                        put ver_edge_y_pos+2*dr_list[ver_edge_steel]
+                                        put -expbar_down_len
+                                    else
+                                        put ver_edge_x_pos+(4*dr_list[ver_edge_steel]+expbar_fra_len)
+                                        put ver_edge_y_pos+2*dr_list[ver_edge_steel]
+                                        put -expbar_down_len
+                                    endif
+                                endif
+
+                                for n=1 to 3*_expbar_spnum[expbar_num]
+                                    _expbar_coor[expbar_num][n]=get(1)
+                                next n
+                            endif
+                    next i
+                endif
+            next row
+        endif
+
+    !座標変換
+        inputNum=ver_all_num
+        _inputSpnum=_ver_all_spnum
+        _inputCoor=_ver_all_coor
+        gosub "座標変換"
+        _ver_all_coor=_outputCoor
+
+    !data upload
+        ver_all_pen=_ver_all_pen
+        ver_all_mat=_ver_all_mat
+        ver_all_r=_ver_all_r
+        ver_all_spnum=_ver_all_spnum
+        ver_all_coor=_ver_all_coor
+
+        parameters \
+        ver_all_num=ver_all_num,
+        ver_all_pen=ver_all_pen,
+        ver_all_mat=ver_all_mat,
+        ver_all_r=ver_all_r,
+        ver_all_spnum=ver_all_spnum,
+        ver_all_coor=ver_all_coor
+return
+
+
+"コの字筋・差し筋data upload":
+    !コの字筋
+        !座標変換
+            inputNum=capbar_num
+            _inputSpnum=_capbar_spnum
+            _inputCoor=_capbar_coor
+            gosub "座標変換"
+            _capbar_coor=_outputCoor
+
+        !data upload
+            capbar_pen=SDpen[code_list[capbar_steel]]
+            capbar_mat=SDmat[code_list[capbar_steel]]
+            capbar_r=dr_list[capbar_steel]
+            capbar_spnum=_capbar_spnum
+            capbar_coor=_capbar_coor
+
+            parameters \
+            capbar_num=capbar_num,
+            capbar_pen=capbar_pen,
+            capbar_mat=capbar_mat,
+            capbar_r=capbar_r,
+            capbar_spnum=capbar_spnum,
+            capbar_coor=capbar_coor
+
+    !差し筋
+        !座標変換
+            inputNum=expbar_num
+            _inputSpnum=_expbar_spnum
+            _inputCoor=_expbar_coor
+            gosub "座標変換"
+            _expbar_coor=_outputCoor
+
+        !data upload
+            expbar_pen=_expbar_pen
+            expbar_mat=_expbar_mat
+            expbar_r=_expbar_r
+            expbar_spnum=_expbar_spnum
+            expbar_coor=_expbar_coor
+
+            parameters \
+            expbar_num=expbar_num,
+            expbar_pen=expbar_pen,
+            expbar_mat=expbar_mat,
+            expbar_r=expbar_r,
+            expbar_spnum=expbar_spnum,
+            expbar_coor=expbar_coor
+return
+
+
+"開口補強筋座標計算":
+    ophor_pen=SDpen[code_list[ophor_steel]]
+    ophor_mat=SDmat[code_list[ophor_steel]]
+    ophor_r=dr_list[ophor_steel]
+
+    opver_pen=SDpen[code_list[opver_steel]]
+    opver_mat=SDmat[code_list[opver_steel]]
+    opver_r=dr_list[opver_steel]
+
+    opdia_pen=SDpen[code_list[opdia_steel]]
+    opdia_mat=SDmat[code_list[opdia_steel]]
+    opdia_r=dr_list[opdia_steel]
+
+    if op_num then
+        opref_thi=opref_row*2*(dr_list[ophor_steel]+dr_list[opver_steel]+dr_list[opdia_steel])
+        opref_pitch=2*(dr_list[ophor_steel]+dr_list[opver_steel]+dr_list[opdia_steel])
+
+        for row=1 to opref_row
+            !ypos
+                ophor_y_pos=opref_thi/2-dr_list[ophor_steel]-(row-1)*opref_pitch
+                opver_y_pos=opref_thi/2-2*dr_list[ophor_steel]-dr_list[opver_steel]-(row-1)*opref_pitch
+                opdia_y_pos=opref_thi/2-2*dr_list[ophor_steel]-2*dr_list[opver_steel]-dr_list[opdia_steel]-(row-1)*opref_pitch
+
+            for i=1 to op_num
+                if op_wid[i]>oprefbar_range or op_hei[i]>oprefbar_range then
+                    ophor_x1_pos=op_pos[i][1]-opref_fra_len
+                    ophor_x2_pos=op_pos[i][1]+op_wid[i]+opref_fra_len
+
+                    opver_z1_pos=op_pos[i][2]-opref_fra_len
+                    opver_z2_pos=op_pos[i][2]+op_hei[i]+opref_fra_len
+
+                    for j=1 to opref_tier
+                        !横筋
+                            for n=1 to 2
+                                if n=1 then !下
+                                    ophor_z_pos=op_pos[i][2]-(op_cover+dr_list[ophor_steel]+(j-1)*opref_gap)
+                                else !上
+                                    ophor_z_pos=op_pos[i][2]+op_hei[i]+(op_cover+dr_list[ophor_steel]+(j-1)*opref_gap)
+                                endif
+
+                                if (n=1 and op_pos[i][2]>oprefbar_limit) or (n=2 and op_pos[i][2]+op_hei[i]<wall_hei-oprefbar_limit) then
+                                    ophor_num=ophor_num+1
+                                    _ophor_spnum[ophor_num]=2
+
+                                    put ophor_x1_pos
+                                    put ophor_y_pos
+                                    put ophor_z_pos
+
+                                    put ophor_x2_pos
+                                    put ophor_y_pos
+                                    put ophor_z_pos
+
+                                    for m=1 to 3*_ophor_spnum[ophor_num]
+                                        _ophor_coor[ophor_num][m]=get(1)
+                                    next m
+                                endif
+                            next n
+
+                        !縦筋
+                            for n=1 to 2
+                                if n=1 then !左
+                                    opver_x_pos=op_pos[i][1]-(op_cover+2*opcap_row*dr_list[opcap_steel]+dr_list[opver_steel]+(j-1)*opref_gap)
+                                else !右
+                                    opver_x_pos=op_pos[i][1]+op_wid[i]+(op_cover+2*opcap_row*dr_list[opcap_steel]+dr_list[opver_steel]+(j-1)*opref_gap)
+                                endif
+
+                                if (n=1 and op_pos[i][1]>oprefbar_limit) or (n=2 and op_pos[i][1]+op_wid[i]<wall_len-oprefbar_limit) then
+                                    opver_num=opver_num+1
+                                    _opver_spnum[opver_num]=2
+
+                                    put opver_x_pos
+                                    put opver_y_pos
+                                    put opver_z1_pos
+
+                                    put opver_x_pos
+                                    put opver_y_pos
+                                    put opver_z2_pos
+
+                                    for m=1 to 3*_opver_spnum[opver_num]
+                                        _opver_coor[opver_num][m]=get(1)
+                                    next m
+                                endif
+                            next n
+
+                        !斜筋
+                            for n=1 to 4
+                                if n=1 then !左下
+                                    opdia_x1_pos=op_pos[i][1]-(opdia_offset+dr_list[opver_steel]+(j-1)*opref_gap)-opref_fra_len/sqr(2)
+                                    opdia_x2_pos=op_pos[i][1]-(opdia_offset+dr_list[opver_steel]+(j-1)*opref_gap)+opref_fra_len/sqr(2)
+                                    opdia_z1_pos=op_pos[i][2]-(opdia_offset+dr_list[ophor_steel]+(j-1)*opref_gap)+opref_fra_len/sqr(2)
+                                    opdia_z2_pos=op_pos[i][2]-(opdia_offset+dr_list[ophor_steel]+(j-1)*opref_gap)-opref_fra_len/sqr(2)
+                                endif
+
+                                if n=2 then !左上
+                                    opdia_x1_pos=op_pos[i][1]-(opdia_offset+dr_list[opver_steel]+(j-1)*opref_gap)-opref_fra_len/sqr(2)
+                                    opdia_x2_pos=op_pos[i][1]-(opdia_offset+dr_list[opver_steel]+(j-1)*opref_gap)+opref_fra_len/sqr(2)
+                                    opdia_z1_pos=op_pos[i][2]+op_hei[i]+(opdia_offset+dr_list[ophor_steel]+(j-1)*opref_gap)-opref_fra_len/sqr(2)
+                                    opdia_z2_pos=op_pos[i][2]+op_hei[i]+(opdia_offset+dr_list[ophor_steel]+(j-1)*opref_gap)+opref_fra_len/sqr(2)
+                                endif
+
+                                if n=3 then !右下
+                                    opdia_x1_pos=op_pos[i][1]+op_wid[i]+(opdia_offset+dr_list[opver_steel]+(j-1)*opref_gap)-opref_fra_len/sqr(2)
+                                    opdia_x2_pos=op_pos[i][1]+op_wid[i]+(opdia_offset+dr_list[opver_steel]+(j-1)*opref_gap)+opref_fra_len/sqr(2)
+                                    opdia_z1_pos=op_pos[i][2]-(opdia_offset+dr_list[ophor_steel]+(j-1)*opref_gap)-opref_fra_len/sqr(2)
+                                    opdia_z2_pos=op_pos[i][2]-(opdia_offset+dr_list[ophor_steel]+(j-1)*opref_gap)+opref_fra_len/sqr(2)
+                                endif
+
+                                if n=4 then !右上
+                                    opdia_x1_pos=op_pos[i][1]+op_wid[i]+(opdia_offset+dr_list[opver_steel]+(j-1)*opref_gap)-opref_fra_len/sqr(2)
+                                    opdia_x2_pos=op_pos[i][1]+op_wid[i]+(opdia_offset+dr_list[opver_steel]+(j-1)*opref_gap)+opref_fra_len/sqr(2)
+                                    opdia_z1_pos=op_pos[i][2]+op_hei[i]+(opdia_offset+dr_list[ophor_steel]+(j-1)*opref_gap)+opref_fra_len/sqr(2)
+                                    opdia_z2_pos=op_pos[i][2]+op_hei[i]+(opdia_offset+dr_list[ophor_steel]+(j-1)*opref_gap)-opref_fra_len/sqr(2)
+                                endif
+
+                                if (n=1 and op_pos[i][1]>oprefbar_limit and op_pos[i][2]>oprefbar_limit) or \
+                                (n=2 and op_pos[i][1]>oprefbar_limit and op_pos[i][2]+op_hei[i]<wall_hei-oprefbar_limit) or \
+                                (n=3 and op_pos[i][1]+op_wid[i]<wall_len-oprefbar_limit and op_pos[i][2]>oprefbar_limit) or \
+                                (n=4 and op_pos[i][1]+op_wid[i]<wall_len-oprefbar_limit and op_pos[i][2]+op_hei[i]<wall_hei-oprefbar_limit) then
+                                    opdia_num=opdia_num+1
+                                    _opdia_spnum[opdia_num]=2
+
+                                    put opdia_x1_pos
+                                    put opdia_y_pos
+                                    put opdia_z1_pos
+
+                                    put opdia_x2_pos
+                                    put opdia_y_pos
+                                    put opdia_z2_pos
+
+                                    for m=1 to 3*_opdia_spnum[opdia_num]
+                                        _opdia_coor[opdia_num][m]=get(1)
+                                    next m
+                                endif
+                            next n
+                    next j
+                endif
+            next i
+        next row
+    endif
+
+    !座標変換
+        inputNum=ophor_num
+        _inputSpnum=_ophor_spnum
+        _inputCoor=_ophor_coor
+        gosub "座標変換"
+        _ophor_coor=_outputCoor
+
+        inputNum=opver_num
+        _inputSpnum=_opver_spnum
+        _inputCoor=_opver_coor
+        gosub "座標変換"
+        _opver_coor=_outputCoor
+
+        inputNum=opdia_num
+        _inputSpnum=_opdia_spnum
+        _inputCoor=_opdia_coor
+        gosub "座標変換"
+        _opdia_coor=_outputCoor
+
+    !data upload
+        ophor_spnum=_ophor_spnum
+        ophor_coor=_ophor_coor
+        opver_spnum=_opver_spnum
+        opver_coor=_opver_coor
+        opdia_spnum=_opdia_spnum
+        opdia_coor=_opdia_coor
+
+        parameters \
+        ophor_num=ophor_num,
+        ophor_pen=ophor_pen,
+        ophor_mat=ophor_mat,
+        ophor_r=ophor_r,
+        ophor_spnum=ophor_spnum,
+        ophor_coor=ophor_coor,
+        opver_num=opver_num,
+        opver_pen=opver_pen,
+        opver_mat=opver_mat,
+        opver_r=opver_r,
+        opver_spnum=opver_spnum,
+        opver_coor=opver_coor,
+        opdia_num=opdia_num,
+        opdia_pen=opdia_pen,
+        opdia_mat=opdia_mat,
+        opdia_r=opdia_r,
+        opdia_spnum=opdia_spnum,
+        opdia_coor=opdia_coor
+return
+
+
+"座標変換":
+    dim _outputCoor[][]
+    _outputCoor[1][1]=0 : _outputCoor[1][2]=0
+
+    for index1=1 to inputNum
+        if _inputSpnum[index1]>0 then
+            for index2=1 to _inputSpnum[index1]
+                !input
+                    tempX=_inputCoor[index1][3*(index2-1)+x]
+                    tempY=_inputCoor[index1][3*(index2-1)+y]
+                    tempZ=_inputCoor[index1][3*(index2-1)+z]
+
+                !step1:rotz wall_rtz
+                    tempLen=sqr(tempX^2+tempY^2)
+
+                    tempRtz=0
+                    if tempY>eps then
+                        tempRtz=acs(tempX/tempLen)
+                    endif
+
+                    if tempY<=eps and tempY>=-eps then
+                        if tempX>=0 then
+                            tempRtz=0
+                        else
+                            tempRtz=180
+                        endif
+                    endif
+
+                    if tempY<-eps then
+                        tempRtz=360-acs(tempX/tempLen)
+                    endif
+                
+                    tempX1=tempLen*cos(tempRtz+wall_rtz)
+                    tempY1=tempLen*sin(tempRtz+wall_rtz)
+                    tempZ1=tempZ
+
+                !step2:add wall_pos[1][1],wall_pos[1][2],0
+                    tempX2=tempX1+wall_pos[1][1]
+                    tempY2=tempY1+wall_pos[1][2]
+                    tempZ2=tempZ1
+
+                !output
+                    _outputCoor[index1][3*(index2-1)+x]=tempX2
+                    _outputCoor[index1][3*(index2-1)+y]=tempY2
+                    _outputCoor[index1][3*(index2-1)+z]=tempZ2
+            next index2
+        endif
+    next index1
+return
+
+
+"master_end":

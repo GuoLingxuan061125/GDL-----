@@ -1,0 +1,900 @@
+!-------------------------------------------------------------------------- 単位切替
+values{2} "unitType" 1, "インチサイズ", 2, "メーターサイズ"
+
+
+values "A" unitSize_values
+
+dim B_Size_values[5]
+for i=1 to 5
+	B_Size_values[i]=unitSize_values[i] 
+next i
+values "B" B_Size_values
+
+!!長さ・巾　対応サイズ増やしました　19/02/27
+!values "A" 1.829, 1.800, 1.524, 1.500, 1.219, 1.200, 0.914, 0.900, 0.610, 0.600, 0.305, 0.153
+!values "B" 1.829, 1.800, 1.524, 1.500, 1.219, 1.200, 0.914, 0.900, 0.610, 0.600
+
+!!変更前のバックアップ　19/02/27
+!!values "A" 1.829, 1.524, 1.219, 0.914, 0.610, 0.305, 0.153		!長さ
+!!values "B" 1.829, 1.524, 1.219, 0.914, 0.610			!幅
+
+
+!-------------------------------------------------------------------------- ジャッキベース
+values "jb_h1" range [0.036, 0.350]
+values "jb_h2" range [0.036, 0.350]
+values "jb_h3" range [0.036, 0.350]
+values "jb_h4" range [0.036, 0.350]
+
+if not(jb_fl1) then lock "jb_h1"
+if not(jb_fl2) then lock "jb_h2"
+if not(jb_fl3) then lock "jb_h3"
+if not(jb_fl4) then lock "jb_h4"
+
+
+!-------------------------------------------------------------------------- 配列複写
+!values "sequence_v" range[1,)				!配列複写（層）
+!values "sequence_h" range[1,)				!配列複写（スパン）
+
+
+!-------------------------------------------------------------------------- 布材・布板入力No設定 
+dim dan_num[]							
+for i=1 to dan_max
+	dan_num[i]=i
+next i
+values "section_no" dan_num			! 段数のリスト化
+
+
+!--------------------------------------------------------------------------  拡幅狭幅ブラケット
+values "frame_decrease1_pos" dan_num
+values "frame_decrease2_pos" dan_num
+values "frame_decrease3_pos" dan_num
+values "frame_decrease4_pos" dan_num
+
+if not(frame_decrease1) then lock "frame_decrease1_pos" 
+if not(frame_decrease2) then lock "frame_decrease2_pos" 
+if not(frame_decrease3) then lock "frame_decrease3_pos" 
+if not(frame_decrease4) then lock "frame_decrease4_pos" 
+
+if GLOB_MODPAR_NAME="prop_shape" then
+	frame_decrease1_pos=dan_max
+	frame_decrease2_pos=dan_max
+	frame_decrease3_pos=dan_max
+	frame_decrease4_pos=dan_max
+
+	parameters frame_decrease1_pos=frame_decrease1_pos
+	parameters frame_decrease2_pos=frame_decrease2_pos
+	parameters frame_decrease3_pos=frame_decrease3_pos
+	parameters frame_decrease4_pos=frame_decrease4_pos
+endif
+
+
+!--------------------------------------------------------------------------  大引受ジャッキ
+dim OobikiType[]
+	OobikiType[1]="金物"
+	OobikiType[2]="ジャッキ"
+
+dim strOobikiType[3]
+dim idOobiki[3]
+for i=1 to 3
+	if i=1 then strOobikiType[i]="なし"
+	if i>1 then strOobikiType[i]=OobikiType[i-1]
+	idOobiki[i]=i-1
+next i
+values{2} "oobikiType1", idOobiki, strOobikiType
+values{2} "oobikiType2", idOobiki, strOobikiType
+values{2} "oobikiType3", idOobiki, strOobikiType
+values{2} "oobikiType4", idOobiki, strOobikiType
+
+_minH=0.065
+_maxH=0.45
+
+values "oobikiAng" 0, 90, custom
+values "oobikiJackH" range[_minH, _maxH]
+
+if oobikiType1=0 then 
+	lock "oobikiAng1", "oobikiJackH1", "oobikiColor1"
+else
+	if oobikiType1=1 then lock "oobikiJackH1"
+endif
+
+if oobikiType2=0 then 
+	lock "oobikiAng2", "oobikiJackH2", "oobikiColor2"
+else
+	if oobikiType2=1 then lock "oobikiJackH2"
+endif
+
+if oobikiType3=0 then 
+	lock "oobikiAng3", "oobikiJackH3", "oobikiColor3"
+else
+	if oobikiType3=1 then lock "oobikiJackH3"
+endif
+
+if oobikiType4=0 then 
+	lock "oobikiAng4", "oobikiJackH4", "oobikiColor4"
+else
+	if oobikiType4=1 then lock "oobikiJackH4"
+endif
+
+if joint then
+	oobikiType1=0 : parameters oobikiType1=oobikiType1
+	oobikiType2=0 : parameters oobikiType2=oobikiType2
+	oobikiType3=0 : parameters oobikiType3=oobikiType3
+	oobikiType4=0 : parameters oobikiType4=oobikiType4
+	bSameSetting_oobiki=0 : parameters bSameSetting_oobiki=bSameSetting_oobiki
+	lock "oobikiType1", "oobikiType2", "oobikiType3", "oobikiType4", "bSameSetting_oobiki"
+endif
+
+if bSameSetting_oobiki then
+	oobikiAng1=oobikiAng : parameters oobikiAng1=oobikiAng1
+	oobikiAng2=oobikiAng : parameters oobikiAng2=oobikiAng2
+	oobikiAng3=oobikiAng : parameters oobikiAng3=oobikiAng3
+	oobikiAng4=oobikiAng : parameters oobikiAng4=oobikiAng4
+	oobikiJackH1=oobikiJackH : parameters oobikiJackH1=oobikiJackH1
+	oobikiJackH2=oobikiJackH : parameters oobikiJackH2=oobikiJackH2
+	oobikiJackH3=oobikiJackH : parameters oobikiJackH3=oobikiJackH3
+	oobikiJackH4=oobikiJackH : parameters oobikiJackH4=oobikiJackH4
+	oobikiColor1=oobikiColor : parameters oobikiColor1=oobikiColor1
+	oobikiColor2=oobikiColor : parameters oobikiColor2=oobikiColor2
+	oobikiColor3=oobikiColor : parameters oobikiColor3=oobikiColor3
+	oobikiColor4=oobikiColor : parameters oobikiColor4=oobikiColor4
+	
+	lock "oobikiAng1", "oobikiAng2", "oobikiAng3", "oobikiAng4",
+		"oobikiJackH1", "oobikiJackH2", "oobikiJackH3", "oobikiJackH4",
+		"oobikiColor1", "oobikiColor2", "oobikiColor3", "oobikiColor4"
+else
+	values "oobikiAng1" 0, 90, custom
+	values "oobikiAng2" 0, 90, custom
+	values "oobikiAng3" 0, 90, custom
+	values "oobikiAng4" 0, 90, custom
+	
+	values "oobikiJackH1" range[_minH, _maxH]
+	values "oobikiJackH2" range[_minH, _maxH]
+	values "oobikiJackH3" range[_minH, _maxH]
+	values "oobikiJackH4" range[_minH, _maxH]
+
+	lock "oobikiAng", "oobikiJackH", "oobikiColor"
+endif
+
+if GLOB_MODPAR_NAME="joint" & joint=0 then
+	oobikiType1=2 : parameters oobikiType1=oobikiType1
+	oobikiType2=2 : parameters oobikiType2=oobikiType2
+	oobikiType3=2 : parameters oobikiType3=oobikiType3
+	oobikiType4=2 : parameters oobikiType4=oobikiType4
+	bSameSetting_oobiki=0 : parameters bSameSetting_oobiki=bSameSetting_oobiki
+endif
+
+
+
+!-------------------------------------------------------------------------- 布材設定 入力用
+dim ledType_values[]
+	ledType_values[1]="布材"
+	ledType_values[2]="先行手摺付ブレース"
+	ledType_values[3]="梁枠"
+
+values "led1_type_in" ledType_values
+values "led2_type_in" ledType_values
+values "led3_type_in" ledType_values
+
+dim beamType_values[]
+	beamType_values[1]="1.5スパン"
+	beamType_values[2]="2スパン"
+	beamType_values[3]="3スパン"
+	beamType_values[4]="4スパン"
+
+values "led1_beamtype_in" beamType_values
+values "led2_beamtype_in" beamType_values
+
+dim _beamtype[] 
+for i=1 to 3
+	_beamtype[i]=beamType_values[i]
+next i
+values "led3_beamtype_in" _beamtype
+
+
+
+!-------------------------------------------------------------------------- ブラケット
+dim bracketType[]
+	bracketType[1]="240"
+	bracketType[2]="500"
+
+dim strBrType[3]
+dim idBrType[3]
+for i=1 to 3
+	if i=1 then strBrType[i]="なし"
+	if i>1 then strBrType[i]=bracketType[i-1]
+	idBrType[i]=i-1
+next i
+values{2} "bracketType1_in" idBrType, strBrType
+values{2} "bracketType2_in" idBrType, strBrType
+values{2} "bracketType3_in" idBrType, strBrType
+values{2} "bracketType4_in" idBrType, strBrType
+
+
+dim bracket_position[]
+dim idBrPos[]
+for i=1 to 4
+	bracket_position[i]="方向"+str(i, -1, 0)
+	idBrPos[i]=i
+next i
+
+values{2} "bracket1_pos_in" idBrPos, bracket_position
+values{2} "bracket2_pos_in" idBrPos, bracket_position
+values{2} "bracket3_pos_in" idBrPos, bracket_position
+values{2} "bracket4_pos_in" idBrPos, bracket_position
+
+
+!-------------------------------------------------------------------------- 布板設定 入力用
+
+values "board_type_in" "布板", "階段", "ハッチ式布板"
+values "board_spos_in" "1", "2"
+values "board_hpos_in" "1", "2"
+values "board_hopen_in" "開", "閉"
+values "board_huse_in" "使用時", "収納時"
+
+if board_type_in="布板" then
+	lock "board_sreverse_in",
+		"board_spos_in", 
+		"board_srail1_in", 
+		"board_srail2_in", 
+		"board_stepHanger_in",
+		"board_stepRail_in",
+		"board_hreverse_in", 
+		"board_hpos_in", 
+		"board_hopen_in", 
+		"board_huse_in" 
+endif
+
+if board_type_in="階段" then
+	lock "board_hreverse_in", 
+		"board_hpos_in", 
+		"board_hopen_in", 
+		"board_huse_in" 
+	if section_no<>1 & not(_bNegarami) then
+		lock "board_stepHanger_in"
+	endif
+endif
+
+if board_type_in="ハッチ式布板" then
+	lock "board_sreverse_in",
+		"board_spos_in", 
+		"board_srail1_in", 
+		"board_srail2_in",
+		"board_stepHanger_in",
+		"board_stepRail_in"
+endif
+
+!-------------------------------------------------------------------------- 表示
+!--- 平面図単線表示の柱
+if app2d then
+	hideparameter "app2d_column", "app2d_column_pen"
+endif
+
+!--- 平面図単線表示タイプ
+values{2} "app2d_type",
+	1, "通常",
+	2, "階段",
+	3, "梁枠"
+
+if app2D then lock "app2d_type"
+
+!--- 立断面図表示タイプ
+values{2} "app3d_type",
+	1, "すべて",
+	2, "手前のみ",
+	3, "奥のみ"
+
+
+!-------------------------------------------------------------------------- 支柱用ペンカラー
+if not(usePenColor) then
+	lock "penMat"
+endif
+
+
+!-------------------------------------------------------------------------- UI
+if joint then
+	values "gs_ui_current_page" 1, 2, 3, 4, 5, 6
+else
+	values "gs_ui_current_page" 1, 2, 3, 4, 5, 6, 7
+endif
+
+!hideparameter all
+
+
+
+
+!--------------------------------------------------------------------------------------------------------
+! 部品リスト
+!--------------------------------------------------------------------------------------------------------
+! 品番の表示方が統一されていなかったので、統一しました。
+! 品番はその部材が含まれる(個数が1以上)とき、表示されます。無いときは、空欄になります。
+
+!-------------------------------------------------------------------------- 品番共通（メートルサイズの追加表記）
+_addStr=""
+if unitType=1 then
+	_addStr=""
+else
+	_addStr="(m)"
+endif
+
+
+!-------------------------------------------------------------------------- ジャッキベース
+!---数量
+list_jackbase_number=0
+_jb_Num=0
+if jb_fl1 then _jb_Num=_jb_Num+1
+if jb_fl2 then _jb_Num=_jb_Num+1
+if jb_fl3 then _jb_Num=_jb_Num+1
+if jb_fl4 then _jb_Num=_jb_Num+1
+
+list_jackbase_number=_jb_Num
+parameters list_jackbase_number=list_jackbase_number
+if list_jackbase_number=0 then lock "list_jackbase_number"
+
+!------------ 品番
+list_jackbase_productcode=""
+if list_jackbase_number>0 then
+	list_jackbase_productcode="ジャッキベース"
+endif
+parameters list_jackbase_productcode=list_jackbase_productcode
+if list_jackbase_number=0 then lock "list_jackbase_productcode"
+
+
+!-------------------------------------------------------------------------- 大引受ジャッキ
+!---数量
+list_oobiki_number =int(0)
+list_oobiki_number2=int(0)
+if oobikiType1=1 then list_oobiki_number=list_oobiki_number+int(1)
+if oobikiType2=1 then list_oobiki_number=list_oobiki_number+int(1)
+if oobikiType3=1 then list_oobiki_number=list_oobiki_number+int(1)
+if oobikiType4=1 then list_oobiki_number=list_oobiki_number+int(1)
+
+if oobikiType1=2 then list_oobiki_number2=list_oobiki_number2+int(1)
+if oobikiType2=2 then list_oobiki_number2=list_oobiki_number2+int(1)
+if oobikiType3=2 then list_oobiki_number2=list_oobiki_number2+int(1)
+if oobikiType4=2 then list_oobiki_number2=list_oobiki_number2+int(1)
+
+list_oobiki_number =list_oobiki_number
+list_oobiki_number2=list_oobiki_number2
+parameters list_oobiki_number=list_oobiki_number
+parameters list_oobiki_number2=list_oobiki_number2
+if list_oobiki_number=0 then lock "list_oobiki_number"
+if list_oobiki_number2=0 then lock "list_oobiki_number2"
+
+!------------ 品番
+list_oobiki_productcode =""
+list_oobiki_productcode2=""
+if list_oobiki_number>0 then
+	list_oobiki_productcode="大引受金物"
+endif
+if list_oobiki_number2>0 then
+	list_oobiki_productcode2="大引受ジャッキ"
+endif
+
+parameters list_oobiki_productcode =list_oobiki_productcode
+parameters list_oobiki_productcode2=list_oobiki_productcode2
+if list_oobiki_number =0 then lock "list_oobiki_productcode"
+if list_oobiki_number2=0 then lock "list_oobiki_productcode2"
+
+
+!-------------------------------------------------------------------------- 拡幅狭幅ブラケット
+!---数量
+list_decrease_number=0
+_decrease_Num=0
+if frame_decrease1 then _decrease_Num=_decrease_Num+1
+if frame_decrease2 then _decrease_Num=_decrease_Num+1
+if frame_decrease3 then _decrease_Num=_decrease_Num+1
+if frame_decrease4 then _decrease_Num=_decrease_Num+1
+
+list_decrease_number=_decrease_Num
+parameters list_decrease_number=list_decrease_number
+if list_decrease_number=0 then lock "list_decrease_number"
+
+!------------ 品番
+list_decrease_productcode=""
+if list_decrease_number>0 then
+	list_decrease_productcode="XPC305SJ"+_addStr
+endif
+parameters list_decrease_productcode=list_decrease_productcode
+if list_decrease_number=0 then lock "list_decrease_productcode"
+
+
+!-------------------------------------------------------------------------- ブラケット
+!------------ 数量
+list_bracket_number =int(0)
+list_bracket_number2=int(0)
+
+for i=1 to dan_max
+	if bracketType1[i]=1 then list_bracket_number=list_bracket_number+int(1)
+	if bracketType2[i]=1 then list_bracket_number=list_bracket_number+int(1)
+	if bracketType3[i]=1 then list_bracket_number=list_bracket_number+int(1)
+	if bracketType4[i]=1 then list_bracket_number=list_bracket_number+int(1)
+
+	if bracketType1[i]=2 then list_bracket_number2=list_bracket_number2+int(1)
+	if bracketType2[i]=2 then list_bracket_number2=list_bracket_number2+int(1)
+	if bracketType3[i]=2 then list_bracket_number2=list_bracket_number2+int(1)
+	if bracketType4[i]=2 then list_bracket_number2=list_bracket_number2+int(1)
+next i
+
+list_bracket_number =list_bracket_number
+list_bracket_number2=list_bracket_number2
+parameters list_bracket_number =list_bracket_number
+parameters list_bracket_number2=list_bracket_number2
+if list_bracket_number =0 then lock "list_bracket_number"
+if list_bracket_number2=0 then lock "list_bracket_number2"
+
+!------------ 品番
+list_bracket_productcode =""
+list_bracket_productcode2=""
+if list_bracket_number>0 then
+	list_bracket_productcode="240"
+endif
+if list_bracket_number2>0 then
+	list_bracket_productcode2="500"
+endif
+parameters list_bracket_productcode =list_bracket_productcode
+parameters list_bracket_productcode2=list_bracket_productcode2
+if list_bracket_number =0 then lock "list_bracket_productcode"
+if list_bracket_number2=0 then lock "list_bracket_productcode2"
+
+
+!-------------------------------------------------------------------------- 布材
+!------------ 数量
+list_ledger_number =int(0)
+list_ledger_number2=int(0)
+for i=1 to dan_max
+	if led1[i] and led1_type[i]="布材" then
+		list_ledger_number=list_ledger_number+int(1)
+	endif
+	if led2[i] and led2_type[i]="布材" then
+		list_ledger_number=list_ledger_number+int(1)
+	endif
+	if led3[i] and led3_type[i]="布材" then
+		list_ledger_number2=list_ledger_number2+int(1)
+	endif
+next i
+gosub "Beam_counter"
+
+list_ledger_number =list_ledger_number
+list_ledger_number2=list_ledger_number2+_ledBeam2Cnt
+parameters list_ledger_number =list_ledger_number
+parameters list_ledger_number2=list_ledger_number2
+if list_ledger_number=0 then lock "list_ledger_number"
+if list_ledger_number2=0 then lock "list_ledger_number2"
+
+!------------ 品番
+list_ledger_productcode =""
+list_ledger_productcode2=""
+if list_ledger_number>0 then
+	list_ledger_productcode="XR"+STR("%~^mm", A)+"S"
+endif
+if list_ledger_number2>0 then
+	list_ledger_productcode2="XR"+STR("%~^mm", B)+"S"
+endif
+
+parameters list_ledger_productcode =list_ledger_productcode
+parameters list_ledger_productcode2=list_ledger_productcode2
+if list_ledger_number =0 then lock "list_ledger_productcode"
+if list_ledger_number2=0 then lock "list_ledger_productcode2"
+
+
+!-------------------------------------------------------------------------- 先行手摺ブレース
+!------------ 数量
+list_brace_number =int(0)
+list_brace_number2=int(0)
+
+if A<unitSize_values[5]-EPS then
+	list_brace_number=int(0)
+else
+	for i=1 to dan_max
+		if led1[i] and led1_type[i]="先行手摺付ブレース" then
+			list_brace_number=list_brace_number+int(1)
+		endif
+		if led2[i] and led2_type[i]="先行手摺付ブレース" then
+			list_brace_number=list_brace_number+int(1)
+		endif
+	next i
+endif
+
+if B<unitSize_values[5]-eps then
+	list_brace_number2=int(0)
+else
+	for i=1 to dan_max
+		if led3[i] and led3_type[i]="先行手摺付ブレース" then
+			list_brace_number2=list_brace_number2+int(1)
+		endif
+	next i
+endif
+
+list_brace_number =list_brace_number
+list_brace_number2=list_brace_number2
+parameters list_brace_number =list_brace_number
+parameters list_brace_number2=list_brace_number2
+if list_brace_number =0 then lock "list_brace_number"
+if list_brace_number2=0 then lock "list_brace_number2"
+
+!------------ 品番
+list_brace_productcode =""
+list_brace_productcode2=""
+if list_brace_number>0 then
+	list_brace_productcode="XX"+STR("%~^mm", A)+"S"
+endif
+if list_brace_number2>0 then
+	list_brace_productcode2="XX"+STR("%~^mm", B)+"S"
+endif
+
+parameters list_brace_productcode =list_brace_productcode
+parameters list_brace_productcode2=list_brace_productcode2
+if list_brace_number =0 then lock "list_brace_productcode"
+if list_brace_number2=0 then lock "list_brace_productcode2"
+
+
+!-------------------------------------------------------------------------- 梁枠
+!------------ 数量
+list_beamframe_number =int(0)
+list_beamframe_number2=int(0)
+
+for i=1 to dan_max
+	if led1[i] and led1_type[i]="梁枠" then
+		list_beamframe_number=list_beamframe_number+int(1)
+	endif
+	if led2[i] and led2_type[i]="梁枠" then
+		list_beamframe_number=list_beamframe_number+int(1)
+	endif
+	if led3[i]>EPS and led3_type[i]="梁枠" then
+		list_beamframe_number2=list_beamframe_number2+int(1)
+	endif
+next i
+
+list_beamframe_number =list_beamframe_number
+list_beamframe_number2=list_beamframe_number2
+
+parameters list_beamframe_number =list_beamframe_number
+parameters list_beamframe_number2=list_beamframe_number2
+if list_beamframe_number =0 then lock "list_beamframe_number"
+if list_beamframe_number2=0 then lock "list_beamframe_number2"
+
+!------------ 品番
+list_beamframe_productcode =""
+list_beamframe_productcode2=""
+if list_beamframe_number>0 then
+	list_beamframe_productcode=STR("%~^mm", beamLength)
+endif
+if list_beamframe_number2>0 then
+	list_beamframe_productcode2=STR("%~^mm", beamLength_d)
+endif
+
+parameters list_beamframe_productcode =list_beamframe_productcode
+parameters list_beamframe_productcode2=list_beamframe_productcode2
+if list_beamframe_number =0 then lock "list_beamframe_productcode"
+if list_beamframe_number2=0 then lock "list_beamframe_productcode2"
+
+
+!-------------------------------------------------------------------------- 強化方杖
+!------------ 数量
+list_anglebrace_number=int(0)
+for i=1 to dan_max
+	if led3_anglebrace[i] then
+		list_anglebrace_number=list_anglebrace_number+int(1)
+	endif
+next i
+
+list_anglebrace_number=list_anglebrace_number
+parameters list_anglebrace_number=list_anglebrace_number
+if list_anglebrace_number=0 then lock "list_anglebrace_number"
+
+!------------ 品番
+list_anglebrace_productcode=""
+if list_anglebrace_number>0 then
+	list_anglebrace_productcode="XG2545S"
+endif
+
+parameters list_anglebrace_productcode=list_anglebrace_productcode
+if list_anglebrace_number=0 then lock "list_anglebrace_productcode"
+
+!-------------------------------------------------------------------------- 布板
+!------------ 数量
+list_ledgerboard_number =int(0)
+list_ledgerboard_number2=int(0)
+
+gosub "board_counter"
+gosub "Beam_counter"
+
+list_ledgerboard_number =_board1Cnt+_boardBeam1Cnt
+list_ledgerboard_number2=_board2Cnt+_boardBeam2Cnt
+
+parameters list_ledgerboard_number =list_ledgerboard_number
+parameters list_ledgerboard_number2=list_ledgerboard_number2
+if list_ledgerboard_number =0 then lock "list_ledgerboard_number"
+if list_ledgerboard_number2=0 then lock "list_ledgerboard_number2"
+
+!------------ 品番
+list_ledgerboard_productcode =""
+list_ledgerboard_productcode2=""
+
+if list_ledgerboard_number>0 then
+	list_ledgerboard_productcode=STR("%~^mm", A)+"×500"
+endif
+if list_ledgerboard_number2>0 then
+	list_ledgerboard_productcode2=STR("%~^mm", A)+"×240"
+endif
+parameters list_ledgerboard_productcode =list_ledgerboard_productcode
+parameters list_ledgerboard_productcode2=list_ledgerboard_productcode2
+if list_ledgerboard_number =0 then lock "list_ledgerboard_productcode"
+if list_ledgerboard_number2=0 then lock "list_ledgerboard_productcode2"
+
+
+!-------------------------------------------------------------------------- 階段 (階段・階段手摺・開口ガード・階段受）
+!------------ 数量
+list_stair_number     =int(0)
+list_sloperail_number =int(0)
+list_stepRail_number  =int(0)
+list_stepHanger_number=int(0)
+
+gosub "board_counter"
+list_stair_number=_stepCnt
+
+for i=1 to dan_max
+	if board[i] & board_type[i]="階段" then
+		if board_srail1[i] then
+			list_sloperail_number=list_sloperail_number+1
+		endif
+		if board_srail2[i] then
+			list_sloperail_number=list_sloperail_number+1
+		endif
+		if board_stepRail[i] then
+			list_stepRail_number=list_stepRail_number+1
+		endif
+		if board_stepHanger[i] & _bNegarami then
+			list_stepHanger_number=list_stepHanger_number+1
+		endif
+	endif
+next i
+list_sloperail_number =list_sloperail_number
+list_stepRail_number  =list_stepRail_number
+list_stepHanger_number=list_stepHanger_number 
+
+parameters list_stair_number     =list_stair_number
+parameters list_sloperail_number =list_sloperail_number
+parameters list_stepRail_number  =list_stepRail_number
+parameters list_stepHanger_number=list_stepHanger_number
+if list_stair_number=0 then lock "list_stair_number"
+if list_sloperail_number=0 then lock "list_sloperail_number"
+if list_stepRail_number=0 then lock "list_stepRail_number"
+if list_stepHanger_number=0 then lock "list_stepHanger_number"
+
+!------------ 品番
+list_stair_productcode     =""
+list_sloperail_productcode =""
+list_stepRail_productcode  =""
+list_stepHanger_productcode=""
+if list_stair_number>0 then
+	list_stair_productcode="クサビ足場用アルミ階段"+_addStr
+endif
+if list_sloperail_number>0 then
+	list_sloperail_productcode="アルバトロス階段手摺"+_addStr
+endif
+if list_stepRail_number>0 then
+	list_stepRail_productcode="開口ガード"+_addStr
+endif
+if list_stepHanger_number>0 then
+	if B>unitSize_values[3]+eps then
+		list_stepHanger_productcode="XKK"+STR("%~^mm", unitSize_values[3])+"S"
+	else
+		list_stepHanger_productcode="XKK"+STR("%~^mm", B)+"S"
+	endif
+endif
+
+parameters list_stair_productcode     =list_stair_productcode
+parameters list_sloperail_productcode =list_sloperail_productcode
+parameters list_stepRail_productcode  =list_stepRail_productcode
+parameters list_stepHanger_productcode=list_stepHanger_productcode
+if list_stair_number=0 then lock "list_stair_productcode"
+if list_sloperail_number=0 then lock "list_sloperail_productcode"
+if list_stepRail_number=0 then lock "list_stepRail_productcode"
+if list_stepHanger_number=0 then lock "list_stepHanger_productcode"
+
+
+!-------------------------------------------------------------------------- ハッチ式布板
+!------------ 数量
+list_hatch_number=int(0)
+gosub "board_counter"
+list_hatch_number=_hatchCnt
+
+parameters list_hatch_number=list_hatch_number
+if list_hatch_number=0 then lock "list_hatch_number"
+
+!------------ 品番
+list_hatch_productcode=""
+if list_hatch_number>0 then
+	list_hatch_productcode="ハッチ式布板"+STR("%~^mm", A)
+endif
+parameters list_hatch_productcode=list_hatch_productcode
+if list_hatch_number=0 then lock "list_hatch_productcode"
+
+
+!-------------------------------------------------------------------------- 巾木
+!------------ 数量
+list_baseboard_number =int(0)
+list_baseboard_number2=int(0)
+
+for i=1 to dan_max
+	if board1_bboard[i] then
+		list_baseboard_number=list_baseboard_number+int(1)
+	endif
+	if board2_bboard[i] then
+		list_baseboard_number=list_baseboard_number+int(1)
+	endif
+	if board3_bboard[i] then
+		list_baseboard_number2=list_baseboard_number2+int(1)
+	endif
+next i
+
+list_baseboard_number =list_baseboard_number
+list_baseboard_number2=list_baseboard_number2
+parameters list_baseboard_number =list_baseboard_number
+parameters list_baseboard_number2=list_baseboard_number2
+if list_baseboard_number =0 then lock "list_baseboard_number"
+if list_baseboard_number2=0 then lock "list_baseboard_number2"
+
+
+!------------ 品番
+list_baseboard_productcode =""
+list_baseboard_productcode2=""
+if list_baseboard_number>0 then
+	list_baseboard_productcode=STR("%~^mm", A)+"×240×40"
+endif
+if list_baseboard_number2>0 then
+	list_baseboard_productcode2=STR("%~^mm", B)+"×240×40"
+endif
+parameters list_baseboard_productcode =list_baseboard_productcode
+parameters list_baseboard_productcode2=list_baseboard_productcode2
+if list_baseboard_number =0 then lock "list_baseboard_productcode"
+if list_baseboard_number2=0 then lock "list_baseboard_productcode2"
+
+
+!-------------------------------------------------------------------------- 面積
+parameters list_area_automatic=A*B
+lock "list_area_automatic"
+
+
+!====================================================
+END
+!====================================================
+
+
+
+
+!--------------------------------------------------------------------------------------------------------
+!	FUNCTION
+!--------------------------------------------------------------------------------------------------------
+"board_counter":
+	_stepCnt=0
+	_hatchCnt=0
+	_board1Cnt=0
+	_board2Cnt=0
+	for i=1 to dan_max
+		if board[i] then
+			if board_type[i]="ハッチ式布板" then
+				_hatchCnt=_hatchCnt+1
+			endif
+
+			for j=1 to board_n
+				if board_flag[i][j] then
+					if board_n>1 then
+						if j=1 then
+							if board_type[i]="布板" then
+								_board1Cnt=_board1Cnt+1
+							else
+								if board_type[i]="階段" then
+									if board_spos[i]="1" then
+										_stepCnt=_stepCnt+1
+									else
+										if _bBoardDepth2_9 then
+											_board2Cnt=_board2Cnt+1
+										else
+											_board1Cnt=_board1Cnt+1
+										endif
+									endif
+								else
+									if board_hpos[i]<>"1" then
+										if _bBoardDepth2_9 then
+											_board2Cnt=_board2Cnt+1
+										else
+											_board1Cnt=_board1Cnt+1
+										endif
+									endif
+								endif
+							endif
+						else
+							if j=board_n then
+								if board_type[i]="布板" then
+									if _bBoardDepth2_9 then
+										_board2Cnt=_board2Cnt+1
+									else
+										_board1Cnt=_board1Cnt+1
+									endif
+								else
+									if board_type[i]="階段" then
+										if board_spos[i]="2" then
+											_stepCnt=_stepCnt+1
+										else
+											if _bBoardDepth2_9 then
+												_board2Cnt=_board2Cnt+1
+											else
+												_board1Cnt=_board1Cnt+1
+											endif
+										endif
+									else
+										if board_hpos[i]<>"2" then
+											if _bBoardDepth2_9 then
+												_board2Cnt=_board2Cnt+1
+											else
+												_board1Cnt=_board1Cnt+1
+											endif
+										endif
+									endif
+								endif
+							else
+								if _bBoardDepth2_15 then
+									_board2Cnt=_board2Cnt+1
+								else
+									_board1Cnt=_board1Cnt+1
+								endif
+							endif
+						endif
+					else
+						_board1Cnt=_board1Cnt+1
+					endif
+				endif
+			next j
+		endif
+	next i
+ 
+	_stepCnt=_stepCnt
+	_hatchCnt=_hatchCnt	
+	_board1Cnt=_board1Cnt
+	_board2Cnt=_board2Cnt
+return
+
+"Beam_counter":
+	_boardBeam1Cnt=0
+	_boardBeam2Cnt=0
+	_ledBeam2Cnt=0
+	if beamID<>1 then
+		for i=1 to dan_max
+			if led_beamBoard[i] & led1_type[i]="梁枠" then
+				for ii=1 to spanNum
+					if led_beamLed[i] then _ledBeam2Cnt=(_ledBeam2Cnt+2)
+
+					if led_beamBoard[i] then
+						for j=1 to board_n
+							if j=1 then
+								_boardBeam1Cnt=_boardBeam1Cnt+1
+							else
+								if j=board_n then
+									if _bBoardDepth2_9 then
+										_boardBeam2Cnt=_boardBeam2Cnt+1
+									else
+										_boardBeam1Cnt=_boardBeam1Cnt+1
+									endif
+								else
+									if _bBoardDepth2_15 then
+										_boardBeam2Cnt=_boardBeam2Cnt+1
+									else
+										_boardBeam1Cnt=_boardBeam1Cnt+1
+									endif
+								endif
+							endif
+						next j
+					endif
+				next ii
+			endif
+		next i
+	endif
+
+	_boardBeam1Cnt=_boardBeam1Cnt
+	_boardBeam2Cnt=_boardBeam2Cnt
+	_ledBeam2Cnt  =_ledBeam2Cnt
+return
+
+

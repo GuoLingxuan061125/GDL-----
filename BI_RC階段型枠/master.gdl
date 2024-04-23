@@ -1,0 +1,72 @@
+code=1
+
+standard_x=(step_num_down-1)*step_tread+landing_1-landing_2-(step_num_up-1)*step_tread
+step_b=atn(step_nosing/step_riser)
+step_c=atn(step_rat/step_tread)
+
+leftPos=min(standard_x,0)-floor_1-floor_dep
+rightPos=(step_num_down-1)*step_tread+landing_1+landing_dep
+totWid=step_wid1+handrail_wid+step_wid2
+
+if step_dir=1 and switch_turn=0 then
+	index_x=1
+	index_y=1
+endif
+
+if step_dir=1 and switch_turn=1 then
+	index_x=-1
+	index_y=-1
+endif
+
+if step_dir=2 and switch_turn=0 then
+	index_x=1
+	index_y=-1
+endif
+
+if step_dir=2 and switch_turn=1 then
+	index_x=-1
+	index_y=1
+endif
+
+if switch_hr1=0 then
+	x_landing=0
+else
+	x_landing=hr_wid2
+endif
+
+if switch_hr1=0 or (hr_hide=2 and hr_hide_start=0 and hr_hide_end=0) then
+	y_down=0
+else
+	y_down=hr_wid
+endif
+
+if switch_hr1=0 or (hr_hide=3 and hr_hide_start=0 and hr_hide_end=0) then
+	y_up=0
+else
+	y_up=hr_wid
+endif
+
+if switch_hr1=0 or (hr_hide=1 and hr_hide_start=0 and hr_hide_end=0) then
+	x_floor=0
+else
+	x_floor=hr_wid2
+endif
+
+if switch_hr2=0 then
+	x_floor2=0
+else
+	x_floor2=hr_wid2
+endif
+
+if switch_gl then
+	z_1=floor_num
+else
+	z_1=floor_num-1
+endif
+
+
+
+plus_rat=step_rat
+
+max_hr_hei=max(hr_hei,landing_hr_hei,floor_hr_hei)
+

@@ -1,0 +1,82 @@
+project2 3,270,1
+
+hotspot2 0,line_pos[1][2],code,line_pos[1][1],1+128:code=code+1
+hotspot2 line_pos[1][1],line_pos[1][2],code,line_pos[1][1],2:code=code+1
+hotspot2 -1,line_pos[1][2],code,line_pos[1][1],3:code=code+1
+
+hotspot2 line_pos[1][1],0,code,line_pos[1][2],1+128:code=code+1
+hotspot2 line_pos[1][1],line_pos[1][2],code,line_pos[1][2],2:code=code+1
+hotspot2 line_pos[1][1],-1,code,line_pos[1][2],3:code=code+1
+
+hotspot2 0,line_pos[2][2],code,line_pos[2][1],1+128:code=code+1
+hotspot2 line_pos[2][1],line_pos[2][2],code,line_pos[2][1],2:code=code+1
+hotspot2 -1,line_pos[2][2],code,line_pos[2][1],3:code=code+1
+
+hotspot2 line_pos[2][1],0,code,line_pos[2][2],1+128:code=code+1
+hotspot2 line_pos[2][1],line_pos[2][2],code,line_pos[2][2],2:code=code+1
+hotspot2 line_pos[2][1],-1,code,line_pos[2][2],3:code=code+1
+
+line2 line_pos[1][1],line_pos[1][2],line_pos[2][1],line_pos[2][2]
+
+
+add2 line_pos[1][1],line_pos[1][2]
+rot2 beam_rtz
+	hotspot2 0,-beam_wid/2-beam_out_thi
+	hotspot2 beam_len,-beam_wid/2-beam_out_thi
+
+	hotspot2 0,beam_wid/2+beam_in_thi
+	hotspot2 beam_len,beam_wid/2+beam_in_thi
+
+	if switch_form_out then
+		if switch_edgeBeam[1]=0 then
+			hotspot2 0,-beam_wid/2-beam_out_thi-form_thi/2,code,form_out_start_offset,1+128:code=code+1
+			hotspot2 -form_out_start_offset,-beam_wid/2-beam_out_thi-form_thi/2,code,form_out_start_offset,2:code=code+1
+			hotspot2 1,-beam_wid/2-beam_out_thi-form_thi/2,code,form_out_start_offset,3:code=code+1
+		endif
+
+		if switch_edgeBeam[2]=0 then
+			hotspot2 beam_len,-beam_wid/2-beam_out_thi-form_thi/2,code,form_out_end_offset,1+128:code=code+1
+			hotspot2 beam_len+form_out_end_offset,-beam_wid/2-beam_out_thi-form_thi/2,code,form_out_end_offset,2:code=code+1
+			hotspot2 beam_len-1,-beam_wid/2-beam_out_thi-form_thi/2,code,form_out_end_offset,3:code=code+1
+		endif
+
+        hotspot2 -form_out_start_offset,-beam_wid/2-beam_out_thi
+        hotspot2 -form_out_start_offset,-beam_wid/2-beam_out_thi-form_thi
+
+        hotspot2 beam_len+form_out_end_offset,-beam_wid/2-beam_out_thi
+        hotspot2 beam_len+form_out_end_offset,-beam_wid/2-beam_out_thi-form_thi
+	endif
+
+	if switch_form_in then
+		if switch_edgeBeam[1]=0 then
+			hotspot2 0,beam_wid/2+beam_in_thi+form_thi/2,code,form_in_start_offset,1+128:code=code+1
+			hotspot2 -form_in_start_offset,beam_wid/2+beam_in_thi+form_thi/2,code,form_in_start_offset,2:code=code+1
+			hotspot2 1,beam_wid/2+beam_in_thi+form_thi/2,code,form_in_start_offset,3:code=code+1
+		endif
+
+		if switch_edgeBeam[2]=0 then
+			hotspot2 beam_len,beam_wid/2+beam_in_thi+form_thi/2,code,form_in_end_offset,1+128:code=code+1
+			hotspot2 beam_len+form_in_end_offset,beam_wid/2+beam_in_thi+form_thi/2,code,form_in_end_offset,2:code=code+1
+			hotspot2 beam_len-1,beam_wid/2+beam_in_thi+form_thi/2,code,form_in_end_offset,3:code=code+1
+		endif
+
+        hotspot2 -form_in_start_offset,beam_wid/2+beam_in_thi
+        hotspot2 -form_in_start_offset,beam_wid/2+beam_in_thi+form_thi
+
+        hotspot2 beam_len+form_in_end_offset,beam_wid/2+beam_in_thi
+        hotspot2 beam_len+form_in_end_offset,beam_wid/2+beam_in_thi+form_thi
+	endif
+del 2
+
+
+
+
+
+
+
+
+
+
+
+
+

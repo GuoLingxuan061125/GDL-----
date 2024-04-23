@@ -1,0 +1,280 @@
+code=1
+x=1
+y=2
+z=3
+eps=1e-5
+
+stairWid=step_wid1
+stairTread=step_tread
+stairRiser=step_riser
+stairNosing=step_nosing
+stairRat=step_rat
+stairThi=step_thi
+stairNum=step_num_totle
+floorHei=floor_hei
+switchMode=switch_mode
+stairMat=m_step
+
+landingDep=landing_dep
+landingThi=landing_thi
+landingRat=landing_rat
+
+switchRail1=switch_hr1
+rail1Wid=hr_wid
+switchRail2=switch_hr2
+rail2Wid=hr2_wid
+stairRailHei=hr_hei
+landingRailHei=landing_hr_hei
+
+
+!====================================================================================階段設定
+values "step_tread" range(0,]
+values "step_riser" range(0,]
+values "step_nosing" range(0,]
+values "step_rat" range(0,]
+values "step_thi" range(0,]
+values "step_num_totle" range[2,]
+
+stairAngle=atn(stairRiser/stairTread)
+
+values{2} "switch_mode" 1,"蹴上により階層高自動計算",2,"階層高により蹴上自動計算"
+if switchMode=1 then
+	floorHei=stairNum*stairRiser
+    parameters floor_hei=floorHei
+	lock "floor_hei"
+else
+	stairRiser=floorHei/stairNum
+    parameters step_riser=stairRiser
+	lock "step_riser"
+endif
+
+
+!====================================================================================踊り場設定
+values "landing_dep" range(0,]
+values "landing_thi" range(0,]
+values "landing_rat" range[0,]
+
+
+!====================================================================================立上り設定
+values "hr_wid" range(0,]
+values "hr2_wid" range(0,]
+values "hr_hei" range(0,]
+values "landing_hr_hei" range(0,]
+
+if switchRail1=1 then
+    stairStart=rail1Wid
+else
+    stairStart=0
+endif
+
+if switchRail2=1 then
+    stairEnd=stairWid-rail2Wid
+else
+    stairEnd=stairWid
+endif
+
+
+!====================================================================================方程式(z=k*x+b)
+equK1=stairRiser/stairTread
+equB1=-stairThi/cos(atn(stairRiser/stairTread))
+equK2=stairRiser/stairTread
+equB2=stairRailHei+stairRiser
+
+
+!====================================================================================立上り外側型枠座標
+handrailOutNum=0
+dim _handrailOutPos[][]
+_handrailOutPos[1][1]=0 : _handrailOutPos[1][2]=0
+
+if switchLanding then
+    handrailOutNum=7
+    _handrailOutPos[1][1]=-stairTread : _handrailOutPos[1][2]=stairRailHei
+    _handrailOutPos[2][1]=-stairTread : _handrailOutPos[2][2]=0
+    _handrailOutPos[3][1]=-equB1/equK1 : _handrailOutPos[3][2]=0
+    _handrailOutPos[4][1]=(stairNum*stairRiser-landingThi-equB1)/equK1 : _handrailOutPos[4][2]=stairNum*stairRiser-landingThi
+    _handrailOutPos[5][1]=stairNum*stairTread+landingDep  : _handrailOutPos[5][2]=stairNum*stairRiser-landingThi
+    _handrailOutPos[6][1]=stairNum*stairTread+landingDep  : _handrailOutPos[6][2]=stairNum*stairRiser+landingRailHei
+    _handrailOutPos[7][1]=(stairNum*stairRiser+landingRailHei-equB2)/equK2 : _handrailOutPos[7][2]=stairNum*stairRiser+landingRailHei
+else
+    handrailOutNum=6
+    _handrailOutPos[1][1]=-stairTread : _handrailOutPos[1][2]=stairRailHei
+    _handrailOutPos[2][1]=-stairTread : _handrailOutPos[2][2]=0
+    _handrailOutPos[3][1]=-equB1/equK1 : _handrailOutPos[3][2]=0
+    _handrailOutPos[4][1]=stairNum*stairTread : _handrailOutPos[4][2]=equK1*(stairNum*stairTread)+equB1
+    _handrailOutPos[5][1]=stairNum*stairTread : _handrailOutPos[5][2]=stairNum*stairRiser+stairRailHei
+    _handrailOutPos[6][1]=(stairNum*stairRiser+stairRailHei-equB2)/equK2 : _handrailOutPos[6][2]=stairNum*stairRiser+stairRailHei
+endif
+
+!面積
+handrailOutArea=0
+
+for i=1 to handrailOutNum
+    if i<handrailOutNum then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    handrailOutArea=handrailOutArea+(_handrailOutPos[i2][1]-_handrailOutPos[i][1])*(_handrailOutPos[i2][2]+_handrailOutPos[i][2])/2
+next i
+
+handrailOutArea=abs(handrailOutArea)
+
+
+
+!====================================================================================立上り内側型枠座標
+handrailInNum=0
+dim _handrailInPos[][]
+_handrailInPos[1][1]=0 : _handrailInPos[1][2]=0
+
+handrailInNum=handrailInNum+1
+_handrailInPos[handrailInNum][1]=-stairTread : _handrailInPos[handrailInNum][2]=0
+
+for i=1 to stairNum
+    handrailInNum=handrailInNum+1
+    _handrailInPos[handrailInNum][1]=-frameThi+(i-1)*stairTread
+    _handrailInPos[handrailInNum][2]=0+(i-1)*stairRiser
+
+    handrailInNum=handrailInNum+1
+    _handrailInPos[handrailInNum][1]=-stairNosing-frameThi+(i-1)*stairTread
+    if i<stairNum then
+        _handrailInPos[handrailInNum][2]=stairRiser-stairRat+frameThi+(i-1)*stairRiser
+    else
+        _handrailInPos[handrailInNum][2]=stairRiser-stairRat+(i-1)*stairRiser
+    endif
+next i
+
+handrailInNum=handrailInNum+1
+_handrailInPos[handrailInNum][1]=stairNum*stairTread
+_handrailInPos[handrailInNum][2]=stairNum*stairRiser
+
+if switchLanding then
+    handrailInNum=handrailInNum+1
+    _handrailInPos[handrailInNum][1]=stairNum*stairTread+landing_dep
+    _handrailInPos[handrailInNum][2]=stairNum*stairRiser-landing_dep*landing_rat/100
+
+    handrailInNum=handrailInNum+1
+    _handrailInPos[handrailInNum][1]=stairNum*stairTread+landing_dep
+    _handrailInPos[handrailInNum][2]=stairNum*stairRiser+landingRailHei
+
+    handrailInNum=handrailInNum+1
+    _handrailInPos[handrailInNum][1]=(stairNum*stairRiser+landingRailHei-equB2)/equK2
+    _handrailInPos[handrailInNum][2]=stairNum*stairRiser+landingRailHei
+else
+    handrailInNum=handrailInNum+1
+    _handrailInPos[handrailInNum][1]=stairNum*stairTread
+    _handrailInPos[handrailInNum][2]=stairNum*stairRiser+stairRailHei
+
+    handrailInNum=handrailInNum+1
+    _handrailInPos[handrailInNum][1]=(stairNum*stairRiser+stairRailHei-equB2)/equK2
+    _handrailInPos[handrailInNum][2]=stairNum*stairRiser+stairRailHei
+endif
+
+handrailInNum=handrailInNum+1
+_handrailInPos[handrailInNum][1]=-stairTread
+_handrailInPos[handrailInNum][2]=stairRailHei
+
+!面積
+handrailInArea=0
+
+for i=1 to handrailInNum
+    if i<handrailInNum then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    handrailInArea=handrailInArea+(_handrailInPos[i2][1]-_handrailInPos[i][1])*(_handrailInPos[i2][2]+_handrailInPos[i][2])/2
+next i
+
+handrailInArea=abs(handrailInArea)
+
+
+
+!====================================================================================集計
+!階段蹴上型枠面積
+stepRiserArea=0
+
+if disFrame and disStepFrame then
+    stepRiserArea=stepRiserArea+stairNum*abs(stairEnd-stairStart)*sqr((stairRiser-stairRat)^2+(stairNosing)^2)
+endif
+
+parameters stepRiserArea=stepRiserArea
+
+
+!階段踏面型枠面積
+stepTreadArea=0
+
+if disFrame and disStepFrame then
+    stepTreadArea=stepTreadArea+(stairNum-1)*abs(stairEnd-stairStart)*sqr((stairRat)^2+(stairTread+stairNosing)^2)
+endif
+
+parameters stepTreadArea=stepTreadArea
+
+
+!立上り側面型枠面積
+handrailSideArea=0
+
+if disFrame and disHandrailFrame then
+    if switchRail1 then
+        handrailSideArea=handrailSideArea+(rail1Wid+2*frameThi)*stairRailHei
+        handrailSideArea=handrailSideArea+handrailOutArea
+        handrailSideArea=handrailSideArea+handrailInArea
+    endif
+
+    if switchRail2 then
+        handrailSideArea=handrailSideArea+(rail2Wid+2*frameThi)*stairRailHei
+        handrailSideArea=handrailSideArea+handrailOutArea
+        handrailSideArea=handrailSideArea+handrailInArea
+    endif
+endif
+
+parameters handrailSideArea=handrailSideArea
+
+
+!立上り天端型枠面積
+handrailTopArea=0
+
+if disFrame and disHandrailFrame then
+    if switchRail1 then
+        if switchLanding then
+            handrailTopArea=handrailTopArea+(rail1Wid+2*frameThi)*((stairNum*stairRiser+landingRailHei)-(stairRailHei))/sin(stairAngle)
+        else
+            handrailTopArea=handrailTopArea+(rail1Wid+2*frameThi)*((stairNum*stairRiser+stairRailHei)-(stairRailHei))/sin(stairAngle)
+        endif
+    endif
+
+    if switchRail2 then
+        if switchLanding then
+            handrailTopArea=handrailTopArea+(rail2Wid+2*frameThi)*((stairNum*stairRiser+landingRailHei)-(stairRailHei))/sin(stairAngle)
+        else
+            handrailTopArea=handrailTopArea+(rail2Wid+2*frameThi)*((stairNum*stairRiser+stairRailHei)-(stairRailHei))/sin(stairAngle)
+        endif
+    endif
+endif
+
+parameters handrailTopArea=handrailTopArea
+
+
+!階段裏面型枠面積
+stepBackArea=0
+
+if disFrame and disStepBackFrame then
+    if switchLanding then
+        stepBackArea=stepBackArea+(stairWid+(switchRail1+switchRail1)*frameThi)*((stairNum*stairRiser-landingThi)-(00))/sin(stairAngle)
+    else
+        stepBackArea=stepBackArea+(stairWid+(switchRail1+switchRail1)*frameThi)*((equK1*(stairNum*stairTread)+equB1)-(0))/sin(stairAngle)
+    endif
+endif
+
+parameters stepBackArea=stepBackArea
+
+
+!踊り場裏面型枠面積
+landingBackArea=0
+
+if disFrame and switchLanding and disLandingBackFrame then
+    landingBackArea=landingBackArea+(stairWid+(switchRail1+switchRail1)*frameThi)*abs((stairNum*stairTread+landingDep)-((stairNum*stairRiser-landingThi-equB1)/equK1))
+endif
+
+parameters landingBackArea=landingBackArea

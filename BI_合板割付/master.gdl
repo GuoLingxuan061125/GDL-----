@@ -1,0 +1,284 @@
+code=1
+x=1
+y=2
+z=3
+eps=1e-5
+
+
+!=================================================================スラブ設定
+values{2} "slabPlace" 1,"床",2,"天井"
+values{2} "slabType" 1,"一般スラブ",2,"傾斜スラブ"
+values "baseDir" 1,-1
+values "rat" range[0,60]
+if slabType<>2 then hideparameter "basePos","baseDir","rat","basePen"
+
+if slabType=1 then
+    values{2} "disHotspot" 0,"なし",1,"スラブ頂点",2,"開口頂点",3,"割り付け芯"
+else
+    values{2} "disHotspot" 0,"なし",1,"スラブ頂点",2,"開口頂点",3,"割り付け芯",10,"傾斜基準線"
+endif
+
+values "slabVertexNum" range[3,]
+
+dim _slabVertexPos[][]
+
+for i=1 to slabVertexNum
+    for j=1 to 2
+        _slabVertexPos[i][j]=slabVertexPos[i][j]
+    next j
+next i
+
+parameters slabVertexPos=_slabVertexPos
+
+for i=1 to slabVertexNum
+    put _slabVertexPos[i][x]
+next i
+
+minx=min(use(nsp))
+maxx=max(get(nsp))
+
+for i=1 to slabVertexNum
+    put _slabVertexPos[i][y]
+next i
+
+miny=min(use(nsp))
+maxy=max(get(nsp))
+
+!傾斜基準線方程式
+baseA=basePos[2][y]-basePos[1][y]
+baseB=basePos[1][x]-basePos[2][x]
+baseC=basePos[2][x]*basePos[1][y]-basePos[1][x]*basePos[2][y]
+
+!傾斜基準線回転角
+baseLen=sqr((basePos[2][x]-basePos[1][x])^2+(basePos[2][y]-basePos[1][y])^2)
+baseRtz=0
+
+if basePos[2][y]>basePos[1][y]+eps then
+    baseRtz=acs((basePos[2][x]-basePos[1][x])/baseLen)
+endif
+
+if basePos[2][y]<=basePos[1][y]+eps and basePos[2][y]>=basePos[1][y]-eps then
+    if basePos[2][x]>=basePos[1][x] then
+        baseRtz=0
+    else
+        baseRtz=180
+    endif
+endif
+
+if basePos[2][y]<basePos[1][y]-eps then
+    baseRtz=360-acs((basePos[2][x]-basePos[1][x])/baseLen)
+endif
+
+!スラブ頂点z座標
+dim _slabVertexZ[]
+
+for i=1 to slabVertexNum
+    if slabType=1 then
+        _slabVertexZ[i]=0
+    else
+        _slabVertexZ[i]=(baseA*_slabVertexPos[i][x]+baseB*_slabVertexPos[i][y]+baseC)/sqr(baseA^2+baseB^2)*tan(rat)*baseDir
+    endif
+next i
+
+parameters slabVertexZ=_slabVertexZ
+
+!スラブ頂点投影座標
+dim _slabProjectPos[][]
+
+for i=1 to slabVertexNum
+    if slabType=1 then
+        _slabProjectPos[i][x]=_slabVertexPos[i][x]
+        _slabProjectPos[i][y]=_slabVertexPos[i][y]
+    else
+        tempA=-baseB
+        tempB=baseA
+        tempC=-(tempA*_slabVertexPos[i][x]+tempB*_slabVertexPos[i][y])
+
+        crossX=(tempC*baseB-baseC*tempB)/(baseA*tempB-tempA*baseB)
+        crossY=(baseC*tempA-tempC*baseA)/(baseA*tempB-tempA*baseB)
+
+        _slabProjectPos[i][x]=crossX+(_slabVertexPos[i][x]-crossX)/cos(rat)
+        _slabProjectPos[i][y]=crossY+(_slabVertexPos[i][y]-crossY)/cos(rat)
+    endif
+next i
+
+parameters slabProjectPos=_slabProjectPos
+
+
+!=================================================================開口設定
+values "opNum" range[0,]
+
+dim _opVertexNum[]
+_opVertexNum[1]=0
+dim _opVertexPos[][]
+_opVertexPos[1][x]=0
+_opVertexPos[1][y]=0
+
+for i=1 to opNum
+    _opVertexNum[i]=opVertexNum[i]
+
+    for j=1 to _opVertexNum[i]
+        _opVertexPos[i][2*j-1]=opVertexPos[i][2*j-1]
+        _opVertexPos[i][2*j]=opVertexPos[i][2*j]
+    next j
+next i
+
+parameters \
+opVertexNum=_opVertexNum,
+opVertexPos=_opVertexPos
+
+values "opVertexNum" range[3,]
+
+!開口頂点z座標
+dim _opVertexZ[][]
+_opVertexZ[1][1]=0
+_opVertexZ[1][2]=0
+
+for i=1 to opNum
+    for j=1 to _opVertexNum[i]
+        if slabType=1 then
+            _opVertexZ[i][j]=0
+        else
+            _opVertexZ[i][j]=(baseA*_opVertexPos[i][2*j-1]+baseB*_opVertexPos[i][2*j]+baseC)/sqr(baseA^2+baseB^2)*tan(rat)*baseDir
+        endif
+    next j
+next i
+
+parameters opVertexZ=_opVertexZ
+
+!開口頂点投影座標
+dim _opProjectPos[][]
+_opProjectPos[1][x]=0
+_opProjectPos[1][y]=0
+
+for i=1 to opNum
+    for j=1 to _opVertexNum[i]
+        if slabType=1 then
+            _opProjectPos[i][2*j-1]=_opVertexPos[i][2*j-1]
+            _opProjectPos[i][2*j]=_opVertexPos[i][2*j]
+        else
+            tempA=-baseB
+            tempB=baseA
+            tempC=-(tempA*_opVertexPos[i][2*j-1]+tempB*_opVertexPos[i][2*j])
+
+            crossX=(tempC*baseB-baseC*tempB)/(baseA*tempB-tempA*baseB)
+            crossY=(baseC*tempA-tempC*baseA)/(baseA*tempB-tempA*baseB)
+
+            _opProjectPos[i][2*j-1]=crossX+(_opVertexPos[i][2*j-1]-crossX)/cos(rat)
+            _opProjectPos[i][2*j]=crossY+(_opVertexPos[i][2*j]-crossY)/cos(rat)
+        endif
+    next j
+next i
+
+parameters opProjectPos=_opProjectPos
+
+
+!=================================================================合板
+values "boardThi" 0.005,0.0055,0.006,0.0075,0.009,0.012,0.015,0.018,0.024,0.028,0.03
+values{2} "boardSizeSet" 1,"3尺6尺",2,"3尺8尺",3,"3尺9尺",4,"3尺10尺",0,"カスタム"
+
+if boardSizeSet=1 then
+    boardSize1=0.910
+    boardSize2=1.820
+    hideparameter "boardSize1","boardSize2"
+endif
+
+if boardSizeSet=2 then
+    boardSize1=0.910
+    boardSize2=1.820/6*8
+    hideparameter "boardSize1","boardSize2"
+endif
+
+if boardSizeSet=3 then
+    boardSize1=0.910
+    boardSize2=1.820/6*9
+    hideparameter "boardSize1","boardSize2"
+endif
+
+if boardSizeSet=4 then
+    boardSize1=0.910
+    boardSize2=1.820/6*10
+    hideparameter "boardSize1","boardSize2"
+endif
+
+if boardSizeSet=0 then
+    values "boardSize1" range[0.455,]
+    values "boardSize2" range[0.455,]
+endif
+
+values{2} "pattern" 1,"通し目地",2,"たて通し目地",3,"馬踏み目地",4,"たて馬踏み目地"
+
+!割り付け芯移動モード
+values "centerX" range[minx,maxx]
+values "centerY" range[miny,maxy]
+
+if center455Move then
+    movePitch=0.455
+    if fra((centerX-minx)/movePitch)<=0.5 then
+        centerX=minx+int((centerX-minx)/movePitch)*movePitch
+    else
+        centerX=minx+ceil((centerX-minx)/movePitch)*movePitch
+    endif
+
+    if fra((centerY-miny)/movePitch)<=0.5 then
+        centerY=miny+int((centerY-miny)/movePitch)*movePitch
+    else
+        centerY=miny+ceil((centerY-miny)/movePitch)*movePitch
+    endif
+
+    parameters centerX=centerX,centerY=centerY
+endif
+
+!割り付け芯z座標
+if slabType=1 then
+    centerZ=0
+else
+    centerZ=(baseA*centerX+baseB*centerY+baseC)/sqr(baseA^2+baseB^2)*tan(rat)*baseDir
+endif
+
+parameters centerZ=centerZ
+
+!割り付け芯投影座標
+if slabType=1 then
+    centerProjectPos[1][x]=centerX
+    centerProjectPos[1][y]=centerY
+else
+    tempA=-baseB
+    tempB=baseA
+    tempC=-(tempA*centerX+tempB*centerY)
+
+    crossX=(tempC*baseB-baseC*tempB)/(baseA*tempB-tempA*baseB)
+    crossY=(baseC*tempA-tempC*baseA)/(baseA*tempB-tempA*baseB)
+
+    centerProjectPos[1][x]=crossX+(centerX-crossX)/cos(rat)
+    centerProjectPos[1][y]=crossY+(centerY-crossY)/cos(rat)
+endif
+
+parameters centerProjectPos=centerProjectPos
+
+!ボードループ数
+for i=1 to slabVertexNum
+    put sqr((_slabProjectPos[i][x]-centerProjectPos[1][x])^2+(_slabProjectPos[i][y]-centerProjectPos[1][y])^2)
+next i
+
+maxDistance=max(get(nsp))
+
+if pattern=1 then
+    boardLoopX=ceil(maxDistance/boardSize1)
+    boardLoopY=ceil(maxDistance/boardSize2)
+endif
+
+if pattern=2 then
+    boardLoopX=ceil(maxDistance/boardSize2)
+    boardLoopY=ceil(maxDistance/boardSize1)
+endif
+
+if pattern=3 then
+    boardLoopX=ceil(maxDistance/boardSize1)+1
+    boardLoopY=ceil(maxDistance/boardSize2/2)*2
+endif
+
+if pattern=4 then
+    boardLoopX=ceil(maxDistance/boardSize2)+1
+    boardLoopY=ceil(maxDistance/boardSize1/2)*2
+endif

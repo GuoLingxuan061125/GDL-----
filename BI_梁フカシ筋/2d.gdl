@@ -1,0 +1,35 @@
+!====================================================================梁躯体
+for i=1 to 2
+    if beamMoveMode=1 then
+        hotspot2 0            ,beamPos[i][y],code,beamPos[i][x],1+128:code=code+1
+        hotspot2 beamPos[i][x],beamPos[i][y],code,beamPos[i][x],2    :code=code+1
+        hotspot2 -1           ,beamPos[i][y],code,beamPos[i][x],3    :code=code+1
+
+        hotspot2 beamPos[i][x],0            ,code,beamPos[i][y],1+128:code=code+1
+        hotspot2 beamPos[i][x],beamPos[i][y],code,beamPos[i][y],2    :code=code+1
+        hotspot2 beamPos[i][x],-1           ,code,beamPos[i][y],3    :code=code+1
+    else
+        hotspot2 beamPos[i][x],beamPos[i][y]
+    endif
+next i
+
+add2 beamPos[1][x],beamPos[1][y]
+rot2 beamRtz
+    line_type spotLine
+    rect2 0,-beamWid/2,beamProjectLen,beamWid/2
+    hotspot2 0,-beamWid/2
+    hotspot2 beamProjectLen,-beamWid/2
+    hotspot2 beamProjectLen,beamWid/2
+    hotspot2 0,beamWid/2
+
+    line_type solidLine
+    rect2 0,-beamWid/2-beamRightOffset,beamProjectLen,beamWid/2+beamLeftOffset
+    hotspot2 0,-beamWid/2-beamRightOffset
+    hotspot2 beamProjectLen,-beamWid/2-beamRightOffset
+    hotspot2 beamProjectLen,beamWid/2+beamLeftOffset
+    hotspot2 0,beamWid/2+beamLeftOffset
+del 2
+
+
+!====================================================================2D投影
+project2{3} 3,270,1,1+2+4+8,parameters disBeam=0,disPoint=0,disCL=0,disSD=disProject2D

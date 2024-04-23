@@ -1,0 +1,1738 @@
+code=1
+eps=1e-5
+x=1
+y=2
+z=3
+
+
+!-----------------------------------------単位質量(kg/m)
+dim len_wei_list[]
+
+if deck_type=1 then
+	len_wei_list[1]="6.52(3.43)"
+	len_wei_list[2]="7.78(4.17)"
+	len_wei_list[3]="10.3(5.52)"
+	len_wei_list[4]="7.09(3.73)"
+	len_wei_list[5]="8.46(4.49)"
+	len_wei_list[6]="11.2(5.96)"
+endif
+
+if deck_type=2 then
+	len_wei_list[1]="7.11"
+	len_wei_list[2]="8.09"
+	len_wei_list[3]="10.0"
+	len_wei_list[4]="120"
+	len_wei_list[5]="14.0"
+	len_wei_list[6]="15.9"
+	len_wei_list[7]="7.11"
+	len_wei_list[8]="8.09"
+	len_wei_list[9]="10.0"
+	len_wei_list[10]="12.0"
+	len_wei_list[11]="14.0"
+	len_wei_list[12]="15.9"
+	len_wei_list[13]="7.95"
+	len_wei_list[14]="9.88"
+	len_wei_list[15]="11.8"
+	len_wei_list[16]="13.7"
+	len_wei_list[17]="15.7"
+	len_wei_list[18]="7.97"
+	len_wei_list[19]="7.97"
+	len_wei_list[20]="9.88"
+	len_wei_list[21]="9.88"
+	len_wei_list[22]="11.8"
+	len_wei_list[23]="11.8"
+	len_wei_list[24]="13.6"
+	len_wei_list[25]="13.6"
+	len_wei_list[26]="15.5"
+	len_wei_list[27]="15.5"
+	len_wei_list[28]="6.11"
+	len_wei_list[29]="7.57"
+	len_wei_list[30]="9.01"
+	len_wei_list[31]="10.5"
+	len_wei_list[32]="11.9"
+endif
+
+if deck_type=3 then
+	len_wei_list[1]="7.78(4.17)"
+	len_wei_list[2]="10.3(5.52)"
+	len_wei_list[3]="8.46(4.49)"
+	len_wei_list[4]="11.2(5.96)"
+endif
+
+
+!-----------------------------------------㎡当たり質量(kg/㎡)
+dim area_wei_list[]
+
+if deck_type=1 then
+	area_wei_list[1]="10.9"
+	area_wei_list[2]="13.0"
+	area_wei_list[3]="17.2"
+	area_wei_list[4]="11.8"
+	area_wei_list[5]="14.1"
+	area_wei_list[6]="18.7"
+endif
+
+if deck_type=2 then
+	area_wei_list[1]="11.3"
+	area_wei_list[2]="12.8"
+	area_wei_list[3]="16.0"
+	area_wei_list[4]="19.1"
+	area_wei_list[5]="22.2"
+	area_wei_list[6]="25.3"
+	area_wei_list[7]="11.3"
+	area_wei_list[8]="12.8"
+	area_wei_list[9]="16.0"
+	area_wei_list[10]="19.1"
+	area_wei_list[11]="22.2"
+	area_wei_list[12]="25.3"
+	area_wei_list[13]="12.6"
+	area_wei_list[14]="15.7"
+	area_wei_list[15]="18.7"
+	area_wei_list[16]="21.8"
+	area_wei_list[17]="24.9"
+	area_wei_list[18]="12.6"
+	area_wei_list[19]="12.6"
+	area_wei_list[20]="15.7"
+	area_wei_list[21]="15.7"
+	area_wei_list[22]="18.7"
+	area_wei_list[23]="18.7"
+	area_wei_list[24]="21.6"
+	area_wei_list[25]="21.6"
+	area_wei_list[26]="24.6"
+	area_wei_list[27]="24.6"
+	area_wei_list[28]="15.3"
+	area_wei_list[29]="18.9"
+	area_wei_list[30]="22.5"
+	area_wei_list[31]="26.2"
+	area_wei_list[32]="29.8"
+endif
+
+if deck_type=3 then
+	area_wei_list[1]="13.0"
+	area_wei_list[2]="17.2"
+	area_wei_list[3]="14.1"
+	area_wei_list[4]="18.7"
+endif
+
+
+!勾配基準線回転角
+base_rtz=0
+if base_pos[2][2]>base_pos[1][2] then
+	base_rtz=acs((base_pos[2][1]-base_pos[1][1])/(sqr((base_pos[2][1]-base_pos[1][1])^2+(base_pos[2][2]-base_pos[1][2])^2)+eps))
+endif
+if base_pos[2][2]=base_pos[1][2] then
+	if base_pos[2][1]>=base_pos[1][1] then
+		base_rtz=0
+	else
+		base_rtz=180
+	endif
+endif
+if base_pos[2][2]<base_pos[1][2] then
+	base_rtz=360-acs((base_pos[2][1]-base_pos[1][1])/(sqr((base_pos[2][1]-base_pos[1][1])^2+(base_pos[2][2]-base_pos[1][2])^2)+eps))
+endif
+
+
+!水流れ回転角
+rtz=0
+if base_rtz>45 and base_rtz<=135 then rtz=90
+if base_rtz>135 and base_rtz<=225 then rtz=180
+if base_rtz>225 and base_rtz<=315 then rtz=270
+if base_rtz<=45 or (base_rtz>315 and base_rtz<=360) then rtz=0
+
+
+!勾配基準線方程式
+if rtz=0 or rtz=180 then
+	base_a=0
+	base_b=-1
+	base_c=(base_pos[1][2]+base_pos[2][2])/2
+else
+	base_a=-1
+	base_b=0
+	base_c=(base_pos[1][1]+base_pos[2][1])/2
+endif
+
+if rtz=0 or rtz=270 then
+	dir_flag=base_dir
+else
+	dir_flag=-base_dir
+endif
+
+values "base_dir" 1,-1
+values "rat" range[0,60]
+values{2} "deck_type" 1,"QLデッキ",2,"JFデッキ",3,"QLルーフ"
+!lock "deck_type"
+
+
+!-----------------------------------------デッキ高さ
+if deck_type=1 then
+	values "deck_hei" 0.05,0.075
+endif
+
+if deck_type=2 then
+	values "deck_hei" 0.075,0.1
+endif
+
+if deck_type=3 then
+	values "deck_hei" 0.05,0.075
+endif
+
+
+!-----------------------------------------板厚
+if deck_type=1 then
+	values{2} "deck_thi" 0.001,"1.0",0.0012,"1.2",0.0016,"1.6"
+endif
+
+if deck_type=2 then
+	if deck_hei=0.075 then
+		values{2} "deck_thi" 0.0007,"0.7",0.0008,"0.8",0.001,"1.0",0.0012,"1.2",0.0014,"1.4",0.0016,"1.6"
+	else
+		values{2} "deck_thi" 0.0008,"0.8",0.001,"1.0",0.0012,"1.2",0.0014,"1.4",0.0016,"1.6"
+	endif
+endif
+
+if deck_type=3 then
+	values{2} "deck_thi" 0.0012,"1.2",0.0016,"1.6"
+endif
+
+
+!-----------------------------------------品名
+if deck_type=1 then
+	if deck_hei=0.05 and deck_thi=0.001 then
+		values{2} "product_num" 1,"QL99-50-10"
+	endif
+	if deck_hei=0.05 and deck_thi=0.0012 then
+		values{2} "product_num" 2,"QL99-50-12"
+	endif
+	if deck_hei=0.05 and deck_thi=0.0016 then
+		values{2} "product_num" 3,"QL99-50-16"
+	endif
+	if deck_hei=0.075 and deck_thi=0.001 then
+		values{2} "product_num" 4,"QL99-75-10"
+	endif
+	if deck_hei=0.075 and deck_thi=0.0012 then
+		values{2} "product_num" 5,"QL99-75-12"
+	endif
+	if deck_hei=0.075 and deck_thi=0.0016 then
+		values{2} "product_num" 6,"QL99-75-16"
+	endif
+endif
+
+if deck_type=2 then
+	if deck_hei=0.075 and deck_thi=0.0007 then
+		values{2} "product_num" 1,"JF75ME-07",7,"JF75MW-07"
+	endif
+	if deck_hei=0.075 and deck_thi=0.0008 then
+		values{2} "product_num" 2,"JF75ME-08",8,"JF75MW-08",13,"JF75-08",18,"JF75Wα-08",19,"JF75W-08"
+	endif
+	if deck_hei=0.075 and deck_thi=0.0010 then
+		values{2} "product_num" 3,"JF75ME-10",9,"JF75MW-10",14,"JF75-10",20,"JF75Wα-10",21,"JF75W-10"
+	endif
+	if deck_hei=0.075 and deck_thi=0.0012 then
+		values{2} "product_num" 4,"JF75ME-12",10,"JF75MW-12",15,"JF75-12",22,"JF75Wα-12",23,"JF75W-12"
+	endif
+	if deck_hei=0.075 and deck_thi=0.0014 then
+		values{2} "product_num" 5,"JF75ME-14",11,"JF75MW-14",16,"JF75-14",24,"JF75Wα-14",25,"JF75W-14"
+	endif
+	if deck_hei=0.075 and deck_thi=0.0016 then
+		values{2} "product_num" 6,"JF75ME-16",12,"JF75MW-16",17,"JF75-16",26,"JF75Wα-16",27,"JF75W-16"
+	endif
+	if deck_hei=0.1 and deck_thi=0.0008 then
+		values{2} "product_num" 28,"JF100-08"
+	endif
+	if deck_hei=0.1 and deck_thi=0.0010 then
+		values{2} "product_num" 29,"JF100-10"
+	endif
+	if deck_hei=0.1 and deck_thi=0.0012 then
+		values{2} "product_num" 30,"JF100-12"
+	endif
+	if deck_hei=0.1 and deck_thi=0.0014 then
+		values{2} "product_num" 31,"JF100-14"
+	endif
+	if deck_hei=0.1 and deck_thi=0.0016 then
+		values{2} "product_num" 32,"JF100-16"
+	endif
+endif
+
+if deck_type=3 then
+	if deck_hei=0.05 and deck_thi=0.0012 then
+		values{2} "product_num" 1,"QL99-50-12Y"
+	endif
+	if deck_hei=0.05 and deck_thi=0.0016 then
+		values{2} "product_num" 1,"QL99-50-16Y"
+	endif
+	if deck_hei=0.075 and deck_thi=0.0012 then
+		values{2} "product_num" 1,"QL99-75-12Y"
+	endif
+	if deck_hei=0.075 and deck_thi=0.0016 then
+		values{2} "product_num" 1,"QL99-75-16Y"
+	endif
+endif
+
+
+!-----------------------------------------めっき
+values{2} "plating_type" 1,"めっき無し",2,"Z12",3,"Z27",4,"Y18",5,"Y27",6,"Y35",7,"K18",8,"K27",9,"K35"
+
+
+!-----------------------------------------単位質量(kg/m)
+len_wei=len_wei_list[product_num]
+parameters len_wei=len_wei
+lock "len_wei"
+
+
+!-----------------------------------------㎡当たり質量(kg/㎡)
+area_wei=area_wei_list[product_num]
+parameters area_wei=area_wei
+lock "area_wei"
+
+
+!=================================================================配置エリア設定
+slab_pos[5][1]=slab_pos[1][1]
+slab_pos[5][2]=slab_pos[1][2]
+parameters slab_pos=slab_pos
+
+!スラブ頂点Z座標
+dim slab_z[]
+for i=1 to 5
+	slab_z[i]=(base_a*slab_pos[i][1]+base_b*slab_pos[i][2]+base_c)/sqr(base_a^2+base_b^2)*dir_flag*tan(rat)
+next i
+
+slab_offset[5][1]=slab_offset[1][1]
+slab_offset[5][2]=slab_offset[1][2]
+parameters slab_offset=slab_offset
+
+!スラブ辺長さ・回転角
+dim slab_len[],slab_rtz[]
+for i=1 to 4
+	slab_len[i]=sqr((slab_pos[i+1][1]-slab_pos[i][1])^2+(slab_pos[i+1][2]-slab_pos[i][2])^2)
+
+	if slab_pos[i+1][2]>slab_pos[i][2] then
+		slab_rtz[i]=acs((slab_pos[i+1][1]-slab_pos[i][1])/(slab_len[i]+eps))
+	endif
+
+	if slab_pos[i+1][2]<slab_pos[i][2] then
+		slab_rtz[i]=-acs((slab_pos[i+1][1]-slab_pos[i][1])/(slab_len[i]+eps))
+	endif
+
+	if slab_pos[i+1][2]=slab_pos[i][2] then
+		if slab_pos[i+1][1]>=slab_pos[i][1] then
+			slab_rtz[i]=0
+		else
+			slab_rtz[i]=180
+		endif
+	endif
+next i
+slab_len[5]=slab_len[1]
+slab_rtz[5]=slab_rtz[1]
+
+!オフセットしたスラブ頂点座標(新頂点座標)
+dim new_pos[][]
+new_pos[1][1]=slab_pos[1][1]+slab_offset[1][1]+slab_offset[4][1]
+new_pos[1][2]=slab_pos[1][2]+slab_offset[1][2]+slab_offset[4][2]
+for i=2 to 4
+	new_pos[i][1]=slab_pos[i][1]+slab_offset[i][1]+slab_offset[i-1][1]
+	new_pos[i][2]=slab_pos[i][2]+slab_offset[i][2]+slab_offset[i-1][2]
+next i
+new_pos[5][1]=new_pos[1][1]
+new_pos[5][2]=new_pos[1][2]
+
+!新頂点Z座標
+dim new_z[]
+for i=1 to 5
+	new_z[i]=(base_a*new_pos[i][1]+base_b*new_pos[i][2]+base_c)/sqr(base_a^2+base_b^2)*dir_flag*tan(rat)
+next i
+
+!新辺長さ
+dim new_len[]
+for i=1 to 4
+	new_len[i]=sqr((new_pos[i+1][1]-new_pos[i][1])^2+(new_pos[i+1][2]-new_pos[i][2])^2)
+next i
+
+!実際辺直線方程式
+dim equ_a[],equ_b[],equ_c[]
+for i=1 to 4
+	equ_a[i]=(new_pos[i+1][2]+(beam_offset[i]-cover_offset)*cos(slab_rtz[i]))-(new_pos[i][2]+(beam_offset[i]-cover_offset)*cos(slab_rtz[i]))
+	equ_b[i]=(new_pos[i][1]-(beam_offset[i]-cover_offset)*sin(slab_rtz[i]))-(new_pos[i+1][1]-(beam_offset[i]-cover_offset)*sin(slab_rtz[i]))
+	equ_c[i]=(new_pos[i+1][1]-(beam_offset[i]-cover_offset)*sin(slab_rtz[i]))*(new_pos[i][2]+(beam_offset[i]-cover_offset)*cos(slab_rtz[i]))-\
+		     (new_pos[i][1]-(beam_offset[i]-cover_offset)*sin(slab_rtz[i]))*(new_pos[i+1][2]+(beam_offset[i]-cover_offset)*cos(slab_rtz[i]))
+next i
+
+!実際頂点座標
+dim equ_pos[][]
+for i=1 to 4
+	if i=1 then
+		equ_pos[i][1]=(equ_c[i]*equ_b[4]-equ_c[4]*equ_b[i])/(equ_a[4]*equ_b[i]-equ_a[i]*equ_b[4])
+		equ_pos[i][2]=(equ_c[4]*equ_a[i]-equ_c[i]*equ_a[4])/(equ_a[4]*equ_b[i]-equ_a[i]*equ_b[4])
+	else
+		equ_pos[i][1]=(equ_c[i]*equ_b[i-1]-equ_c[i-1]*equ_b[i])/(equ_a[i-1]*equ_b[i]-equ_a[i]*equ_b[i-1])
+		equ_pos[i][2]=(equ_c[i-1]*equ_a[i]-equ_c[i]*equ_a[i-1])/(equ_a[i-1]*equ_b[i]-equ_a[i]*equ_b[i-1])
+	endif
+next i
+equ_pos[5][1]=equ_pos[1][1]
+equ_pos[5][2]=equ_pos[1][2]
+
+!実際頂点Z座標
+dim equ_z[]
+for i=1 to 5
+	equ_z[i]=(base_a*equ_pos[i][1]+base_b*equ_pos[i][2]+base_c)/sqr(base_a^2+base_b^2)*dir_flag*tan(rat)
+next i
+
+!実際辺長さ・回転角
+dim equ_len[],equ_rtz[]
+for i=1 to 4
+	equ_len[i]=sqr((equ_pos[i+1][1]-equ_pos[i][1])^2+(equ_pos[i+1][2]-equ_pos[i][2])^2)
+
+	if equ_pos[i+1][2]>equ_pos[i][2] then
+		equ_rtz[i]=acs((equ_pos[i+1][1]-equ_pos[i][1])/(equ_len[i]+eps))
+	endif
+
+	if equ_pos[i+1][2]<equ_pos[i][2] then
+		equ_rtz[i]=-acs((equ_pos[i+1][1]-equ_pos[i][1])/(equ_len[i]+eps))
+	endif
+
+	if equ_pos[i+1][2]=equ_pos[i][2] then
+		if equ_pos[i+1][1]>=equ_pos[i][1] then
+			equ_rtz[i]=0
+		else
+			equ_rtz[i]=180
+		endif
+	endif
+next i
+equ_len[5]=equ_len[1]
+equ_rtz[5]=equ_rtz[1]
+
+
+minx_slab=min(slab_pos[1][1],slab_pos[2][1],slab_pos[3][1],slab_pos[4][1])
+maxx_slab=max(slab_pos[1][1],slab_pos[2][1],slab_pos[3][1],slab_pos[4][1])
+miny_slab=min(slab_pos[1][2],slab_pos[2][2],slab_pos[3][2],slab_pos[4][2])
+maxy_slab=max(slab_pos[1][2],slab_pos[2][2],slab_pos[3][2],slab_pos[4][2])
+minx=min(equ_pos[1][1],equ_pos[2][1],equ_pos[3][1],equ_pos[4][1])
+maxx=max(equ_pos[1][1],equ_pos[2][1],equ_pos[3][1],equ_pos[4][1])
+miny=min(equ_pos[1][2],equ_pos[2][2],equ_pos[3][2],equ_pos[4][2])
+maxy=max(equ_pos[1][2],equ_pos[2][2],equ_pos[3][2],equ_pos[4][2])
+minz=min(equ_z[1],equ_z[2],equ_z[3],equ_z[4])
+maxz=max(equ_z[1],equ_z[2],equ_z[3],equ_z[4])
+slab_x=maxx-minx
+slab_y=maxy-miny
+
+mul_x=1
+mul_y=1
+
+if rtz=0 or rtz=180 then
+	mul_x=1
+	mul_y=1/cos(rat)
+else
+	mul_x=1/cos(rat)
+	mul_y=1
+endif
+
+!デッキ長さ
+if deck_dir=1 then
+	deck_length=slab_y*mul_y
+else
+	deck_length=slab_x*mul_x
+endif
+deck_length=ceil(deck_length/0.005)*0.005
+parameters deck_length=deck_length
+parameters equ_pos=equ_pos
+
+
+!=================================================================梁・角柱
+values "beam_offset" range[0,]
+for i=1 to 4
+	beam_offset[i]=0
+next i
+parameters beam_offset=beam_offset
+values "column_offset" range[0,]
+
+left_offset=0
+right_offset=0
+down_offset=0
+up_offset=0
+
+if switch_column then
+	for i=1 to 4
+		if equ_pos[i][x]>=minx-eps and equ_pos[i][x]<=minx+eps then
+			put column_move[i][x]+column_offset[i][x]
+		endif
+	next i
+	left_offset=max(get(nsp))
+
+	for i=1 to 4
+		if equ_pos[i][x]>=maxx-eps and equ_pos[i][x]<=maxx+eps then
+			put -column_move[i][x]+column_offset[i][x]
+		endif
+	next i
+	right_offset=max(get(nsp))
+
+	for i=1 to 4
+		if equ_pos[i][y]>=miny-eps and equ_pos[i][y]<=miny+eps then
+			put column_move[i][y]+column_offset[i][y]
+		endif
+	next i
+	down_offset=max(get(nsp))
+
+	for i=1 to 4
+		if equ_pos[i][y]>=maxy-eps and equ_pos[i][y]<=maxy+eps then
+			put -column_move[i][y]+column_offset[i][y]
+		endif
+	next i
+	up_offset=max(get(nsp))
+endif
+
+
+!=================================================================開口
+dim _op_pos[][],_op_len[],_op_wid[]
+_op_pos[1][1]=0 : _op_pos[1][2]=0 : _op_len[1]=0 : _op_wid[1]=0
+
+if op_num>0 then
+	for i=1 to op_num
+		_op_pos[i][1]=min(max(op_pos[i][1],minx),maxx)
+		_op_pos[i][2]=min(max(op_pos[i][2],miny),maxy)
+		_op_len[i]=min(max(op_len[i],0),maxx-op_pos[i][1])
+		_op_wid[i]=min(max(op_wid[i],0),maxy-op_pos[i][2])
+	next i
+else
+	hideparameter "op_pos","op_len","op_wid"
+endif
+
+parameters \
+op_pos=_op_pos,
+op_len=_op_len,
+op_wid=_op_wid
+
+
+!=================================================================デッキ配列
+values{2} "deck_dir" 1,"X方向",2,"Y方向"
+if deck_dir=1 then
+	values{2} "deck_start" 1,"左から",2,"右から"
+else
+	values{2} "deck_start" 1,"下から",2,"上から"
+endif
+values{2} "body_type" 1,"S造",2,"RC造"
+
+if product_num<=27 then
+	values{2} "deck_JF_start" 1,"A0タイプ(W625)",2,"B0タイプ(W500)"
+else
+	values{2} "deck_JF_start" 1,"Sタイプ(W390)",2,"S1タイプ(W290)"
+endif
+if deck_type<>2 then hideparameter "deck_JF_start","body_type"
+lock "deck_JF_start"
+
+
+if deck_dir=1 then !X方向
+	if deck_start=1 then !左
+		start_pos=minx
+		pos_flag=1
+	else !右
+		start_pos=maxx
+		pos_flag=-1
+	endif
+else !Y方向
+	if deck_start=1 then !下
+		start_pos=miny
+		pos_flag=1
+	else !上
+		start_pos=maxy
+		pos_flag=-1
+	endif
+endif
+
+
+dim _deck_wid[],deck_pos[]
+_deck_wid[1]=0 : deck_pos[1]=0
+
+deck_num1=0 !標準
+deck_num2=0 !役物
+deck_num3=0 !調整プレート
+
+if deck_type=1 or deck_type=3 then !QLデッキ・QLルーフ
+	deck_unit1=0.6 !QLデッキ幅(二山)
+	deck_unit2=0.3 !QLデッキ幅(一山)
+
+	!デッキプレート数
+	if deck_dir=1 then
+		total_len=slab_x*mul_x
+	else
+		total_len=slab_y*mul_y
+	endif
+	fra_len=total_len
+
+	deck_num1=int(total_len/deck_unit1)
+	fra_len=fra_len-deck_num1*deck_unit1
+
+	if fra_len>0.55 then
+		deck_num1=deck_num1+1
+		deck_num2=0
+		deck_num3=0
+	else
+		if fra_len>0.25 then
+			deck_num2=1
+			fra_len=fra_len-deck_unit2
+
+			if fra_len>0 then
+				deck_num3=1
+				deck_wid3=ceil(fra_len/0.05)*0.05
+			else
+				deck_num3=0
+			endif
+		else
+			deck_num2=0
+			deck_num3=1
+			deck_wid3=ceil(fra_len/0.05)*0.05
+		endif
+	endif
+
+	!デッキプレート幅
+	for i=1 to deck_num1+deck_num2+deck_num3
+		if i<=deck_num1 then
+			_deck_wid[i]=deck_unit1
+		endif
+
+		if i>deck_num1 and i<=deck_num1+deck_num2 then
+			_deck_wid[i]=deck_unit2
+		endif
+
+		if i>deck_num1+deck_num2 then
+			_deck_wid[i]=deck_wid3
+		endif
+
+		_deck_wid[i]=_deck_wid[i]/mul_x
+	next i
+
+	!デッキプレート位置
+	deck_pos[1]=start_pos+pos_flag*_deck_wid[1]/2
+
+	for i=2 to deck_num1+deck_num2+deck_num3
+		deck_pos[i]=deck_pos[i-1]+pos_flag*(_deck_wid[i-1]/2+_deck_wid[i]/2)
+	next i
+else !JFデッキ
+	deck_unit=0 !JFデッキ幅(標準)
+	deck_yama=0 !JFデッキ山幅
+
+	if product_num<=27 then
+		deck_unit=0.630
+		deck_a0=0.625
+		deck_b0=0.500
+		deck_c0=0.495
+		deck_d0=0.560
+	else
+		deck_unit=0.400
+		deck_s=0.390
+		deck_s1=0.290
+	endif
+
+	if product_num<=6 then
+		deck_yama=0.043
+	else
+		if product_num<=12 then
+			deck_yama=0.036
+		else
+			if product_num<=17 then
+				deck_yama=0.043
+			else
+				if product_num<=27 then
+					deck_yama=0.036
+				else
+					deck_yama=0.050
+				endif
+			endif
+		endif
+	endif
+
+	!デッキプレート数・幅・位置
+	deck_count=0 !デッキ数
+
+	if deck_dir=1 then
+		total_len=slab_x*mul_x
+	else
+		total_len=slab_y*mul_y
+	endif
+	fra_len=total_len
+
+	if body_type=1 then !S造
+		standard_offset=0.125
+	else !RC造
+		standard_offset=0
+	endif
+
+	!敷始め役物
+	if deck_dir=1 then !X方向
+		if deck_start=1 then !左
+			if left_offset>standard_offset+eps then
+				deck_JF_start=2
+			else
+				deck_JF_start=1
+			endif
+		else !右
+			if right_offset>standard_offset+eps then
+				deck_JF_start=2
+			else
+				deck_JF_start=1
+			endif
+		endif
+	else !Y方向
+		if deck_start=1 then !下
+			if down_offset>standard_offset+eps then
+				deck_JF_start=2
+			else
+				deck_JF_start=1
+			endif
+		else !上
+			if up_offset>standard_offset+eps then
+				deck_JF_start=2
+			else
+				deck_JF_start=1
+			endif
+		endif
+	endif
+
+	parameters deck_JF_start=deck_JF_start
+
+	deck_num2=deck_num2+1
+	if product_num<=27 then
+		if deck_JF_start=1 then deck_jf_unit1=deck_a0 !A0
+		if deck_JF_start=2 then deck_jf_unit1=deck_b0 !B0
+	else
+		if deck_JF_start=1 then deck_jf_unit1=deck_s !S
+		if deck_JF_start=2 then deck_jf_unit1=deck_s1 !S1
+	endif
+	fra_len=fra_len-deck_jf_unit1
+
+	deck_count=deck_count+1
+	_deck_wid[deck_count]=deck_jf_unit1
+	deck_pos[deck_count]=start_pos+pos_flag*_deck_wid[deck_count]/2
+
+	!敷終り役物
+	if product_num<=27 then !JF75
+		if body_type=1 then
+			fra_range=2.230
+			standard1=0.340
+			standard2=0.424
+			standard3=0.500
+			standard4=0.679
+			standard5=0.944
+			standard6=1.054
+			standard7=1.089
+			standard8=1.199
+			standard9=1.309
+			standard10=1.600
+			standard11=1.719
+			standard12=1.829
+			standard13=1.939
+			standard14=2.230
+		else
+			fra_range=2.250
+			standard1=0.360
+			standard2=0.444
+			standard3=0.520
+			standard4=0.729
+			standard5=0.990
+			standard6=1.074
+			standard7=1.139
+			standard8=1.249
+			standard9=1.359
+			standard10=1.620
+			standard11=1.769
+			standard12=1.879
+			standard13=1.989
+			standard14=2.250
+		endif
+
+		if fra_len>fra_range then
+			deck_num1=deck_num1+ceil((fra_len-fra_range)/deck_unit)
+			fra_len=fra_len-deck_num1*deck_unit
+
+			for i=1 to deck_num1
+				deck_count=deck_count+1
+				_deck_wid[deck_count]=deck_unit
+				deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2+_deck_wid[deck_count]/2)
+			next i
+		endif
+
+		if fra_len<=standard1 then
+			!調整PL(1)
+			deck_num3=deck_num3+1
+
+			overlap_offset=max(ceil((fra_len+0.040)/0.100)*0.100,0.200)-fra_len
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=max(ceil((fra_len+0.040)/0.100)*0.100,0.200)
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+
+		if fra_len>standard1 and fra_len<=standard2 then
+			if body_type=1 then
+				!C0(1)
+				deck_num2=deck_num2+1
+
+				overlap_offset=deck_c0-fra_len
+
+				deck_count=deck_count+1
+				_deck_wid[deck_count]=deck_c0
+				deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+			else
+				!C0(1)+調整PL(1)
+				deck_num2=deck_num2+1
+				deck_num3=deck_num3+1
+
+				overlap_offset=(deck_c0+max(ceil((fra_len-deck_c0+2*0.040)/0.100)*0.100,0.200)-fra_len)/2
+
+				deck_count=deck_count+1
+				_deck_wid[deck_count]=deck_c0
+				deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+
+				deck_count=deck_count+1
+				_deck_wid[deck_count]=max(ceil((fra_len-deck_c0+2*0.040)/0.100)*0.100,0.200)
+				deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+			endif
+		endif
+
+		if fra_len>standard2 and fra_len<=standard3 then
+			!D0(1)
+			deck_num2=deck_num2+1
+			
+			overlap_offset=deck_d0-fra_len
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=deck_d0
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+
+		if fra_len>standard3 and fra_len<=standard4 then
+			!D0(1)+調整PL(1)
+			deck_num2=deck_num2+1
+			deck_num3=deck_num3+1
+
+			overlap_offset=(deck_d0+max(ceil((fra_len-deck_d0+2*0.040)/0.100)*0.100,0.200)-fra_len)/2
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=deck_d0
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=max(ceil((fra_len-deck_d0+2*0.040)/0.100)*0.100,0.200)
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+
+		if fra_len>standard4 and fra_len<=standard5 then
+			!N(1)+調整PL(1)
+			deck_num1=deck_num1+1
+			deck_num3=deck_num3+1
+
+			overlap_offset=deck_unit+max(ceil((fra_len-deck_unit+0.040)/0.100)*0.100,0.200)-fra_len
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=deck_unit
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2+_deck_wid[deck_count]/2)
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=max(ceil((fra_len-deck_unit+0.040)/0.100)*0.100,0.200)
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+
+		if fra_len>standard5 and fra_len<=standard6 then
+			!A0(1)+D0(1)
+			deck_num2=deck_num2+2
+
+			overlap_offset=(deck_a0+deck_d0-fra_len)/2
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=deck_a0
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=deck_d0
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+
+		if fra_len>standard6 and fra_len<=standard7 then
+			!N(1)+D0(1)
+			deck_num1=deck_num1+1
+			deck_num2=deck_num2+1
+
+			overlap_offset=deck_unit+deck_d0-fra_len
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=deck_unit
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2+_deck_wid[deck_count]/2)
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=deck_d0
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+
+		if fra_len>standard7 and fra_len<=standard8 then
+			!A0(2)+調整PL(1)
+			deck_num2=deck_num2+1
+			deck_num3=deck_num3+1
+
+			overlap_offset=(2*deck_a0+max(ceil((fra_len-2*deck_a0+3*0.040)/0.100)*0.100,0.200)-fra_len)/3
+
+			for j=1 to 2
+				deck_count=deck_count+1
+				_deck_wid[deck_count]=deck_a0
+				deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+			next j
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=max(ceil((fra_len-2*deck_a0+3*0.040)/0.100)*0.100,0.200)
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+
+		if fra_len>standard8 and fra_len<=standard9 then
+			!N(1)+A0(1)+調整PL(1)
+			deck_num1=deck_num1+1
+			deck_num2=deck_num2+1
+			deck_num3=deck_num3+1
+
+			overlap_offset=(deck_unit+deck_a0+max(ceil((fra_len-deck_unit-deck_a0+2*0.040)/0.100)*0.100,0.200)-fra_len)/2
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=deck_unit
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2+_deck_wid[deck_count]/2)
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=deck_a0
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=max(ceil((fra_len-deck_unit-deck_a0+2*0.040)/0.100)*0.100,0.200)
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+
+		if fra_len>standard9 and fra_len<=standard10 then
+			!N(2)+調整PL(1)
+			deck_num1=deck_num1+2
+			deck_num3=deck_num3+1
+
+			overlap_offset=2*deck_unit+max(ceil((fra_len-2*deck_unit+0.040)/0.100)*0.100,0.200)-fra_len
+
+			for j=1 to 2
+				deck_count=deck_count+1
+				_deck_wid[deck_count]=deck_unit
+				deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2+_deck_wid[deck_count]/2)
+			next j
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=max(ceil((fra_len-2*deck_unit+0.040)/0.100)*0.100,0.200)
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+
+		if fra_len>standard10 and fra_len<=standard11 then
+			!A0(3)+調整PL(1)
+			deck_num2=deck_num2+3
+			deck_num3=deck_num3+1
+
+			overlap_offset=(3*deck_a0+max(ceil((fra_len-3*deck_a0+4*0.040)/0.100)*0.100,0.200)-fra_len)/4
+
+			for j=1 to 3
+				deck_count=deck_count+1
+				_deck_wid[deck_count]=deck_a0
+				deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+			next j
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=max(ceil((fra_len-3*deck_a0+4*0.040)/0.100)*0.100,0.200)
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+
+		if fra_len>standard11 and fra_len<=standard12 then
+			!N(1)+A0(2)+調整PL(1)
+			deck_num1=deck_num1+1
+			deck_num2=deck_num2+2
+			deck_num3=deck_num3+1
+
+			overlap_offset=(deck_unit+2*deck_a0+max(ceil((fra_len-deck_unit-2*deck_a0+3*0.040)/0.100)*0.100,0.200)-fra_len)/3
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=deck_unit
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2+_deck_wid[deck_count]/2)
+
+			for j=1 to 2
+				deck_count=deck_count+1
+				_deck_wid[deck_count]=deck_a0
+				deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+			next j
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=max(ceil((fra_len-deck_unit-2*deck_a0+3*0.040)/0.100)*0.100,0.200)
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+
+		if fra_len>standard12 and fra_len<=standard13 then
+			!N(2)+A0(1)+調整PL(1)
+			deck_num1=deck_num1+2
+			deck_num2=deck_num2+1
+			deck_num3=deck_num3+1
+
+			overlap_offset=(2*deck_unit+deck_a0+max(ceil((fra_len-2*deck_unit-deck_a0+2*0.040)/0.100)*0.100,0.200)-fra_len)/2
+
+			for j=1 to 2
+				deck_count=deck_count+1
+				_deck_wid[deck_count]=deck_unit
+				deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2+_deck_wid[deck_count]/2)
+			next j
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=deck_a0
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=max(ceil((fra_len-2*deck_unit-deck_a0+2*0.040)/0.100)*0.100,0.200)
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+
+		if fra_len>standard13 and fra_len<=standard14 then
+			!N(3)+調整PL(1)
+			deck_num1=deck_num1+3
+			deck_num3=deck_num3+1
+
+			overlap_offset=3*deck_unit+max(ceil((fra_len-3*deck_unit+0.040)/0.100)*0.100,0.200)-fra_len
+
+			for j=1 to 3
+				deck_count=deck_count+1
+				_deck_wid[deck_count]=deck_unit
+				deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2+_deck_wid[deck_count]/2)
+			next j
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=max(ceil((fra_len-3*deck_unit+0.040)/0.100)*0.100,0.200)
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+	else !JF100
+		if fra_len>1.410 then
+			deck_num1=deck_num1+ceil((fra_len-1.410)/deck_unit)
+			fra_len=fra_len-deck_num1*deck_unit
+
+			for i=1 to deck_num1
+				deck_count=deck_count+1
+				_deck_wid[deck_count]=deck_unit
+				deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2+_deck_wid[deck_count]/2)
+			next i
+		endif
+
+		if fra_len<=0.360 then
+			!調整PL(1)
+			deck_num3=deck_num3+1
+
+			overlap_offset=max(ceil((fra_len+0.040)/0.100)*0.100,0.200)-fra_len
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=max(ceil((fra_len+0.040)/0.100)*0.100,0.200)
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+
+		if fra_len>0.360 and fra_len<=0.610 then
+			!S1(1)+調整PL(1)
+			deck_num2=deck_num2+1
+			deck_num3=deck_num3+1
+
+			overlap_offset=(deck_s1+max(ceil((fra_len-deck_s1+2*0.040)/0.100)*0.100,0.200)-fra_len)/2
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=deck_s1
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=max(ceil((fra_len-deck_s1+2*0.040)/0.100)*0.100,0.200)
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+
+		if fra_len>0.610 and fra_len<=0.710 then
+			!S(1)+調整PL(1)
+			deck_num2=deck_num2+1
+			deck_num3=deck_num3+1
+
+			overlap_offset=(deck_s+max(ceil((fra_len-deck_s+2*0.040)/0.100)*0.100,0.200)-fra_len)/2
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=deck_s
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=max(ceil((fra_len-deck_s+2*0.040)/0.100)*0.100,0.200)
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+
+		if fra_len>0.710 and fra_len<=0.760 THEN
+			!N(1)+調整PL(1)
+			deck_num1=deck_num1+1
+			deck_num3=deck_num3+1
+
+			overlap_offset=deck_unit+max(ceil((fra_len-deck_unit+0.040)/0.100)*0.100,0.200)-fra_len
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=deck_unit
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2+_deck_wid[deck_count]/2)
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=max(ceil((fra_len-deck_unit+0.040)/0.100)*0.100,0.200)
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+
+		if fra_len>0.760 and fra_len<=1.060 then
+			!S(2)+調整PL(1)
+			deck_num2=deck_num2+2
+			deck_num3=deck_num3+1
+
+			overlap_offset=(2*deck_s+max(ceil((fra_len-2*deck_s+3*0.040)/0.100)*0.100,0.200)-fra_len)/3
+
+			for j=1 to 2
+				deck_count=deck_count+1
+				_deck_wid[deck_count]=deck_s
+				deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+			next j
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=max(ceil((fra_len-2*deck_s+3*0.040)/0.100)*0.100,0.200)
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+
+		if fra_len>1.060 and fra_len<=1.110 then
+			!N(1)+S(1)+調整PL(1)
+			deck_num1=deck_num1+1
+			deck_num2=deck_num2+1
+			deck_num3=deck_num3+1
+
+			overlap_offset=(deck_unit+deck_s+max(ceil((fra_len-deck_unit-deck_s+2*0.040)/0.100)*0.100,0.200)-fra_len)/2
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=deck_unit
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2+_deck_wid[deck_count]/2)
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=deck_s
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=max(ceil((fra_len-deck_unit-deck_s+2*0.040)/0.100)*0.100,0.200)
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+
+		if fra_len>1.110 and fra_len<=1.410 then
+			!S(3)+調整PL(1)
+			deck_num2=deck_num2+3
+			deck_num3=deck_num3+1
+
+			overlap_offset=(3*deck_s+max(ceil((fra_len-3*deck_s+4*0.040)/0.100)*0.100,0.200)-fra_len)/4
+
+			for j=1 to 3
+				deck_count=deck_count+1
+				_deck_wid[deck_count]=deck_s
+				deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+			next j
+
+			deck_count=deck_count+1
+			_deck_wid[deck_count]=max(ceil((fra_len-3*deck_s+4*0.040)/0.100)*0.100,0.200)
+			deck_pos[deck_count]=deck_pos[deck_count-1]+pos_flag*(_deck_wid[deck_count-1]/2-overlap_offset+_deck_wid[deck_count]/2)
+		endif
+	endif
+endif
+
+!デッキプレート始点・終点
+dim _deck_start_pos[],_deck_end_pos[]
+_deck_start_pos[1]=0 : _deck_end_pos[1]=0
+
+dim _deck_edge_pos[][]
+_deck_edge_pos[1][1]=0 : _deck_edge_pos[1][2]=0
+
+if deck_dir=1 then
+	for i=1 to deck_num1+deck_num2+deck_num3
+		for j=1 to 4
+			if deck_pos[i]-_deck_wid[i]/2+0.05>=min(equ_pos[j][1],equ_pos[j+1][1]) and deck_pos[i]-_deck_wid[i]/2+0.05<max(equ_pos[j][1],equ_pos[j+1][1]) then
+				put (equ_a[j]*(deck_pos[i]-_deck_wid[i]/2)+equ_c[j])/(-equ_b[j])
+			endif
+			if deck_pos[i]+_deck_wid[i]/2-0.05>=min(equ_pos[j][1],equ_pos[j+1][1]) and deck_pos[i]+_deck_wid[i]/2-0.05<max(equ_pos[j][1],equ_pos[j+1][1]) then
+				put (equ_a[j]*(deck_pos[i]+_deck_wid[i]/2)+equ_c[j])/(-equ_b[j])
+			endif
+		next j
+
+		_deck_start_pos[i]=min(use(nsp))
+		_deck_end_pos[i]=max(get(nsp))
+
+		for j=1 to 4
+			if deck_pos[i]>=min(equ_pos[j][1],equ_pos[j+1][1]) and deck_pos[i]<max(equ_pos[j][1],equ_pos[j+1][1]) then
+				put (equ_a[j]*deck_pos[i]+equ_c[j])/(-equ_b[j])
+			endif
+		next j
+
+		_deck_edge_pos[i][1]=min(use(nsp))
+		_deck_edge_pos[i][2]=max(get(nsp))
+	next i
+else
+	for i=1 to deck_num1+deck_num2+deck_num3
+		for j=1 to 4
+			if deck_pos[i]-_deck_wid[i]/2+0.05>=min(equ_pos[j][2],equ_pos[j+1][2]) and deck_pos[i]-_deck_wid[i]/2+0.05<max(equ_pos[j][2],equ_pos[j+1][2]) then
+				put (equ_b[j]*(deck_pos[i]-_deck_wid[i]/2)+equ_c[j])/(-equ_a[j])
+			endif
+			if deck_pos[i]+_deck_wid[i]/2-0.05>=min(equ_pos[j][2],equ_pos[j+1][2]) and deck_pos[i]+_deck_wid[i]/2-0.05<max(equ_pos[j][2],equ_pos[j+1][2]) then
+				put (equ_b[j]*(deck_pos[i]+_deck_wid[i]/2)+equ_c[j])/(-equ_a[j])
+			endif
+		next j
+
+		_deck_start_pos[i]=min(use(nsp))
+		_deck_end_pos[i]=max(get(nsp))
+
+		for j=1 to 4
+			if deck_pos[i]>=min(equ_pos[j][2],equ_pos[j+1][2]) and deck_pos[i]<max(equ_pos[j][2],equ_pos[j+1][2]) then
+				put (equ_b[j]*deck_pos[i]+equ_c[j])/(-equ_a[j])
+			endif
+		next j
+
+		_deck_edge_pos[i][1]=min(use(nsp))
+		_deck_edge_pos[i][2]=max(get(nsp))
+	next i
+endif
+
+deck_start_pos=_deck_start_pos
+deck_end_pos=_deck_end_pos
+
+parameters \
+deck_start_pos=_deck_start_pos,
+deck_end_pos=_deck_end_pos,
+
+deck_wid=_deck_wid
+
+parameters \
+deck_num1=deck_num1,
+deck_num2=deck_num2,
+deck_num3=deck_num3,
+deck_wid=_deck_wid
+
+dim _deck_start_offset[],_deck_end_offset[]
+_deck_start_offset[1]=0 : _deck_end_offset[1]=0
+
+for i=1 to deck_num1+deck_num2+deck_num3
+	_deck_start_offset[i]=deck_start_offset[i]
+	_deck_end_offset[i]=deck_end_offset[i]
+next i
+
+parameters \
+deck_start_offset=_deck_start_offset,
+deck_end_offset=_deck_end_offset
+
+
+!デッキ総枚数
+deck_totnum=deck_num1+deck_num2+deck_num3
+parameters deck_totnum=deck_totnum
+
+!デッキ配列リスト
+if deck_type=1 or deck_type=3 then
+	values{2} "deck_order" 1,"二山",2,"一山",6,"調整板"
+else
+	if product_num<=27 then
+		values{2} "deck_order" 1,"標準",2,"A0",3,"B0",4,"C0",5,"D0",6,"調整板"
+	else
+		values{2} "deck_order" 1,"標準",2,"S",3,"S1",6,"調整板"
+	endif
+endif
+
+dim _deck_order[]
+for i=1 to deck_totnum
+	if deck_type=1 or deck_type=3 then
+		if deck_wid[i]=deck_unit1 then _deck_order[i]=1
+		if deck_wid[i]=deck_unit2 then _deck_order[i]=2
+		if deck_wid[i]<deck_unit2 then _deck_order[i]=6
+	else
+		if product_num<=27 then
+			if deck_wid[i]=deck_unit then _deck_order[i]=1
+			if deck_wid[i]=deck_a0 then _deck_order[i]=2
+			if deck_wid[i]=deck_b0 then _deck_order[i]=3
+			if deck_wid[i]=deck_c0 then _deck_order[i]=4
+			if deck_wid[i]=deck_d0 then _deck_order[i]=5
+			if deck_wid[i]<=0.400 then _deck_order[i]=6
+		else
+			if deck_wid[i]=deck_unit then _deck_order[i]=1
+			if deck_wid[i]=deck_s then _deck_order[i]=2
+			if deck_wid[i]=deck_s1 then _deck_order[i]=3
+			if i=deck_totnum then _deck_order[i]=6
+		endif
+	endif
+next i
+parameters deck_order=_deck_order
+
+!デッキ長さリスト
+dim _deck_len[]
+for i=1 to deck_totnum
+	_deck_len[i]=abs(_deck_end_pos[i]-_deck_start_pos[i])
+	_deck_len[i]=ceil(_deck_len[i]/roundup_unit)*roundup_unit
+next i
+deck_len=_deck_len
+parameters deck_len=_deck_len
+
+values{2} "fire_type" 0,"なし",1,"①",2,"②",3,"③",4,"④",5,"⑤",6,"その他"
+values{2} "concrete_type" 1,"普通",2,"軽量一種",3,"軽量二種"
+values{2} "edge_type1" 1,"エンドクローズ",2,"オープン"
+values{2} "edge_type2" 1,"エンドクローズ",2,"オープン"
+values "concrete_thi" 0.08,0.085,0.09,0.095,0.1
+
+
+!=================================================================補強筋・支保工
+values "SDresol" range[3,]
+
+if deck_type=1 or deck_type=3 then
+	hideparameter "switch_sup","m_sle","sle_num","sle_x","sle_y","m_sup","sup_thi","sup_d","sup_pitch","sup_hei","sup_num"
+
+	values{2} "ref_size" 1,"φ6-150x150",2,"φ6-100x100",3,"φ6-75x75",4,"D10-＠200",5,"D10-＠150"
+
+    ref_d=0 !ひび割れ拡大防止筋径
+    ref_pitch=0 !ひび割れ拡大防止筋ピッチ
+
+	if ref_size=1 then
+		ref_d=0.006
+		ref_pitch=0.15
+	endif
+	if ref_size=2 then
+		ref_d=0.006
+		ref_pitch=0.1
+	endif
+	if ref_size=3 then
+		ref_d=0.006
+		ref_pitch=0.075
+	endif
+	if ref_size=4 then
+		ref_d=0.01
+		ref_pitch=0.2
+	endif
+	if ref_size=5 then
+		ref_d=0.01
+		ref_pitch=0.15
+	endif
+
+	values "spacer_x_pitch" range[1,]
+	values "spacer_y_pitch" range[0.5,]
+	values{2} "fire_d" 10,"D10",13,"D13",16,"D16",19,"D19"
+else
+	hideparameter "SDresol","switch_ref","m_ref","ref_size","ref_hei","ref_edge","ref_ver_num","ref_hor_num","spacer_x_pitch","spacer_y_pitch","switch_fire","m_fire","fire_d","fire_edge","fire_num","fire_coor"
+
+	if switch_sup then
+		values "sle_num" range[1,]
+	else
+		parameters sle_num=0
+	endif
+endif
+
+
+!===============================ひび割れ防止筋
+ref_ver_num=0 !縦筋本数
+ref_hor_num=0 !横筋本数
+dim ref_ver_coor[][],ref_hor_coor[][]
+ref_ver_coor[1][1]=0 : ref_ver_coor[1][2]=0 : ref_hor_coor[1][1]=0 : ref_hor_coor[1][2]=0
+
+if (deck_type=1 or deck_type=3) then
+    ref_ver_num=int((maxx-minx-2*0.05)/ref_pitch)+1
+    ref_hor_num=int((maxy-miny-2*0.05)/ref_pitch)+1
+
+	!縦筋
+	if deck_dir=1 then
+		z_pos=deck_hei+ref_hei+ref_d/2
+	else
+		z_pos=deck_hei+ref_hei+ref_d+ref_d/2
+	endif
+
+	if ref_ver_num>0 then
+		dim ref_ver_pos[]
+		dim ref_ver_ins[][]
+
+		for i=1 to ref_ver_num
+			ref_ver_pos[i]=minx+((maxx-minx)-(ref_ver_num-1)*ref_pitch)/2+(i-1)*ref_pitch
+	
+			ins_num=0
+			for j=1 to 4
+				if ref_ver_pos[i]>=min(equ_pos[j][1],equ_pos[j+1][1]) and ref_ver_pos[i]<max(equ_pos[j][1],equ_pos[j+1][1]) then
+					ins_num=ins_num+1
+					ref_ver_ins[i][ins_num]=(equ_a[j]*ref_ver_pos[i]+equ_c[j])/(-equ_b[j])
+				endif
+			next j
+
+			start_pos=min(ref_ver_ins[i][1],ref_ver_ins[i][2])-ref_edge
+			end_pos=max(ref_ver_ins[i][1],ref_ver_ins[i][2])+ref_edge
+
+			ref_ver_coor[i][1]=ref_ver_pos[i]
+			ref_ver_coor[i][2]=start_pos
+			ref_ver_coor[i][3]=z_pos+(base_a*(ref_ver_coor[i][1])+base_b*(ref_ver_coor[i][2])+base_c)*dir_flag*tan(rat)
+			ref_ver_coor[i][4]=ref_ver_pos[i]
+			ref_ver_coor[i][5]=end_pos
+			ref_ver_coor[i][6]=z_pos+(base_a*(ref_ver_coor[i][4])+base_b*(ref_ver_coor[i][5])+base_c)*dir_flag*tan(rat)
+		next i
+	endif
+
+	!横筋
+	if deck_dir=1 then
+		z_pos=deck_hei+ref_hei+ref_d+ref_d/2
+	else
+		z_pos=deck_hei+ref_hei+ref_d/2
+	endif
+
+	if ref_hor_num>0 then
+		dim ref_hor_pos[]
+		dim ref_hor_ins[][]
+
+		for i=1 to ref_hor_num
+			ref_hor_pos[i]=miny+((maxy-miny)-(ref_hor_num-1)*ref_pitch)/2+(i-1)*ref_pitch
+	
+			ins_num=0
+			for j=1 to 4
+				if ref_hor_pos[i]>=min(equ_pos[j][2],equ_pos[j+1][2]) and ref_hor_pos[i]<max(equ_pos[j][2],equ_pos[j+1][2]) then
+					ins_num=ins_num+1
+					ref_hor_ins[i][ins_num]=(equ_b[j]*ref_hor_pos[i]+equ_c[j])/(-equ_a[j])
+				endif
+			next j
+
+			start_pos=min(ref_hor_ins[i][1],ref_hor_ins[i][2])-ref_edge
+			end_pos=max(ref_hor_ins[i][1],ref_hor_ins[i][2])+ref_edge
+
+			ref_hor_coor[i][1]=start_pos
+			ref_hor_coor[i][2]=ref_hor_pos[i]
+			ref_hor_coor[i][3]=z_pos+(base_a*(ref_hor_coor[i][1])+base_b*(ref_hor_coor[i][2])+base_c)*dir_flag*tan(rat)
+			ref_hor_coor[i][4]=end_pos
+			ref_hor_coor[i][5]=ref_hor_pos[i]
+			ref_hor_coor[i][6]=z_pos+(base_a*(ref_hor_coor[i][4])+base_b*(ref_hor_coor[i][5])+base_c)*dir_flag*tan(rat)
+		next i
+	endif
+endif
+
+
+!===============================耐火補強筋
+fire_num=0 !耐火補強筋本数
+dim fire_coor[][]
+fire_coor[1][1]=0 : fire_coor[1][2]=0
+
+if (deck_type=1 or deck_type=3) and switch_fire then
+	fire_num=deck_num1*2+deck_num2
+	dim fire_pos[]
+	dim fire_ins[][]
+	
+	for i=1 to fire_num
+		if deck_dir=1 then
+			if deck_start=1 then
+				fire_pos[i]=minx+i*deck_unit1/2
+			else
+				fire_pos[i]=maxx-i*deck_unit1/2
+			endif
+
+			ins_num=0
+			for j=1 to 4
+				if fire_pos[i]>=min(equ_pos[j][1],equ_pos[j+1][1]) and fire_pos[i]<max(equ_pos[j][1],equ_pos[j+1][1]) then
+					ins_num=ins_num+1
+					fire_ins[i][ins_num]=(equ_a[j]*fire_pos[i]+equ_c[j])/(-equ_b[j])
+				endif
+			next j
+
+			start_pos=min(fire_ins[i][1],fire_ins[i][2])-fire_edge
+			end_pos=max(fire_ins[i][1],fire_ins[i][2])+fire_edge
+
+			fire_coor[i][1]=fire_pos[i]
+			fire_coor[i][2]=start_pos
+			fire_coor[i][3]=deck_hei-fire_d/1000/2+(base_a*(fire_coor[i][1])+base_b*(fire_coor[i][2])+base_c)*dir_flag*tan(rat)
+			fire_coor[i][4]=fire_pos[i]
+			fire_coor[i][5]=end_pos
+			fire_coor[i][6]=deck_hei-fire_d/1000/2+(base_a*(fire_coor[i][4])+base_b*(fire_coor[i][5])+base_c)*dir_flag*tan(rat)
+		else
+			if deck_start=1 then
+				fire_pos[i]=miny+i*deck_unit1/2
+			else
+				fire_pos[i]=maxy-i*deck_unit1/2
+			endif
+
+			ins_num=0
+			for j=1 to 4
+				if fire_pos[i]>=min(equ_pos[j][2],equ_pos[j+1][2]) and fire_pos[i]<max(equ_pos[j][2],equ_pos[j+1][2]) then
+					ins_num=ins_num+1
+					fire_ins[i][ins_num]=(equ_b[j]*fire_pos[i]+equ_c[j])/(-equ_a[j])
+				endif
+			next j
+
+			start_pos=min(fire_ins[i][1],fire_ins[i][2])-fire_edge
+			end_pos=max(fire_ins[i][1],fire_ins[i][2])+fire_edge
+
+			fire_coor[i][1]=start_pos
+			fire_coor[i][2]=fire_pos[i]
+			fire_coor[i][3]=deck_hei-fire_d/1000/2+(base_a*(fire_coor[i][1])+base_b*(fire_coor[i][2])+base_c)*dir_flag*tan(rat)
+			fire_coor[i][4]=end_pos
+			fire_coor[i][5]=fire_pos[i]
+			fire_coor[i][6]=deck_hei-fire_d/1000/2+(base_a*(fire_coor[i][4])+base_b*(fire_coor[i][5])+base_c)*dir_flag*tan(rat)
+		endif
+	next i
+endif
+
+
+!===============================支保工
+sup_num=0
+dim sle_coor[][] !大引き位置リスト
+sle_coor[1][1]=0 : sle_coor[1][2]=0
+dim sup_coor[][] !支柱位置リスト
+sup_coor[1][1]=0 : sup_coor[1][2]=0
+
+if deck_type=2 and switch_sup then
+	values "sup_hei" range[sle_y+sup_thi,]
+	values "sup_pitch" range[deck_unit,]
+
+	dim sle_pos[]
+	dim sle_ins[][]
+
+	for i=1 to sle_num
+		ins_num=0
+
+		if deck_dir=1 then
+			sle_pos[i]=miny+(maxy-miny)/sle_num/2+(i-1)*(maxy-miny)/sle_num
+
+			for j=1 to 4
+				if sle_pos[i]>=min(equ_pos[j][2],equ_pos[j+1][2]) and sle_pos[i]<max(equ_pos[j][2],equ_pos[j+1][2]) then
+					ins_num=ins_num+1
+					sle_ins[i][ins_num]=(equ_b[j]*sle_pos[i]+equ_c[j])/(-equ_a[j])
+				endif
+			next j
+
+			start_pos=min(sle_ins[i][1],sle_ins[i][2])
+			end_pos=max(sle_ins[i][1],sle_ins[i][2])
+
+			sle_coor[i][1]=start_pos
+			sle_coor[i][2]=sle_pos[i]
+			sle_coor[i][3]=-deck_hei+deck_thi+(base_a*(sle_coor[i][1])+base_b*(sle_coor[i][2])+base_c)*dir_flag*tan(rat)
+			sle_coor[i][4]=end_pos
+			sle_coor[i][5]=sle_pos[i]
+			sle_coor[i][6]=-deck_hei+deck_thi+(base_a*(sle_coor[i][4])+base_b*(sle_coor[i][5])+base_c)*dir_flag*tan(rat)
+
+			count_sup=int((end_pos-start_pos-deck_unit)/sup_pitch)+1
+
+			if count_sup>0 then
+				for j=1 to count_sup
+					sup_num=sup_num+1
+					sup_coor[sup_num][1]=start_pos+((end_pos-start_pos)-(count_sup-1)*sup_pitch)/2+(j-1)*sup_pitch
+					sup_coor[sup_num][2]=sle_pos[i]
+				next j
+			endif
+		else
+			sle_pos[i]=minx+(maxx-minx)/sle_num/2+(i-1)*(maxx-minx)/sle_num
+
+			for j=1 to 4
+				if sle_pos[i]>=min(equ_pos[j][1],equ_pos[j+1][1]) and sle_pos[i]<max(equ_pos[j][1],equ_pos[j+1][1]) then
+					ins_num=ins_num+1
+					sle_ins[i][ins_num]=(equ_a[j]*sle_pos[i]+equ_c[j])/(-equ_b[j])
+				endif
+			next j
+
+			start_pos=min(sle_ins[i][1],sle_ins[i][2])
+			end_pos=max(sle_ins[i][1],sle_ins[i][2])
+
+			sle_coor[i][1]=sle_pos[i]
+			sle_coor[i][2]=start_pos
+			sle_coor[i][3]=-deck_hei+deck_thi+(base_a*(sle_coor[i][1])+base_b*(sle_coor[i][2])+base_c)*dir_flag*tan(rat)
+			sle_coor[i][4]=sle_pos[i]
+			sle_coor[i][5]=end_pos
+			sle_coor[i][6]=-deck_hei+deck_thi+(base_a*(sle_coor[i][4])+base_b*(sle_coor[i][5])+base_c)*dir_flag*tan(rat)
+
+			count_sup=int((end_pos-start_pos-deck_unit)/sup_pitch)+1
+
+			if count_sup>0 then
+				for j=1 to count_sup
+					sup_num=sup_num+1
+					sup_coor[sup_num][1]=sle_pos[i]
+					sup_coor[sup_num][2]=start_pos+((end_pos-start_pos)-(count_sup-1)*sup_pitch)/2+(j-1)*sup_pitch
+				next j
+			endif
+		endif
+	next i
+endif
+
+parameters sup_num=sup_num
+
+
+
+values{2} "mode_2d" 1,"簡易表示",2,"詳細表示"
+values{2} "mode_3d" 1,"簡易表示",2,"詳細表示"
+
+
+!品名
+dim product_num_text_list[][]
+product_num_text_list[1][1]="QL99-50-10"
+product_num_text_list[1][2]="QL99-50-12"
+product_num_text_list[1][3]="QL99-50-16"
+product_num_text_list[1][4]="QL99-75-10"
+product_num_text_list[1][5]="QL99-75-12"
+product_num_text_list[1][6]="QL99-75-16"
+product_num_text_list[2][1]="JF75ME-07"
+product_num_text_list[2][2]="JF75ME-08"
+product_num_text_list[2][3]="JF75ME-10"
+product_num_text_list[2][4]="JF75ME-12"
+product_num_text_list[2][5]="JF75ME-14"
+product_num_text_list[2][6]="JF75ME-16"
+product_num_text_list[2][7]="JF75MW-07"
+product_num_text_list[2][8]="JF75MW-08"
+product_num_text_list[2][9]="JF75MW-10"
+product_num_text_list[2][10]="JF75MW-12"
+product_num_text_list[2][11]="JF75MW-14"
+product_num_text_list[2][12]="JF75MW-16"
+product_num_text_list[2][13]="JF75-08"
+product_num_text_list[2][14]="JF75-10"
+product_num_text_list[2][15]="JF75-12"
+product_num_text_list[2][16]="JF75-14"
+product_num_text_list[2][17]="JF75-16"
+product_num_text_list[2][18]="JF75Wα-08"
+product_num_text_list[2][19]="JF75W-08"
+product_num_text_list[2][20]="JF75Wα-10"
+product_num_text_list[2][21]="JF75W-10"
+product_num_text_list[2][22]="JF75Wα-12"
+product_num_text_list[2][23]="JF75W-12"
+product_num_text_list[2][24]="JF75Wα-14"
+product_num_text_list[2][25]="JF75W-14"
+product_num_text_list[2][26]="JF75Wα-16"
+product_num_text_list[2][27]="JF75W-16"
+product_num_text_list[2][28]="JF100-08"
+product_num_text_list[2][29]="JF100-10"
+product_num_text_list[2][30]="JF100-12"
+product_num_text_list[2][31]="JF100-14"
+product_num_text_list[2][32]="JF100-16"
+product_num_text_list[3][1]="QL99-50-12Y"
+product_num_text_list[3][2]="QL99-50-16Y"
+product_num_text_list[3][3]="QL99-75-12Y"
+product_num_text_list[3][4]="QL99-75-16Y"
+
+product_num_text=product_num_text_list[deck_type][product_num]
+parameters product_num_text=product_num_text
+
+
+!めっき
+dim plating_type_text_list[]
+plating_type_text_list[1]="めっき無し"
+plating_type_text_list[2]="亜鉛めっきZ12"
+plating_type_text_list[3]="亜鉛めっきZ27"
+plating_type_text_list[4]="Y18"
+plating_type_text_list[5]="Y27"
+plating_type_text_list[6]="Y35"
+plating_type_text_list[7]="K18"
+plating_type_text_list[8]="K27"
+plating_type_text_list[9]="K35"
+
+plating_type_text=plating_type_text_list[plating_type]
+parameters plating_type_text=plating_type_text
+
+
+!デッキ面積
+deck_totarea=0
+dim _deck_area[]
+for i=1 to deck_totnum
+	_deck_area[i]=deck_wid[i]*deck_len[i]
+	deck_totarea=deck_totarea+_deck_area[i]
+next i
+parameters \
+deck_area=_deck_area,
+deck_totarea=deck_totarea
+
+
+!デッキ総長さ
+deck_totlen=0
+for i=1 to deck_totnum
+	deck_totlen=deck_totlen+deck_len[i]
+next i
+parameters deck_totlen=deck_totlen
+
+
+!ひび割れ拡大防止筋・耐火補強筋
+ref_totnum=0
+ref_totlen=0
+fire_totnum=0
+fire_totlen=0
+
+if deck_type=1 or deck_type=3 then
+	for i=1 to ref_ver_num
+		ref_totnum=ref_totnum+1
+		ref_totlen=ref_totlen+sqr((ref_ver_coor[i][1]-ref_ver_coor[i][4])^2+(ref_ver_coor[i][2]-ref_ver_coor[i][5])^2+(ref_ver_coor[i][3]-ref_ver_coor[i][6])^2)
+	next i
+	for i=1 to ref_hor_num
+		ref_totnum=ref_totnum+1
+		ref_totlen=ref_totlen+sqr((ref_hor_coor[i][1]-ref_hor_coor[i][4])^2+(ref_hor_coor[i][2]-ref_hor_coor[i][5])^2+(ref_hor_coor[i][3]-ref_hor_coor[i][6])^2)
+	next i
+
+	if switch_fire then
+		for i=1 to fire_num
+			fire_totnum=fire_totnum+1
+			fire_totlen=fire_totlen+sqr((fire_coor[i][1]-fire_coor[i][4])^2+(fire_coor[i][2]-fire_coor[i][5])^2+(fire_coor[i][3]-fire_coor[i][6])^2)
+		next i
+	endif
+endif
+
+parameters \
+ref_totnum=ref_totnum,
+ref_totlen=ref_totlen,
+fire_totnum=fire_totnum,
+fire_totlen=fire_totlen
+
+fire_weight=fire_totlen*fire_unitWeight[fire_d]/1000
+parameters fire_weight=fire_weight 
+
+
+!スペーサー数
+spacer_num=0
+
+if deck_type=1 or deck_type=3 then
+	deck_yama_num=deck_num1*2+deck_num2
+	spacer_x_num=int((deck_yama_num-1)/spacer_x_pitch)+1
+	dim spacer_x_pos[]
+	dim spacer_x_pos_num[]
+
+	for i=1 to spacer_x_num
+		spacer_x_pos[i]=1+(i-1)*spacer_x_pitch
+
+		if spacer_x_pos[i]<=2*deck_num1 then
+			spacer_x_pos_num[i]=ceil(spacer_x_pos[i]/2)
+		else
+			spacer_x_pos_num[i]=deck_num1+ceil((spacer_x_pos[i]-2*deck_num1)/1)
+		endif
+
+		spacer_num=spacer_num+int((deck_len[spacer_x_pos_num[i]]-2*deck_edge_wid)/spacer_y_pitch)+1
+	next i
+endif
+
+parameters spacer_num=spacer_num
+
+if deck_type=2 then hideparameter "ref_totnum","ref_totlen","fire_totnum","fire_totlen","spacer_num"
+
+
+!========================================================================矢印
+if deck_dir=1 then
+	for i=1 to 4
+		if (minx+maxx)/2>=min(equ_pos[i][1],equ_pos[i+1][1]) and (minx+maxx)/2<max(equ_pos[i][1],equ_pos[i+1][1]) then
+			put (equ_a[i]*((minx+maxx)/2)+equ_c[i])/(-equ_b[i])
+		endif
+	next i
+
+	arr_start_pos=min(use(nsp))
+	arr_end_pos=max(get(nsp))
+else
+	for i=1 to 4
+		if (miny+maxy)/2>=min(equ_pos[i][2],equ_pos[i+1][2]) and (miny+maxy)/2<max(equ_pos[i][2],equ_pos[i+1][2]) then
+			put (equ_b[i]*((miny+maxy)/2)+equ_c[i])/(-equ_a[i])
+		endif
+	next i
+
+	arr_start_pos=min(use(nsp))
+	arr_end_pos=max(get(nsp))
+endif
+
+arr_start=(arr_start_pos*9+arr_end_pos)/10
+arr_end=(arr_end_pos*9+arr_start_pos)/10
+
+
+!========================================================================マーク設定
+if deck_dir=1 then
+	values{2} "arrow_pos" 1,"下",2,"中央",3,"上"
+	values{2} "deckMark_pos" 1,"下",2,"中央",3,"上"
+	values{2} "deckType_pos" 1,"下",2,"中央",3,"上"
+	values{2} "oneSize_pos" 1,"下",2,"中央",3,"上"
+else
+	values{2} "arrow_pos" 1,"左",2,"中央",3,"右"
+	values{2} "deckMark_pos" 1,"左",2,"中央",3,"右"
+	values{2} "deckType_pos" 1,"左",2,"中央",3,"右"
+	values{2} "oneSize_pos" 1,"左",2,"中央",3,"右"
+endif
+
+if deck_type=1 or deck_type=3 then
+	values{2} "labelType" 11,"合成_01",12,"合成_02",13,"合成_03",14,"合成_04",15,"合成_05",16,"合成_06"
+else
+	values{2} "labelType" 1,"フラット_01",2,"フラット_02",3,"フラット_03",4,"フラット_04",5,"フラット_05",\
+						  6,"フラット_06",7,"フラット_07",8,"フラット_08",9,"フラット_09"
+endif
+
+values "roundup_unit" range[0.001,]

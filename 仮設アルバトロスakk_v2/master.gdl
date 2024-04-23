@@ -1,0 +1,1195 @@
+!--------------------------------------------------------------------------
+EPS=0.0001		
+!--------------------------------------------------------------------------
+unID_2D=unID_2D		!ホットスポットユニークID　 2D
+unID_3D=unID_3D		!ホットスポットユニークID　 3D
+
+
+!-------------------------------------------------------------------------- 表示レベル変換
+details_2d=app2d			!平面複線表示
+details_elevation=app3d		!立面複線表現
+
+
+!--------------------------------------------------------------------------
+orgpos_y=0.0522				!配置基準点
+orgpos_y2=0.1				!階段配置基準点
+rail_y=0.04					!階段手摺配置基準点
+
+
+
+!------------------------------------------------------------------------- 支柱
+values "prop_shape" "3600", "2700", "900+1800", "1800", "1350", "900", "450", "450（根絡み専用）","225（根絡み専用）"		!支柱 
+
+!---数量
+list_prop_number=int(0)
+list_prop_number2=int(0)
+_prop_Num=0
+if prop1 then _prop_Num=_prop_Num+1
+if prop2 then _prop_Num=_prop_Num+1
+if prop3 then _prop_Num=_prop_Num+1
+if prop4 then _prop_Num=_prop_Num+1
+list_prop_number=_prop_Num
+if prop_shape="900+1800" then list_prop_number2=_prop_Num
+
+parameters list_prop_number=list_prop_number
+parameters list_prop_number2=list_prop_number2
+if list_prop_number=0 then lock "list_prop_number"
+if list_prop_number2=0 then lock "list_prop_number2"
+
+!------------ 品番
+list_prop_productcode=""
+list_prop_productcode2=""
+if list_prop_number>0 then
+	if prop_shape="900+1800" then
+		list_prop_productcode="支柱"+"900"
+		list_prop_productcode2="支柱"+"1800"
+	else
+		list_prop_productcode="支柱"+prop_shape
+	endif
+endif
+parameters list_prop_productcode=list_prop_productcode
+parameters list_prop_productcode2=list_prop_productcode2
+if list_prop_number=0 then lock "list_prop_productcode"
+if list_prop_number2=0 then lock "list_prop_productcode2"
+
+if prop_shape<>"900+1800" then
+	hideparameter "list_prop_productcode2","list_prop_number2"
+endif
+
+if prop_shape="900+1800" then prop_shape="2700"
+
+
+!--------------------------------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------------
+dim unitSize_values[7]
+if unitType=1 then
+	unitSize_values[1]=1.829
+	unitSize_values[2]=1.524
+	unitSize_values[3]=1.219
+	unitSize_values[4]=0.914
+	unitSize_values[5]=0.610
+	unitSize_values[6]=0.305
+	unitSize_values[7]=0.153
+else
+	unitSize_values[1]=1.8
+	unitSize_values[2]=1.5
+	unitSize_values[3]=1.2
+	unitSize_values[4]=0.9
+	unitSize_values[5]=0.6
+	unitSize_values[6]=0.3
+	unitSize_values[7]=0.153
+endif
+
+
+!--------------------------------------------------------------------------------------------------------
+if GLOB_MODPAR_NAME="prop_shape" then				!---支柱形状変更時パラメータをリセット
+	!------ 入力段
+	section_no=int(1) : parameters section_no=section_no
+
+	!------ 平面図表示
+	app2d_type=1 : parameters app2d_type=app2d_type 
+	
+	!------ 支柱
+	joint=1  : parameters joint=joint
+	jb_fl1=0 : parameters jb_fl1=jb_fl1
+	jb_fl2=0 : parameters jb_fl2=jb_fl2
+	jb_fl3=0 : parameters jb_fl3=jb_fl3
+	jb_fl4=0 : parameters jb_fl4=jb_fl4
+	frame_decrease1=0 : parameters frame_decrease1=frame_decrease1
+	frame_decrease2=0 : parameters frame_decrease2=frame_decrease2
+	frame_decrease3=0 : parameters frame_decrease3=frame_decrease3
+	frame_decrease4=0 : parameters frame_decrease4=frame_decrease4
+	usePenColor=0 : parameters usePenColor=usePenColor
+	
+	for  i=1 to 8
+		!------ 布材
+		led1[i]=0
+		led2[i]=0
+		led3[i]=0
+		led1_type[i]="布材"
+		led2_type[i]="布材"
+		led3_type[i]="布材"
+		led1_beamtype[i]="1.5スパン"
+		led2_beamtype[i]="1.5スパン"
+		led3_beamtype[i]="1.5スパン"
+		led_beamLed[i]=1
+		led_beamBoard[i]=1
+		led3_anglebrace[i]=0
+
+		parameters led1[i]=led1[i]
+		parameters led2[i]=led2[i]
+		parameters led3[i]=led3[i]
+		parameters led1_type[i]=led1_type[i]
+		parameters led2_type[i]=led2_type[i]
+		parameters led3_type[i]=led3_type[i]
+		parameters led1_beamtype[i]=led1_beamtype[i]
+		parameters led2_beamtype[i]=led2_beamtype[i]
+		parameters led3_beamtype[i]=led3_beamtype[i]
+		parameters led_beamLed[i]=led_beamLed[i]
+		parameters led_beamBoard[i]=led_beamBoard[i]
+		parameters led3_anglebrace[i]=led3_anglebrace[i]
+
+		!------ 布板
+		board[i]=0
+		board_type[i]="布板"
+		board_sreverse[i]=0
+		board_spos[i]="1"
+		board_srail1[i]=0
+		board_srail2[i]=0
+		if i=1 then 
+			board_stepHanger[i]=1
+		else
+			board_stepHanger[i]=0
+		endif
+		board_stepRail[i]=1
+		board_hreverse[i]=0
+		board_hpos[i]="1"
+		board_hopen[i]="閉"
+		board_huse[i]="使用時"
+		board1_show[i]=1
+		board2_show[i]=1
+		board3_show[i]=1
+		board1_bboard[i]=0
+		board2_bboard[i]=0
+		board3_bboard[i]=0
+
+		parameters board[i]=board[i]
+		parameters board_type[i]=board_type[i]
+		parameters board_sreverse[i]=board_sreverse[i]
+		parameters board_spos[i]=board_spos[i]
+		parameters board_srail1[i]=board_srail1[i]
+		parameters board_srail2[i]=board_srail2[i]
+		parameters board_stepHanger[i]=board_stepHanger[i]
+		parameters board_stepRail[i]=board_stepRail[i]
+		parameters board_hreverse[i]=board_hreverse[i]
+		parameters board_hpos[i]=board_hpos[i]
+		parameters board_hopen[i]=board_hopen[i]
+		parameters board_huse[i]=board_huse[i]
+		parameters board1_show[i]=board1_show[i]
+		parameters board2_show[i]=board2_show[i]
+		parameters board3_show[i]=board3_show[i]
+		parameters board1_bboard[i]=board1_bboard[i]
+		parameters board2_bboard[i]=board2_bboard[i]
+		parameters board3_bboard[i]=board3_bboard[i]
+
+		!------ ブラケット
+		bracketType1[i]=0
+		bracketType2[i]=0
+		bracketType3[i]=0
+		bracketType4[i]=0
+		bracket1_pos[i]=1
+		bracket2_pos[i]=1
+		bracket3_pos[i]=1
+		bracket4_pos[i]=1
+
+		parameters bracketType1[i]=bracketType1[i]
+		parameters bracketType2[i]=bracketType2[i]
+		parameters bracketType3[i]=bracketType3[i]
+		parameters bracketType4[i]=bracketType4[i]
+		parameters bracket1_pos[i]=bracket1_pos[i]
+		parameters bracket2_pos[i]=bracket2_pos[i]
+		parameters bracket3_pos[i]=bracket3_pos[i]
+		parameters bracket4_pos[i]=bracket4_pos[i]
+	next i
+endif
+
+
+
+!------------------------段数パラメータコントロール-------------------------------------------
+if GLOB_MODPAR_NAME="section_no" or GLOB_MODPAR_NAME="prop_shape" then		!---入力段変更時　または　支柱形状変更時
+	led1_in           =led1[section_no]            : parameters led1_in           =led1_in
+	led1_type_in      =led1_type[section_no]       : parameters led1_type_in      =led1_type_in
+	led1_beamtype_in  =led1_beamtype[section_no]   : parameters led1_beamtype_in  =led1_beamtype_in
+	led_beamLed_in    =led_beamLed[section_no]     : parameters led_beamLed_in    =led_beamLed_in
+	led_beamBoard_in  =led_beamBoard[section_no]   : parameters led_beamBoard_in  =led_beamBoard_in
+	led2_in           =led2[section_no]            : parameters led2_in           =led2_in
+	led2_type_in      =led2_type[section_no]       : parameters led2_type_in      =led2_type_in
+	led2_beamtype_in  =led2_beamtype[section_no]   : parameters led2_beamtype_in  =led2_beamtype_in
+	led3_in           =led3[section_no]            : parameters led3_in           =led3_in
+	led3_type_in      =led3_type[section_no]       : parameters led3_type_in      =led3_type_in
+	led3_anglebrace_in=led3_anglebrace[section_no] : parameters led3_anglebrace_in=led3_anglebrace_in
+	led3_beamtype_in  =led3_beamtype[section_no]   : parameters led3_beamtype_in  =led3_beamtype_in
+
+	!-----
+	bracketType1_in=bracketType1[section_no] : parameters bracketType1_in=bracketType1_in
+	bracketType2_in=bracketType2[section_no] : parameters bracketType2_in=bracketType2_in
+	bracketType3_in=bracketType3[section_no] : parameters bracketType3_in=bracketType3_in
+	bracketType4_in=bracketType4[section_no] : parameters bracketType4_in=bracketType4_in
+	bracket1_pos_in=bracket1_pos[section_no] : parameters bracket1_pos_in=bracket1_pos_in
+	bracket2_pos_in=bracket2_pos[section_no] : parameters bracket2_pos_in=bracket2_pos_in
+	bracket3_pos_in=bracket3_pos[section_no] : parameters bracket3_pos_in=bracket3_pos_in
+	bracket4_pos_in=bracket4_pos[section_no] : parameters bracket4_pos_in=bracket4_pos_in
+
+	!-----
+	board_in           =board[section_no]            : parameters board_in           =board_in
+	board_type_in      =board_type[section_no]       : parameters board_type_in      =board_type_in
+	board1_show_in     =board1_show[section_no]      : parameters board1_show_in     =board1_show_in
+	board2_show_in     =board2_show[section_no]      : parameters board2_show_in     =board2_show_in
+	board3_show_in     =board3_show[section_no]      : parameters board3_show_in     =board3_show_in
+	board_sreverse_in  =board_sreverse[section_no]   : parameters board_sreverse_in  =board_sreverse_in
+	board_spos_in      =board_spos[section_no]       : parameters board_spos_in      =board_spos_in
+	board_srail1_in    =board_srail1[section_no]     : parameters board_srail1_in    =board_srail1_in
+	board_srail2_in    =board_srail2[section_no]     : parameters board_srail2_in    =board_srail2_in
+	board_stepHanger_in=board_stepHanger[section_no] : parameters board_stepHanger_in=board_stepHanger_in
+	board_stepRail_in  =board_stepRail[section_no]   : parameters board_stepRail_in  =board_stepRail_in
+	board_hreverse_in  =board_hreverse[section_no]   : parameters board_hreverse_in  =board_hreverse_in
+	board_hpos_in      =board_hpos[section_no]       : parameters board_hpos_in      =board_hpos_in
+	board_hopen_in     =board_hopen[section_no]      : parameters board_hopen_in     =board_hopen_in
+	board_huse_in      =board_huse[section_no]       : parameters board_huse_in      =board_huse_in
+	board1_bboard_in   =board1_bboard[section_no]    : parameters board1_bboard_in   =board1_bboard_in
+	board2_bboard_in   =board2_bboard[section_no]    : parameters board2_bboard_in   =board2_bboard_in
+	board3_bboard_in   =board3_bboard[section_no]    : parameters board3_bboard_in   =board3_bboard_in
+endif
+
+if GLOB_MODPAR_NAME="led1_in" then							!布材１
+	led1[section_no]=led1_in : parameters led1[section_no]=led1[section_no]
+endif
+
+if GLOB_MODPAR_NAME="led1_type_in" then						!布材１：タイプ
+	led1_type[section_no]=led1_type_in : parameters led1_type[section_no]=led1_type[section_no]
+endif
+
+if GLOB_MODPAR_NAME="led1_beamtype_in" then					!梁枠タイプ １
+	led1_beamtype[section_no]=led1_beamtype_in : parameters led1_beamtype[section_no]=led1_beamtype[section_no]
+endif
+
+if GLOB_MODPAR_NAME="led2_in" then							!布材２
+	led2[section_no]=led2_in : parameters led2[section_no]=led2[section_no]
+endif
+
+if GLOB_MODPAR_NAME="led2_type_in" then						!布材２：タイプ
+	led2_type[section_no]=led2_type_in : parameters led2_type[section_no]=led2_type[section_no]
+endif
+
+if GLOB_MODPAR_NAME="led2_beamtype_in" then					!梁枠タイプ ２
+	led2_beamtype[section_no]=led2_beamtype_in : parameters led2_beamtype[section_no]=led2_beamtype[section_no]
+endif
+
+if GLOB_MODPAR_NAME="led3_in" then							!布材３
+	led3[section_no]=led3_in : parameters led3[section_no]=led3[section_no]
+endif
+
+if GLOB_MODPAR_NAME="led3_type_in" then						!布材３：タイプ
+	led3_type[section_no]=led3_type_in : parameters led3_type[section_no]=led3_type[section_no]
+endif
+
+if GLOB_MODPAR_NAME="led3_anglebrace_in" then					!強化方杖
+	led3_anglebrace[section_no]=led3_anglebrace_in : parameters led3_anglebrace[section_no]=led3_anglebrace[section_no]
+endif
+
+if GLOB_MODPAR_NAME="led3_beamtype_in" then					!梁枠タイプ３
+	led3_beamtype[section_no]=led3_beamtype_in : parameters led3_beamtype[section_no]=led3_beamtype[section_no]
+endif
+
+if GLOB_MODPAR_NAME="led_beamLed_in" then						!梁枠間布材
+	led_beamLed[section_no]=led_beamLed_in : parameters led_beamLed[section_no]=led_beamLed[section_no]
+endif
+
+if GLOB_MODPAR_NAME="led_beamBoard_in" then					!梁枠上布板
+	led_beamBoard[section_no]=led_beamBoard_in : parameters led_beamBoard[section_no]=led_beamBoard[section_no]
+endif
+
+
+
+!---------
+if GLOB_MODPAR_NAME="bracketType1_in" then						!ブラケットタイプ1
+	bracketType1[section_no]=bracketType1_in : parameters bracketType1[section_no]=bracketType1[section_no]
+endif
+
+if GLOB_MODPAR_NAME="bracketType2_in" then						!ブラケットタイプ2
+	bracketType2[section_no]=bracketType2_in : parameters bracketType2[section_no]=bracketType2[section_no]
+endif
+
+if GLOB_MODPAR_NAME="bracketType3_in" then						!ブラケットタイプ3
+	bracketType3[section_no]=bracketType3_in : parameters bracketType3[section_no]=bracketType3[section_no]
+endif
+
+if GLOB_MODPAR_NAME="bracketType4_in" then						!ブラケットタイプ4
+	bracketType4[section_no]=bracketType4_in : parameters bracketType4[section_no]=bracketType4[section_no]
+endif
+
+if GLOB_MODPAR_NAME="bracket1_pos_in" then						!ブラケット位置1
+	bracket1_pos[section_no]=bracket1_pos_in : parameters bracket1_pos[section_no]=bracket1_pos[section_no]
+endif
+
+if GLOB_MODPAR_NAME="bracket2_pos_in" then						!ブラケット位置2
+	bracket2_pos[section_no]=bracket2_pos_in : parameters bracket2_pos[section_no]=bracket2_pos[section_no]
+endif
+
+if GLOB_MODPAR_NAME="bracket3_pos_in" then						!ブラケット位置3
+	bracket3_pos[section_no]=bracket3_pos_in : parameters bracket3_pos[section_no]=bracket3_pos[section_no]
+endif
+
+if GLOB_MODPAR_NAME="bracket4_pos_in" then						!ブラケット位置4
+	bracket4_pos[section_no]=bracket4_pos_in : parameters bracket4_pos[section_no]=bracket4_pos[section_no]
+endif
+
+
+
+!---------
+if GLOB_MODPAR_NAME="board_in" then							!布板
+	board[section_no]=board_in : parameters board[section_no]=board[section_no]
+endif
+
+if GLOB_MODPAR_NAME="board_type_in" then						!布板タイプ
+	board_type[section_no]=board_type_in : parameters board_type[section_no]=board_type[section_no]
+endif
+
+if GLOB_MODPAR_NAME="board1_show_in" then						!布板1を表示
+	board1_show[section_no]=board1_show_in : parameters board1_show[section_no]=board1_show[section_no]
+endif
+
+if GLOB_MODPAR_NAME="board2_show_in" then						!布板2を表示
+	board2_show[section_no]=board2_show_in : parameters board2_show[section_no]=board2_show[section_no]
+endif
+
+if GLOB_MODPAR_NAME="board3_show_in" then						!布板3を表示
+	board3_show[section_no]=board3_show_in : parameters board3_show[section_no]=board3_show[section_no]
+endif
+
+if GLOB_MODPAR_NAME="board_sreverse_in" then					!階段反転
+	board_sreverse[section_no]=board_sreverse_in : parameters board_sreverse[section_no]=board_sreverse[section_no]
+endif
+
+if GLOB_MODPAR_NAME="board_spos_in" then						!階段位置
+	board_spos[section_no]=board_spos_in : parameters board_spos[section_no]=board_spos[section_no]
+endif
+
+if GLOB_MODPAR_NAME="board_srail1_in" then						!階段手摺１
+	board_srail1[section_no]=board_srail1_in : parameters board_srail1[section_no]=board_srail1[section_no]
+endif
+
+if GLOB_MODPAR_NAME="board_srail2_in" then						!階段手摺２
+	board_srail2[section_no]=board_srail2_in : parameters board_srail2[section_no]=board_srail2[section_no]
+endif
+
+if GLOB_MODPAR_NAME="board_stepHanger_in" then					!階段受
+	board_stepHanger[section_no]=board_stepHanger_in : parameters board_stepHanger[section_no]=board_stepHanger[section_no]
+endif
+
+if GLOB_MODPAR_NAME="board_stepRail_in" then						!開口ガード
+	board_stepRail[section_no]=board_stepRail_in : parameters board_stepRail[section_no]=board_stepRail[section_no]
+endif
+
+if GLOB_MODPAR_NAME="board_hreverse_in" then					!ハッチ反転
+	board_hreverse[section_no]=board_hreverse_in : parameters board_hreverse[section_no]=board_hreverse[section_no]
+endif
+
+if GLOB_MODPAR_NAME="board_hpos_in" then						!ハッチ位置
+	board_hpos[section_no]=board_hpos_in : parameters board_hpos[section_no]=board_hpos[section_no]
+endif
+
+if GLOB_MODPAR_NAME="board_hopen_in" then						!ハッチ開閉
+	board_hopen[section_no]=board_hopen_in : parameters board_hopen[section_no]=board_hopen[section_no]
+endif
+
+if GLOB_MODPAR_NAME="board_huse_in" then						!ハッチはしご
+	board_huse[section_no]=board_huse_in : parameters board_huse[section_no]=board_huse[section_no]
+endif
+
+if GLOB_MODPAR_NAME="board1_bboard_in" then						!巾木1
+	board1_bboard[section_no]=board1_bboard_in : parameters board1_bboard[section_no]=board1_bboard[section_no]
+endif
+
+if GLOB_MODPAR_NAME="board2_bboard_in" then						!巾木2
+	board2_bboard[section_no]=board2_bboard_in : parameters board2_bboard[section_no]=board2_bboard[section_no]
+endif
+
+if GLOB_MODPAR_NAME="board3_bboard_in" then						!巾木3
+	board3_bboard[section_no]=board3_bboard_in : parameters board3_bboard[section_no]=board3_bboard[section_no]
+endif
+
+!--------------------------------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------------
+
+
+
+
+
+!------------------------------------------------------------------------------ ジャッキベース
+jb_pos=max( jb_h1*jb_fl1, jb_h2*jb_fl2, jb_h3*jb_fl3, jb_h4*jb_fl4)
+jb_offset1=jb_pos-jb_h1
+jb_offset2=jb_pos-jb_h2
+jb_offset3=jb_pos-jb_h3
+jb_offset4=jb_pos-jb_h4
+
+base_w=0.14			!ベースジャッキ幅
+base_d=0.14			!ベースジャッキ奥行
+
+
+
+!------------------------------------------------------------------------------ 支柱
+!-----------------------支柱位置
+dim _column_posX[4]
+	_column_posX[1]=0
+	_column_posX[2]=0
+	_column_posX[3]=a
+	_column_posX[4]=a
+
+dim _column_posY[4]
+	_column_posY[1]=0
+	_column_posY[2]=b
+	_column_posY[3]=b
+	_column_posY[4]=0
+
+
+!-----------------------支柱全体高さ計算
+if joint then
+	joint_h=0.155
+else
+	joint_h=0
+endif
+
+
+z1=0
+zz=0
+dan_max=0
+_bNegarami=0
+
+dim dan[]
+
+if prop_shape="3600" then
+	z1=3.6-0.025+joint_h	!ジョイント込高
+	zz=3.6					!基準高
+	_bNegarami=0
+
+	dan_max=int(8)			!段数
+	dan[1]=0.38
+	dan[2]=0.83
+	dan[3]=1.28
+	dan[4]=1.73
+	dan[5]=2.18
+	dan[6]=2.63
+	dan[7]=3.08
+	dan[8]=3.53
+endif
+
+if prop_shape="2700" then
+	z1=2.7-0.025+joint_h
+	zz=2.7
+	_bNegarami=1
+
+	dan_max=int(7)			!段数
+	dan[1]=0.135
+	dan[2]=0.38
+	dan[3]=0.83
+	dan[4]=1.28
+	dan[5]=1.73
+	dan[6]=2.18
+	dan[7]=2.63
+endif
+
+if prop_shape="1800" then
+	z1=1.8-0.025+joint_h	!ジョイント込高
+	zz=1.8					!基準高
+	_bNegarami=0
+
+	dan_max=int(4)			!段数
+	dan[1]=0.38
+	dan[2]=0.83
+	dan[3]=1.28
+	dan[4]=1.73
+endif
+
+if prop_shape="1350" then
+	z1=1.35-0.025+joint_h
+	zz=1.35
+	_bNegarami=1
+
+	dan_max=int(4)			!段数
+	dan[1]=0.135
+	dan[2]=0.38
+	dan[3]=0.83
+	dan[4]=1.28
+endif
+
+if prop_shape="900" then
+	z1=0.9-0.025+joint_h
+	zz=0.9
+	_bNegarami=1
+
+	dan_max=int(3)			!段数
+	dan[1]=0.135
+	dan[2]=0.38
+	dan[3]=0.83
+endif
+
+if prop_shape="450" then
+	z1=0.45-0.025+joint_h
+	zz=0.45
+	_bNegarami=0
+
+	dan_max=int(1)			!段数
+	dan[1]=0.38
+endif
+
+if prop_shape="450（根絡み専用）" then
+	z1=0.45-0.025+0.155
+	zz=0.45
+	_bNegarami=1
+
+	dan_max=int(2)			!段数
+	dan[1]=0.135
+	dan[2]=0.38
+endif
+
+if prop_shape="225（根絡み専用）" then
+	z1=0.225-0.025+0.155
+	zz=0.225
+	_bNegarami=1
+
+	dan_max=int(1)			!段数
+	dan[1]=0.155
+endif
+
+decrease_h1=dan[frame_decrease1_pos]-1.35			!拡幅狭幅ブラケット高
+decrease_h2=dan[frame_decrease2_pos]-1.35
+decrease_h3=dan[frame_decrease3_pos]-1.35
+decrease_h4=dan[frame_decrease4_pos]-1.35
+
+ZZYZX=zz*(sequence_v-1)+z1+jb_pos		!---トータル高
+parameters ZZYZX=ZZYZX : lock "ZZYZX"
+
+
+!------------------------------------------------------------------------------ 布板
+!----------------------- 布板位置
+
+!		③
+!	――――――――
+!		②
+!	――――――――
+!		①
+
+!----------------------- 階段・ハッチ式布板位置
+stepPosBack=0
+for i=1 to dan_max
+	if board[i] and board_type[i]="階段" then
+		if board_spos[i]="2" then stepPosBack=1
+		i=dan_max
+	endif
+next i
+
+hatchPosBack=0
+for i=1 to dan_max
+	if board[i] and board_type[i]="ハッチ式布板" then
+		if board_hpos[i]="2" then hatchPosBack=1
+		i=dan_max
+	endif
+next i
+
+
+!----------------------- 布板サイズ
+board_d1=0.5		!--- 布板奥行1
+board_d2=0.24		!--- 布板奥行2
+stair_d=0.42		!--- 階段幅
+
+
+!----------------------- 布板梁間位置
+board_n=1
+dim boardDepth[]
+boardDepth[1]=0 : boardDepth[2]=0
+
+if B<unitSize_values[5]+EPS then
+	board_n=int(1)		!--- 布板枚数
+	board_pich=(B-board_d1)/(board_n+int(1))			 !--- 布板間隔
+	boardDepth[1]=board_d1
+endif
+
+if B>unitSize_values[5]+EPS and B<unitSize_values[4]+EPS then
+	board_n=int(2)		!--- 布板枚数
+	board_pich=(B-board_d1-board_d2)/(board_n+int(1))		 !--- 布板間隔
+	if board_exchange=0 then
+		boardDepth[1]=board_d1
+		boardDepth[2]=board_d2
+	else
+		boardDepth[1]=board_d2
+		boardDepth[2]=board_d1
+	endif
+endif
+
+if B>unitSize_values[4]+EPS and B<unitSize_values[3]+EPS then
+	board_n=int(2)		!--- 布板枚数
+	board_pich=(B-board_d1-board_d1)/(board_n+int(1))		!--- 布板間隔
+	
+	boardDepth[1]=board_d1
+	boardDepth[2]=board_d1
+endif
+
+if B>unitSize_values[3]+EPS and B<unitSize_values[2]+EPS then
+	board_n=int(3)		!--- 布板枚数
+	board_pich=(B-board_d1-board_d1-board_d2)/(board_n+int(1))	!--- 布板間隔
+
+	boardDepth[1]=board_d1
+	boardDepth[2]=board_d2
+	boardDepth[3]=board_d1
+endif
+
+if B>unitSize_values[2]+EPS then
+	board_n=int(3)		!--- 布板枚数
+	board_pich=(B-board_d1-board_d1-board_d1)/(board_n+int(1))	!--- 布板間隔
+
+	boardDepth[1]=board_d1
+	boardDepth[2]=board_d1
+	boardDepth[3]=board_d1
+endif
+
+frame_w=0.0272				!--- 手摺フレーム厚
+frame_d=0.0272				!--- 手摺フレーム幅
+
+!----------------------- 布板表示
+dim board_flag[][]
+for ii=1 to dan_max
+	for i=1 to board_n
+		board_flag[ii][i]=1
+		if i=1 and not(board1_show[ii]) then board_flag[ii][i]=0
+		if i=2 and not(board2_show[ii]) then board_flag[ii][i]=0
+		if i=3 and not(board3_show[ii]) then board_flag[ii][i]=0
+	next i
+next ii
+parameters board_flag=board_flag
+
+_bBoardDepth2_9=0
+if (b<unitSize_values[3] & b>unitSize_values[4]-eps) then
+	_bBoardDepth2_9=1
+endif
+
+_bBoardDepth2_15=0
+if (b<unitSize_values[1] & b>unitSize_values[2]-eps) then
+	_bBoardDepth2_15=1
+endif
+
+
+!----------------------- 最下段の階段位置
+plateLen=0.14				!--- 階段受のサイズ
+plateAng=46.51
+
+stepPosX=0
+stepPosZ=0
+stepRailPosZ=0
+if board[1] & board_type[1]="階段" & _bNegarami then
+	stepPosX=(plateLen*cos(plateAng))
+	stepPosZ=(plateLen*sin(plateAng)) 
+	stepRailPosZ=0.205
+endif
+
+
+!-----------------------ハッチ式布板
+dia=0.0427
+dia2=dia*0.8
+
+ladder_w=0.347		!--- はしご幅
+ladder_fd=0.026		!--- はしごフレーム見付
+ladder_fw=0.039		!--- はしごフレーム見込
+lad_step_d=0.027	!--- はしごステップ厚
+
+c_board_b=0.5		!--- 布板幅
+side_w=0.025		!--- フレーム厚
+c_board=0.025		!--- 布板厚
+
+if a<1.8 then
+	c_b_1=0.038			!--- 布板端
+	ladder_br=0.064+0.018		!--- はしごブラケット
+else
+	c_b_1=0.334			!--- 布板端
+	ladder_br=0.064+0.305		!--- はしごブラケットポジション
+endif
+hatch=0.645				!--- ハッチ長
+
+
+!------------------------------------------------------------------------------ 布材
+!----------------------- 梁枠
+bBeam1=0
+for i=1 to dan_max
+	if led1[i] & led1_type[i]="梁枠" then
+		bBeam1=1
+		Beam1_dan=i
+		i=dan_max
+	endif
+next i
+
+bBeam2=0
+for i=1 to dan_max
+	if led2[i] & led2_type[i]="梁枠" then
+		bBeam2=1
+		Beam2_dan=i
+		i=dan_max
+	endif
+next i
+
+bBeam3=0
+for i=1 to dan_max
+	if led3[i] & led3_type[i]="梁枠" then
+		bBeam3=1
+		Beam3_dan=i
+		i=dan_max
+	endif
+next i
+
+dim beamLength_values[4]
+	beamLength_values[1]=unitSize_values[1]+unitSize_values[4]
+	beamLength_values[2]=unitSize_values[1]*2
+	beamLength_values[3]=unitSize_values[1]*3
+	beamLength_values[4]=unitSize_values[1]*4
+
+beamLength=0
+beamID=0
+spanNum=0
+if bBeam1 then
+	if led1_beamtype[Beam1_dan]="1.5スパン" then
+		beamLength=beamLength_values[1] 
+		beamID=1
+		spanNum=1
+	endif
+
+	if led1_beamtype[Beam1_dan]="2スパン" then
+		beamLength=beamLength_values[2] 
+		beamID=2
+		spanNum=1
+	endif
+
+	if led1_beamtype[Beam1_dan]="3スパン" then
+		beamLength=beamLength_values[3] 
+		beamID=3
+		spanNum=2
+	endif
+
+	if led1_beamtype[Beam1_dan]="4スパン" then
+		beamLength=beamLength_values[4] 
+		beamID=4
+		spanNum=3
+	endif
+endif
+
+if not(bBeam1) & bBeam2 then
+	if led2_beamtype[Beam2_dan]="1.5スパン" then
+		beamLength=beamLength_values[1] 
+		beamID=1
+		spanNum=1
+	endif
+
+	if led2_beamtype[Beam2_dan]="2スパン" then
+		beamLength=beamLength_values[2] 
+		beamID=2
+		spanNum=1
+	endif
+
+	if led2_beamtype[Beam2_dan]="3スパン" then
+		beamLength=beamLength_values[3] 
+		beamID=3
+		spanNum=2
+	endif
+
+	if led2_beamtype[Beam2_dan]="4スパン" then
+		beamLength=beamLength_values[4] 
+		beamID=4
+		spanNum=3
+	endif
+
+endif
+
+beamLength_d=0
+beamID_d=0
+if bBeam3 then
+	if led3_beamtype[Beam3_dan]="1.5スパン" then
+		beamLength_d=beamLength_values[1] 
+		beamID_d=1
+	endif
+
+	if led3_beamtype[Beam3_dan]="2スパン" then
+		beamLength_d=beamLength_values[2] 
+		beamID_d=2
+	endif
+
+	if led3_beamtype[Beam3_dan]="3スパン" then
+		beamLength_d=beamLength_values[3] 
+		beamID_d=3
+	endif
+
+	if led3_beamtype[Beam3_dan]="4スパン" then
+		beamLength2=beamLength_values[4] 
+		beamID_d=4
+	endif
+endif
+
+
+!------------------------------------------------------------------------------ 平面表示
+!----------------------- 2Dペン設定をデフォルトペンに置き換え
+gs_cont_pen =SYMB_VIEW_PEN
+gs_fill_type=SYMB_FILL
+gs_fill_pen =SYMB_FILL_PEN
+gs_back_pen =SYMB_FBGD_PEN 
+
+
+!----------------------- 単線表示用フラグ
+board_2D=0
+switch_board1=0
+switch_board2=0
+switch_board3=0
+
+for i=1 to 8
+	if board[i] then
+		board_2D=1
+		if board1_show[i]=1 then switch_board1=1
+		if board2_show[i]=1 then switch_board2=1
+		if board3_show[i]=1 then switch_board3=1
+	endif
+next i
+
+led1_2D=0
+for i=1 to 8
+	if led1[i]  &  led1_type[i]="布材" then
+		led1_2D=1
+		i=8
+	endif
+next i
+
+led2_2D=0
+for i=1 to 8
+	if led2[i]  &  led2_type[i]="布材" then
+		led2_2D=1
+		i=8
+	endif
+next i
+
+led3_2D=0
+for i=1 to 8
+	if led3[i]  &  led3_type[i]="布材" then
+		led3_2D=1
+		i=8
+	endif
+next i
+
+board_sreverse_2D=0
+for i=1 to 8
+	if board_sreverse[i] then
+		board_sreverse_2D=1
+		i=8
+	endif
+next i
+
+board_spos_2D=0
+for i=1 to 8
+	if board_spos[i]="2"then
+		board_spos_2D=1
+		i=8
+	endif
+next i
+
+
+
+!-------------------------------------------------------------------------- プレビュー画面
+dim fontnames[]
+n=REQUEST ("FONTNAMES_LIST", "", fontnames)
+VALUES "font_preview" fontnames, CUSTOM
+
+
+DEFINE STYLE "preview_2D" font_preview, 3, 5, 0
+DEFINE STYLE "preview_3D" font_preview, 400, 5, 0
+
+
+!--------------------------------------------------------------------------
+!支柱(master)
+!--------------------------------------------------------------------------
+	if prop_shape="3600" then 
+		prop=3.6
+		prop_code=1
+	endif
+	if prop_shape="2700" then 
+		prop=2.7
+		prop_code=2
+	endif
+	if prop_shape="1800" then 
+		prop=1.8
+		prop_code=3
+	endif
+	if prop_shape="1350" then 
+		prop=1.35
+		prop_code=4
+	endif
+	if prop_shape="900" then 
+		prop=0.9
+		prop_code=5
+	endif
+	if prop_shape="450" then 
+		prop=0.45
+		prop_code=6
+	endif
+	if prop_shape="450（根絡み専用）" then
+		prop=0.45
+		joint=int(1)
+		prop_code=7
+	endif
+	if prop_shape="225（根絡み専用）" then
+		prop=0.225
+		joint=int(1)
+		prop_code=8
+	endif
+
+	pillar_dia=0.0486		!パイプ径
+	pillar_dia2=0.0419		!ピン径
+	parts_w=0.106			!金物幅
+	parts_d=0.008
+
+	define material "mat_red" 2, 1.0, 0.0, 0.0
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!ブラケット(master)
+!--------------------------------------------------------------------------
+	if unitType=1 then
+		bracket_a=0.305
+	else
+		bracket_a=0.3
+	endif
+
+	bracket_b=0.0427
+	bracket_zzyzx=1.35
+	bracket_dia=0.0427			!パイプ径
+	bracket_dia2=0.0486			!ベースパイプ径
+	bracket_dia3=0.0419			!ジョイント径
+	bracket_dia4=0.034			!補強パイプ径
+	bracket_parts_w=0.106		!金物幅
+	bracket_parts_d=0.008
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!布材(master)
+!--------------------------------------------------------------------------
+	board_a=1.829
+	board_b=0.0427
+	board_zzyzx=0.0427
+	board_dia=0.0427
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!強化方づえ(master)
+!--------------------------------------------------------------------------
+	cane_a=0.255
+	cane_b=0.0965
+	cane_zzyzx=0.450
+	cane_dia=0.0272			!パイプ径
+	cane_gw1=0.029			!下側ガイド幅1
+	cane_gw2=0.0475			!下側ガイド幅2
+	cane_gw3=0.046			!下側ガイド高
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!強化方づえ(master)
+!--------------------------------------------------------------------------
+	brace_dia=0.0486			!パイプ径
+	brace_dia2=0.0419			!ピン径
+	brace_dia3=0.0272			!ブレース水平材径
+	brace_dia4=0.0217			!ブレース径
+	brace_bh=0.93				!ブレース水平基準高
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!梁枠2743(master)
+!--------------------------------------------------------------------------
+	beam2743_dia=0.0427			!パイプ径　大
+	beam2743_dia1=0.034			!パイプ径　小
+	beam2743_dia2=0.0486		!支柱径
+	beam2743_dia3=0.0419		!ジョイントピン径
+
+	if unitType=1 then
+		beam2743_a=1.829+0.914
+	else
+		beam2743_a=1.8+0.9
+	endif
+	beam2743_b=0.0427
+	beam2743_zzyzx=0.25
+	beam2743_widthDif=ABS((beam2743_a-(1.829+0.914))/2)
+
+	if unitType=1 then
+		prop_p1=1.829	!支柱ポジション1
+	else
+		prop_p1=1.8
+	endif
+
+	prop_h=0.325		!支柱高
+	beam2743_st1=0.0211
+
+	beam2743_bp1=0.3717-beam2743_widthDif		!水平材　スタートポジション
+	beam2743_bp2=0.3567-beam2743_widthDif		!水平材　エンドポジション
+	beam2743_bp_len=beam2743_a-(beam2743_bp1+beam2743_bp2)
+
+	beam2743_parts_w=0.106		!金物幅
+	beam2743_parts_d=0.008		!金物厚
+
+	beam2743_baluster_l=sqr(2)*beam2743_zzyzx	!手摺子長さ
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!梁枠3658(master)
+!--------------------------------------------------------------------------
+	beam3658_dia=0.0427			!パイプ径　大
+	beam3658_dia1=0.034			!パイプ径　小
+	beam3658_dia2=0.0486		!支柱径
+	beam3658_dia3=0.0419		!ジョイントピン径
+
+	if unitType=1 then
+		beam3658_a=1.829*2
+	else
+		beam3658_a=1.8*2
+	endif
+
+	beam3658_b=0.0427
+	beam3658_zzyzx=0.25
+	beam3658_widthDif=ABS((beam3658_a-(1.829*2))/2)
+	beam3658_st1=0.0211
+
+	beam3658_bp1=0.3717-beam3658_widthDif		!水平材　スタートポジション
+	beam3658_bp2=0.3717-beam3658_widthDif		!水平材　エンドポジション
+	beam3658_bp_len=beam3658_a-(beam3658_bp1+beam3658_bp2)
+
+	beam3658_parts_w=0.106		!金物幅
+	beam3658_parts_d=0.008		!金物厚
+
+	beam3658_baluster_l=sqr(2)*beam3658_zzyzx	!手摺子長さ
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!梁枠5487(master)
+!--------------------------------------------------------------------------
+	beam5487_dia=0.0427				!パイプ径　大
+	beam5487_dia1=0.034				!パイプ径　小
+	beam5487_dia2=0.0486			!支柱径
+	beam5487_dia3=0.0419			!ジョイントピン径
+
+	if unitType=1 then
+		beam5487_a=1.829*3
+	else
+		beam5487_a=1.8*3
+	endif
+
+	beam5487_b=0.0427
+	beam5487_zzyzx=0.35
+
+
+	if unitType=1 then
+		prop_p=1.829		! 支柱ポジション
+		beam5487_widthDif=0.0
+	else
+		prop_p=1.8		
+		beam5487_widthDif=0.029
+	endif
+
+	beam5487_prop_h=0.425			!支柱高
+	beam5487_st1=0.0211
+
+	beam5487_bp1=0.3717-beam5487_widthDif			!水平材　スタートポジション
+	beam5487_bp2=0.3717-beam5487_widthDif			!水平材　エンドポジション
+	beam5487_bp_len=beam5487_a-(beam5487_bp1+beam5487_bp2)
+
+	beam5487_parts_w=0.106		!金物幅
+	beam5487_parts_d=0.008		!金物厚
+	beam5487_baluster_l=sqr(2)*beam5487_zzyzx		!手摺子長さ
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!梁枠7316(master)
+!--------------------------------------------------------------------------
+	beam7316_dia=0.0427			!パイプ径　大
+	beam7316_dia1=0.034			!パイプ径　小
+	beam7316_dia2=0.0486		!支柱径
+	beam7316_dia3=0.0419		!ジョイントピン径
+
+	if unitType=1 then
+		beam7316_a=1.829*4
+	else
+		beam7316_a=1.8*4
+	endif
+
+	beam7316_b=0.0427
+	beam7316_zzyzx=0.45
+
+	beam7316_widthDif=ABS((beam7316_a-(1.829*4))/2)
+
+	beam7316_prop_h=0.5295			!支柱高
+	beam7316_st1=0.0211
+
+	beam7316_bp1=0.11				!水平材　スタートポジション
+	beam7316_bp2=0.11				!水平材　エンドポジション
+	beam7316_bp_len=beam7316_a-(beam7316_bp1+beam7316_bp2)
+
+	beam7316_parts_w=0.106			!金物幅
+	beam7316_parts_d=0.008			!金物厚
+	beam7316_baluster_l=sqr(beam7316_zzyzx^2+0.3776^2)		!手摺子長さ
+	beam7316_baluster_l2=sqr(beam7316_zzyzx^2+0.2598^2)		!手摺子長さ
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!先端クサビブラケットXB240S(master)
+!--------------------------------------------------------------------------
+	wedge_bracket240_a=0.360
+	wedge_bracket240_b=0.0427
+	wedge_bracket240_zzyzx=0.230
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!先端クサビブラケットXB500S(master)
+!--------------------------------------------------------------------------
+	wedge_bracket500_a=0.610
+	wedge_bracket500_b=0.0427
+	wedge_bracket500_zzyzx=0.230
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!構成踏板
+!--------------------------------------------------------------------------
+	ksfi_zzyzx=0.05
+	ksfi_orgpos_y=0.0522			!配置基準点
+	ksfi_mpos=0.0485				!布板スタートポジション
+	ksfi_m_ex=0.0375				!芯ー延長サイズ
+	ksfi_g_d=0.006					!ガイド厚
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+!--------------------------------------------------------------------------
+!階段受
+!--------------------------------------------------------------------------
+	gw1=0.029
+	gw2=0.0475
+	gw3=0.046
+	gwPosX=0.0223
+	gwPosZ=0.025
+
+	plateT=0.006
+	plateLen=0.14
+	plateAng=46.51
+
+	pipePosX=0.0758
+	pipePosY=plateLen*cos(plateAng)
+	pipePosZ=plateLen*sin(plateAng)
+	pipeDia=0.0427
+
+	kdu_b=pipePosY
+	kdu_zzyzx=-pipePosZ
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+
+

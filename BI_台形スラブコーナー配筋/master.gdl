@@ -1,0 +1,665 @@
+code=1
+x=1
+y=2
+z=3
+eps=1e-5
+
+
+!設定
+gosub "スラブ設定"
+gosub "鉄筋リスト"
+gosub "配筋設定"
+
+!座標計算
+gosub "座標変換sub初期化"
+gosub "座標計算"
+
+goto "master_end"
+end
+
+"スラブ設定":
+    values{2} "slabVertLine" 1,"左下",2,"右下",3,"右上",4,"左上"
+    values "slabThi" range(0,]
+    values "slabBotLen" range(0,]
+    values "slabTopLen" range(slabBotLen,]
+    values "slabOffsetWid" range[0,]
+
+    slabBotAngle=90+atn((slabTopLen-slabBotLen)/slabThi)
+    parameters slabBotAngle=slabBotAngle
+
+    if slabVertLine=1 then slabRtz=0
+    if slabVertLine=2 then slabRtz=90
+    if slabVertLine=3 then slabRtz=180
+    if slabVertLine=4 then slabRtz=270
+return
+
+
+"鉄筋リスト":
+    !=================================外半径リスト
+        dim dr_list[]
+        dr_list[10]=0.0055 !d10
+        dr_list[13]=0.007 !d13
+        dr_list[16]=0.009 !d16
+        dr_list[19]=0.0105 !d19
+        dr_list[22]=0.0125 !d22
+        dr_list[25]=0.014 !d25
+        dr_list[29]=0.0165 !d29
+        dr_list[32]=0.018 !d32
+        dr_list[35]=0.02 !d35
+        dr_list[38]=0.0215 !d38
+        dr_list[41]=0.023 !d41
+
+    !=================================コードリスト
+        dim code_list[]
+        code_list[10]=1
+        code_list[13]=2
+        code_list[16]=3
+        code_list[19]=4
+        code_list[22]=5
+        code_list[25]=6
+        code_list[29]=7
+        code_list[32]=8
+        code_list[35]=9
+        code_list[38]=10
+        code_list[41]=11
+
+    !=================================継ぎ手定着長さL1
+        dim l1_list[][]
+        l1_list[1][18]=45
+        l1_list[1][21]=40
+        l1_list[1][24]=35
+        l1_list[1][27]=35
+        l1_list[1][30]=35
+        l1_list[1][33]=35
+        l1_list[1][36]=35
+        l1_list[1][39]=30
+        l1_list[1][42]=30
+        l1_list[1][45]=30
+        l1_list[1][48]=30
+        l1_list[1][51]=30
+        l1_list[1][54]=30
+        l1_list[1][57]=30
+        l1_list[1][60]=30
+        l1_list[2][18]=50
+        l1_list[2][21]=45
+        l1_list[2][24]=40
+        l1_list[2][27]=40
+        l1_list[2][30]=35
+        l1_list[2][33]=35
+        l1_list[2][36]=35
+        l1_list[2][39]=35
+        l1_list[2][42]=35
+        l1_list[2][45]=35
+        l1_list[2][48]=30
+        l1_list[2][51]=30
+        l1_list[2][54]=30
+        l1_list[2][57]=30
+        l1_list[2][60]=30
+        l1_list[3][18]=0
+        l1_list[3][21]=50
+        l1_list[3][24]=45
+        l1_list[3][27]=45
+        l1_list[3][30]=40
+        l1_list[3][33]=40
+        l1_list[3][36]=40
+        l1_list[3][39]=40
+        l1_list[3][42]=40
+        l1_list[3][45]=40
+        l1_list[3][48]=35
+        l1_list[3][51]=35
+        l1_list[3][54]=35
+        l1_list[3][57]=35
+        l1_list[3][60]=35
+        l1_list[4][18]=0
+        l1_list[4][21]=0
+        l1_list[4][24]=55
+        l1_list[4][27]=55
+        l1_list[4][30]=50
+        l1_list[4][33]=50
+        l1_list[4][36]=50
+        l1_list[4][39]=45
+        l1_list[4][42]=45
+        l1_list[4][45]=45
+        l1_list[4][48]=40
+        l1_list[4][51]=40
+        l1_list[4][54]=40
+        l1_list[4][57]=40
+        l1_list[4][60]=40
+
+    !=================================定着長さL2
+        dim l2_list[][]
+        l2_list[1][18]=40
+        l2_list[1][21]=35
+        l2_list[1][24]=30
+        l2_list[1][27]=30
+        l2_list[1][30]=30
+        l2_list[1][33]=30
+        l2_list[1][36]=30
+        l2_list[1][39]=25
+        l2_list[1][42]=25
+        l2_list[1][45]=25
+        l2_list[1][48]=25
+        l2_list[1][51]=25
+        l2_list[1][54]=25
+        l2_list[1][57]=25
+        l2_list[1][60]=25
+        l2_list[2][18]=40
+        l2_list[2][21]=35
+        l2_list[2][24]=35
+        l2_list[2][27]=35
+        l2_list[2][30]=30
+        l2_list[2][33]=30
+        l2_list[2][36]=30
+        l2_list[2][39]=30
+        l2_list[2][42]=30
+        l2_list[2][45]=30
+        l2_list[2][48]=25
+        l2_list[2][51]=25
+        l2_list[2][54]=25
+        l2_list[2][57]=25
+        l2_list[2][60]=25
+        l2_list[3][18]=0
+        l2_list[3][21]=40
+        l2_list[3][24]=40
+        l2_list[3][27]=40
+        l2_list[3][30]=35
+        l2_list[3][33]=35
+        l2_list[3][36]=35
+        l2_list[3][39]=35
+        l2_list[3][42]=35
+        l2_list[3][45]=35
+        l2_list[3][48]=30
+        l2_list[3][51]=30
+        l2_list[3][54]=30
+        l2_list[3][57]=30
+        l2_list[3][60]=30
+        l2_list[4][18]=0
+        l2_list[4][21]=0
+        l2_list[4][24]=45
+        l2_list[4][27]=45
+        l2_list[4][30]=40
+        l2_list[4][33]=40
+        l2_list[4][36]=40
+        l2_list[4][39]=40
+        l2_list[4][42]=40
+        l2_list[4][45]=40
+        l2_list[4][48]=35
+        l2_list[4][51]=35
+        l2_list[4][54]=35
+        l2_list[4][57]=35
+        l2_list[4][60]=35
+return
+
+
+"配筋設定":
+    !基本設定
+        values "SDresol" range[3,]
+
+        values{2} "conFc" 18,"18 N/㎟",21,"21 N/㎟",24,"24 N/㎟",27,"27 N/㎟",30,"30 N/㎟",33,"33 N/㎟",36,"36 N/㎟",39,"39 N/㎟",42,"42 N/㎟",45,"45 N/㎟",\
+            48,"48 N/㎟",51,"51 N/㎟",54,"54 N/㎟",57,"57 N/㎟",60,"60 N/㎟"
+
+        if conFc=18 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345"
+        if conFc=21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390"
+        if conFc>21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390",4,"SD490"
+
+        l1=l1_list[sdType][conFc]
+        l2=l2_list[sdType][conFc]
+
+        parameters l1=l1,l2=l2
+        lock "L1","L2"
+
+        values "L1Plus" range[0,]
+        values "L2Plus" range[0,]
+
+        l1=l1+L1Plus
+        l2=l2+L2Plus
+
+    !配筋設定
+        values "rebarRow" range[1,4]
+        values{2} "rebarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+        values "rebarStartPos" range[0,]
+        values "verPitch" range[0.1,]
+        values "botCover" range[0,]
+        values "sideCover" range[0,]
+        values "rebarGap" range[0,]
+
+        rebarNd=min(max(rebarNd,10),41)
+        verPitch=max(verPitch,0.1)
+
+        values{2} "verTopAnchorType" 1,"垂直延長",2,"斜め延長",0,"定着なし"
+        values{2} "verTopAnchorLen" 1,"L1",2,"L2",3,"カスタム"
+
+        if verTopAnchorLen=1 then
+            topAnchorLen=L1*rebarNd/1000
+            parameters topAnchorLen=topAnchorLen
+            lock "topAnchorLen"
+        endif
+
+        if verTopAnchorLen=2 then
+            topAnchorLen=L2*rebarNd/1000
+            parameters topAnchorLen=topAnchorLen
+            lock "topAnchorLen"
+        endif
+
+        if verTopAnchorLen=3 then
+            values "topAnchorLen" range(0,]
+        endif
+return
+
+
+"座標変換sub初期化":
+    inputNum=0
+    dim _inputSpnum[],_inputCoor[][],_outputCoor[][]
+    _inputSpnum[1]=0
+    _inputCoor[1][1]=0 : _inputCoor[1][2]=0
+    _outputCoor[1][1]=0 : _outputCoor[1][2]=0
+return
+
+
+"座標計算":
+    !変数初期化
+        rebarRad=dr_list[rebarNd]
+        rebarDia=2*rebarRad
+        rebarMat=SDmat[code_list[rebarNd]]
+        rebarPen=SDpen[code_list[rebarNd]]
+
+        verNum=0
+        dim _verVtxNum[],_verVtxPos[][]
+        _verVtxNum[1]=0
+        _verVtxPos[1][1]=0 : _verVtxPos[1][2]=0
+
+        horNum=0
+        dim _horVtxNum[],_horVtxPos[][]
+        _horVtxNum[1]=0
+        _horVtxPos[1][1]=0 : _horVtxPos[1][2]=0
+
+        if slabBotAngle>90 then
+            horPitch=verPitch/sin(slabBotAngle-90)/2
+        else
+            horPitch=100
+        endif
+
+    !x方向
+        for i=1 to rebarRow
+            !x方向本数
+                tempX1=-slabOffsetWid+rebarStartPos
+                tempX2=slabTopLen-(sideCover+(4*i-1)*rebarRad+(i-1)*rebarGap)/cos(slabBotAngle-90)
+                verXNum=ceil(abs(tempX2-tempX1)/verPitch)
+
+            for j=1 to verXNum
+                !Xpos
+                    verX=tempX1+(j-1)*verPitch
+
+
+                verSideOffset=sideCover+(4*i-3)*rebarRad+(i-1)*rebarGap
+
+                !botZpos
+                    bendBorder=slabBotLen+(botCover+2*rebarRad+(rebarRow-1)*(4*rebarRad+rebarGap))*tan(slabBotAngle-90)-verSideOffset/cos(slabBotAngle-90)
+
+                    if verX<=bendBorder then
+                        if rebarBotPosChange=0 then
+                            verBotZ=botCover+rebarRad+(i-1)*(4*rebarRad+rebarGap)
+                        else
+                            verBotZ=botCover+3*rebarRad+(i-1)*(4*rebarRad+rebarGap)
+                        endif
+                    else
+                        if rebarBotPosChange=0 then
+                            verBotZ=(verX+(verSideOffset+2*rebarRad)/cos(slabBotAngle-90)-slabBotLen)*tan(180-slabBotAngle)
+                        else
+                            verBotZ=(verX+(verSideOffset+2*rebarRad)/cos(slabBotAngle-90)-slabBotLen)*tan(180-slabBotAngle)+2*rebarRad
+                        endif
+
+                        !コーナー部横筋
+                            horSideOffset=sideCover+(4*i-1)*rebarRad+(i-1)*rebarGap
+
+                            !edgeXpos
+                                horEdgeX1=slabBotLen-l1*rebarNd/1000
+                                horEdgeX2=slabBotLen-1.5*l1*rebarNd/1000
+
+                            !edgeYpos
+                                horEdgeY1=slabBotLen-l1*rebarNd/1000
+                                horEdgeY2=slabBotLen-1.5*l1*rebarNd/1000
+
+                            !Zpos
+                                horZ1=(verX+(verSideOffset+2*rebarRad)/cos(slabBotAngle-90)-slabBotLen)*tan(180-slabBotAngle)-2*rebarRad*cos(slabBotAngle-90)
+                                horZ2=(verX+(verSideOffset+2*rebarRad)/cos(slabBotAngle-90)-slabBotLen)*tan(180-slabBotAngle)-2*rebarRad*cos(slabBotAngle-90)-horPitch*cos(slabBotAngle-90)
+
+                            !bendXpos
+                                horBendX1=slabBotLen+horZ1*tan(slabBotAngle-90)-horSideOffset/cos(slabBotAngle-90)
+                                horBendX2=slabBotLen+horZ2*tan(slabBotAngle-90)-horSideOffset/cos(slabBotAngle-90)
+
+                            !bendYpos
+                                horBendY1=slabBotLen+horZ1*tan(slabBotAngle-90)-horSideOffset/cos(slabBotAngle-90)
+                                horBendY2=slabBotLen+horZ2*tan(slabBotAngle-90)-horSideOffset/cos(slabBotAngle-90)
+
+                            horNum=horNum+1
+                            _horVtxNum[horNum]=3
+
+                            put horEdgeX1
+                            put horBendY1
+                            put horZ1
+
+                            put horBendX1
+                            put horBendY1
+                            put horZ1
+
+                            put horBendX1
+                            put horEdgeY2
+                            put horZ1
+
+                            for n=1 to 3*_horVtxNum[horNum]
+                                _horVtxPos[horNum][n]=get(1)
+                            next n
+
+                            if horZ2>botCover+3*rebarRad+(i-1)*(4*rebarRad+rebarGap) then
+                                horNum=horNum+1
+                                _horVtxNum[horNum]=3
+
+                                put horEdgeX2
+                                put horBendY2
+                                put horZ2
+
+                                put horBendX2
+                                put horBendY2
+                                put horZ2
+
+                                put horBendX2
+                                put horEdgeY1
+                                put horZ2
+
+                                for n=1 to 3*_horVtxNum[horNum]
+                                    _horVtxPos[horNum][n]=get(1)
+                                next n
+                            endif
+                    endif
+
+                !botYpos
+                    if fra(j/2)<>0 then
+                        if fra(i/2)<>0 then
+                            verBotAnchorLen=30*rebarNd/1000
+                        else
+                            verBotAnchorLen=10*rebarNd/1000
+                        endif
+                    else
+                        if fra(i/2)<>0 then
+                            verBotAnchorLen=10*rebarNd/1000
+                        else
+                            verBotAnchorLen=30*rebarNd/1000
+                        endif
+                    endif
+
+                    verBotY2=slabBotLen+verBotZ*tan(slabBotAngle-90)-verSideOffset/cos(slabBotAngle-90)
+                    if verX<=bendBorder then
+                        verBotY1=-slabOffsetWid-verBotAnchorLen
+                    else
+                        verBotY1=verBotY2-2*rebarRad*tan(90-slabBotAngle/2)-verCornerFraLen
+                    endif
+
+                !topZpos
+                    verTopZ=slabThi
+
+                !topYpos
+                    verTopY=slabTopLen-verSideOffset/cos(slabBotAngle-90)
+
+                !縦筋上端定着
+                    if verTopAnchorType=1 then
+                        !anchorZpos
+                            verAnchorZ=slabThi+topAnchorLen
+
+                        !anchorYpos
+                            verAnchorY=verTopY
+                    endif
+
+                    if verTopAnchorType=2 then
+                        !anchorZpos
+                            verAnchorZ=slabThi+topAnchorLen*cos(slabBotAngle-90)
+
+                        !anchorYpos
+                            verAnchorY=verTopY+topAnchorLen*sin(slabBotAngle-90)
+                    endif
+
+                !座標input
+                    verNum=verNum+1
+
+                    put verX
+                    put verBotY1
+                    put verBotZ
+
+                    put verX
+                    put verBotY2
+                    put verBotZ
+
+                    if verTopAnchorType=1 then
+                        _verVtxNum[verNum]=4
+
+                        put verX
+                        put verTopY
+                        put verTopZ
+
+                        put verX
+                        put verAnchorY
+                        put verAnchorZ
+                    endif
+
+                    if verTopAnchorType=2 then
+                        _verVtxNum[verNum]=3
+
+                        put verX
+                        put verAnchorY
+                        put verAnchorZ
+                    endif
+
+                    if verTopAnchorType=0 then
+                        _verVtxNum[verNum]=3
+
+                        put verX
+                        put verTopY
+                        put verTopZ
+                    endif
+
+                    for n=1 to 3*_verVtxNum[verNum]
+                        _verVtxPos[verNum][n]=get(1)
+                    next n
+            next j
+        next i
+
+    !y方向
+        for i=1 to rebarRow
+            !y方向本数
+                tempY1=-slabOffsetWid+rebarStartPos
+                tempY2=slabTopLen-(sideCover+(4*i-1)*rebarRad+(i-1)*rebarGap)/cos(slabBotAngle-90)
+                verYNum=ceil(abs(tempY2-tempY1)/verPitch)
+
+            for j=1 to verYNum
+                !Ypos
+                    verY=tempY1+(j-1)*verPitch
+
+
+                verSideOffset=sideCover+(4*i-3)*rebarRad+(i-1)*rebarGap
+
+                !botZpos
+                    bendBorder=slabBotLen+(botCover+2*rebarRad+(rebarRow-1)*(4*rebarRad+rebarGap))*tan(slabBotAngle-90)-verSideOffset/cos(slabBotAngle-90)
+
+                    if verY<=bendBorder then
+                        if rebarBotPosChange=1 then
+                            verBotZ=botCover+rebarRad+(i-1)*(4*rebarRad+rebarGap)
+                        else
+                            verBotZ=botCover+3*rebarRad+(i-1)*(4*rebarRad+rebarGap)
+                        endif
+                    else
+                        if rebarBotPosChange=1 then
+                            verBotZ=(verY+(verSideOffset+2*rebarRad)/cos(slabBotAngle-90)-slabBotLen)*tan(180-slabBotAngle)
+                        else
+                            verBotZ=(verY+(verSideOffset+2*rebarRad)/cos(slabBotAngle-90)-slabBotLen)*tan(180-slabBotAngle)+2*rebarRad
+                        endif
+                    endif
+
+                !botXpos
+                    if fra(j/2)<>0 then
+                        if fra(i/2)<>0 then
+                            verBotAnchorLen=30*rebarNd/1000
+                        else
+                            verBotAnchorLen=10*rebarNd/1000
+                        endif
+                    else
+                        if fra(i/2)<>0 then
+                            verBotAnchorLen=10*rebarNd/1000
+                        else
+                            verBotAnchorLen=30*rebarNd/1000
+                        endif
+                    endif
+
+                    rebarBotX2=slabBotLen+verBotZ*tan(slabBotAngle-90)-verSideOffset/cos(slabBotAngle-90)
+                    if verY<=bendBorder then
+                        verBotX1=-slabOffsetWid-verBotAnchorLen
+                    else
+                        verBotX1=rebarBotX2-2*rebarRad*tan(90-slabBotAngle/2)-verCornerFraLen
+                    endif
+
+                !topZpos
+                    verTopZ=slabThi
+
+                !topXpos
+                    verTopX=slabTopLen-verSideOffset/cos(slabBotAngle-90)
+
+                !縦筋上端定着
+                    if verTopAnchorType=1 then
+                        !anchorZpos
+                            verAnchorZ=slabThi+topAnchorLen
+
+                        !anchorXpos
+                            verAnchorX=verTopX
+                    endif
+
+                    if verTopAnchorType=2 then
+                        !anchorZpos
+                            verAnchorZ=slabThi+topAnchorLen*cos(slabBotAngle-90)
+
+                        !anchorXpos
+                            verAnchorX=verTopX+topAnchorLen*sin(slabBotAngle-90)
+                    endif
+
+                !座標input
+                    verNum=verNum+1
+
+                    put verBotX1
+                    put verY
+                    put verBotZ
+
+                    put rebarBotX2
+                    put verY
+                    put verBotZ
+
+                    if verTopAnchorType=1 then
+                        _verVtxNum[verNum]=4
+
+                        put verTopX
+                        put verY
+                        put verTopZ
+
+                        put verAnchorX
+                        put verY
+                        put verAnchorZ
+                    endif
+
+                    if verTopAnchorType=2 then
+                        _verVtxNum[verNum]=3
+
+                        put verAnchorX
+                        put verY
+                        put verAnchorZ
+                    endif
+
+                    if verTopAnchorType=0 then
+                        _verVtxNum[verNum]=3
+
+                        put verTopX
+                        put verY
+                        put verTopZ
+                    endif
+
+                    for n=1 to 3*_verVtxNum[verNum]
+                        _verVtxPos[verNum][n]=get(1)
+                    next n
+            next j
+        next i
+
+    !座標変換
+        inputNum=verNum
+        _inputSpnum=_verVtxNum
+        _inputCoor=_verVtxPos
+        gosub "座標変換"
+        _verVtxPos=_outputCoor
+
+        inputNum=horNum
+        _inputSpnum=_horVtxNum
+        _inputCoor=_horVtxPos
+        gosub "座標変換"
+        _horVtxPos=_outputCoor
+
+    !data upload
+        verVtxNum=_verVtxNum
+        verVtxPos=_verVtxPos
+        horVtxNum=_horVtxNum
+        horVtxPos=_horVtxPos
+
+        parameters \
+            rebarDia=rebarDia,
+            rebarMat=rebarMat,
+            rebarPen=rebarPen,
+            verNum=verNum,
+            verVtxNum=verVtxNum,
+            verVtxPos=verVtxPos,
+            horNum=horNum,
+            horVtxNum=horVtxNum,
+            horVtxPos=horVtxPos
+return
+
+
+"座標変換":
+    dim _outputCoor[][]
+    _outputCoor[1][1]=0 : _outputCoor[1][2]=0
+
+    for index1=1 to inputNum
+        if _inputSpnum[index1]>0 then
+            for index2=1 to _inputSpnum[index1]
+                !input
+                    tempX=_inputCoor[index1][3*(index2-1)+x]
+                    tempY=_inputCoor[index1][3*(index2-1)+y]
+                    tempZ=_inputCoor[index1][3*(index2-1)+z]
+
+                !step1:rotz slabRtz
+                    tempLen=sqr(tempX^2+tempY^2)
+
+                    tempRtz=0
+                    if tempY>eps then
+                        tempRtz=acs(tempX/tempLen)
+                    endif
+
+                    if tempY<=eps and tempY>=-eps then
+                        if tempX>=0 then
+                            tempRtz=0
+                        else
+                            tempRtz=180
+                        endif
+                    endif
+
+                    if tempY<-eps then
+                        tempRtz=360-acs(tempX/tempLen)
+                    endif
+                
+                    tempX1=tempLen*cos(tempRtz+slabRtz)
+                    tempY1=tempLen*sin(tempRtz+slabRtz)
+                    tempZ1=tempZ
+
+                !output
+                    _outputCoor[index1][3*(index2-1)+x]=tempX1
+                    _outputCoor[index1][3*(index2-1)+y]=tempY1
+                    _outputCoor[index1][3*(index2-1)+z]=tempZ1
+            next index2
+        endif
+    next index1
+return
+
+
+"master_end":

@@ -1,0 +1,204 @@
+code=1
+
+
+!==============================================================================階段
+values{2} "step_dir" 1,"逆時計回り",2,"時計回り"
+values "floor_num" range[2,]
+values "step_num_totle" range[3,]
+
+step_rat_angle=atn(step_rat/(step_tread+step_nosing))
+step_angle=atn(step_riser/step_tread)
+
+parameters \
+step_rat_angle=step_rat_angle,
+step_angle=step_angle
+
+values{2} "switch_mode" 1,"蹴上により階層高自動計算",2,"階層高により蹴上自動計算"
+
+if switch_mode=1 then
+	floor_hei=step_num_totle*step_riser
+	parameters floor_hei=floor_hei
+	lock "floor_hei"
+else
+	step_riser=floor_hei/step_num_totle
+	parameters step_riser=step_riser
+	lock "step_riser"
+endif
+
+values "step_wid1" range[0,]
+values "step_wid2" range[0,]
+values "step_tread" range[0,]
+values "step_riser" range[0,]
+values "step_nosing" range[0,]
+values "step_rat" range[0,]
+
+step_wid_tot=step_wid1+handrail_wid+step_wid2
+
+
+!==============================================================================踊り場
+values "step_num_down" range[2,step_num_totle-1]
+
+step_num_up=step_num_totle-step_num_down
+parameters step_num_up=step_num_up
+lock "step_num_up"
+
+values "landing_1" range[step_tread,]
+values "landing_2" range[0,]
+values "handrail_wid" range[0,]
+values "landing_dep" range(0,]
+values "landing_thi" range(0,]
+values "landing_rat" range[0,landing_thi/landing_dep*100]
+if standard_x>=step_tread then
+	values "floor_1" range[0,]
+else
+	values "floor_1" range[step_tread-max(standard_x,0),]
+endif
+values "floor_dep" range(0,]
+values "floor_thi" range(0,]
+values "floor_rat" range[0,floor_thi/floor_dep*100]
+
+if switch_floor=0 then
+	hideparameter "floor_dep","floor_rat","floor_ditch","floor_rd"
+endif
+
+
+!==============================================================================1階下がり
+values "gl_num" range[1,]
+
+if switch_gl=0 then
+	hideparameter "gl_num"
+endif
+
+
+!==============================================================================立上り
+values{2} "hr2_type" 1,"手すり",2,"壁"
+if switch_floor then
+	values{2} "hr_hide" 0,"なし",1,"フロア踊り場側",2,"中間踊り場下部階段側",3,"中間踊り場上部階段側"
+else
+	values{2} "hr_hide" 0,"なし",2,"中間踊り場下部階段側",3,"中間踊り場上部階段側"
+endif
+
+if hr_hide=1 then
+	values "hr_hide_start" range[0,step_wid_tot-2*hr_wid-hr_hide_end)
+	values "hr_hide_end" range[0,step_wid_tot-2*hr_wid-hr_hide_start)
+endif
+if hr_hide=2 or hr_hide=3 then
+	if switch_floor then
+		values "hr_hide_start" range[0,floor_dep+floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-2*hr_wid-hr_hide_end]
+		values "hr_hide_end" range[0,floor_dep+floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-2*hr_wid-hr_hide_start]
+	else
+		values "hr_hide_start" range[0,floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid-hr_hide_end]
+		values "hr_hide_end" range[0,floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid-hr_hide_start]
+	endif
+endif
+
+if switch_hr2=0 then hideparameter "hr2_type"
+
+if switch_hr2 and hr2_type=2 then values "handrail_wid" range(0,]
+
+values "hr_hei" range(0,]
+values "hr2_hei" range(0,]
+values "hrb_hei" range[0,hr_hei]
+
+if switch_hrb1=0 and switch_hrb2=0 then
+	hideparameter "hrb_wid","hrb_thi","hrb_hei"
+endif
+
+
+!==============================================================================RD
+values "landing_rd_y" range[-(step_wid1+handrail_wid/2)+y_down+0.16,(step_wid1+handrail_wid/2)-y_up-0.16]
+values "floor_rd_y" range[-(step_wid1+handrail_wid/2)+y_down+0.16,(step_wid1+handrail_wid/2)-y_up-0.16]
+
+
+!==============================================================================ボーダー
+if switch_hr1=0 then
+	switch_boarder=0
+	parameters switch_boarder=switch_boarder
+	hideparameter "switch_boarder","boarder_hei","boarder_wid","m_boarder"
+endif
+
+if switch_boarder=0 then
+	hideparameter "boarder_hei","boarder_wid","m_boarder"
+endif
+
+values "boarder_hei" range[0,]
+values "boarder_wid" range[0,]
+
+
+!==============================================================================仕上げ
+values{2} "step_fin_type" 1,"こて塗り仕上げ",2,"詰め込み仕上げ"
+values "mortar_thi" range[0,]
+
+if step_fin_type<>1 then
+	hideparameter "fin_tread","fin_riser","fin_nosing"
+endif
+
+if step_fin_type<>2 then
+	hideparameter "fin_mortar","mortar_thi"
+endif
+
+standard_x=(step_num_down-1)*step_tread+landing_1-landing_2-(step_num_up-1)*step_tread
+step_a=45+atn(step_nosing/step_riser)/2
+
+if step_dir=1 and switch_turn=0 then
+	index_x=1
+	index_y=1
+endif
+
+if step_dir=1 and switch_turn=1 then
+	index_x=-1
+	index_y=-1
+endif
+
+if step_dir=2 and switch_turn=0 then
+	index_x=1
+	index_y=-1
+endif
+
+if step_dir=2 and switch_turn=1 then
+	index_x=-1
+	index_y=1
+endif
+
+if switch_hr1=0 then
+	x_landing=0
+else
+	x_landing=hr_wid2
+endif
+
+if switch_hr1=0 or (hr_hide=2 and hr_hide_start=0 and hr_hide_end=0) then
+	y_down=0
+else
+	y_down=hr_wid
+endif
+
+if switch_hr1=0 or (hr_hide=3 and hr_hide_start=0 and hr_hide_end=0) then
+	y_up=0
+else
+	y_up=hr_wid
+endif
+
+if switch_hr1=0 or (hr_hide=1 and hr_hide_start=0 and hr_hide_end=0) then
+	x_floor=0
+else
+	x_floor=hr_wid2
+endif
+
+if switch_hr2=0 then
+	x_floor2=0
+else
+	x_floor2=hr_wid2
+endif
+
+if switch_gl then
+	z_1=floor_num
+else
+	z_1=floor_num-1
+endif
+
+plus_rat=step_rat
+
+max_hr_hei=max(hr_hei,landing_hr_hei,floor_hr_hei)
+
+
+

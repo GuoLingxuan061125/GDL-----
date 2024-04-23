@@ -1,0 +1,834 @@
+project2{3} 3,270,2,1+2+4+8+16+32,parameters mode_3d=mode_2d,top_line=1,dis_detail_3d=0,dis_deck=0,dis_parting=0
+project2{3} 3,270,2,1+2+4+8+16+32,parameters mode_3d=mode_2d,top_line=1,dis_detail_3d=0,dis_line=0,dis_parting=0
+
+define style "moji" textfont,1*100/glob_scale,5,1
+define style "mark" textfont,mark_fontSize*100/glob_scale,5,0
+define style "label1" textfont,label_fontSize1*100/glob_scale,5,0
+define style "label2" textfont,label_fontSize2*100/glob_scale,5,0
+
+!========================================================================屋根基準線
+if dis_base then
+	for i=1 to 2
+		hotspot2 0,base_pos[i][2],code,base_pos[i][1],1+128:code=code+1
+		hotspot2 base_pos[i][1],base_pos[i][2],code,base_pos[i][1],2:code=code+1
+		hotspot2 -1,base_pos[i][2],code,base_pos[i][1],3:code=code+1
+	
+		hotspot2 base_pos[i][1],0,code,base_pos[i][2],1+128:code=code+1
+		hotspot2 base_pos[i][1],base_pos[i][2],code,base_pos[i][2],2:code=code+1
+		hotspot2 base_pos[i][1],-1,code,base_pos[i][2],3:code=code+1
+	next i
+
+	line2 base_pos[1][1],base_pos[1][2],base_pos[2][1],base_pos[2][2]
+
+	add2 (base_pos[1][1]+base_pos[2][1])/2,(base_pos[1][2]+base_pos[2][2])/2
+	rot2 base_rtz
+		line2 0,0,0,-0.2*base_dir
+		hotspot2 0,0,code,base_dir,1+128:code=code+1
+		hotspot2 0,-0.2*base_dir,code,base_dir,2:code=code+1
+		hotspot2 0,1,code,base_dir,3:code=code+1
+	del 2
+endif
+
+
+!========================================================================輪郭
+set fill fill_2d
+
+!poly2 5,1+2+4,
+!equ_pos[1][1],equ_pos[1][2],
+!equ_pos[2][1],equ_pos[2][2],
+!equ_pos[3][1],equ_pos[3][2],
+!equ_pos[4][1],equ_pos[4][2],
+!equ_pos[5][1],equ_pos[5][2]
+
+
+!========================================================================スラブ
+style "moji"
+
+for i=1 to 4
+	hotline2 new_pos[i][1],new_pos[i][2],new_pos[i+1][1],new_pos[i+1][2],code
+
+	if dis_slab_num then
+		add2 equ_pos[i][1],equ_pos[i][2]
+		rot2 equ_rtz[i]
+		add2 equ_len[i]/2,0.15
+		rot2 -equ_rtz[i]
+			text2 0,0,i
+		del 4
+	endif
+
+	hotspot2 equ_pos[i][1],equ_pos[i][2]
+!	line2 equ_pos[i][1],equ_pos[i][2],equ_pos[i+1][1],equ_pos[i+1][2]
+next i
+
+
+for i=1 to 4
+	if i=1 then
+		hotspot2 slab_offset[1][1]+slab_offset[4][1],slab_pos[1][2]+slab_offset[1][2]+slab_offset[4][2],code,slab_pos[1][1],1+128:code=code+1
+		hotspot2 slab_pos[1][1]+slab_offset[1][1]+slab_offset[4][1],slab_pos[1][2]+slab_offset[1][2]+slab_offset[4][2],code,slab_pos[1][1],2:code=code+1
+		hotspot2 -1+slab_offset[1][1]+slab_offset[4][1],slab_pos[1][2]+slab_offset[1][2]+slab_offset[4][2],code,slab_pos[1][1],3:code=code+1
+	
+		hotspot2 slab_pos[1][1]+slab_offset[1][1]+slab_offset[4][1],slab_offset[1][2]+slab_offset[4][2],code,slab_pos[1][2],1+128:code=code+1
+		hotspot2 slab_pos[1][1]+slab_offset[1][1]+slab_offset[4][1],slab_pos[1][2]+slab_offset[1][2]+slab_offset[4][2],code,slab_pos[1][2],2:code=code+1
+		hotspot2 slab_pos[1][1]+slab_offset[1][1]+slab_offset[4][1],-1+slab_offset[1][2]+slab_offset[4][2],code,slab_pos[1][2],3:code=code+1
+	else
+		hotspot2 slab_offset[i][1]+slab_offset[i-1][1],slab_pos[i][2]+slab_offset[i][2]+slab_offset[i-1][2],code,slab_pos[i][1],1+128:code=code+1
+		hotspot2 slab_pos[i][1]+slab_offset[i][1]+slab_offset[i-1][1],slab_pos[i][2]+slab_offset[i][2]+slab_offset[i-1][2],code,slab_pos[i][1],2:code=code+1
+		hotspot2 -1+slab_offset[i][1]+slab_offset[i-1][1],slab_pos[i][2]+slab_offset[i][2]+slab_offset[i-1][2],code,slab_pos[i][1],3:code=code+1
+
+		hotspot2 slab_pos[i][1]+slab_offset[i][1]+slab_offset[i-1][1],slab_offset[i][2]+slab_offset[i-1][2],code,slab_pos[i][2],1+128:code=code+1
+		hotspot2 slab_pos[i][1]+slab_offset[i][1]+slab_offset[i-1][1],slab_pos[i][2]+slab_offset[i][2]+slab_offset[i-1][2],code,slab_pos[i][2],2:code=code+1
+		hotspot2 slab_pos[i][1]+slab_offset[i][1]+slab_offset[i-1][1],-1+slab_offset[i][2]+slab_offset[i-1][2],code,slab_pos[i][2],3:code=code+1
+	endif
+
+	if switch_deck_offset=0 then
+		if i=1 then
+			hotspot2 (slab_pos[1][1]+slab_offset[4][1]+slab_pos[2][1]+slab_offset[2][1])/2,\
+				(slab_pos[1][2]+slab_offset[1][2]+slab_offset[4][2]+slab_pos[2][2]+slab_offset[2][2]+slab_offset[1][2])/2,code,slab_offset[1][1],1+128:code=code+1
+			hotspot2 (slab_pos[1][1]+slab_offset[1][1]+slab_offset[4][1]+slab_pos[2][1]+slab_offset[2][1]+slab_offset[1][1])/2,\
+				(slab_pos[1][2]+slab_offset[1][2]+slab_offset[4][2]+slab_pos[2][2]+slab_offset[2][2]+slab_offset[1][2])/2,code,slab_offset[1][1],2:code=code+1
+			hotspot2 (slab_pos[1][1]-1+slab_offset[4][1]+slab_pos[2][1]+slab_offset[2][1]-1)/2,\
+				(slab_pos[1][2]+slab_offset[1][2]+slab_offset[4][2]+slab_pos[2][2]+slab_offset[2][2]+slab_offset[1][2])/2,code,slab_offset[1][1],3:code=code+1
+
+			hotspot2 (slab_pos[1][1]+slab_offset[1][1]+slab_offset[4][1]+slab_pos[2][1]+slab_offset[2][1]+slab_offset[1][1])/2,\
+				(slab_pos[1][2]+slab_offset[4][2]+slab_pos[2][2]+slab_offset[2][2])/2,code,slab_offset[1][2],1+128:code=code+1
+			hotspot2 (slab_pos[1][1]+slab_offset[1][1]+slab_offset[4][1]+slab_pos[2][1]+slab_offset[2][1]+slab_offset[1][1])/2,\
+				(slab_pos[1][2]+slab_offset[1][2]+slab_offset[4][2]+slab_pos[2][2]+slab_offset[2][2]+slab_offset[1][2])/2,code,slab_offset[1][2],2:code=code+1
+			hotspot2 (slab_pos[1][1]+slab_offset[1][1]+slab_offset[4][1]+slab_pos[2][1]+slab_offset[2][1]+slab_offset[1][1])/2,\
+				(slab_pos[1][2]-1+slab_offset[4][2]+slab_pos[2][2]+slab_offset[2][2]-1)/2,code,slab_offset[1][2],3:code=code+1
+		else
+			hotspot2 (slab_pos[i][1]+slab_offset[i-1][1]+slab_pos[i+1][1]+slab_offset[i+1][1])/2,\
+				(slab_pos[i][2]+slab_offset[i][2]+slab_offset[i-1][2]+slab_pos[i+1][2]+slab_offset[i+1][2]+slab_offset[i][2])/2,code,slab_offset[i][1],1+128:code=code+1
+			hotspot2 (slab_pos[i][1]+slab_offset[i][1]+slab_offset[i-1][1]+slab_pos[i+1][1]+slab_offset[i+1][1]+slab_offset[i][1])/2,\
+				(slab_pos[i][2]+slab_offset[i][2]+slab_offset[i-1][2]+slab_pos[i+1][2]+slab_offset[i+1][2]+slab_offset[i][2])/2,code,slab_offset[i][1],2:code=code+1
+			hotspot2 (slab_pos[i][1]-1+slab_offset[i-1][1]+slab_pos[i+1][1]+slab_offset[i+1][1]-1)/2,\
+				(slab_pos[i][2]+slab_offset[i][2]+slab_offset[i-1][2]+slab_pos[i+1][2]+slab_offset[i+1][2]+slab_offset[i][2])/2,code,slab_offset[i][1],3:code=code+1
+
+			hotspot2 (slab_pos[i][1]+slab_offset[i][1]+slab_offset[i-1][1]+slab_pos[i+1][1]+slab_offset[i+1][1]+slab_offset[i][1])/2,\
+				(slab_pos[i][2]+slab_offset[i-1][2]+slab_pos[i+1][2]+slab_offset[i+1][2])/2,code,slab_offset[i][2],1+128:code=code+1
+			hotspot2 (slab_pos[i][1]+slab_offset[i][1]+slab_offset[i-1][1]+slab_pos[i+1][1]+slab_offset[i+1][1]+slab_offset[i][1])/2,\
+				(slab_pos[i][2]+slab_offset[i][2]+slab_offset[i-1][2]+slab_pos[i+1][2]+slab_offset[i+1][2]+slab_offset[i][2])/2,code,slab_offset[i][2],2:code=code+1
+			hotspot2 (slab_pos[i][1]+slab_offset[i][1]+slab_offset[i-1][1]+slab_pos[i+1][1]+slab_offset[i+1][1]+slab_offset[i][1])/2,\
+				(slab_pos[i][2]-1+slab_offset[i-1][2]+slab_pos[i+1][2]+slab_offset[i+1][2]-1)/2,code,slab_offset[i][2],3:code=code+1
+		endif
+	endif
+next i
+
+
+!========================================================================マーク
+if display_mark then
+!敷込マーク・矢印
+fill fill_back
+
+if arrow_pos=1 then arrow_defult=_deck_edge_pos[1][1]+arrow_offset
+if arrow_pos=2 then arrow_defult=(_deck_edge_pos[1][1]+_deck_edge_pos[1][2])/2
+if arrow_pos=3 then arrow_defult=_deck_edge_pos[1][2]-arrow_offset
+
+if deck_dir=1 then
+	!line2 (minx+maxx)/2,arr_start,(minx+maxx)/2,arr_end
+	!line2 (minx+maxx)/2,arr_start,(minx+maxx)/2-0.1,arr_start+0.1
+	!line2 (minx+maxx)/2,arr_start,(minx+maxx)/2+0.1,arr_start+0.1
+	!line2 (minx+maxx)/2,arr_end,(minx+maxx)/2-0.1,arr_end-0.1
+	!line2 (minx+maxx)/2,arr_end,(minx+maxx)/2+0.1,arr_end-0.1
+
+	if deck_start=1 then
+		poly2 3,1+2+4,
+		deck_pos[1]+deck_wid[1]/2-sqr(3)*0.1,arrow_defult-0.1,
+		deck_pos[1]+deck_wid[1]/2-sqr(3)*0.1,arrow_defult+0.1,
+		deck_pos[1]+deck_wid[1]/2,arrow_defult
+	else
+		poly2 3,1+2+4,
+		deck_pos[1]-deck_wid[1]/2+sqr(3)*0.1,arrow_defult-0.1,
+		deck_pos[1]-deck_wid[1]/2+sqr(3)*0.1,arrow_defult+0.1,
+		deck_pos[1]-deck_wid[1]/2,arrow_defult
+	endif
+else
+	!line2 arr_start,(miny+maxy)/2,arr_end,(miny+maxy)/2
+	!line2 arr_start,(miny+maxy)/2,arr_start+0.1,(miny+maxy)/2+0.1
+	!line2 arr_start,(miny+maxy)/2,arr_start+0.1,(miny+maxy)/2-0.1
+	!line2 arr_end,(miny+maxy)/2,arr_end-0.1,(miny+maxy)/2+0.1
+	!line2 arr_end,(miny+maxy)/2,arr_end-0.1,(miny+maxy)/2-0.1
+
+	if deck_start=1 then
+		poly2 3,1+2+4,
+		arrow_defult-0.1,deck_pos[1]+deck_wid[1]/2-sqr(3)*0.1,
+		arrow_defult+0.1,deck_pos[1]+deck_wid[1]/2-sqr(3)*0.1,
+		arrow_defult,deck_pos[1]+deck_wid[1]/2
+	else
+		poly2 3,1+2+4,
+		arrow_defult-0.1,deck_pos[1]-deck_wid[1]/2+sqr(3)*0.1,
+		arrow_defult+0.1,deck_pos[1]-deck_wid[1]/2+sqr(3)*0.1,
+		arrow_defult,deck_pos[1]-deck_wid[1]/2
+	endif
+endif
+
+
+!小口ふさぎ・デッキタイプ
+style "mark"
+fill fill_back
+
+for i=1 to deck_totnum
+	if deckType_pos=1 then deckType_coor=_deck_edge_pos[i][1]+deckType_offset
+	if deckType_pos=2 then deckType_coor=(_deck_edge_pos[i][1]+_deck_edge_pos[i][2])/2
+	if deckType_pos=3 then deckType_coor=_deck_edge_pos[i][2]-deckType_offset
+
+	if deck_type=1 or deck_type=3 then !QL
+		if deck_order[i]=2 then !一山
+			if deck_dir=1 then
+				if edge_type1=2 then
+					poly2 4,1+2+4,
+					deck_pos[i]-0.03,_deck_edge_pos[i][1]+edgeMark_offset-0.03,
+					deck_pos[i]+0.03,_deck_edge_pos[i][1]+edgeMark_offset-0.03,
+					deck_pos[i]+0.03,_deck_edge_pos[i][1]+edgeMark_offset+0.03,
+					deck_pos[i]-0.03,_deck_edge_pos[i][1]+edgeMark_offset+0.03
+				endif
+
+				if edge_type2=2 then
+					poly2 4,1+2+4,
+					deck_pos[i]-0.03,_deck_edge_pos[i][2]-edgeMark_offset-0.03,
+					deck_pos[i]+0.03,_deck_edge_pos[i][2]-edgeMark_offset-0.03,
+					deck_pos[i]+0.03,_deck_edge_pos[i][2]-edgeMark_offset+0.03,
+					deck_pos[i]-0.03,_deck_edge_pos[i][2]-edgeMark_offset+0.03
+				endif
+
+				poly2_ 2,1,
+				deck_pos[i],deckType_coor,900,
+				0.15,360,4001
+
+				text2 deck_pos[i],deckType_coor,"F"
+			else
+				if edge_type1=2 then
+					poly2 4,1+2+4,
+					_deck_edge_pos[i][1]+edgeMark_offset-0.03,deck_pos[i]-0.03,
+					_deck_edge_pos[i][1]+edgeMark_offset+0.03,deck_pos[i]-0.03,
+					_deck_edge_pos[i][1]+edgeMark_offset+0.03,deck_pos[i]+0.03,
+					_deck_edge_pos[i][1]+edgeMark_offset-0.03,deck_pos[i]+0.03
+				endif
+
+				if edge_type2=2 then
+					poly2 4,1+2+4,
+					_deck_edge_pos[i][2]-edgeMark_offset-0.03,deck_pos[i]-0.03,
+					_deck_edge_pos[i][2]-edgeMark_offset+0.03,deck_pos[i]-0.03,
+					_deck_edge_pos[i][2]-edgeMark_offset+0.03,deck_pos[i]+0.03,
+					_deck_edge_pos[i][2]-edgeMark_offset-0.03,deck_pos[i]+0.03
+				endif
+
+				poly2_ 2,1,
+				deckType_coor,deck_pos[i],900,
+				0.15,360,4001
+
+				text2 deckType_coor,deck_pos[i],"F"
+			endif
+		endif
+	else !JF
+		if deck_order[i]<>1 and deck_order[i]<>6 then
+			deck_type_text=""
+
+			if product_num<=27 then
+				if deck_order[i]=2 then deck_type_text="A"
+				if deck_order[i]=3 then deck_type_text="B"
+				if deck_order[i]=4 then deck_type_text="C"
+				if deck_order[i]=5 then deck_type_text="D"
+			else
+				if deck_order[i]=2 then deck_type_text="S"
+				if deck_order[i]=3 then deck_type_text="S1"
+			endif
+
+			if deck_dir=1 then
+				text2 deck_pos[i],deckType_coor,deck_type_text
+			else
+				text2 deckType_coor,deck_pos[i],deck_type_text
+			endif
+		endif
+	endif
+next i
+
+
+!現場切断記号
+cutSign_size=0.2/2
+
+for i=1 to deck_totnum
+	if deck_order[i]<>6 then
+		if abs(_deck_start_pos[i]-_deck_edge_pos[i][1])>eps then
+			if deck_dir=1 then
+				poly2 4,1+4,
+				deck_pos[i],_deck_edge_pos[i][1],
+				deck_pos[i]+cutSign_size,_deck_edge_pos[i][1]+cutSign_size,
+				deck_pos[i],_deck_edge_pos[i][1]+2*cutSign_size,
+				deck_pos[i]-cutSign_size,_deck_edge_pos[i][1]+cutSign_size
+			else
+				poly2 4,1+4,
+				_deck_edge_pos[i][1],deck_pos[i],
+				_deck_edge_pos[i][1]+cutSign_size,deck_pos[i]+cutSign_size,
+				_deck_edge_pos[i][1]+2*cutSign_size,deck_pos[i],
+				_deck_edge_pos[i][1]+cutSign_size,deck_pos[i]-cutSign_size
+			endif
+		endif
+
+		if abs(_deck_end_pos[i]-_deck_edge_pos[i][2])>eps then
+			if deck_dir=1 then
+				poly2 4,1+4,
+				deck_pos[i],_deck_edge_pos[i][2],
+				deck_pos[i]-cutSign_size,_deck_edge_pos[i][2]-cutSign_size,
+				deck_pos[i],_deck_edge_pos[i][2]-2*cutSign_size,
+				deck_pos[i]+cutSign_size,_deck_edge_pos[i][2]-cutSign_size
+			else
+				poly2 4,1+4,
+				_deck_edge_pos[i][2],deck_pos[i],
+				_deck_edge_pos[i][2]-cutSign_size,deck_pos[i]+cutSign_size,
+				_deck_edge_pos[i][2]-2*cutSign_size,deck_pos[i],
+				_deck_edge_pos[i][2]-cutSign_size,deck_pos[i]-cutSign_size
+			endif
+		endif
+	endif
+next i
+
+
+!調整板記号
+if deck_order[deck_totnum]=6 then
+	if deck_start=1 then
+		deckMark_coor1=deck_pos[deck_totnum]+deck_wid[deck_totnum]/2-mark_fontSize*3/40
+	else
+		deckMark_coor1=deck_pos[deck_totnum]-deck_wid[deck_totnum]/2+mark_fontSize*3/40
+	endif
+
+	if deckMark_pos=1 then deckMark_coor2=_deck_edge_pos[deck_totnum][1]+deckMark_offset
+	if deckMark_pos=2 then deckMark_coor2=(_deck_edge_pos[deck_totnum][1]+_deck_edge_pos[deck_totnum][2])/2
+	if deckMark_pos=3 then deckMark_coor2=_deck_edge_pos[deck_totnum][2]-deckMark_offset
+
+	if deck_dir=1 then
+		add2 deckMark_coor1,deckMark_coor2
+		if deck_start=1 then rot2 90
+		if deck_start=2 then rot2 -90
+	else
+		add2 deckMark_coor2,deckMark_coor1
+		rot2 0
+	endif
+
+		if deck_type=1 or deck_type=3 then !QL
+			text2 0,0,"C"+str(deck_wid[deck_totnum]*1000,1,0)
+		else !JF
+			!add2 0,mark_fontSize*3/40
+			!	text2 0,0,"* * *"
+			!del 1
+			text2 0,0,"W"+str(deck_wid[deck_totnum]*10,1,0)
+		endif
+	del 2
+endif
+
+
+!デッキマーク
+if deckMark_pos=1 then deckMark_coor=arr_start_pos+deckMark_offset
+if deckMark_pos=2 then deckMark_coor=(arr_start_pos+arr_end_pos)/2
+if deckMark_pos=3 then deckMark_coor=arr_end_pos-deckMark_offset
+
+if deck_dir=1 then
+	add2 (minx+maxx)/2,deckMark_coor
+	rot2 0
+else
+	add2 deckMark_coor,(miny+maxy)/2
+	rot2 90
+endif
+
+	if deck_type=1 or deck_type=3 then !QL
+		gosub "QLデッキラベル"
+	else !JF
+		gosub "JFデッキラベル"
+	endif
+
+del 2
+
+
+!各寸表示
+style "label1"
+
+if abs(deck_len[1]-deck_len[deck_totnum])>eps then
+	oneSize_size1=0.7
+	oneSize_size2=0.25
+
+	for i=1 to deck_totnum
+		if oneSize_pos=1 then oneSize_coor=min(_deck_edge_pos[i][1]+oneSize_offset,(_deck_edge_pos[i][1]+_deck_edge_pos[i][2])/2)
+		if oneSize_pos=2 then oneSize_coor=(_deck_edge_pos[i][1]+_deck_edge_pos[i][2])/2
+		if oneSize_pos=3 then oneSize_coor=max(_deck_edge_pos[i][2]-oneSize_offset,(_deck_edge_pos[i][1]+_deck_edge_pos[i][2])/2)
+
+		if deck_dir=1 then
+			add2 deck_pos[i],oneSize_coor
+
+			if deck_start=1 then
+				rot2 90
+			else
+				rot2 -90
+			endif
+		else
+			add2 oneSize_coor,deck_pos[i]
+			rot2 0
+		endif
+
+			!外枠
+			poly2_ 5,1+4,
+			-oneSize_size1/2+oneSize_size2/2,-oneSize_size2/2,1,
+			oneSize_size1/2-oneSize_size2/2,-oneSize_size2/2,1,
+			oneSize_size1/2-oneSize_size2/2,oneSize_size2/2,1000+1,
+			-oneSize_size1/2+oneSize_size2/2,oneSize_size2/2,1,
+			-oneSize_size1/2+oneSize_size2/2,-oneSize_size2/2,1000+1
+
+			!寸法
+			text2 0,0,str(deck_len[i]*1000,1,0)
+		del 2
+	next i
+endif
+
+
+endif
+
+
+
+!========================================================================梁
+!for i=1 to 4
+!	add2 new_pos[i][1],new_pos[i][2]
+!	rot2 slab_rtz[i]
+!		hotspot2 slab_len[i]/2,0,code,beam_offset[i],1+128:code=code+1
+!		hotspot2 slab_len[i]/2,beam_offset[i],code,beam_offset[i],2:code=code+1
+!		hotspot2 slab_len[i]/2,-1,code,beam_offset[i],3:code=code+1
+!	del 2
+!next i
+
+
+!========================================================================柱
+if switch_column then
+	for i=1 to 4
+		hotspot2 equ_pos[i][1],equ_pos[i][2]+column_move[i][2],code,column_move[i][1],1+128:code=code+1
+		hotspot2 equ_pos[i][1]+column_move[i][1],equ_pos[i][2]+column_move[i][2],code,column_move[i][1],2:code=code+1
+		hotspot2 equ_pos[i][1]-1,equ_pos[i][2]+column_move[i][2],code,column_move[i][1],3:code=code+1
+
+		hotspot2 equ_pos[i][1]+column_move[i][1],equ_pos[i][2],code,column_move[i][2],1+128:code=code+1
+		hotspot2 equ_pos[i][1]+column_move[i][1],equ_pos[i][2]+column_move[i][2],code,column_move[i][2],2:code=code+1
+		hotspot2 equ_pos[i][1]+column_move[i][1],equ_pos[i][2]-1,code,column_move[i][2],3:code=code+1
+
+		add2 equ_pos[i][1]+column_move[i][1],equ_pos[i][2]+column_move[i][2]
+			!左下角
+			hotspot2 0,-column_offset[i][2],code,column_offset[i][1],1+128:code=code+1
+			hotspot2 -column_offset[i][1],-column_offset[i][2],code,column_offset[i][1],2:code=code+1
+			hotspot2 1,-column_offset[i][2],code,column_offset[i][1],3:code=code+1
+			
+			hotspot2 -column_offset[i][1],0,code,column_offset[i][2],1+128:code=code+1
+			hotspot2 -column_offset[i][1],-column_offset[i][2],code,column_offset[i][2],2:code=code+1
+			hotspot2 -column_offset[i][1],1,code,column_offset[i][2],3:code=code+1
+	
+			!右下角
+			hotspot2 0,-column_offset[i][2],code,column_offset[i][1],1+128:code=code+1
+			hotspot2 column_offset[i][1],-column_offset[i][2],code,column_offset[i][1],2:code=code+1
+			hotspot2 -1,-column_offset[i][2],code,column_offset[i][1],3:code=code+1
+			
+			hotspot2 column_offset[i][1],0,code,column_offset[i][2],1+128:code=code+1
+			hotspot2 column_offset[i][1],-column_offset[i][2],code,column_offset[i][2],2:code=code+1
+			hotspot2 column_offset[i][1],1,code,column_offset[i][2],3:code=code+1
+	
+			!右上角
+			hotspot2 0,column_offset[i][2],code,column_offset[i][1],1+128:code=code+1
+			hotspot2 column_offset[i][1],column_offset[i][2],code,column_offset[i][1],2:code=code+1
+			hotspot2 -1,column_offset[i][2],code,column_offset[i][1],3:code=code+1
+			
+			hotspot2 column_offset[i][1],0,code,column_offset[i][2],1+128:code=code+1
+			hotspot2 column_offset[i][1],column_offset[i][2],code,column_offset[i][2],2:code=code+1
+			hotspot2 column_offset[i][1],-1,code,column_offset[i][2],3:code=code+1
+	
+			!左上角
+			hotspot2 0,column_offset[i][2],code,column_offset[i][1],1+128:code=code+1
+			hotspot2 -column_offset[i][1],column_offset[i][2],code,column_offset[i][1],2:code=code+1
+			hotspot2 1,column_offset[i][2],code,column_offset[i][1],3:code=code+1
+			
+			hotspot2 -column_offset[i][1],0,code,column_offset[i][2],1+128:code=code+1
+			hotspot2 -column_offset[i][1],column_offset[i][2],code,column_offset[i][2],2:code=code+1
+			hotspot2 -column_offset[i][1],-1,code,column_offset[i][2],3:code=code+1
+		del 1
+	next i
+endif
+
+
+!======================================================================開口ホットスポットとサブライン
+if op_num>0 then
+	for i=1 to op_num
+		hotspot2 0,op_pos[i][2],code,op_pos[i][1],1+128:code=code+1
+		hotspot2 op_pos[i][1],op_pos[i][2],code,op_pos[i][1],2:code=code+1
+		hotspot2 -1,op_pos[i][2],code,op_pos[i][1],3:code=code+1
+	
+		hotspot2 op_pos[i][1],0,code,op_pos[i][2],1+128:code=code+1
+		hotspot2 op_pos[i][1],op_pos[i][2],code,op_pos[i][2],2:code=code+1
+		hotspot2 op_pos[i][1],-1,code,op_pos[i][2],3:code=code+1
+
+		hotspot2 op_pos[i][1],op_pos[i][2]+op_wid[i]/2,code,op_len[i],1+128:code=code+1
+		hotspot2 op_pos[i][1]+op_len[i],op_pos[i][2]+op_wid[i]/2,code,op_len[i],2:code=code+1
+		hotspot2 op_pos[i][1]-1,op_pos[i][2]+op_wid[i]/2,code,op_len[i],3:code=code+1
+
+		hotspot2 op_pos[i][1]+op_len[i]/2,op_pos[i][2],code,op_wid[i],1+128:code=code+1
+		hotspot2 op_pos[i][1]+op_len[i]/2,op_pos[i][2]+op_wid[i],code,op_wid[i],2:code=code+1
+		hotspot2 op_pos[i][1]+op_len[i]/2,op_pos[i][2]-1,code,op_wid[i],3:code=code+1
+
+		hotspot2 op_pos[i][1]+op_len[i],op_pos[i][2]
+		hotspot2 op_pos[i][1]+op_len[i],op_pos[i][2]+op_wid[i]
+		hotspot2 op_pos[i][1],op_pos[i][2]+op_wid[i]
+
+		rect2 op_pos[i][1],op_pos[i][2],op_pos[i][1]+op_len[i],op_pos[i][2]+op_wid[i]
+	next i
+endif
+
+set line_type all_line_type
+
+
+!======================================================================デッキ端部オフセット
+if switch_deck_offset then
+	for i=1 to deck_num1+deck_num2+deck_num3
+		if deck_dir=1 then
+			hotspot2 deck_pos[i],_deck_start_pos[i],code,deck_start_offset[i],1+128:code=code+1
+			hotspot2 deck_pos[i],_deck_start_pos[i]+deck_start_offset[i],code,deck_start_offset[i],2:code=code+1
+			hotspot2 deck_pos[i],_deck_start_pos[i]-1,code,deck_start_offset[i],3:code=code+1
+
+			hotspot2 deck_pos[i],_deck_end_pos[i],code,deck_end_offset[i],1+128:code=code+1
+			hotspot2 deck_pos[i],_deck_end_pos[i]+deck_end_offset[i],code,deck_end_offset[i],2:code=code+1
+			hotspot2 deck_pos[i],_deck_end_pos[i]-1,code,deck_end_offset[i],3:code=code+1
+		else
+			hotspot2 _deck_start_pos[i],deck_pos[i],code,deck_start_offset[i],1+128:code=code+1
+			hotspot2 _deck_start_pos[i]+deck_start_offset[i],deck_pos[i],code,deck_start_offset[i],2:code=code+1
+			hotspot2 _deck_start_pos[i]-1,deck_pos[i],code,deck_start_offset[i],3:code=code+1
+
+			hotspot2 _deck_end_pos[i],deck_pos[i],code,deck_end_offset[i],1+128:code=code+1
+			hotspot2 _deck_end_pos[i]+deck_end_offset[i],deck_pos[i],code,deck_end_offset[i],2:code=code+1
+			hotspot2 _deck_end_pos[i]-1,deck_pos[i],code,deck_end_offset[i],3:code=code+1
+		endif
+	next i
+endif
+
+
+!======================================================================工区・梱包番号
+if dis_detail_2d then
+	add2 (minx+maxx)/2,(miny+maxy)/2
+		text2 0,0.1,"工区："+construction_area
+		text2 0,-0.1,"梱包番号："+str(packing_num,1,0)
+	del 1
+endif
+
+end
+
+
+
+"QLデッキラベル":
+	ql_label_size=0.8
+	gap=0.04
+	mid_space=0.3*ql_label_size
+	bb=mid_space/2
+	aa=sqr((ql_label_size/2)^2-bb^2)
+
+	hotspot2 0,0
+	hotspot2 ql_label_size/2,0
+	hotspot2 -ql_label_size/2,0
+	hotspot2 0,ql_label_size/2
+	hotspot2 0,-ql_label_size/2
+
+	!外枠
+	if labelType<14 then
+		gap_index=0
+		circle2 0,0,ql_label_size/2
+		line2 -aa,-bb,aa,-bb
+		line2 -aa,bb,aa,bb
+		line2 0,-bb,0,-ql_label_size/2
+		line2 0,bb,0,ql_label_size/2
+
+		if labelType>=12 then
+			gap_index=1
+			circle2 0,0,ql_label_size/2+gap
+		endif
+
+		if labelType>=13 then
+			gap_index=2
+			circle2 0,0,ql_label_size/2+2*gap
+		endif
+	else
+		gap_index=0
+		temp_size=ql_label_size
+
+		poly2 8,1+4,
+			-temp_size/2,-temp_size/2+temp_size/6,
+			-temp_size/2+temp_size/6,-temp_size/2,
+			temp_size/2-temp_size/6,-temp_size/2,
+			temp_size/2,-temp_size/2+temp_size/6,
+			temp_size/2,temp_size/2-temp_size/6,
+			temp_size/2-temp_size/6,temp_size/2,
+			-temp_size/2+temp_size/6,temp_size/2,
+			-temp_size/2,temp_size/2-temp_size/6
+
+		line2 -ql_label_size/2,-bb,ql_label_size/2,-bb
+		line2 -ql_label_size/2,bb,ql_label_size/2,bb
+		line2 0,-bb,0,-ql_label_size/2
+		line2 0,bb,0,ql_label_size/2
+
+		if labelType>=15 then
+			gap_index=1
+			temp_size=ql_label_size+2*gap
+
+			poly2 8,1+4,
+				-temp_size/2,-temp_size/2+temp_size/6,
+				-temp_size/2+temp_size/6,-temp_size/2,
+				temp_size/2-temp_size/6,-temp_size/2,
+				temp_size/2,-temp_size/2+temp_size/6,
+				temp_size/2,temp_size/2-temp_size/6,
+				temp_size/2-temp_size/6,temp_size/2,
+				-temp_size/2+temp_size/6,temp_size/2,
+				-temp_size/2,temp_size/2-temp_size/6
+		endif
+
+		if labelType>=16 then
+			gap_index=2
+			temp_size=ql_label_size+4*gap
+
+			poly2 8,1+4,
+				-temp_size/2,-temp_size/2+temp_size/6,
+				-temp_size/2+temp_size/6,-temp_size/2,
+				temp_size/2-temp_size/6,-temp_size/2,
+				temp_size/2,-temp_size/2+temp_size/6,
+				temp_size/2,temp_size/2-temp_size/6,
+				temp_size/2-temp_size/6,temp_size/2,
+				-temp_size/2+temp_size/6,temp_size/2,
+				-temp_size/2,temp_size/2-temp_size/6
+		endif
+	endif
+
+	style "label1"
+	!長さ(中間)
+	if abs(deck_len[1]-deck_len[deck_totnum])<eps then
+		text2 0,0,str(deck_len[1]*1000,1,0)
+	else
+		text2 0,0,"各  寸"
+	endif
+
+	style "label2"
+	!梱包番号(左上)
+	text2 -0.2*ql_label_size,0.2*ql_label_size+0.3*mid_space,packing_num
+
+	!板厚(右上)
+	text2 0.2*ql_label_size,0.2*ql_label_size+0.3*mid_space,deck_thi*1000
+
+	!標準枚数(左下)
+	text2 -0.2*ql_label_size,-0.2*ql_label_size-0.3*mid_space,deck_num1
+
+	!一山枚数(右下)
+	text2 0.2*ql_label_size,-0.2*ql_label_size-0.3*mid_space,deck_num2
+
+	!スラブ厚さ(枠外左上)
+	text2 -0.2*ql_label_size,0.5*ql_label_size+label_fontSize2/15+gap_index*gap,slab_thi*1000
+return
+
+"JFデッキラベル":
+	jf_label_size1=1.1
+	jf_label_size2=0.375
+	gap=0.04
+
+	hotspot2 0,0
+	hotspot2 -jf_label_size1/2,0
+	hotspot2 jf_label_size1/2,0
+	hotspot2 0,-jf_label_size2/2
+	hotspot2 0,jf_label_size2/2
+
+	!外枠
+	if labelType<=3 then
+		gap_index=0
+		temp_size1=jf_label_size1
+		temp_size2=jf_label_size2
+
+		poly2_ 5,1+4,
+			-temp_size1/2+temp_size2/2,-temp_size2/2,1,
+			temp_size1/2-temp_size2/2,-temp_size2/2,1,
+			temp_size1/2-temp_size2/2,temp_size2/2,1000+1,
+			-temp_size1/2+temp_size2/2,temp_size2/2,1,
+			-temp_size1/2+temp_size2/2,-temp_size2/2,1000+1
+
+		line2 -temp_size1/2,0,temp_size1/2,0
+		line2 0,0,0,temp_size2/2
+
+		if labelType>=2 then
+			gap_index=1
+			temp_size1=jf_label_size1+2*gap
+			temp_size2=jf_label_size2+2*gap
+
+			poly2_ 5,1+4,
+				-temp_size1/2+temp_size2/2,-temp_size2/2,1,
+				temp_size1/2-temp_size2/2,-temp_size2/2,1,
+				temp_size1/2-temp_size2/2,temp_size2/2,1000+1,
+				-temp_size1/2+temp_size2/2,temp_size2/2,1,
+				-temp_size1/2+temp_size2/2,-temp_size2/2,1000+1
+		endif
+
+		if labelType>=3 then
+			gap_index=2
+			temp_size1=jf_label_size1+4*gap
+			temp_size2=jf_label_size2+4*gap
+
+			poly2_ 5,1+4,
+				-temp_size1/2+temp_size2/2,-temp_size2/2,1,
+				temp_size1/2-temp_size2/2,-temp_size2/2,1,
+				temp_size1/2-temp_size2/2,temp_size2/2,1000+1,
+				-temp_size1/2+temp_size2/2,temp_size2/2,1,
+				-temp_size1/2+temp_size2/2,-temp_size2/2,1000+1
+		endif
+	endif
+
+	if labelType>3 and labelType<=6 then
+		gap_index=0
+		temp_size1=jf_label_size1
+		temp_size2=jf_label_size2
+
+		poly2 4,1+4,
+			-temp_size1/2,-temp_size2/2,
+			temp_size1/2,-temp_size2/2,
+			temp_size1/2,temp_size2/2,
+			-temp_size1/2,temp_size2/2
+
+		line2 -temp_size1/2,0,temp_size1/2,0
+		line2 0,0,0,temp_size2/2
+
+		if labelType>=5 then
+			gap_index=1
+			temp_size1=jf_label_size1+2*gap
+			temp_size2=jf_label_size2+2*gap
+
+			poly2 4,1+4,
+				-temp_size1/2,-temp_size2/2,
+				temp_size1/2,-temp_size2/2,
+				temp_size1/2,temp_size2/2,
+				-temp_size1/2,temp_size2/2
+		endif
+
+		if labelType>=6 then
+			gap_index=2
+			temp_size1=jf_label_size1+4*gap
+			temp_size2=jf_label_size2+4*gap
+
+			poly2 4,1+4,
+				-temp_size1/2,-temp_size2/2,
+				temp_size1/2,-temp_size2/2,
+				temp_size1/2,temp_size2/2,
+				-temp_size1/2,temp_size2/2
+		endif
+	endif
+
+	if labelType>6 then
+		gap_index=0
+		temp_size1=jf_label_size1
+		temp_size2=jf_label_size2
+
+		poly2 6,1+4,
+			-temp_size1/2,0,
+			-temp_size1/2+temp_size2/2,-temp_size2/2,
+			temp_size1/2-temp_size2/2,-temp_size2/2,
+			temp_size1/2,0,
+			temp_size1/2-temp_size2/2,temp_size2/2,
+			-temp_size1/2+temp_size2/2,temp_size2/2
+
+		line2 -temp_size1/2,0,temp_size1/2,0
+		line2 0,0,0,temp_size2/2			
+
+		if labelType>=8 then
+			gap_index=1
+			temp_size1=jf_label_size1+2*gap
+			temp_size2=jf_label_size2+2*gap
+
+			poly2 6,1+4,
+				-temp_size1/2,0,
+				-temp_size1/2+temp_size2/2,-temp_size2/2,
+				temp_size1/2-temp_size2/2,-temp_size2/2,
+				temp_size1/2,0,
+				temp_size1/2-temp_size2/2,temp_size2/2,
+				-temp_size1/2+temp_size2/2,temp_size2/2
+		endif
+
+		if labelType>=9 then
+			gap_index=2
+			temp_size1=jf_label_size1+4*gap
+			temp_size2=jf_label_size2+4*gap
+
+			poly2 6,1+4,
+				-temp_size1/2,0,
+				-temp_size1/2+temp_size2/2,-temp_size2/2,
+				temp_size1/2-temp_size2/2,-temp_size2/2,
+				temp_size1/2,0,
+				temp_size1/2-temp_size2/2,temp_size2/2,
+				-temp_size1/2+temp_size2/2,temp_size2/2
+		endif
+	endif
+
+	style "label1"
+	!長さ(中下)
+	if abs(deck_len[1]-deck_len[deck_totnum])<eps then
+		text2 0,-jf_label_size2/4,str(deck_len[1]*1000,1,0)
+	else
+		text2 0,-jf_label_size2/4,"各  寸"
+	endif
+
+	!梱包番号(左上)
+	text2 -jf_label_size1/4.5,jf_label_size2/4,packing_num
+
+	!板厚(右上)
+	text2 jf_label_size1/4.5,jf_label_size2/4,deck_thi*1000
+
+	style "label2"
+	!スラブ厚さ(枠外左上)
+	text2 -jf_label_size1/4.5,0.5*jf_label_size2+label_fontSize2/15+gap_index*gap,slab_thi*1000
+
+	!枚数(枠外下)
+	jf_order_text=""
+	dim _jf_deck_type[]
+	for i=1 to 6
+	_jf_deck_type[i]=0
+	next i
+
+	for i=1 to deck_totnum
+		_jf_deck_type[deck_order[i]]=_jf_deck_type[deck_order[i]]+1
+	next i
+
+	for i=2 to 5
+		if product_num<=27 then
+			if i=2 then temp_text="A"
+			if i=3 then temp_text="B"
+		else
+			if i=2 then temp_text="S"
+			if i=3 then temp_text="S1"
+		endif
+		if i=4 then temp_text="C"
+		if i=5 then temp_text="D"
+
+		if _jf_deck_type[i]>0 then
+			if jf_order_text<>"" then jf_order_text=jf_order_text+","
+
+			if _jf_deck_type[i]=1 then
+				jf_order_text=jf_order_text+temp_text
+			else
+				jf_order_text=jf_order_text+temp_text+"("+str(_jf_deck_type[i],1,0)+")"
+			endif
+		endif
+	next i
+
+	if _jf_deck_type[1]>0 then
+		if _jf_deck_type[1]=1 then
+			jf_order_text=jf_order_text+",T"
+		else
+			jf_order_text=jf_order_text+",T"+"("+str(_jf_deck_type[1],1,0)+")"
+		endif
+	endif
+
+	if _jf_deck_type[6]>0 then
+		jf_order_text=jf_order_text+",W"+str(deck_wid[deck_totnum]*10,1,0)
+	endif
+
+	text2 0,-0.5*jf_label_size2-label_fontSize2/15-gap_index*gap,jf_order_text
+return
+
+
+
+
+
+
+
+
+
+
+
+

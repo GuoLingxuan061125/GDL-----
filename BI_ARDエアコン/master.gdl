@@ -1,0 +1,179 @@
+code=1
+eps=1e-5
+x=1
+y=2
+z=3
+
+
+!========================================================================共通オプション========================================================================
+!形態
+values{2} "houseType" 1,"賃貸",2,"施主宅"
+
+!商品名
+if houseType=1 then values{2} "tradeName" 1,"ノクリア/AHシリーズ",2,"ノクリア/Vシリーズ",3,"霧ヶ峰/GVシリーズ",4,"霧ヶ峰/JXVシリーズ"
+if houseType=2 then values{2} "tradeName" 1,"エオリア/EXシリーズ",2,"risora/CXシリーズ",3,"risora/SXシリーズ"
+
+!能力
+if houseType=1 then
+    if tradeName=1 then values{2} "capacity" 1,"2.2kW 6.0畳用",2,"2.5kW 8.0畳用",3,"2.8kW 10畳用",4,"3.6kW 12畳用",5,"4.0kW 14畳用",6,"5.6kW 18畳用"
+    if tradeName=2 then values{2} "capacity" 7,"6.3kW 20畳用",8,"7.1kW 23畳用"
+    if tradeName=3 then values{2} "capacity" 1,"2.2kW 6.0畳用",2,"2.5kW 8.0畳用",3,"2.8kW 10畳用",4,"3.6kW 12畳用",5,"4.0kW 14畳用",6,"5.6kW 18畳用"
+    if tradeName=4 then values{2} "capacity" 7,"6.3kW 20畳用",8,"7.1kW 23畳用"
+endif
+
+if houseType=2 then
+    values{2} "capacity" 1,"2.2kW 6.0畳用",2,"2.5kW 8.0畳用",3,"2.8kW 10畳用",4,"3.6kW 12畳用",5,"4.0kW 14畳用",6,"5.6kW 18畳用",7,"6.3kW 20畳用",8,"7.1kW 23畳用"
+endif
+
+!エリア[形態][商品名]
+dim _usingAreaList[][]
+_usingAreaList[1][1]=1
+_usingAreaList[1][2]=1
+_usingAreaList[1][3]=2
+_usingAreaList[1][4]=2
+_usingAreaList[2][1]=3
+_usingAreaList[2][2]=3
+_usingAreaList[2][3]=3
+
+usingArea=_usingAreaList[houseType][tradeName]
+if usingArea=1 then values{2} "usingArea" 1,"東京･千葉･神奈川"
+if usingArea=2 then values{2} "usingArea" 2,"埼玉"
+if usingArea=3 then values{2} "usingArea" 3,"全国"
+
+parameters usingArea=usingArea
+
+!メーカー[形態][商品名]
+dim _makerList[][]
+_makerList[1][1]=1
+_makerList[1][2]=1
+_makerList[1][3]=2
+_makerList[1][4]=2
+_makerList[2][1]=3
+_makerList[2][2]=4
+_makerList[2][3]=4
+
+maker=_makerList[houseType][tradeName]
+if maker=1 then values{2} "maker" 1,"㈱富士通ゼネラル"
+if maker=2 then values{2} "maker" 1,"三菱電機㈱"
+if maker=3 then values{2} "maker" 1,"パナソニック㈱"
+if maker=4 then values{2} "maker" 1,"ダイキン工業㈱"
+
+parameters maker=maker
+
+
+!========================================================================賃貸仕様オプション========================================================================
+values{2} "hidePipe" 1,"有り(1K)",2,"有り(1LDK)",0,"なし"
+values{2} "outdoorUnitSetCondi" 1,"同一フロア設置",2,"1フロア下階設置(妻壁配管)",3,"2フロア下階設置(妻壁配管)",4,"廊下側設置",5,"2段ラック設置",6,"フラワーBOX設置(3尺/縦格子)",\
+                                7,"フラワーBOX設置(6尺/縦格子)",8,"フラワーBOX設置(3尺/横格子)",9,"フラワーBOX設置(6尺/横格子)",10,"フラワーBOX上階用雨樋セット"
+values{2} "indoorPipeCover" 1,"有り(横抜き･～100mm)",2,"有り(横抜き･～300mm)",0,"なし"
+
+if houseType<>1 then hideparameter "rentTypeOption"
+
+
+!========================================================================施主宅仕様オプション========================================================================
+values{2} "hidePipe2" 1,"有り(1K)",2,"有り(1LDK)",0,"なし"
+values{2} "outdoorUnitSetCondi2" 1,"同一フロア設置",2,"1フロア下階設置(妻壁配管)",3,"2フロア下階設置(妻壁配管)",4,"廊下側設置",5,"2段ラック設置",6,"フラワーBOX設置(3尺/縦格子)",\
+                                 7,"フラワーBOX設置(6尺/縦格子)",8,"フラワーBOX設置(3尺/横格子)",9,"フラワーBOX設置(6尺/横格子)",10,"フラワーBOX上階用雨樋セット"
+values{2} "indoorPipeCover2" 1,"有り(横抜き･～100mm)",2,"有り(横抜き･～300mm)",0,"なし"
+
+if houseType<>2 then hideparameter "ownerTypeOption"
+
+
+!========================================================================BI-CODE========================================================================
+dim _BI_code[]
+_BI_code[1]=0
+
+if houseType=1 then
+    if capacity=1 then put 38001,38049,38101
+    if capacity=2 then put 38003,38049,38101
+    if capacity=3 then put 38005,38049,38101
+    if capacity=4 then put 38007,38049,38101
+    if capacity=5 then put 38009,38049,38101
+    if capacity=6 then put 38011,38049,38101
+    if capacity=7 then put 38013,38049,38101
+    if capacity=8 then put 38015,38049,38101
+endif
+
+for i=1 to nsp
+    _BI_code[i]=get(1)
+next i
+
+parameters BI_code=_BI_code
+
+
+!========================================================================BI-CODE-OPTION========================================================================
+dim _BI_code_option[]
+_BI_code_option[1]=-1
+
+if houseType=1 then
+    if hidePipe=1 then put 38033
+    if hidePipe=2 then put 38034
+
+    if spareSleeve=1 then put 38035,38101
+
+    if outdoorUnitSetCondi=2 then put 38037
+    if outdoorUnitSetCondi=3 then put 38038
+    if outdoorUnitSetCondi=4 then put 38036
+    if outdoorUnitSetCondi=5 then put 38040
+    if outdoorUnitSetCondi=6 then put 41001,41006
+    if outdoorUnitSetCondi=7 then put 41002,41006
+    if outdoorUnitSetCondi=8 then put 41003,41006
+    if outdoorUnitSetCondi=9 then put 41004,41006
+    if outdoorUnitSetCondi=10 then put 41005
+
+    if outdoorHorDrain=1 then put 38044
+
+    if indoorPipeCover=1 then put 38047
+    if indoorPipeCover=2 then put 38048
+endif
+
+if houseType=2 then
+
+endif
+
+!dim _BI_code_option[]
+!_BI_code_option[1]=0
+!
+!if houseType=1 then
+!    if hidePipe=1 then put 38033,-1
+!    if hidePipe=2 then put 38034,-1
+!    if hidePipe=0 then put -1,-1
+!
+!    if spareSleeve=1 then put 38035,38101
+!    if spareSleeve=0 then put -1,-1
+!
+!    if outdoorUnitSetCondi=2 then put 38037,-1
+!    if outdoorUnitSetCondi=3 then put 38038,-1
+!    if outdoorUnitSetCondi=4 then put 38036,-1
+!    if outdoorUnitSetCondi=5 then put 38040,-1
+!    if outdoorUnitSetCondi=6 then put 41001,41006
+!    if outdoorUnitSetCondi=7 then put 41002,41006
+!    if outdoorUnitSetCondi=8 then put 41003,41006
+!    if outdoorUnitSetCondi=9 then put 41004,41006
+!    if outdoorUnitSetCondi=10 then put 41005,-1
+!
+!    if outdoorHorDrain=1 then put 38044,-1
+!    if outdoorHorDrain=0 then put -1,-1
+!
+!    if indoorPipeCover=1 then put 38047,-1
+!    if indoorPipeCover=2 then put 38048,-1
+!    if indoorPipeCover=0 then put -1,-1
+!
+!    if airCutValve=1 then put -1,-1
+!    if airCutValve=0 then put -1,-1
+!
+!    if airconPreSleeve=1 then put -1,-1
+!    if airconPreSleeve=0 then put -1,-1
+!endif
+!
+!if houseType=2 then
+!
+!endif
+
+for i=1 to nsp
+    _BI_code_option[i]=get(1)
+next i
+
+parameters BI_code_option=_BI_code_option
+
+

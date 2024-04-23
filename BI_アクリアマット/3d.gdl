@@ -1,0 +1,126 @@
+if boardWid=1 then boardMat=board395Mat
+if boardWid=2 then boardMat=board430Mat
+if boardWid=3 then boardMat=board455Mat
+if boardWid=4 then boardMat=board470Mat
+
+!========================================================================屋根基準線
+if dis_base then
+	for i=1 to 2
+		hotspot 0,base_pos[i][2],0,code,base_pos[i][1],1+128:code=code+1
+		hotspot base_pos[i][1],base_pos[i][2],0,code,base_pos[i][1],2:code=code+1
+		hotspot -1,base_pos[i][2],0,code,base_pos[i][1],3:code=code+1
+	
+		hotspot base_pos[i][1],0,0,code,base_pos[i][2],1+128:code=code+1
+		hotspot base_pos[i][1],base_pos[i][2],0,code,base_pos[i][2],2:code=code+1
+		hotspot base_pos[i][1],-1,0,code,base_pos[i][2],3:code=code+1
+	next i
+
+	lin_ base_pos[1][1],base_pos[1][2],0,base_pos[2][1],base_pos[2][2],0
+
+	add (base_pos[1][1]+base_pos[2][1])/2,(base_pos[1][2]+base_pos[2][2])/2,0
+	rotz base_rtz
+		lin_ 0,0,0,0,-0.2*base_dir,0
+		hotspot 0,0,0,code,base_dir,1+128:code=code+1
+		hotspot 0,-0.2*base_dir,0,code,base_dir,2:code=code+1
+		hotspot 0,1,0,code,base_dir,3:code=code+1
+	del 2
+endif
+
+
+
+for i=1 to 2
+    for j=1 to slabVertexNum
+        if j<slabVertexNum then
+            j2=j+1
+        else
+            j2=1
+        endif
+
+        hotspot _slabVertexPos[j][x],_slabVertexPos[j][y],_slabVertexZ[j]
+        lin_ _slabVertexPos[j][x],_slabVertexPos[j][y],_slabVertexZ[j],_slabVertexPos[j2][x],_slabVertexPos[j2][y],_slabVertexZ[j2]
+    next j
+addz sizeThi
+next i
+del 2
+
+if disCenter then
+    add base_pos[1][1],base_pos[1][2],0
+    rotz base_rtz
+    rotx -rat*base_dir
+    rotz -base_rtz
+    add -base_pos[1][1],-base_pos[1][2],0
+
+    for i=1 to 2
+        hotspot 0      ,centerY,0,code,centerX,1+128 : code=code+1
+        hotspot centerX,centerY,0,code,centerX,2     : code=code+1
+        hotspot -1     ,centerY,0,code,centerX,3     : code=code+1
+
+        hotspot centerX,0      ,0,code,centerY,1+128 : code=code+1
+        hotspot centerX,centerY,0,code,centerY,2     : code=code+1
+        hotspot centerX,-1     ,0,code,centerY,3     : code=code+1
+
+        lin_ centerX-0.2,centerY,0,centerX+0.2,centerY,0
+        lin_ centerX,centerY-0.2,0,centerX,centerY+0.2,0
+
+        lin_ centerX-0.2,centerY,0,centerX-0.15,centerY-0.05,0
+        lin_ centerX-0.2,centerY,0,centerX-0.15,centerY+0.05,0
+
+        lin_ centerX+0.2,centerY,0,centerX+0.15,centerY-0.05,0
+        lin_ centerX+0.2,centerY,0,centerX+0.15,centerY+0.05,0
+
+        lin_ centerX,centerY-0.2,0,centerX-0.05,centerY-0.15,0
+        lin_ centerX,centerY-0.2,0,centerX+0.05,centerY-0.15,0
+
+        lin_ centerX,centerY+0.2,0,centerX-0.05,centerY+0.15,0
+        lin_ centerX,centerY+0.2,0,centerX+0.05,centerY+0.15,0
+    addz sizeThi
+    next i
+    del 2
+
+    del 5
+else
+    for i=1 to slabVertexNum
+        hotspot 0                   ,_slabVertexPos[i][y],_slabVertexZ[i],code,_slabVertexPos[i][x],1+128 : code=code+1
+        hotspot _slabVertexPos[i][x],_slabVertexPos[i][y],_slabVertexZ[i],code,_slabVertexPos[i][x],2     : code=code+1
+        hotspot -1                  ,_slabVertexPos[i][y],_slabVertexZ[i],code,_slabVertexPos[i][x],3     : code=code+1
+
+        hotspot _slabVertexPos[i][x],0                   ,_slabVertexZ[i],code,_slabVertexPos[i][y],1+128 : code=code+1
+        hotspot _slabVertexPos[i][x],_slabVertexPos[i][y],_slabVertexZ[i],code,_slabVertexPos[i][y],2     : code=code+1
+        hotspot _slabVertexPos[i][x],-1                  ,_slabVertexZ[i],code,_slabVertexPos[i][y],3     : code=code+1
+    next i
+endif
+
+group "ceil"
+    material boardMat
+
+    for i=1 to slabVertexNum
+        put _slabNewPos[i][x],_slabNewPos[i][y],0
+    next i
+    put _slabNewPos[1][x],_slabNewPos[1][y],-1
+
+    extrude slabVertexNum+1,0,0,sizeThi,1+2+4+8+16+32,
+    get(nsp)
+endgroup
+
+group "aclear_mat"
+    material boardMat
+
+    for i=1 to boardTheoNum
+        add _boardPos[i][1],_boardPos[i][2],0
+            block unitX,unitY,sizeThi
+        del 1
+    next i
+endgroup
+
+aclear_mat_1 = isectgroup ("aclear_mat","ceil")
+
+add base_pos[1][1],base_pos[1][2],0
+rotz base_rtz
+rotx -rat*base_dir
+rotz -base_rtz
+add -base_pos[1][1],-base_pos[1][2],0
+    placegroup aclear_mat_1
+del 5
+
+
+

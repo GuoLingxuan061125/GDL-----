@@ -1,0 +1,870 @@
+
+!================================================================================積算
+if display_doubuchi then
+	doubuchi_num=num_d
+else
+	doubuchi_num=0
+endif
+
+parameters doubuchi_num=doubuchi_num
+
+parameters seal_num=joiner_all_num
+
+corner_defult1=0
+corner_len1=0
+
+if corner_L=1 then 
+	corner_defult1=corner_defult1+ceil((hei+siding_up-siding_down)/sid_wid)
+	corner_len1=corner_len1+hei+siding_up-siding_down
+
+	if switch_op then
+		for i=1 to win_num
+			if win_xz2[i][1]+absx<=-offset_start_d and win_xz2[i][1]+win_wid2[i]+absx>=-offset_start_d then
+				corner_len1=corner_len1-win_hei2[i]+offset_win2+offset_win3*(win_type[i]-1)
+			endif
+		next i
+	endif
+		
+	if switch_beam then
+		for i=1 to beam_num
+			if beam_x[i]+absx<=-offset_start_d and beam_x[i]+beam_wid[i]+absx>=-offset_start_d then
+				corner_len1=corner_len1-beam_hei[i]
+			endif
+		next i
+	endif
+		
+	if switch_floor then
+		for i=1 to floor_num
+			if floor_x[i]+absx<=-offset_start_d and floor_x[i]+floor_wid[i]+absx>=-offset_start_d then
+				corner_len1=corner_len1-floor_hei[i]
+			endif
+		next i
+	endif
+
+	if switch_polygon then
+		for j=1 to num_polygon
+			if -offset_start_d>polygon_minx[j]+absx and -offset_start_d<polygon_maxx[j]+absx then
+				start_pos=0
+				start_num=0
+				end_pos=0
+				end_num=0
+
+				for n=1 to point_polygon[j]
+					n1=n
+					if n<point_polygon[j] then
+						n2=n+1
+					else
+						n2=1
+					endif
+	
+					if -offset_start_d>=min(coo_polygon[2*n1-1][j],coo_polygon[2*n2-1][j])+absx and -offset_start_d<max(coo_polygon[2*n1-1][j],coo_polygon[2*n2-1][j])+absx then
+						temp_a=coo_polygon[2*n1-1][j]+absx
+						temp_b=coo_polygon[2*n1][j]
+						temp_c=coo_polygon[2*n2-1][j]+absx
+						temp_d=coo_polygon[2*n2][j]
+						temp_x=-offset_start_d
+						
+						if start_num=0 then
+							start_num=n1
+							start_pos=temp_b+(temp_x-temp_a)/(temp_c-temp_a)*(temp_d-temp_b)
+						else
+							end_num=n1
+							end_pos=temp_b+(temp_x-temp_a)/(temp_c-temp_a)*(temp_d-temp_b)
+						endif
+					endif
+				next n
+
+				if start_num>0 and end_num>0 then
+					corner_len1=corner_len1-abs(end_pos-start_pos)
+				endif
+			endif
+		next j
+	endif
+endif 
+
+if corner_R=1 then 
+	corner_defult1=corner_defult1+ceil((hei+siding_up-siding_down)/sid_wid)
+	corner_len1=corner_len1+hei+siding_up-siding_down
+
+	if switch_op then
+		for i=1 to win_num
+			if win_xz2[i][1]+absx<=len+offset_end_d and win_xz2[i][1]+win_wid2[i]+absx>=len+offset_end_d then
+				corner_len1=corner_len1-win_hei2[i]+offset_win2+offset_win3*(win_type[i]-1)
+			endif
+		next i
+	endif
+
+	if switch_beam then
+		for i=1 to beam_num
+			if beam_x[i]+absx<=len+offset_end_d and beam_x[i]+beam_wid[i]+absx>=len+offset_end_d then
+				corner_len1=corner_len1-beam_hei[i]
+			endif
+		next i
+	endif
+
+	if switch_floor then
+		for i=1 to floor_num
+			if floor_x[i]+absx<=len+offset_end_d and floor_x[i]+floor_wid[i]+absx>=len+offset_end_d then
+				corner_len1=corner_len1-floor_hei[i]
+			endif
+		next i
+	endif
+
+	if switch_polygon then
+		for j=1 to num_polygon
+			if len+offset_end_d>polygon_minx[j]+absx and len+offset_end_d<polygon_maxx[i]+absx then
+				start_pos=0
+				start_num=0
+				end_pos=0
+				end_num=0
+
+				for n=1 to point_polygon[j]
+					n1=n
+					if n<point_polygon[j] then
+						n2=n+1
+					else
+						n2=1
+					endif
+	
+					if len+offset_end_d>=min(coo_polygon[2*n1-1][j],coo_polygon[2*n2-1][j])+absx and len+offset_end_d<max(coo_polygon[2*n1-1][j],coo_polygon[2*n2-1][j])+absx then
+						temp_a=coo_polygon[2*n1-1][j]+absx
+						temp_b=coo_polygon[2*n1][j]
+						temp_c=coo_polygon[2*n2-1][j]+absx
+						temp_d=coo_polygon[2*n2][j]
+						temp_x=len+offset_end_d
+						
+						if start_num=0 then
+							start_num=n1
+							start_pos=temp_b+(temp_x-temp_a)/(temp_c-temp_a)*(temp_d-temp_b)
+						else
+							end_num=n1
+							end_pos=temp_b+(temp_x-temp_a)/(temp_c-temp_a)*(temp_d-temp_b)
+						endif
+					endif
+				next n
+
+				if start_num>0 and end_num>0 then
+					corner_len1=corner_len1-abs(end_pos-start_pos)
+				endif
+			endif
+		next j
+	endif
+endif
+
+parameters siding_corner_num1=corner_defult1
+parameters siding_corner_len1=corner_len1
+
+corner_defult2=0
+corner_len2=0
+
+if corner_L=2 then 
+	corner_defult2=corner_defult2+(ceil((hei+siding_up-siding_down-sid_wid)/sid_wid)+1)
+	corner_len2=corner_len2+hei+siding_up-siding_down
+
+	if switch_op then
+		for i=1 to win_num
+			if win_xz2[i][1]+absx<=-offset_start_d and win_xz2[i][1]+win_wid2[i]+absx>=-offset_start_d then
+				corner_len2=corner_len2-win_hei2[i]+offset_win2+offset_win3*(win_type[i]-1)
+			endif
+		next i
+	endif
+		
+	if switch_beam then
+		for i=1 to beam_num
+			if beam_x[i]+absx<=-offset_start_d and beam_x[i]+beam_wid[i]+absx>=-offset_start_d then
+				corner_len2=corner_len2-beam_hei[i]
+			endif
+		next i
+	endif
+	
+	if switch_floor then	
+		for i=1 to floor_num
+			if floor_x[i]+absx<=-offset_start_d and floor_x[i]+floor_wid[i]+absx>=-offset_start_d then
+				corner_len2=corner_len2-floor_hei[i]
+			endif
+		next i
+	endif
+
+	if switch_polygon then
+		for j=1 to num_polygon
+			if -offset_start_d>polygon_minx[j]+absx and -offset_start_d<polygon_maxx[j]+absx then
+				start_pos=0
+				start_num=0
+				end_pos=0
+				end_num=0
+
+				for n=1 to point_polygon[j]
+					n1=n
+					if n<point_polygon[j] then
+						n2=n+1
+					else
+						n2=1
+					endif
+	
+					if -offset_start_d>=min(coo_polygon[2*n1-1][j],coo_polygon[2*n2-1][j])+absx and -offset_start_d<max(coo_polygon[2*n1-1][j],coo_polygon[2*n2-1][j])+absx then
+						temp_a=coo_polygon[2*n1-1][j]+absx
+						temp_b=coo_polygon[2*n1][j]
+						temp_c=coo_polygon[2*n2-1][j]+absx
+						temp_d=coo_polygon[2*n2][j]
+						temp_x=-offset_start_d
+						
+						if start_num=0 then
+							start_num=n1
+							start_pos=temp_b+(temp_x-temp_a)/(temp_c-temp_a)*(temp_d-temp_b)
+						else
+							end_num=n1
+							end_pos=temp_b+(temp_x-temp_a)/(temp_c-temp_a)*(temp_d-temp_b)
+						endif
+					endif
+				next n
+
+				if start_num>0 and end_num>0 then
+					corner_len2=corner_len2-abs(end_pos-start_pos)
+				endif
+			endif
+		next j
+	endif
+endif
+
+if corner_R=2 then 
+	corner_defult2=corner_defult2+(ceil((hei+siding_up-siding_down-sid_wid)/sid_wid)+1)
+	corner_len2=corner_len2+hei+siding_up-siding_down
+
+	if switch_op then
+		for i=1 to win_num
+			if win_xz2[i][1]+absx<=len+offset_end_d and win_xz2[i][1]+win_wid2[i]+absx>=len+offset_end_d then
+				corner_len2=corner_len2-win_hei2[i]+offset_win2+offset_win3*(win_type[i]-1)
+			endif
+		next i
+	endif
+	
+	if switch_beam then
+		for i=1 to beam_num
+			if beam_x[i]+absx<=len+offset_end_d and beam_x[i]+beam_wid[i]+absx>=len+offset_end_d then
+				corner_len2=corner_len2-beam_hei[i]
+			endif
+		next i
+	endif
+	
+	if switch_floor then
+		for i=1 to floor_num
+			if floor_x[i]+absx<=len+offset_end_d and floor_x[i]+floor_wid[i]+absx>=len+offset_end_d then
+				corner_len2=corner_len2-floor_hei[i]
+			endif
+		next i
+	endif
+
+	if switch_polygon then
+		for j=1 to num_polygon
+			if len+offset_end_d>polygon_minx[j]+absx and len+offset_end_d<polygon_maxx[j]+absx then
+				start_pos=0
+				start_num=0
+				end_pos=0
+				end_num=0
+
+				for n=1 to point_polygon[j]
+					n1=n
+					if n<point_polygon[j] then
+						n2=n+1
+					else
+						n2=1
+					endif
+	
+					if len+offset_end_d>=min(coo_polygon[2*n1-1][j],coo_polygon[2*n2-1][j])+absx and len+offset_end_d<max(coo_polygon[2*n1-1][j],coo_polygon[2*n2-1][j])+absx then
+						temp_a=coo_polygon[2*n1-1][j]+absx
+						temp_b=coo_polygon[2*n1][j]
+						temp_c=coo_polygon[2*n2-1][j]+absx
+						temp_d=coo_polygon[2*n2][j]
+						temp_x=len+offset_end_d
+						
+						if start_num=0 then
+							start_num=n1
+							start_pos=temp_b+(temp_x-temp_a)/(temp_c-temp_a)*(temp_d-temp_b)
+						else
+							end_num=n1
+							end_pos=temp_b+(temp_x-temp_a)/(temp_c-temp_a)*(temp_d-temp_b)
+						endif
+					endif
+				next n
+
+				if start_num>0 and end_num>0 then
+					corner_len2=corner_len2-abs(end_pos-start_pos)
+				endif
+			endif
+		next j
+	endif
+endif
+
+parameters siding_corner_num2=corner_defult2
+parameters siding_corner_len2=corner_len2
+
+
+!=====================ハットジョイナー座標と長さリスト
+values "seal_start_pos" range[0,sid_len]
+seal_defult=-offset_start_d+wid2_d/2+seal_start_pos
+
+if switch_seal=0 then
+	joiner_num=ceil((len+offset_start_d+offset_end_d-2*wid2_d-seal_start_pos)/sid_len)
+	lock "joiner_num"
+else
+	values "joiner_num" range[0,]
+endif
+parameters joiner_num=joiner_num
+
+if joiner_num>0 then
+	for i=1 to joiner_num
+		if switch_seal then 
+			parameters joiner_coo[i]=joiner_coo[i]
+		else
+			parameters joiner_coo[i]=seal_defult
+		endif
+
+		seal_defult=seal_defult+sid_len
+	next i
+endif
+
+joiner_all_num=0
+
+if switch_start_joiner then
+	joiner_all_num=joiner_all_num+1
+	joiner_all_pos[joiner_all_num]=-offset_start_d+wid2_d/2
+endif
+
+if joiner_num>0 then
+	for i=1 to joiner_num
+		joiner_all_num=joiner_all_num+1
+		joiner_all_pos[joiner_all_num]=joiner_coo[i]
+	next i
+endif
+
+if switch_end_joiner then
+	joiner_all_num=joiner_all_num+1
+	joiner_all_pos[joiner_all_num]=len+offset_end_d-wid2_d/2
+endif
+
+parameters joiner_all_num=joiner_all_num
+parameters joiner_all_pos=joiner_all_pos
+
+seal_len=0
+
+for i=1 to joiner_all_num
+
+	len_defult=hei+siding_up-siding_down
+	
+	if switch_op then
+		for j=1 to win_num
+			if joiner_all_pos[i]>win_xz2[j][1]+absx and joiner_all_pos[i]<win_xz2[j][1]+win_wid2[j]+absx then len_defult=len_defult-win_hei2[j]
+		next j
+	endif
+
+	if switch_beam then
+		for j=1 to beam_num
+			if joiner_all_pos[i]>beam_x[j]+absx and joiner_all_pos[i]<beam_x[j]+beam_wid[j]+absx then len_defult=len_defult-beam_hei[j]
+		next j
+	endif
+
+	if switch_floor then
+		for j=1 to floor_num	
+			if joiner_all_pos[i]>floor_x[j]+absx and joiner_all_pos[i]<floor_x[j]+floor_wid[j]+absx then len_defult=len_defult-floor_hei[j]
+		next j
+	endif
+
+	if switch_polygon then
+		for j=1 to num_polygon
+			if joiner_all_pos[i]>polygon_minx[j]+absx and joiner_all_pos[i]<polygon_maxx[j]+absx then
+				start_pos=0
+				start_num=0
+				end_pos=0
+				end_num=0
+
+				for n=1 to point_polygon[j]
+					n1=n
+					if n<point_polygon[j] then
+						n2=n+1
+					else
+						n2=1
+					endif
+	
+					if joiner_all_pos[i]>=min(coo_polygon[2*n1-1][j],coo_polygon[2*n2-1][j])+absx and joiner_all_pos[i]<max(coo_polygon[2*n1-1][j],coo_polygon[2*n2-1][j])+absx then
+						temp_a=coo_polygon[2*n1-1][j]+absx
+						temp_b=coo_polygon[2*n1][j]
+						temp_c=coo_polygon[2*n2-1][j]+absx
+						temp_d=coo_polygon[2*n2][j]
+						temp_x=joiner_all_pos[i]
+						
+						if start_num=0 then
+							start_num=n1
+							start_pos=temp_b+(temp_x-temp_a)/(temp_c-temp_a)*(temp_d-temp_b)
+						else
+							end_num=n1
+							end_pos=temp_b+(temp_x-temp_a)/(temp_c-temp_a)*(temp_d-temp_b)
+						endif
+					endif
+				next n
+
+				if start_num>0 and end_num>0 then
+					len_defult=len_defult-abs(end_pos-start_pos)
+				endif
+			endif
+		next j
+	endif
+
+	seal_len=seal_len+len_defult
+
+	parameters joiner_all_len[i]=len_defult
+
+next i
+
+parameters seal_len=seal_len
+
+!======================サイデイング枚数
+siding_len=len+offset_start_d+offset_end_d-wid2_d+joiner_wid
+roundx=int(siding_len/sid_len)
+
+if siding_len-roundx*sid_len>sid_len/2 then roundx=roundx+1
+
+if siding_len-roundx*sid_len<=sid_len/2 then roundx=roundx+(siding_len-roundx*sid_len)/sid_len
+
+parameters siding_num=roundx*ceil((hei+siding_up-siding_down)/sid_wid)
+
+
+!======================サイデイング面積
+dim _polygon_area[]
+_polygon_area[1]=0
+
+for i=1 to num_polygon
+    for j=1 to _point_polygon[i]
+        if _coo_polygon[2*j-1][i]<-offset_start_d then _coo_polygon[2*j-1][i]=-offset_start_d
+        if _coo_polygon[2*j-1][i]>len+offset_end_d then _coo_polygon[2*j-1][i]=len+offset_end_d
+        if _coo_polygon[2*j][i]<siding_down then _coo_polygon[2*j][i]=siding_down
+        if _coo_polygon[2*j][i]>hei+siding_up then _coo_polygon[2*j][i]=hei+siding_up
+    next j
+
+	_polygon_area[i]=0
+
+	for n=1 to _point_polygon[i]
+		n1=n
+		if n<_point_polygon[i] then
+			n2=n+1
+		else
+			n2=1
+		endif
+
+		_polygon_area[i]=_polygon_area[i]+(_coo_polygon[2*n1][i]+_coo_polygon[2*n2][i])*(_coo_polygon[2*n1-1][i]-_coo_polygon[2*n2-1][i])/2
+	next n
+
+	_polygon_area[i]=abs(_polygon_area[i])
+next i
+
+siding_area_defult=(siding_len)*(hei+siding_up-siding_down)
+parameters siding_area_defult=siding_area_defult
+
+if switch_op then
+	for i=1 to win_num
+        if win_type[i]=1 then
+            siding_area_defult=siding_area_defult-(min(win_xz2[i][1]+win_wid2[i]-offset_win,len+offset_end_d)-max(win_xz2[i][1]+offset_win,-offset_start_d))*\
+                (min(win_xz2[i][2]+win_hei2[i]-offset_win2,hei+siding_up)-max(win_xz2[i][2],siding_down))
+        else
+            siding_area_defult=siding_area_defult-(min(win_xz2[i][1]+win_wid2[i]-offset_win,len+offset_end_d)-max(win_xz2[i][1]+offset_win,-offset_start_d))*\
+                (min(win_xz2[i][2]+win_hei2[i]-offset_win2,hei+siding_up)-max(win_xz2[i][2]+offset_win3,siding_down))
+        endif
+	next i
+endif
+
+if switch_beam then
+	for i=1 to beam_num
+		siding_area_defult=siding_area_defult-(min(beam_x[i]+beam_wid[i],len+offset_end_d)-max(beam_x[i],-offset_start_d))*beam_hei[i]
+	next i
+endif
+
+if switch_floor then
+	for i=1 to floor_num
+		siding_area_defult=siding_area_defult-(min(floor_x[i]+floor_wid[i],len+offset_end_d)-max(floor_x[i],-offset_start_d))*floor_hei[i]
+	next i
+endif
+
+if switch_polygon then
+	for i=1 to num_polygon
+		siding_area_defult=siding_area_defult-_polygon_area[i]
+	next i
+endif
+
+if roof_cut then
+	siding_area_defult=siding_area_defult-cut_xzL[1][1]*cut_xzL[1][2]/2-cut_xzR[1][1]*cut_xzR[1][2]/2
+endif
+
+parameters siding_area=siding_area_defult
+
+
+!======================断熱材面積
+dannetsu_area_defult=(len+wallStartOffset+wallEndOffset)*(hei+siding_up-siding_down)
+parameters dannetsu_area_defult=dannetsu_area_defult
+
+if switch_op then
+	for i=1 to win_num
+        if win_type[i]=1 then
+            dannetsu_area_defult=dannetsu_area_defult-(min(win_xz2[i][1]+win_wid2[i]-offset_win,len+wallEndOffset)-max(win_xz2[i][1]+offset_win,-wallStartOffset))*\
+                (min(win_xz2[i][2]+win_hei2[i]-offset_win2,hei+siding_up)-max(win_xz2[i][2],siding_down))
+        else
+            dannetsu_area_defult=dannetsu_area_defult-(min(win_xz2[i][1]+win_wid2[i]-offset_win,len+wallEndOffset)-max(win_xz2[i][1]+offset_win,-wallStartOffset))*\
+                (min(win_xz2[i][2]+win_hei2[i]-offset_win2,hei+siding_up)-max(win_xz2[i][2]+offset_win3,siding_down))
+        endif
+	next i
+endif
+
+if switch_beam then
+	for i=1 to beam_num
+		dannetsu_area_defult=dannetsu_area_defult-(min(beam_x[i]+beam_wid[i],len+wallEndOffset)-max(beam_x[i],-wallStartOffset))*beam_hei[i]
+	next i
+endif
+
+if switch_floor then
+	for i=1 to floor_num
+		dannetsu_area_defult=dannetsu_area_defult-(min(floor_x[i]+floor_wid[i],len+wallEndOffset)-max(floor_x[i],-wallStartOffset))*floor_hei[i]
+	next i
+endif
+
+if switch_polygon then
+	for i=1 to num_polygon
+		dannetsu_area_defult=dannetsu_area_defult-_polygon_area[i]
+	next i
+endif
+
+if roof_cut then
+	dannetsu_area_defult=dannetsu_area_defult-cut_xzL[1][1]*cut_xzL[1][2]/2-cut_xzR[1][1]*cut_xzR[1][2]/2
+endif
+
+parameters dannetsu_area=dannetsu_area_defult
+
+
+!======================防水シート面積
+sheet_area_defult=(len+offset_start_b+offset_end_b)*(hei+siding_up-siding_down)
+
+if switch_op then
+	for i=1 to win_num
+        if win_type[i]=1 then
+            sheet_area_defult=sheet_area_defult-(min(win_xz2[i][1]+win_wid2[i]-offset_win,len+offset_end_b)-max(win_xz2[i][1]+offset_win,-offset_start_b))*\
+                (min(win_xz2[i][2]+win_hei2[i]-offset_win2,hei+sheet_up)-max(win_xz2[i][2],sheet_down))
+        else
+            sheet_area_defult=sheet_area_defult-(min(win_xz2[i][1]+win_wid2[i]-offset_win,len+offset_end_b)-max(win_xz2[i][1]+offset_win,-offset_start_b))*\
+                (min(win_xz2[i][2]+win_hei2[i]-offset_win2,hei+sheet_up)-max(win_xz2[i][2]+offset_win3,sheet_down))
+        endif
+	next i
+endif
+
+if switch_beam then
+	for i=1 to beam_num
+		sheet_area_defult=sheet_area_defult-(min(beam_x[i]+beam_wid[i],len+offset_end_b)-max(beam_x[i],-offset_start_b))*beam_hei[i]
+	next i
+endif
+
+if switch_floor then
+	for i=1 to floor_num
+		sheet_area_defult=sheet_area_defult-(min(floor_x[i]+floor_wid[i],len+offset_end_b)-max(floor_x[i],-offset_start_b))*floor_hei[i]
+	next i
+endif
+
+if switch_polygon then
+	for i=1 to num_polygon
+		sheet_area_defult=sheet_area_defult-_polygon_area[i]
+	next i
+endif
+
+if roof_cut then
+	sheet_area_defult=sheet_area_defult-cut_xzL[1][1]*cut_xzL[1][2]/2-cut_xzR[1][1]*cut_xzR[1][2]/2
+endif
+
+parameters sheet_area=sheet_area_defult
+
+lock "doubuchi_num","seal_num","siding_num","siding_corner_num1","siding_corner_num2","seal_len","siding_area_defult","siding_area","siding_corner_len1","siding_corner_len2","sheet_area"
+
+
+!================================================================================内側サイデイング積算
+if switch_siding_back then
+
+	parameters doubuchi_num_b=ceil((len+offset_start_d2+offset_end_d2-2*wid2_d)/pitch_d)+1
+	
+	parameters seal_num_b=ceil((len+offset_start_d2+offset_end_d2-2*wid2_d)/sid_len)+1
+	
+	parameters seal_len_b=seal_num_b*(hei+siding_up-siding_down2)
+	
+	
+	!======================サイデイング枚数
+	roundx=int((len+offset_start_d2+offset_end_d2-wid2_d)/sid_len)
+	
+	if (len+offset_start_d2+offset_end_d2-wid2_d)-roundx*sid_len>sid_len/2 then roundx=roundx+1
+	
+	if (len+offset_start_d2+offset_end_d2-wid2_d)-roundx*sid_len<=sid_len/2 then roundx=roundx+((len+offset_start_d2+offset_end_d2-wid2_d)-roundx*sid_len)/sid_len
+	
+	parameters siding_num_b=roundx*ceil((hei+siding_up-siding_down2)/sid_wid)
+	
+	
+	!======================出隅入隅
+	corner_defult1=0
+	corner_len1=0
+	
+	if corner_L2=1 then 
+		corner_defult1=corner_defult1+ceil((hei+siding_up-siding_down2)/sid_wid)
+		corner_len1=corner_len1+hei+siding_up-siding_down2
+	endif
+	if corner_R2=1 then 
+		corner_defult1=corner_defult1+ceil((hei+siding_up-siding_down2)/sid_wid)
+		corner_len1=corner_len1+hei+siding_up-siding_down2
+	endif
+	
+	parameters siding_corner_num1_b=corner_defult1
+	parameters siding_corner_len1_b=corner_len1
+	
+	corner_defult2=0
+	corner_len2=0
+	
+	if corner_L2=2 then 
+		corner_defult2=corner_defult2+ceil((hei+siding_up-siding_down2)/sid_wid)
+		corner_len2=corner_len2+hei+siding_up-siding_down2
+	endif
+	if corner_R2=2 then 
+		corner_defult2=corner_defult2+ceil((hei+siding_up-siding_down2)/sid_wid)
+		corner_len2=corner_len2+hei+siding_up-siding_down2
+	endif
+	
+	parameters siding_corner_num2_b=corner_defult2
+	parameters siding_corner_len2_b=corner_len2
+	
+	
+	!======================サイディング総面積
+	siding_area_defult=(len+offset_start_d2+offset_end_d2-wid2_d)*(hei+siding_up-siding_down2)
+	
+	if switch_op then
+		for i=1 to win_num
+			siding_area_defult=siding_area_defult-win_wid2[i]*win_hei2[i]
+		next i
+	endif
+	
+	if switch_beam then
+		for i=1 to beam_num
+			siding_area_defult=siding_area_defult-beam_wid[i]*beam_hei[i]
+		next i
+	endif
+	
+	if switch_floor then
+		for i=1 to floor_num
+			siding_area_defult=siding_area_defult-floor_wid[i]*floor_hei[i]
+		next i
+	endif
+	
+	if roof_cut then
+		siding_area_defult=siding_area_defult-cut_xzL[1][1]*cut_xzL[1][2]/2-cut_xzR[1][1]*cut_xzR[1][2]/2
+	endif
+	
+	parameters siding_area_b=siding_area_defult
+
+	lock "doubuchi_num_b","seal_num_b","siding_num_b","siding_corner_num1_b","siding_corner_num2_b","seal_len_b","siding_area_b","siding_corner_len1_b","siding_corner_len2_b"
+
+else
+
+	hideparameter "doubuchi_num_b","seal_num_b","siding_num_b","siding_corner_num1_b","siding_corner_num2_b","seal_len_b","siding_area_b","siding_corner_len1_b","siding_corner_len2_b"
+
+endif
+
+
+
+
+
+!グレーアウト
+
+if interface_f1 then
+
+lock "coo_start","coo_end","len","m_jiku","h_num","mb_num","m_dannetsu","cut_xzL","cut_xzR",\
+"switch_op","win_num","win_type","win_xz","win_wid","win_hei","switch_beam","beam_num","beam_x","beam_wid","beam_hei","switch_floor","floor_num","floor_wid","floor_hei","floor_x",\
+"offset_start_gh","offset_end_gh","m_gouhan","offset_start","offset_start2","offset_end","offset_end2","m_board1","m_board2",\
+"m_board3","m_board4","m_board5","m_molding","m_panel1","m_panel2","m_panel3","m_panel4","m_panel5","m_sheet","m_doubuchi","m_joiner","offset_start_b","offset_end_b",\
+"offset_start_d","offset_end_d","m_seal","direction","offset_start_b2","offset_end_b2","offset_start_d2","offset_end_d2"
+
+hideparameter "interface_f1"
+
+endif
+
+
+!================================================================================付属品
+index_len=len+offset_start_d+offset_end_d-wid2_d+joiner_wid
+index_len2=len+offset_start_m+offset_end_m-wid2_d+joiner_wid
+
+if corner_L=1 or corner_L=2 then
+	index_len=index_len+corner_wid*2
+	index_len2=index_len2+corner_wid*2
+endif
+
+if corner_R=1 or corner_R=2 then
+	index_len=index_len+corner_wid*2
+	index_len2=index_len2+corner_wid*2
+endif
+
+!index_len
+if roof_cut then
+    index_len=index_len-cut_xzL[1][1]+sqr(cut_xzL[1][1]^2+cut_xzL[1][2]^2)-cut_xzR[1][1]+sqr(cut_xzR[1][1]^2+cut_xzR[1][2]^2)
+endif
+
+if switch_op then
+	for i=1 to win_num
+		if win_xz[i][2]+win_hei2[i]>hei+siding_up then
+			win_start_pos=win_xz2[i][1]+offset_win+absx
+			if win_start_pos<-offset_start_d then win_start_pos=-offset_start_d
+			if win_start_pos>len+offset_end_d then win_start_pos=len+offset_end_d
+
+			win_end_pos=win_xz2[i][1]+win_wid2[i]-offset_win+absx
+			if win_end_pos<-offset_start_d then win_end_pos=-offset_start_d
+			if win_end_pos>len+offset_end_d then win_end_pos=len+offset_end_d
+
+			index_len=index_len-abs(win_end_pos-win_start_pos)
+		endif
+	next i
+endif
+
+if switch_polygon then
+	for j=1 to num_polygon
+		if hei+siding_up>polygon_miny[j] and hei+siding_up<polygon_maxy[j] then
+			start_pos=0
+			start_num=0
+			end_pos=0
+			end_num=0
+
+			for n=1 to point_polygon[j]
+				n1=n
+				if n<point_polygon[j] then
+					n2=n+1
+				else
+					n2=1
+				endif
+
+				if hei+siding_up>=min(coo_polygon[2*n1][j],coo_polygon[2*n2][j]) and hei+siding_up<max(coo_polygon[2*n1][j],coo_polygon[2*n2][j]) then
+					temp_a=coo_polygon[2*n1-1][j]+absx
+					temp_b=coo_polygon[2*n1][j]
+					temp_c=coo_polygon[2*n2-1][j]+absx
+					temp_d=coo_polygon[2*n2][j]
+					temp_y=hei+siding_up
+
+					if start_num=0 then
+						start_num=n1
+						start_pos=temp_a+(temp_y-temp_b)/(temp_d-temp_b)*(temp_c-temp_a)
+						if start_pos<-offset_start_d then start_pos=-offset_start_d
+						if start_pos>len+offset_end_d then start_pos=len+offset_end_d
+					else
+						end_num=n1
+						end_pos=temp_a+(temp_y-temp_b)/(temp_d-temp_b)*(temp_c-temp_a)
+						if end_pos<-offset_start_d then end_pos=-offset_start_d
+						if end_pos>len+offset_end_d then end_pos=len+offset_end_d
+					endif
+				endif
+			next n
+
+			if start_num>0 and end_num>0 then
+				index_len=index_len-abs(end_pos-start_pos)
+			endif
+		endif
+	next j
+endif
+
+!index_len2
+if switch_op then
+	for i=1 to win_num
+		if win_xz[i][2]<siding_down then
+			index_len2=index_len2-win_wid2[i]+2*offset_win
+		endif
+	next i
+endif
+
+top_seal_len=0
+mendo_len=0
+drainer_len=0
+baseboard_len=0
+
+top_seal_len=index_len
+mendo_len=index_len
+drainer_len=index_len2
+baseboard_len=index_len2
+
+if switch_mendo=0 then
+	top_seal_len=0
+	mendo_len=0
+	hideparameter "m_mendo","mendo_hei","mendo_wid","m_top_seal","top_seal_wid"
+endif
+
+if switch_drainer=0 then
+	drainer_len=0
+	hideparameter "m_drainer","drainer_hei","drainer_low"
+endif
+
+if switch_baseboard=0 then
+	baseboard_len=0
+	hideparameter "baseboard_num","baseboard_m","baseboard_thi","baseboard_hei","baseboard_offset"
+endif
+
+parameters top_seal_len=top_seal_len
+parameters mendo_len=mendo_len
+parameters drainer_len=drainer_len
+parameters baseboard_len=baseboard_len
+
+
+!==============================================================================================================開口部シーリング集計
+op_seal_len_1=0
+op_seal_len_2=0
+op_rat_len=0
+
+if win_num>0 then
+	for i=1 to win_num
+		if switch_seal_op_side[i] then
+			if win_type[i]=1 then
+				op_seal_len_1=op_seal_len_1+2*(win_hei2[i]-offset_win2)
+			else
+				op_seal_len_1=op_seal_len_1+2*(win_hei2[i]-offset_win2-offset_win3)
+			endif
+		endif
+
+		if switch_seal_op_top[i] then
+			op_seal_len_1=op_seal_len_1+(win_wid2[i]-2*offset_win)
+		endif
+
+		if switch_seal_op_down[i] then
+			op_seal_len_2=op_seal_len_2+(win_wid2[i]-2*offset_win)
+		endif
+
+		if switch_seal_op_rat[i] then
+			op_rat_len=op_rat_len+(win_wid2[i]-2*offset_win)
+		endif	
+	next i
+endif
+
+parameters op_seal_len_1=op_seal_len_1
+parameters op_seal_len_2=op_seal_len_2
+parameters op_rat_len=op_rat_len
+
+
+!==============================================================================================================防水シール集計
+sheetseal_len=0
+
+if switch_sheetseal then
+	sheetseal_len=sheetseal_len+len+offset_start_b+offset_end_b
+    if roof_cut then sheetseal_len=sheetseal_len-cut_xzL[1][1]+sqr(cut_xzL[1][1]^2+cut_xzL[1][2]^2)-cut_xzR[1][1]+sqr(cut_xzR[1][1]^2+cut_xzR[1][2]^2)
+	
+	if switch_op then
+		for i=1 to win_num
+			if win_type[i]=1 then
+				sheetseal_len=sheetseal_len+2*(win_hei2[i]-offset_win2+sheetseal_wid)+(win_wid2[i]-2*offset_win+2*sheetseal_wid)
+			else
+				sheetseal_len=sheetseal_len+2*(win_hei2[i]-offset_win2-offset_win3+2*sheetseal_wid)+2*(win_wid2[i]-2*offset_win+2*sheetseal_wid)
+			endif
+		next i
+	endif
+endif
+
+parameters sheetseal_len=sheetseal_len
+lock "sheetseal_len"
+
+
+
+
+
+
+
+
+

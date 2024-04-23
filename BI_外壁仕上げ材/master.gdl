@@ -1,0 +1,29 @@
+code=1
+
+parameters wall_thi=0
+
+dim op_type_text_list[]
+op_type_text_list[101]="バルコニー"
+op_type_text_list[102]="ルーフバルコニー"
+op_type_text_list[103]="サービスバルコニー"
+op_type_text_list[104]="妻面バルコニー"
+op_type_text_list[105]="妻壁"
+op_type_text_list[106]="開放廊下"
+op_type_text_list[107]="吹抜"
+op_type_text_list[108]="内部階段"
+op_type_text_list[109]="メールコーナー"
+op_type_text_list[201]="玄関扉"
+op_type_text_list[202]="トランクルーム扉"
+op_type_text_list[203]="共用扉"
+op_type_text_list[204]="MB扉"
+op_type_text_list[205]="エントランス廻り"
+op_type_text_list[206]="EV三方枠(露出)"
+op_type_text_list[207]="集会室扉"
+op_type_text_list[208]="屋上点検扉"
+op_type_text_list[209]="ルーフバルコニー点検扉"
+op_type_text_list[210]="門扉 二方"
+op_type_text_list[211]="階段扉 三方"
+op_type_text_list[212]="管理室扉"
+op_type_text_list[213]="ゴミ置場扉"
+op_type_text_list[214]="電気室扉"
+op_type_text_list[215]="ポンプ室扉"

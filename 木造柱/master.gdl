@@ -1,0 +1,11 @@
+values{2} "col" 1,"間柱",2,"管柱",3,"通し柱"
+
+if col<>1 then hideparameter "col_hei_offset","col_hei_offset_rep"
+if col=3 then hideparameter "col_hei"
+if col<>3 then hideparameter "B_mortise","B_hei1","B_hei2","Btop_ele","col_hei_corner"
+
+values{2} "pro_2d"	1,"輪郭",2,"カラー"
+values{2} "tenon_type_U" 0,"なし",1,"短ほぞ",2,"長ほぞ",3,"扇ほぞ"
+values{2} "tenon_type_D" 0,"なし",1,"短ほぞ",2,"長ほぞ",3,"扇ほぞ"
+values{2} "B_hei1" 120,"120",150,"150",210,"210",240,"240",270,"270",330,"330"
+values{2} "B_hei2" 120,"120",150,"150",210,"210",240,"240",270,"270",330,"330"

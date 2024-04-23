@@ -1,0 +1,212 @@
+code=1
+
+standard_x=(step_num_down-step_num_up)*step_tread+landing_1-landing_2
+step_a=45+atn(step_nosing/step_riser)/2
+max_hr_hei=max(hr_hei,landing_hr_hei,floor_hr_hei,hr2_hei)
+
+if step_dir=1 and switch_turn=0 then
+	index_x=1
+	index_y=1
+endif
+
+if step_dir=1 and switch_turn=1 then
+	index_x=-1
+	index_y=-1
+endif
+
+if step_dir=2 and switch_turn=0 then
+	index_x=1
+	index_y=-1
+endif
+
+if step_dir=2 and switch_turn=1 then
+	index_x=-1
+	index_y=1
+endif
+
+if switch_hr1=0 then
+	x_landing=0
+else
+	x_landing=hr_wid2
+endif
+
+if switch_hr1=0 or (hr_hide=2 and hr_hide_start=0 and hr_hide_end=0) then
+	y_down=0
+else
+	y_down=hr_wid
+endif
+
+if switch_hr1=0 or (hr_hide=3 and hr_hide_start=0 and hr_hide_end=0) then
+	y_up=0
+else
+	y_up=hr_wid
+endif
+
+if switch_hr1=0 or (hr_hide=1 and hr_hide_start=0 and hr_hide_end=0) then
+	x_floor=0
+else
+	x_floor=hr_wid2
+endif
+
+if switch_hr2=0 then
+	x_floor2=0
+else
+	x_floor2=hr_wid2
+endif
+
+if switch_gl then
+	z_1=floor_num
+else
+	z_1=floor_num-1
+endif
+
+dbn_side_cover=dose_side_cover
+
+
+!=================================材質・線色コードリスト
+dim scode_list[]
+scode_list[10]=1
+scode_list[13]=2
+scode_list[16]=3
+scode_list[19]=4
+
+!=================================外径半径リスト
+dim dr_list[]
+dr_list[10]=0.0055 !d10
+dr_list[13]=0.007 !d13
+dr_list[16]=0.009 !d16
+dr_list[19]=0.0105 !d19
+
+!=================================呼び径リスト
+dim nd_list[]
+nd_list[10]=0.01 !D10
+nd_list[13]=0.013 !D13
+nd_list[16]=0.016 !D16
+nd_list[19]=0.019 !D19
+
+!=================================直線定着長さL2
+dim l2_list[][]
+l2_list[1][18]=40
+l2_list[1][21]=35
+l2_list[1][24]=30
+l2_list[1][27]=30
+l2_list[1][30]=30
+l2_list[1][33]=30
+l2_list[1][36]=30
+l2_list[1][39]=25
+l2_list[1][42]=25
+l2_list[1][45]=25
+l2_list[1][48]=25
+l2_list[1][51]=25
+l2_list[1][54]=25
+l2_list[1][57]=25
+l2_list[1][60]=25
+l2_list[2][18]=40
+l2_list[2][21]=35
+l2_list[2][24]=35
+l2_list[2][27]=35
+l2_list[2][30]=30
+l2_list[2][33]=30
+l2_list[2][36]=30
+l2_list[2][39]=30
+l2_list[2][42]=30
+l2_list[2][45]=30
+l2_list[2][48]=25
+l2_list[2][51]=25
+l2_list[2][54]=25
+l2_list[2][57]=25
+l2_list[2][60]=25
+l2_list[3][18]=0
+l2_list[3][21]=40
+l2_list[3][24]=40
+l2_list[3][27]=40
+l2_list[3][30]=35
+l2_list[3][33]=35
+l2_list[3][36]=35
+l2_list[3][39]=35
+l2_list[3][42]=35
+l2_list[3][45]=35
+l2_list[3][48]=30
+l2_list[3][51]=30
+l2_list[3][54]=30
+l2_list[3][57]=30
+l2_list[3][60]=30
+l2_list[4][18]=0
+l2_list[4][21]=0
+l2_list[4][24]=45
+l2_list[4][27]=45
+l2_list[4][30]=40
+l2_list[4][33]=40
+l2_list[4][36]=40
+l2_list[4][39]=40
+l2_list[4][42]=40
+l2_list[4][45]=40
+l2_list[4][48]=35
+l2_list[4][51]=35
+l2_list[4][54]=35
+l2_list[4][57]=35
+l2_list[4][60]=35
+
+
+!=================================折り曲げ定着直線部長さL2
+dim l2h_list[][]
+l2h_list[1][18]=30
+l2h_list[1][21]=25
+l2h_list[1][24]=20
+l2h_list[1][27]=20
+l2h_list[1][30]=20
+l2h_list[1][33]=20
+l2h_list[1][36]=20
+l2h_list[1][39]=15
+l2h_list[1][42]=15
+l2h_list[1][45]=15
+l2h_list[1][48]=15
+l2h_list[1][51]=15
+l2h_list[1][54]=15
+l2h_list[1][57]=15
+l2h_list[1][60]=15
+l2h_list[2][18]=30
+l2h_list[2][21]=25
+l2h_list[2][24]=25
+l2h_list[2][27]=25
+l2h_list[2][30]=20
+l2h_list[2][33]=20
+l2h_list[2][36]=20
+l2h_list[2][39]=20
+l2h_list[2][42]=20
+l2h_list[2][45]=20
+l2h_list[2][48]=15
+l2h_list[2][51]=15
+l2h_list[2][54]=15
+l2h_list[2][57]=15
+l2h_list[2][60]=15
+l2h_list[3][18]=0
+l2h_list[3][21]=30
+l2h_list[3][24]=30
+l2h_list[3][27]=30
+l2h_list[3][30]=25
+l2h_list[3][33]=25
+l2h_list[3][36]=25
+l2h_list[3][39]=25
+l2h_list[3][42]=25
+l2h_list[3][45]=25
+l2h_list[3][48]=20
+l2h_list[3][51]=20
+l2h_list[3][54]=20
+l2h_list[3][57]=20
+l2h_list[3][60]=20
+l2h_list[4][18]=0
+l2h_list[4][21]=0
+l2h_list[4][24]=35
+l2h_list[4][27]=35
+l2h_list[4][30]=30
+l2h_list[4][33]=30
+l2h_list[4][36]=30
+l2h_list[4][39]=30
+l2h_list[4][42]=30
+l2h_list[4][45]=30
+l2h_list[4][48]=25
+l2h_list[4][51]=25
+l2h_list[4][54]=25
+l2h_list[4][57]=25
+l2h_list[4][60]=25

@@ -1,0 +1,476 @@
+
+! =============================================================================
+! Tabpage Structure Definition
+! =============================================================================
+TABID_Root 	= -1
+_idxTab 	= 1
+
+TABID_BasicSetting		= _idxTab  : _idxTab = _idxTab + 1
+TABID_ColumnSetting		= _idxTab  : _idxTab = _idxTab + 1
+if joint then
+	TABID_BeamSetting		= _idxTab  : _idxTab = _idxTab + 1
+	TABID_BoardSetting		= _idxTab  : _idxTab = _idxTab + 1
+	TABID_BracketSetting	= _idxTab  : _idxTab = _idxTab + 1
+	TABID_List			= _idxTab  : _idxTab = _idxTab + 1
+else	
+	TABID_OobikiSetting		= _idxTab  : _idxTab = _idxTab + 1
+	TABID_BeamSetting		= _idxTab  : _idxTab = _idxTab + 1
+	TABID_BoardSetting		= _idxTab  : _idxTab = _idxTab + 1
+	TABID_BracketSetting	= _idxTab  : _idxTab = _idxTab + 1
+	TABID_List			= _idxTab  : _idxTab = _idxTab + 1
+endif
+
+
+! =============================================================================
+! Display actual tabpages
+! =============================================================================
+ui_dialog `仮設足場設定`
+ui_current_page 	gs_ui_current_page
+
+UI_PAGE TABID_BasicSetting, 		TABID_Root, 	`基本設定`, 	""
+	gosub "BasicSettingPage"
+
+UI_PAGE TABID_ColumnSetting, 		TABID_Root, 	`支柱／ジャッキベース／拡幅狭幅ブラケット設定`, 	""
+	gosub "ColumnSettingsPage"
+
+if not(joint) then
+	UI_PAGE TABID_OobikiSetting, 	TABID_Root, 	`大引受／大引受ジャッキ設定`, 	""
+		gosub "OobikiSettingsPage"
+endif
+
+UI_PAGE TABID_BeamSetting, 		TABID_Root, 	`布材／先行手摺付ブレース／梁枠設定`, 	""
+	gosub "BeamSettingsPage"
+
+UI_PAGE TABID_BoardSetting, 		TABID_Root, 	`布板／階段／ハッチ式布板設定`, 	""
+	gosub "BoardSettingsPage"
+
+UI_PAGE TABID_BracketSetting, 		TABID_Root, 	`ブラケット設定`, 	""
+	gosub "BracketSettingsPage"
+
+UI_PAGE TABID_List, 				TABID_Root, 	`部材リスト`, 	""
+	gosub "ListPage"
+
+
+! ==============================================================================
+END
+! ==============================================================================
+
+
+
+!----------------------------------------------------------------------------------------------------------
+"BasicSettingPage":
+!----------------------------------------------------------------------------------------------------------
+
+	gosub "prev_nextButton"
+	
+	iFillListID	= TABID_BasicSetting
+	itemID 	= 1
+	
+	pageStartY	= 30
+	dy 		= 24
+	yEnd 		= 268
+	yCurrent 	= pageStartY + 1
+	
+	ui_listfield iFillListID, 0, yCurrent-3, 444, yEnd - yCurrent, 0
+		ui_listitem itemID, iFillListID, "",	0, "", "サイズ" : itemID = itemID + 1
+			ui_listitem itemID, iFillListID, "unitType",	1, "", " 単位切替" : itemID = itemID + 1
+			ui_listitem itemID, iFillListID, "A",	1, "", " 桁行" : itemID = itemID + 1
+			ui_listitem itemID, iFillListID, "B",	1, "", " 梁間" : itemID = itemID + 1
+		
+		ui_listitem itemID, iFillListID, "",	0, "", "平面図表示設定" : itemID = itemID + 1
+			ui_listitem itemID, iFillListID, "app2d",	1, "", " 平面複線表示" : itemID = itemID + 1
+			if not(app2d) then
+				ui_listitem itemID, iFillListID, "app2d_type",	1, "", "   2D平面図表示タイプ" : itemID = itemID + 1
+				ui_listitem itemID, iFillListID, "app2d_column",	1, "", "   2D支柱位置表示" : itemID = itemID + 1
+				ui_listitem itemID, iFillListID, "app2d_column_pen",	1, "", "   2D支柱　ペン" : itemID = itemID + 1
+			endif
+
+		ui_listitem itemID, iFillListID, "",	0, "", "立断面図表示設定" : itemID = itemID + 1
+			ui_listitem itemID, iFillListID, "res",	1, "", " 曲面解像度" : itemID = itemID + 1
+			ui_listitem itemID, iFillListID, "app3d",	1, "", " 立断面複線表現" : itemID = itemID + 1
+			ui_listitem itemID, iFillListID, "app3d_type",	1, "", " 立断面表示要素" : itemID = itemID + 1
+
+!		ui_listitem itemID, iFillListID, "",	0, "", "配列複写" : itemID = itemID + 1
+!			ui_listitem itemID, iFillListID, "sequence_v",	1, "", "配列複写（層）" : itemID = itemID + 1
+!			ui_listitem itemID, iFillListID, "sequence_h",	1, "", "配列複写（スパン）" : itemID = itemID + 1
+
+
+return
+
+
+!----------------------------------------------------------------------------------------------------------
+"ColumnSettingsPage":
+!----------------------------------------------------------------------------------------------------------
+
+	gosub "prev_nextButton"
+	
+	iFillListID	= TABID_ColumnSetting
+	itemID 	= 1
+	
+	pageStartY	= 30
+	dy 		= 24
+	yEnd 		= 268
+	yCurrent 	= pageStartY + 1
+
+	ui_listfield iFillListID, 0, yCurrent-3, 444, yEnd - yCurrent, 0
+
+	ui_listitem itemID, iFillListID, "",	0, "", "支柱" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "prop_shape",	1, "", " 支柱形状" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "joint",		1, "", " 支柱先端ピン" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "prop1",	1, "uiTab_column1.png",	" 支柱1" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "prop2",	1, "uiTab_column2.png",	" 支柱2" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "prop3",	1, "uiTab_column3.png",	" 支柱3" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "prop4",	1, "uiTab_column4.png",	" 支柱4" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "usePenColor",	1, "", " 材質はペンカラーを使用" : itemID = itemID + 1
+		if usePenColor then	ui_listitem itemID, iFillListID, "penMat", 1, "", "  ・支柱カラー" : itemID = itemID + 1
+	
+	
+	ui_listitem itemID, iFillListID, "",	0, "", "ジャッキベース" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "jb_fl1",	1, "", " ジャッキベース1" : itemID = itemID + 1
+			if jb_fl1	 then	ui_listitem itemID, iFillListID, "jb_h1",	1, "", "  ・高さ" : itemID = itemID + 1
+
+		ui_listitem itemID, iFillListID, "jb_fl2",	1, "", " ジャッキベース2" : itemID = itemID + 1
+			if jb_fl2	 then 	ui_listitem itemID, iFillListID, "jb_h2",	1, "", "  ・高さ" : itemID = itemID + 1
+
+		ui_listitem itemID, iFillListID, "jb_fl3",	1, "", " ジャッキベース3" : itemID = itemID + 1
+			if jb_fl3	 then 	ui_listitem itemID, iFillListID, "jb_h3",	1, "", "  ・高さ" : itemID = itemID + 1
+
+		ui_listitem itemID, iFillListID, "jb_fl4",	1, "", " ジャッキベース4" : itemID = itemID + 1
+			if jb_fl4 then 	ui_listitem itemID, iFillListID, "jb_h4",	1, "", "  ・高さ" : itemID = itemID + 1
+	
+	
+	ui_listitem itemID, iFillListID, "",	0, "", "拡幅狭幅ブラケット" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "frame_decrease1",	1, "", " 拡幅狭幅ブラケット1" : itemID = itemID + 1
+			if frame_decrease1 then 	ui_listitem itemID, iFillListID, "frame_decrease1_pos",	1, "", "  ・取付段" : itemID = itemID + 1
+
+		ui_listitem itemID, iFillListID, "frame_decrease2",	1, "", " 拡幅狭幅ブラケット2" : itemID = itemID + 1
+			if frame_decrease2 then 	ui_listitem itemID, iFillListID, "frame_decrease2_pos",	1, "", "  ・取付段" : itemID = itemID + 1
+
+		ui_listitem itemID, iFillListID, "frame_decrease3",	1, "", " 拡幅狭幅ブラケット3" : itemID = itemID + 1
+			if frame_decrease3 then 	ui_listitem itemID, iFillListID, "frame_decrease3_pos",	1, "", "  ・取付段" : itemID = itemID + 1
+
+		ui_listitem itemID, iFillListID, "frame_decrease4",	1, "", " 拡幅狭幅ブラケット4" : itemID = itemID + 1
+			if frame_decrease4 then 	ui_listitem itemID, iFillListID, "frame_decrease4_pos",	1, "", "  ・取付段" : itemID = itemID + 1
+
+return
+
+!----------------------------------------------------------------------------------------------------------
+"OobikiSettingsPage":
+!----------------------------------------------------------------------------------------------------------
+
+	gosub "prev_nextButton"
+	
+	iFillListID	= TABID_OobikiSetting
+	itemID 	= 1
+	
+	pageStartY	= 30
+	dy 		= 24
+	yEnd 		= 268
+	yCurrent 	= pageStartY + 1
+
+	ui_listfield iFillListID, 0, yCurrent-3, 444, yEnd - yCurrent, 0
+
+	ui_listitem itemID, iFillListID, "",	0, "", "大引受／大引受ジャッキ" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "bSameSetting_oobiki",	1, "", " 設定は共通(角度、カラー調整材、高さ)" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "oobikiType1",	1, "", " 大引受1" : itemID = itemID + 1
+			if oobikiType1 > 0 & not(bSameSetting_oobiki)	then	
+				ui_listitem itemID, iFillListID, "oobikiAng1",	1, "", "  ・角度" : itemID = itemID + 1
+				ui_listitem itemID, iFillListID, "oobikiColor1",	1, "", "  ・カラー調整材" : itemID = itemID + 1
+				if oobikiType1 = 2 then	ui_listitem itemID, iFillListID, "oobikiJackH1",	1, "", "  ・ジャッキ高さ" : itemID = itemID + 1
+			endif
+
+		ui_listitem itemID, iFillListID, "oobikiType2",	1, "", " 大引受2" : itemID = itemID + 1
+			if oobikiType2 > 0  & not(bSameSetting_oobiki)	then		
+				ui_listitem itemID, iFillListID, "oobikiAng2",	1, "", "  ・角度" : itemID = itemID + 1
+				ui_listitem itemID, iFillListID, "oobikiColor2",	1, "", "  ・カラー調整材" : itemID = itemID + 1
+				if oobikiType2 = 2 then	ui_listitem itemID, iFillListID, "oobikiJackH2",	1, "", "  ・ジャッキ高さ" : itemID = itemID + 1
+			endif
+
+		ui_listitem itemID, iFillListID, "oobikiType3",	1, "", " 大引受3" : itemID = itemID + 1
+			if oobikiType3 > 0  & not(bSameSetting_oobiki)	then		
+				ui_listitem itemID, iFillListID, "oobikiAng3",	1, "", "  ・角度" : itemID = itemID + 1
+				ui_listitem itemID, iFillListID, "oobikiColor3",	1, "", "  ・カラー調整材" : itemID = itemID + 1
+				if oobikiType3 = 2 then	ui_listitem itemID, iFillListID, "oobikiJackH3",	1, "", "  ・ジャッキ高さ" : itemID = itemID + 1
+			endif
+
+		ui_listitem itemID, iFillListID, "oobikiType4",	1, "", " 大引受4" : itemID = itemID + 1
+			if oobikiType4 > 0 & not(bSameSetting_oobiki)	then		
+				ui_listitem itemID, iFillListID, "oobikiAng4",	1, "", "  ・角度" : itemID = itemID + 1
+				ui_listitem itemID, iFillListID, "oobikiColor4",	1, "", "  ・カラー調整材" : itemID = itemID + 1
+				if oobikiType4 = 2 then	ui_listitem itemID, iFillListID, "oobikiJackH4",	1, "", "  ・ジャッキ高さ" : itemID = itemID + 1
+			endif
+
+		if 	bSameSetting_oobiki		then		
+			ui_listitem itemID, iFillListID, "",	1, "", " 共通設定" : itemID = itemID + 1
+			ui_listitem itemID, iFillListID, "oobikiAng",	1, "", "  ・角度" : itemID = itemID + 1
+			ui_listitem itemID, iFillListID, "oobikiColor",	1, "", "  ・カラー調整材" : itemID = itemID + 1
+			ui_listitem itemID, iFillListID, "oobikiJackH",	1, "", "  ・ジャッキ高さ" : itemID = itemID + 1
+		endif
+	
+return
+
+
+
+!----------------------------------------------------------------------------------------------------------
+"BeamSettingsPage":
+!----------------------------------------------------------------------------------------------------------
+
+	gosub "section_Num"
+	gosub "prev_nextButton"
+	
+	iFillListID	= TABID_BeamSetting
+	itemID 	= 1
+	
+	pageStartY	= 30
+	dy 		= 24
+	yEnd 		= 268
+	yCurrent 	= pageStartY + 1
+
+	ui_listfield iFillListID, 0, yCurrent-3, 444, yEnd - yCurrent, 0
+
+
+	!------手前
+	ui_listitem itemID, iFillListID, "led1_in",	0, "", "布材１" : itemID = itemID + 1
+	if led1_in then
+		ui_listitem itemID, iFillListID, "led1_type_in",	1, "", " 布材１：タイプ" : itemID = itemID + 1
+	
+		if led1_type_in="梁枠" then
+			ui_listitem itemID, iFillListID, "led1_beamtype_in",	1, "", "  ・梁枠タイプ １" : itemID = itemID + 1
+			ui_listitem itemID, iFillListID, "led_beamLed_in",	1, "", "  ・梁枠間布材" : itemID = itemID + 1
+			ui_listitem itemID, iFillListID, "led_beamBoard_in",	1, "", "  ・梁枠上布板" : itemID = itemID + 1
+		endif
+	endif
+	
+	!------奥
+	ui_listitem itemID, iFillListID, "led2_in",	0, "", "布材２" : itemID = itemID + 1
+	if led2_in then
+		ui_listitem itemID, iFillListID, "led2_type_in",	1, "", " 布材２：タイプ" : itemID = itemID + 1
+	
+		if led2_type_in="梁枠" then
+			ui_listitem itemID, iFillListID, "led2_beamtype_in",	1, "", "  ・梁枠タイプ ２" : itemID = itemID + 1
+		endif
+	endif
+	
+	!------左
+	ui_listitem itemID, iFillListID, "led3_in",	0, "", "布材３" : itemID = itemID + 1
+	if led3_in then
+		ui_listitem itemID, iFillListID, "led3_type_in",	1, "", " 布材３：タイプ" : itemID = itemID + 1
+
+		if led3_type_in="梁枠" then
+			ui_listitem itemID, iFillListID, "led3_beamtype_in",	1, "", "  ・梁枠タイプ ３" : itemID = itemID + 1
+		endif
+	endif
+	ui_listitem itemID, iFillListID, "led3_anglebrace_in",	0, "", "強化方杖" : itemID = itemID + 1
+return
+
+
+!----------------------------------------------------------------------------------------------------------
+"BoardSettingsPage":
+!----------------------------------------------------------------------------------------------------------
+
+	gosub "section_Num"
+	gosub "prev_nextButton"
+	
+	iFillListID	= TABID_BoardSetting
+	itemID 	= 1
+	
+	pageStartY	= 30
+	dy 		    = 24
+	yEnd 		= 268
+	yCurrent 	= pageStartY + 1
+
+	ui_listfield iFillListID, 0, yCurrent-3, 444, yEnd - yCurrent, 0
+
+		ui_listitem itemID, iFillListID, "board_in",	0, "", "布板" : itemID = itemID + 1
+		if board_in then
+			ui_listitem itemID, iFillListID, "board_type_in",		0, "", " 布板タイプ" : itemID = itemID + 1
+		
+			if board_type_in="階段" then
+				ui_listitem itemID, iFillListID, "board_sreverse_in",		1, "", "  ・階段反転" : itemID = itemID + 1
+				ui_listitem itemID, iFillListID, "board_spos_in",		1, "", "  ・階段位置" : itemID = itemID + 1
+				ui_listitem itemID, iFillListID, "board_srail1_in",		1, "", "  ・階段手摺１" : itemID = itemID + 1
+				ui_listitem itemID, iFillListID, "board_srail2_in",		1, "", "  ・階段手摺２" : itemID = itemID + 1
+				ui_listitem itemID, iFillListID, "board_stepRail_in",		1, "", "  ・開口ガード" : itemID = itemID + 1
+				if section_no = 1 & _bNegarami then
+					ui_listitem itemID, iFillListID, "board_stepHanger_in",	1, "", "  ・階段受" : itemID = itemID + 1
+				endif
+
+			endif
+		
+			if board_type_in="ハッチ式布板" then
+				ui_listitem itemID, iFillListID, "board_hreverse_in",		1, "", "  ・ハッチ反転" : itemID = itemID + 1
+				ui_listitem itemID, iFillListID, "board_hpos_in",		1, "", "  ・ハッチ位置" : itemID = itemID + 1
+				ui_listitem itemID, iFillListID, "board_hopen_in",		1, "", "  ・ハッチ開閉" : itemID = itemID + 1
+				ui_listitem itemID, iFillListID, "board_huse_in",		1, "", "  ・ハッチはしご" : itemID = itemID + 1
+			endif
+
+
+			ui_listitem itemID, iFillListID, "",		0, "", "布板表示" : itemID = itemID + 1
+				ui_listitem itemID, iFillListID, "board1_show_in",	1, "", " 布板1を表示" : itemID = itemID + 1
+				if board_n >1 then
+					ui_listitem itemID, iFillListID, "board2_show_in",	1, "", " 布板2を表示" : itemID = itemID + 1
+				endif
+				if board_n >2 then
+					ui_listitem itemID, iFillListID, "board3_show_in",	1, "", " 布板3を表示" : itemID = itemID + 1
+				endif
+                if B>unitSize_values[5]+EPS and B<unitSize_values[4]+EPS then
+                    ui_listitem itemID, iFillListID, "board_exchange",  1, "", " 布板巾交換" : itemID = itemID + 1
+                endif
+		endif
+
+		ui_listitem itemID, iFillListID, "",		0, "", "巾木" : itemID = itemID + 1
+			ui_listitem itemID, iFillListID, "board1_bboard_in",	1, "", " 巾木1" : itemID = itemID + 1
+			ui_listitem itemID, iFillListID, "board2_bboard_in",	1, "", " 巾木2" : itemID = itemID + 1
+			ui_listitem itemID, iFillListID, "board3_bboard_in",	1, "", " 巾木3" : itemID = itemID + 1
+return
+
+
+!----------------------------------------------------------------------------------------------------------
+"BracketSettingsPage":
+!----------------------------------------------------------------------------------------------------------
+
+	gosub "section_Num"
+	gosub "prev_nextButton"
+	
+	iFillListID	= TABID_BracketSetting
+	itemID 	= 1
+	
+	pageStartY	= 30
+	dy 		= 24
+	yEnd 		= 268
+	yCurrent 	= pageStartY + 1
+
+	ui_listfield iFillListID, 0, yCurrent-3, 444, yEnd - yCurrent, 0
+
+	ui_listitem itemID, iFillListID, "",	0, "", "ブラケット" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "bracketType1_in",	1, "", " ブラケット1" : itemID = itemID + 1
+			if bracketType1_in > 0  then 		ui_listitem itemID, iFillListID, "bracket1_pos_in",	1, "", "   ・取付方向：" : itemID = itemID + 1
+
+		ui_listitem itemID, iFillListID, "bracketType2_in",	1, "", " ブラケット2" : itemID = itemID + 1
+			if bracketType2_in > 0  then 		ui_listitem itemID, iFillListID, "bracket2_pos_in",	1, "", "   ・取付方向：" : itemID = itemID + 1
+
+		ui_listitem itemID, iFillListID, "bracketType3_in",	1, "", " ブラケット3" : itemID = itemID + 1
+			if bracketType3_in > 0  then 		ui_listitem itemID, iFillListID, "bracket3_pos_in",	1, "", "   ・取付方向：" : itemID = itemID + 1
+
+		ui_listitem itemID, iFillListID, "bracketType4_in",	1, "", " ブラケット4" : itemID = itemID + 1
+			if bracketType4_in > 0  then 		ui_listitem itemID, iFillListID, "bracket4_pos_in",	1, "", "   ・取付方向：" : itemID = itemID + 1
+
+return
+
+
+
+
+!----------------------------------------------------------------------------------------------------------
+"ListPage":
+!----------------------------------------------------------------------------------------------------------
+
+	gosub "prev_nextButton"
+	
+	iFillListID	= TABID_List
+	itemID 	= 1
+	
+	pageStartY	= 30
+	dy 		= 24
+	yEnd 		= 268
+	yCurrent 	= pageStartY + 1
+
+	ui_listfield iFillListID, 0, yCurrent-3, 444, yEnd - yCurrent, 0
+		
+		ui_listitem itemID, iFillListID, "list_prop_productcode",		0, "", "支柱（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_prop_number",			0, "", "支柱　本数" : itemID = itemID + 1
+
+		if list_prop_number2>0 then
+			ui_listitem itemID, iFillListID, "list_prop_productcode2",		0, "", "支柱（規格）" : itemID = itemID + 1
+			ui_listitem itemID, iFillListID, "list_prop_number2",			0, "", "支柱　本数" : itemID = itemID + 1
+		endif
+
+		ui_listitem itemID, iFillListID, "list_jackbase_productcode",		0, "", "ジャッキベース（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_jackbase_number",		0, "", "ジャッキベース　個数" : itemID = itemID + 1
+		
+		ui_listitem itemID, iFillListID, "list_oobiki_productcode",		0, "", "大引受１（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_oobiki_number",			0, "", "大引受１　個数" : itemID = itemID + 1
+
+		ui_listitem itemID, iFillListID, "list_oobiki_productcode2",		0, "", "大引受２（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_oobiki_number2",			0, "", "大引受２　個数" : itemID = itemID + 1
+
+		ui_listitem itemID, iFillListID, "list_ledger_productcode",		0, "", "布材１（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_ledger_number",			0, "", "布材１　本数" : itemID = itemID + 1
+		
+		ui_listitem itemID, iFillListID, "list_ledger_productcode2",		0, "", "布材２（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_ledger_number2",		0, "", "布材２　本数" : itemID = itemID + 1
+			
+		ui_listitem itemID, iFillListID, "list_brace_productcode",		0, "", "先行手摺ブレース１（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_brace_number",			0, "", "先行手摺ブレース１　本数" : itemID = itemID + 1
+		
+		ui_listitem itemID, iFillListID, "list_brace_productcode2",		0, "", "先行手摺ブレース２（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_brace_number2",			0, "", "先行手摺ブレース２　本数" : itemID = itemID + 1
+		
+		ui_listitem itemID, iFillListID, "list_beamframe_productcode",	0, "", "梁枠１（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_beamframe_number",		0, "", "梁枠１　本数" : itemID = itemID + 1
+		
+		ui_listitem itemID, iFillListID, "list_beamframe_productcode2",	0, "", "梁枠２（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_beamframe_number2",		0, "", "梁枠２　本数" : itemID = itemID + 1
+		
+		ui_listitem itemID, iFillListID, "list_anglebrace_productcode",	0, "", "強化方杖（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_anglebrace_number",		0, "", "強化方杖　本数" : itemID = itemID + 1
+		
+		ui_listitem itemID, iFillListID, "list_decrease_productcode",		0, "", "拡幅狭幅ブラケット（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_decrease_number",		0, "", "拡幅狭幅ブラケット　個数" : itemID = itemID + 1
+		
+		ui_listitem itemID, iFillListID, "list_bracket_productcode",		0, "", "ブラケット１（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_bracket_number",		0, "", "ブラケット１　個数" : itemID = itemID + 1
+		
+		ui_listitem itemID, iFillListID, "list_bracket_productcode2",		0, "", "ブラケット２（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_bracket_number2",		0, "", "ブラケット２　個数" : itemID = itemID + 1
+		
+		ui_listitem itemID, iFillListID, "list_ledgerboard_productcode",	0, "", "布板１（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_ledgerboard_number",		0, "", "布板１　個数" : itemID = itemID + 1
+		
+		ui_listitem itemID, iFillListID, "list_ledgerboard_productcode2",	0, "", "布板２（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_ledgerboard_number2",		0, "", "布板２　個数" : itemID = itemID + 1
+		
+		ui_listitem itemID, iFillListID, "list_stair_productcode",		0, "", "階段（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_stair_number",			0, "", "階段　個数" : itemID = itemID + 1
+		
+		ui_listitem itemID, iFillListID, "list_sloperail_productcode",		0, "", "斜面手摺（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_sloperail_number",		0, "", "斜面手摺　本数" : itemID = itemID + 1
+
+		ui_listitem itemID, iFillListID, "list_stepRail_productcode",		0, "", "開口ガード（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_stepRail_number",		0, "", "開口ガード　本数" : itemID = itemID + 1
+
+		ui_listitem itemID, iFillListID, "list_stepHanger_productcode",	0, "", "階段受（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_stepHanger_number",		0, "", "階段受　本数" : itemID = itemID + 1
+		
+		ui_listitem itemID, iFillListID, "list_hatch_productcode",		0, "", "ハッチ式布板（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_hatch_number",			0, "", "ハッチ式布板　個数" : itemID = itemID + 1
+		
+		ui_listitem itemID, iFillListID, "list_baseboard_productcode",	0, "", "巾木１（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_baseboard_number",		0, "", "巾木１　個数" : itemID = itemID + 1
+		
+		ui_listitem itemID, iFillListID, "list_baseboard_productcode2",	0, "", "巾木２（規格）" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_baseboard_number2",		0, "", "巾木２　個数" : itemID = itemID + 1
+		
+		!---------------------------------------------------
+		ui_listitem itemID, iFillListID, "list_area_automatic",		0, "", "面積" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_area1",			0, "", "エリア" : itemID = itemID + 1
+		ui_listitem itemID, iFillListID, "list_area2",			0, "", "エリア２" : itemID = itemID + 1
+
+return
+
+
+!----------------------------------------------------------------------------------------------------------
+"prev_nextButton":
+!----------------------------------------------------------------------------------------------------------
+	ui_button ui_prev, `<<`, 380, 0, 30, 20
+	ui_button ui_next, `>>`, 414, 0, 30, 20
+return
+
+
+!----------------------------------------------------------------------------------------------------------
+"section_Num":
+!----------------------------------------------------------------------------------------------------------
+	ui_style 0,1
+	ui_outfield 	"入力段:",	10, 	3, 	50,	20
+	ui_infield 	"section_no", 	100, 	0,	100,	25
+return
+

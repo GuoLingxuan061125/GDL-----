@@ -1,0 +1,22 @@
+project2 3,270,pro_2d
+
+hotspot2 0,0
+hotspot2 0.105/2,0.105/2
+hotspot2 -0.105/2,0.105/2
+hotspot2 0.105/2,-0.105/2
+hotspot2 -0.105/2,-0.105/2
+
+
+if pro_2d=2 then
+    edgeLen=0.105
+    FILL gs_fill_type
+    POLY2_B 5,1+2+4,gs_fill_pen,gs_back_pen,
+        -edgeLen/2,+edgeLen/2,1,
+        +edgeLen/2,+edgeLen/2,1,
+        +edgeLen/2,-edgeLen/2,1,
+        -edgeLen/2,-edgeLen/2,1,
+        -edgeLen/2,+edgeLen/2,-1
+    line2 -edgeLen/2,+edgeLen/2,+edgeLen/2,-edgeLen/2
+    line2 +edgeLen/2,+edgeLen/2,-edgeLen/2,-edgeLen/2
+endif
+

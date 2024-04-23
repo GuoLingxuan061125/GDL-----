@@ -1,0 +1,152 @@
+!====================================================================================集計
+treadFinArea=0      !踏面仕上面積
+risingFinArea=0     !蹴上仕上面積
+nosingFinLen=0      !ノンスリップ仕上長さ
+nosingFinArea=0     !ノンスリップ仕上面積
+mortarArea=0        !仕上げモルタル面積
+landingTopFinArea=0 !踊り場仕上面積
+bottomFinArea=0     !床裏仕上面積
+rail1TopFinLen=0    !外側立上り天端仕上長さ
+rail1TopFinArea=0   !外側立上り天端仕上面積
+rail2TopFinLen=0    !内側立上り天端仕上長さ
+rail2TopFinArea=0   !内側立上り天端仕上面積
+railOutFinArea=0    !立上り外側仕上面積
+railInFinArea=0     !立上り内側仕上面積
+
+if switchFin then
+    if stepFinType=1 then
+        treadFinArea=stairNum*(stairEnd-stairStart)*sqr((stairTread+stairNosing)^2+(stairRat)^2)
+        risingFinArea=stairNum*(stairEnd-stairStart)*sqr((stairRiser-stairRat)^2+(stairNosing)^2)
+        nosingFinLen=stairNum*(stairEnd-stairStart)
+        nosingFinArea=nosingFinLen*nonslipWid
+    else
+        mortarArea=stairNum*(stairEnd-stairStart)*(sqr((stairTread+stairNosing)^2+(stairRat)^2)+sqr((stairRiser-stairRat)^2+(stairNosing)^2))
+    endif
+
+    if switchLanding then
+        landingTopFinArea=(stairEnd-stairStart)*sqr((landingDep)^2+(landingDep*landingRat/100)^2)
+        bottomFinArea=stairWid*(sqr(((stairNum*stairRiser-landingThi)-(0))^2+(((stairNum*stairRiser-landingThi-equB1)/equK1)-(-equB1/equK1))^2)+\
+					  ((stairNum*stairTread+landingDep)-((stairNum*stairRiser-landingThi-equB1)/equK1)))
+    else
+        bottomFinArea=stairWid*sqr(((equK1*(stairNum*stairTread)+equB1)-(0))^2+((stairNum*stairTread)-(-equB1/equK1))^2)
+    endif
+
+    if switchRail1 then
+        if switchLanding then
+            rail1TopFinLen=sqr(((stairNum*stairRiser+landingRailHei)-(stairRailHei))^2+(((stairNum*stairRiser+landingRailHei-equB2)/equK2)-(-stairTread))^2)+\
+                           ((stairNum*stairTread+landingDep)-((stairNum*stairRiser+landingRailHei-equB2)/equK2))
+        else
+            rail1TopFinLen=sqr(((stairNum*stairRiser+landingRailHei)-(stairRailHei))^2+(((stairNum*stairRiser+landingRailHei-equB2)/equK2)-(-stairTread))^2)+\
+                           ((stairNum*stairTread)-((stairNum*stairRiser+landingRailHei-equB2)/equK2))
+        endif
+        railInFinArea=railInFinArea+handrailInArea
+        railOutFinArea=railOutFinArea+handrailOutArea
+    endif
+    rail1TopFinArea=rail1TopFinLen*rail1Wid
+
+    if switchRail2 then
+        if switchLanding then
+            rail2TopFinLen=sqr(((stairNum*stairRiser+landingRailHei)-(stairRailHei))^2+(((stairNum*stairRiser+landingRailHei-equB2)/equK2)-(-stairTread))^2)+\
+                           ((stairNum*stairTread+landingDep)-((stairNum*stairRiser+landingRailHei-equB2)/equK2))
+        else
+            rail2TopFinLen=sqr(((stairNum*stairRiser+landingRailHei)-(stairRailHei))^2+(((stairNum*stairRiser+landingRailHei-equB2)/equK2)-(-stairTread))^2)+\
+                           ((stairNum*stairTread)-((stairNum*stairRiser+landingRailHei-equB2)/equK2))
+        endif
+        railInFinArea=railInFinArea+handrailInArea
+        railOutFinArea=railOutFinArea+handrailOutArea
+    endif
+    rail2TopFinArea=rail2TopFinLen*rail2Wid
+
+    
+endif
+
+
+parameters \
+area_step_tread=treadFinArea,
+area_step_riser=risingFinArea,
+len_step_nosing=nosingFinLen,
+area_step_nosing=nosingFinArea,
+area_step_mortar=mortarArea,
+area_landing=landingTopFinArea,
+area_step_down=bottomFinArea,
+len_hr1_top=rail1TopFinLen,
+area_hr1_top=rail1TopFinArea,
+len_hr2_top=rail2TopFinLen,
+area_hr2_top=rail2TopFinArea,
+area_hr_outside=railOutFinArea,
+area_hr_inside=railInFinArea
+
+
+!コンクリート数量
+concrete_vol=0
+
+!階段
+step_cut_area1=(step_tread*step_riser/2)+((step_riser+step_rat)*step_nosing/2)-((step_tread+step_nosing)*step_rat/2)
+concrete_vol=concrete_vol+(stairEnd-stairStart)*step_num_totle*step_cut_area1
+
+x1=0 : y1=0
+x2=stairNum*stairTread : y2=stairNum*stairRiser
+if switchLanding then
+    x3=(stairNum*stairRiser-landingThi-equB1)/equK1 : y3=stairNum*stairRiser-landingThi
+else
+    x3=stairNum*stairTread : y3=equK1*(stairNum*stairTread)+equB1
+endif
+x4=-equB1/equK1 : y4=0
+
+step_cut_area2=(x2-x1)*(y2+y1)/2+(x3-x2)*(y3+y2)/2+(x4-x3)*(y4+y3)/2+(x1-x4)*(y1+y4)/2
+step_cut_area2=abs(step_cut_area2)
+concrete_vol=concrete_vol+(stairEnd-stairStart)*step_cut_area2
+
+
+!踊り場
+if switchLanding then
+    x1=stairNum*stairTread : y1=stairNum*stairRiser
+    x2=stairNum*stairTread+landingDep : y2=stairNum*stairRiser-landingDep*landingRat/100
+    x3=stairNum*stairTread+landingDep : y3=stairNum*stairRiser-landingThi
+    x4=(stairNum*stairRiser-landingThi-equB1)/equK1 : y4=stairNum*stairRiser-landingThi
+
+    landing_cut_area=(x2-x1)*(y2+y1)/2+(x3-x2)*(y3+y2)/2+(x4-x3)*(y4+y3)/2+(x1-x4)*(y1+y4)/2
+    landing_cut_area=abs(landing_cut_area)
+    concrete_vol=concrete_vol+(stairEnd-stairStart)*landing_cut_area
+endif
+
+
+!立上り
+if switchLanding then
+    x1=-stairTread : y1=stairRailHei
+    x2=-stairTread : y2=0
+    x3=-equB1/equK1 : y3=0
+    x4=(stairNum*stairRiser-landingThi-equB1)/equK1 : y4=stairNum*stairRiser-landingThi
+    x5=stairNum*stairTread+landingDep : y5=stairNum*stairRiser-landingThi
+    x6=stairNum*stairTread+landingDep : y6=stairNum*stairRiser+landingRailHei
+    x7=(stairNum*stairRiser+landingRailHei-equB2)/equK2 : y7=stairNum*stairRiser+landingRailHei
+else
+    x1=-stairTread : y1=stairRailHei
+    x2=-stairTread : y2=0
+    x3=-equB1/equK1 : y3=0
+    x4=stairNum*stairTread : y4=equK1*(stairNum*stairTread)+equB1
+    x5=stairNum*stairTread : y5=stairNum*stairRiser+stairRailHei
+    x6=(stairNum*stairRiser+stairRailHei-equB2)/equK2 : y6=stairNum*stairRiser+stairRailHei
+    x7=(stairNum*stairRiser+stairRailHei-equB2)/equK2 : y7=stairNum*stairRiser+stairRailHei
+endif
+
+handrail_cut_area=(x2-x1)*(y2+y1)/2+(x3-x2)*(y3+y2)/2+(x4-x3)*(y4+y3)/2+(x5-x4)*(y5+y4)/2+(x6-x5)*(y6+y5)/2+(x7-x6)*(y7+y6)/2+(x1-x7)*(y1+y7)/2
+handrail_cut_area=abs(handrail_cut_area)
+
+if switchRail1 then
+    concrete_vol=concrete_vol+hr_wid*handrail_cut_area
+endif
+
+if switchRail2 then
+    concrete_vol=concrete_vol+hr2_wid*handrail_cut_area
+endif
+
+parameters concrete_vol=concrete_vol
+
+
+
+
+
+
+
+

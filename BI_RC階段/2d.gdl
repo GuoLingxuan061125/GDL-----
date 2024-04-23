@@ -1,0 +1,476 @@
+define style "moji1" textfont,0.7*100/glob_scale,5,0
+
+if switch_turn then
+	rot2 180
+endif
+
+if step_dir=2 then 
+	mul2 1,-1
+endif
+
+hotspot2 0,0
+hotspot2 0,step_wid1
+hotspot2 (step_num_down-1)*step_tread+landing_1+landing_dep,0
+hotspot2 (step_num_down-1)*step_tread+landing_1+landing_dep,step_wid_tot
+
+hotspot2 step_num_down*step_tread-step_tread,step_wid1/2,code,landing_1,1+128:code=code+1
+hotspot2 step_num_down*step_tread-step_tread-1,step_wid1/2,code,landing_1,3:code=code+1
+hotspot2 step_num_down*step_tread-step_tread+landing_1,step_wid1/2,code,landing_1,2:code=code+1
+
+hotspot2 step_num_down*step_tread+landing_1-step_tread,step_wid1+handrail_wid/2,code,landing_dep,1+128:code=code+1
+hotspot2 step_num_down*step_tread+landing_1-step_tread-1,step_wid1+handrail_wid/2,code,landing_dep,3:code=code+1
+hotspot2 step_num_down*step_tread+landing_1-step_tread+landing_dep,step_wid1+handrail_wid/2,code,landing_dep,2:code=code+1
+
+hotspot2 step_num_down*step_tread-step_tread+landing_1,step_wid_tot/2,code,landing_2,1+128:code=code+1
+hotspot2 step_num_down*step_tread-step_tread+landing_1+1,step_wid_tot/2,code,landing_2,3:code=code+1
+hotspot2 step_num_down*step_tread-step_tread+landing_1-landing_2,step_wid_tot/2,code,landing_2,2:code=code+1
+
+hotspot2 step_num_down*step_tread-step_tread+landing_1,step_wid1,code,handrail_wid,1+128:code=code+1
+hotspot2 step_num_down*step_tread-step_tread+landing_1,step_wid1-1,code,handrail_wid,3:code=code+1
+hotspot2 step_num_down*step_tread-step_tread+landing_1,step_wid1+handrail_wid,code,handrail_wid,2:code=code+1
+
+
+for i=1 to step_num_down-1
+	rect2 0,0,step_tread,step_wid1
+	add2 step_tread,0
+next i
+del step_num_down-1
+
+add2 (step_num_down-1)*step_tread+landing_1-landing_2,step_wid1+handrail_wid
+for i=1 to step_num_up-1
+	rect2 0,0,-step_tread,step_wid2
+	add2 -step_tread,0
+next i
+del step_num_up
+
+
+line2 (step_num_down-1)*step_tread,step_wid1,(step_num_down-1)*step_tread+landing_1,step_wid1
+line2 (step_num_down-1)*step_tread+landing_1,step_wid1+handrail_wid,(step_num_down-1)*step_tread+landing_1,step_wid1
+line2 (step_num_down-1)*step_tread+landing_1,step_wid1+handrail_wid,(step_num_down-1)*step_tread-landing_2,step_wid1+handrail_wid
+
+line2 (step_num_down-1)*step_tread,0,(step_num_down-1)*step_tread+landing_1+landing_dep,0
+line2 (step_num_down-1)*step_tread+landing_1+landing_dep,0,(step_num_down-1)*step_tread+landing_1+landing_dep,step_wid_tot
+line2 (step_num_down-1)*step_tread+landing_1+landing_dep,step_wid_tot,(step_num_down-1)*step_tread-landing_2,step_wid_tot
+
+set line_type line_2
+
+line2 (step_num_down-1)*step_tread+landing_1,0,(step_num_down-1)*step_tread+landing_1,step_wid_tot
+
+if standard_x>=0 then
+	hotspot2 0,step_wid1/2,code,floor_1,1+128:code=code+1
+	hotspot2 1,step_wid1/2,code,floor_1,3:code=code+1
+	hotspot2 -floor_1,step_wid1/2,code,floor_1,2:code=code+1
+	line2 -floor_1,0,-floor_1,step_wid_tot
+else
+	hotspot2 standard_x,step_wid_tot/2,code,floor_1,1+128:code=code+1
+	hotspot2 standard_x+1,step_wid_tot/2,code,floor_1,3:code=code+1
+	hotspot2 standard_x-floor_1,step_wid_tot/2,code,floor_1,2:code=code+1
+	line2 standard_x-floor_1,0,standard_x-floor_1,step_wid_tot
+endif
+
+set line_type line_1
+
+if switch_floor then
+	hotspot2 min(standard_x,0)-floor_1,step_wid1+handrail_wid/2,code,floor_dep,1+128:code=code+1
+	hotspot2 min(standard_x,0)-floor_1+1,step_wid1+handrail_wid/2,code,floor_dep,3:code=code+1
+	hotspot2 min(standard_x,0)-floor_1-floor_dep,step_wid1+handrail_wid/2,code,floor_dep,2:code=code+1
+endif
+
+
+!=========================フロア踊り場
+line2 0,step_wid1,min(0,standard_x)-floor_1,step_wid1
+line2 min(0,standard_x)-floor_1,step_wid1,min(0,standard_x)-floor_1,step_wid1+handrail_wid
+line2 min(0,standard_x)-floor_1,step_wid1+handrail_wid,standard_x,step_wid1+handrail_wid
+
+if switch_floor then
+	line2 0,0,min(0,standard_x)-floor_1-floor_dep,0
+	line2 min(0,standard_x)-floor_1-floor_dep,0,min(0,standard_x)-floor_1-floor_dep,step_wid_tot
+	line2 min(0,standard_x)-floor_1-floor_dep,step_wid_tot,standard_x,step_wid_tot
+	
+	hotspot2 min(0,standard_x)-floor_1-floor_dep,0
+	hotspot2 min(0,standard_x)-floor_1-floor_dep,step_wid_tot
+else
+	line2 0,0,min(0,standard_x)-floor_1,0
+	line2 standard_x,step_wid_tot,min(0,standard_x)-floor_1,step_wid_tot
+
+	hotspot2 min(0,standard_x)-floor_1,0
+	hotspot2 min(0,standard_x)-floor_1,step_wid_tot
+endif
+
+
+!中間踊り場勾配
+line2 (step_num_down-1)*step_tread+landing_1+landing_dep/3,step_wid1+handrail_wid/2,(step_num_down-1)*step_tread+landing_1+landing_dep*2/3,step_wid1+handrail_wid/2
+line2 (step_num_down-1)*step_tread+landing_1+landing_dep*2/3,step_wid1+handrail_wid/2,(step_num_down-1)*step_tread+landing_1+landing_dep*2/3-0.1,step_wid1+handrail_wid/2+0.03
+line2 (step_num_down-1)*step_tread+landing_1+landing_dep*2/3,step_wid1+handrail_wid/2,(step_num_down-1)*step_tread+landing_1+landing_dep*2/3-0.1,step_wid1+handrail_wid/2-0.03
+
+!フロア踊り場勾配
+if switch_floor then
+	line2 min(standard_x,0)-floor_1-floor_dep/3,step_wid1+handrail_wid/2,min(standard_x,0)-floor_1-floor_dep*2/3,step_wid1+handrail_wid/2
+	line2 min(standard_x,0)-floor_1-floor_dep*2/3,step_wid1+handrail_wid/2,min(standard_x,0)-floor_1-floor_dep*2/3+0.1,step_wid1+handrail_wid/2+0.03
+	line2 min(standard_x,0)-floor_1-floor_dep*2/3,step_wid1+handrail_wid/2,min(standard_x,0)-floor_1-floor_dep*2/3+0.1,step_wid1+handrail_wid/2-0.03
+endif
+
+!登る方向
+circle2 0,step_wid1/2,0.02
+line2 0,step_wid1/2,(step_num_down-1)*step_tread+landing_1+landing_dep/2,step_wid1/2
+line2 (step_num_down-1)*step_tread+landing_1+landing_dep/2,step_wid1/2,standard_x+(step_num_up-1)*step_tread+landing_2+landing_dep/2,step_wid_tot/2
+line2 standard_x,step_wid_tot/2,standard_x+(step_num_up-1)*step_tread+landing_2+landing_dep/2,step_wid_tot/2
+line2 standard_x,step_wid_tot/2,standard_x+0.1,step_wid_tot/2+0.03
+line2 standard_x,step_wid_tot/2,standard_x+0.1,step_wid_tot/2-0.03
+
+
+!======================================================================立上り
+set fill hr_fill
+
+if switch_hr1 then
+	if switch_floor then
+		if hr_hide<>1 then
+			poly2 4,1+2+4,
+			min(standard_x,0)-floor_1-floor_dep,0,
+			min(standard_x,0)-floor_1-floor_dep+hr_wid2,0,
+			min(standard_x,0)-floor_1-floor_dep+hr_wid2,step_wid_tot,
+			min(standard_x,0)-floor_1-floor_dep,step_wid_tot
+		else !フロア踊り場側り立上り開口
+			poly2 4,1+2+4,
+			min(standard_x,0)-floor_1-floor_dep,hr_wid,
+			min(standard_x,0)-floor_1-floor_dep+hr_wid2,hr_wid,
+			min(standard_x,0)-floor_1-floor_dep+hr_wid2,hr_wid+hr_hide_start,
+			min(standard_x,0)-floor_1-floor_dep,hr_wid+hr_hide_start
+	
+			poly2 4,1+2+4,
+			min(standard_x,0)-floor_1-floor_dep,step_wid_tot-hr_wid,
+			min(standard_x,0)-floor_1-floor_dep+hr_wid2,step_wid_tot-hr_wid,
+			min(standard_x,0)-floor_1-floor_dep+hr_wid2,step_wid_tot-hr_wid-hr_hide_end,
+			min(standard_x,0)-floor_1-floor_dep,step_wid_tot-hr_wid-hr_hide_end
+		endif
+	endif
+
+	if hr_hide<>2 then
+		if switch_floor then
+			poly2 4,1+2+4,	
+			min(standard_x,0)-floor_1-floor_dep,0,
+			min(standard_x,0)-floor_1-floor_dep,hr_wid,
+			(step_num_down-1)*step_tread+landing_1+landing_dep,hr_wid,
+			(step_num_down-1)*step_tread+landing_1+landing_dep,0
+		else
+			poly2 4,1+2+4,	
+			min(standard_x,0)-floor_1,0,
+			min(standard_x,0)-floor_1,hr_wid,
+			(step_num_down-1)*step_tread+landing_1+landing_dep,hr_wid,
+			(step_num_down-1)*step_tread+landing_1+landing_dep,0
+		endif
+	else !中間踊り場下部階段側立上り開口
+		if switch_floor then
+			poly2 4,1+2+4,	
+			min(standard_x,0)-floor_1-floor_dep+hr_wid2,0,
+			min(standard_x,0)-floor_1-floor_dep+hr_wid2,hr_wid,
+			min(standard_x,0)-floor_1-floor_dep+hr_wid2+hr_hide_start,hr_wid,
+			min(standard_x,0)-floor_1-floor_dep+hr_wid2+hr_hide_start,0
+		else
+			poly2 4,1+2+4,	
+			min(standard_x,0)-floor_1,0,
+			min(standard_x,0)-floor_1,hr_wid,
+			min(standard_x,0)-floor_1+hr_hide_start,hr_wid,
+			min(standard_x,0)-floor_1+hr_hide_start,0
+		endif
+
+		poly2 4,1+2+4,	
+		(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2,0,
+		(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2,hr_wid,
+		(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2-hr_hide_end,hr_wid,
+		(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2-hr_hide_end,0
+	endif
+
+	if hr_hide<>3 then
+		if switch_floor then
+			poly2 4,1+2+4,
+			min(standard_x,0)-floor_1-floor_dep,step_wid_tot,
+			min(standard_x,0)-floor_1-floor_dep,step_wid_tot-hr_wid,
+			(step_num_down-1)*step_tread+landing_1+landing_dep,step_wid_tot-hr_wid,
+			(step_num_down-1)*step_tread+landing_1+landing_dep,step_wid_tot
+		else
+			poly2 4,1+2+4,
+			min(standard_x,0)-floor_1,step_wid_tot,
+			min(standard_x,0)-floor_1,step_wid_tot-hr_wid,
+			(step_num_down-1)*step_tread+landing_1+landing_dep,step_wid_tot-hr_wid,
+			(step_num_down-1)*step_tread+landing_1+landing_dep,step_wid_tot
+		endif
+	else !中間踊り場上部階段側立上り開口
+		if switch_floor then
+			poly2 4,1+2+4,	
+			min(standard_x,0)-floor_1-floor_dep+hr_wid2,step_wid_tot,
+			min(standard_x,0)-floor_1-floor_dep+hr_wid2,step_wid_tot-hr_wid,
+			min(standard_x,0)-floor_1-floor_dep+hr_wid2+hr_hide_start,step_wid_tot-hr_wid,
+			min(standard_x,0)-floor_1-floor_dep+hr_wid2+hr_hide_start,step_wid_tot
+		else
+			poly2 4,1+2+4,	
+			min(standard_x,0)-floor_1,step_wid_tot,
+			min(standard_x,0)-floor_1,step_wid_tot-hr_wid,
+			min(standard_x,0)-floor_1+hr_hide_start,step_wid_tot-hr_wid,
+			min(standard_x,0)-floor_1+hr_hide_start,step_wid_tot
+		endif
+
+		poly2 4,1+2+4,	
+		(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2,step_wid_tot,
+		(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2,step_wid_tot-hr_wid,
+		(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2-hr_hide_end,step_wid_tot-hr_wid,
+		(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2-hr_hide_end,step_wid_tot
+	endif
+
+	poly2 4,1+2+4,
+	(step_num_down-1)*step_tread+landing_1+landing_dep,0,
+	(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2,0,
+	(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2,step_wid_tot,
+	(step_num_down-1)*step_tread+landing_1+landing_dep,step_wid_tot
+
+	if hr_hide>0 then
+		if switch_floor and hr_hide=1 then !フロア踊り場側
+			hotspot2 min(standard_x,0)-floor_1-floor_dep,hr_wid,code,hr_hide_start,1+128:code=code+1
+			hotspot2 min(standard_x,0)-floor_1-floor_dep,hr_wid-1,code,hr_hide_start,3:code=code+1
+			hotspot2 min(standard_x,0)-floor_1-floor_dep,hr_wid+hr_hide_start,code,hr_hide_start,2:code=code+1
+
+			hotspot2 min(standard_x,0)-floor_1-floor_dep,step_wid_tot-hr_wid,code,hr_hide_end,1+128:code=code+1
+			hotspot2 min(standard_x,0)-floor_1-floor_dep,step_wid_tot-hr_wid+1,code,hr_hide_end,3:code=code+1
+			hotspot2 min(standard_x,0)-floor_1-floor_dep,step_wid_tot-hr_wid-hr_hide_end,code,hr_hide_end,2:code=code+1
+		endif
+
+		if hr_hide=2 then !中間踊り場下部階段側
+			if switch_floor then
+				hotspot2 min(standard_x,0)-floor_1-floor_dep+hr_wid2,0,code,hr_hide_start,1+128:code=code+1
+				hotspot2 min(standard_x,0)-floor_1-floor_dep+hr_wid2-1,0,code,hr_hide_start,3:code=code+1
+				hotspot2 min(standard_x,0)-floor_1-floor_dep+hr_wid2+hr_hide_start,0,code,hr_hide_start,2:code=code+1
+			else
+				hotspot2 min(standard_x,0)-floor_1,0,code,hr_hide_start,1+128:code=code+1
+				hotspot2 min(standard_x,0)-floor_1-1,0,code,hr_hide_start,3:code=code+1
+				hotspot2 min(standard_x,0)-floor_1+hr_hide_start,0,code,hr_hide_start,2:code=code+1
+			endif
+			hotspot2 (step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2,0,code,hr_hide_end,1+128:code=code+1
+			hotspot2 (step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2+1,0,code,hr_hide_end,3:code=code+1
+			hotspot2 (step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2-hr_hide_end,0,code,hr_hide_end,2:code=code+1
+		endif
+
+		if hr_hide=3 then !中間踊り場上部階段側
+			if switch_floor then
+				hotspot2 min(standard_x,0)-floor_1-floor_dep+hr_wid2  ,step_wid_tot,code,hr_hide_start,1+128:code=code+1
+				hotspot2 min(standard_x,0)-floor_1-floor_dep+hr_wid2-1,step_wid_tot,code,hr_hide_start,3:code=code+1
+				hotspot2 min(standard_x,0)-floor_1-floor_dep+hr_wid2+hr_hide_start,step_wid_tot,code,hr_hide_start,2:code=code+1
+			else
+				hotspot2 min(standard_x,0)-floor_1  ,step_wid_tot,code,hr_hide_start,1+128:code=code+1
+				hotspot2 min(standard_x,0)-floor_1-1,step_wid_tot,code,hr_hide_start,3:code=code+1
+				hotspot2 min(standard_x,0)-floor_1+hr_hide_start,step_wid_tot,code,hr_hide_start,2:code=code+1
+			endif
+			hotspot2 (step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2  ,step_wid_tot,code,hr_hide_end,1+128:code=code+1
+			hotspot2 (step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2+1,step_wid_tot,code,hr_hide_end,3:code=code+1
+			hotspot2 (step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2-hr_hide_end,step_wid_tot,code,hr_hide_end,2:code=code+1
+		endif
+	endif
+endif
+
+if switch_hr2 then
+	if hr2_type=1 then
+		poly2_ 10,1+2+4,
+		min(standard_x,0)-floor_1-hr2_wid,step_wid1-hr2_wid,1,
+		min(standard_x,0)-floor_1-hr2_wid,step_wid1+handrail_wid+hr2_wid,1,
+		(step_num_down-1)*step_tread+landing_1+hr2_wid,step_wid1+handrail_wid+hr2_wid,1,
+		(step_num_down-1)*step_tread+landing_1+hr2_wid,step_wid1-hr2_wid,1,
+		min(standard_x,0)-floor_1-hr2_wid,step_wid1-hr2_wid,-1,
+		min(standard_x,0)-floor_1,step_wid1,1,
+		min(standard_x,0)-floor_1,step_wid1+handrail_wid,1,
+		(step_num_down-1)*step_tread+landing_1,step_wid1+handrail_wid,1,
+		(step_num_down-1)*step_tread+landing_1,step_wid1,1,
+		min(standard_x,0)-floor_1,step_wid1,-1
+	endif
+	
+	if hr2_type=2 then
+		poly2 4,1+2+4,
+		min(standard_x,0)-floor_1,step_wid1,
+		min(standard_x,0)-floor_1,step_wid1+handrail_wid,
+		(step_num_down-1)*step_tread+landing_1,step_wid1+handrail_wid,
+		(step_num_down-1)*step_tread+landing_1,step_wid1
+	endif
+endif
+
+
+set fill normal_fill
+
+
+!======================================================================溝
+if switch_floor then
+	if step_ditch then
+		if landing_ditch and floor_ditch then
+			rect2 min(standard_x,0)-floor_1-floor_dep+x_floor+ditch_wid,y_down+ditch_wid,(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing-ditch_wid,step_wid_tot-y_up-ditch_wid
+			rect2 min(standard_x,0)-floor_1-floor_dep+x_floor,y_down,(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing,step_wid_tot-y_up
+		endif
+		
+		if landing_ditch and floor_ditch=0 then
+			poly2 8,1+4,
+			min(standard_x,0)-floor_1-floor_dep+x_floor,y_down,
+			(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing,y_down,
+			(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing,step_wid_tot-y_up,
+			min(standard_x,0)-floor_1-floor_dep+x_floor,step_wid_tot-y_up,
+			min(standard_x,0)-floor_1-floor_dep+x_floor,step_wid_tot-y_up-ditch_wid,
+			(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing-ditch_wid,step_wid_tot-y_up-ditch_wid,
+			(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing-ditch_wid,y_down+ditch_wid,
+			min(standard_x,0)-floor_1-floor_dep+x_floor,y_down+ditch_wid
+		endif
+		
+		if landing_ditch=0 and floor_ditch then
+			poly2 8,1+4,
+			(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing,y_down,
+			min(standard_x,0)-floor_1-floor_dep+x_floor,y_down,
+			min(standard_x,0)-floor_1-floor_dep+x_floor,step_wid_tot-y_up,
+			(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing,step_wid_tot-y_up,
+			(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing,step_wid_tot-y_up-ditch_wid,
+			min(standard_x,0)-floor_1-floor_dep+x_floor+ditch_wid,step_wid_tot-y_up-ditch_wid,
+			min(standard_x,0)-floor_1-floor_dep+x_floor+ditch_wid,y_down+ditch_wid,
+			(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing,y_down+ditch_wid
+		endif
+	
+		if landing_ditch=0 and floor_ditch=0 then
+			rect2 min(standard_x,0)-floor_1-floor_dep+ditch_wid,y_down,(step_num_down-1)*step_tread+landing_1+landing_dep-ditch_wid,y_down+ditch_wid
+			rect2 min(standard_x,0)-floor_1-floor_dep+ditch_wid,step_wid_tot-y_up,(step_num_down-1)*step_tread+landing_1+landing_dep-ditch_wid,step_wid_tot-y_up-ditch_wid
+		endif
+	else
+		if landing_ditch then
+			rect2 (step_num_down-1)*step_tread+landing_1+landing_dep-x_landing,y_down,(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing-ditch_wid,step_wid_tot-y_up
+		endif
+		
+		if floor_ditch then
+			rect2 min(standard_x,0)-floor_1-floor_dep+x_floor,y_down,min(standard_x,0)-floor_1-floor_dep+x_floor+ditch_wid,step_wid_tot-y_up
+		endif
+	endif
+else
+	if step_ditch and landing_ditch then
+		poly2 8,1+4,
+		min(0,standard_x)-floor_1,y_down,
+		(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing,y_down,
+		(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing,step_wid_tot-y_up,
+		min(0,standard_x)-floor_1,step_wid_tot-y_up,
+		min(0,standard_x)-floor_1,step_wid_tot-y_up-ditch_wid,
+		(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing-ditch_wid,step_wid_tot-y_up-ditch_wid,
+		(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing-ditch_wid,y_down+ditch_wid,
+		min(0,standard_x)-floor_1,y_down+ditch_wid
+	endif
+
+	if step_ditch=0 and landing_ditch then
+		poly2 4,1+4,
+		(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing,y_down,
+		(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing,step_wid_tot-y_up,
+		(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing-ditch_wid,step_wid_tot-y_up,
+		(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing-ditch_wid,y_down
+	endif
+
+	if step_ditch and landing_ditch=0 then
+		poly2 4,1+4,
+		min(0,standard_x)-floor_1,y_down,
+		(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing,y_down,
+		(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing,y_down+ditch_wid,
+		min(0,standard_x)-floor_1,y_down+ditch_wid
+
+		poly2 4,1+4,
+		(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing,step_wid_tot-y_up,
+		min(0,standard_x)-floor_1,step_wid_tot-y_up,
+		min(0,standard_x)-floor_1,step_wid_tot-y_up-ditch_wid,
+		(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing,step_wid_tot-y_up-ditch_wid
+	endif
+endif
+
+
+!======================================================================RD
+if landing_rd then 
+	circle2 (step_num_down-1)*step_tread+landing_1+landing_dep-x_landing-0.16,step_wid1+handrail_wid/2+landing_rd_y,0.15
+	circle2 (step_num_down-1)*step_tread+landing_1+landing_dep-x_landing-0.16,step_wid1+handrail_wid/2+landing_rd_y,0.075
+	line2 (step_num_down-1)*step_tread+landing_1+landing_dep-x_landing-0.16-0.075,step_wid1+handrail_wid/2+landing_rd_y,\
+		(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing-0.16+0.075,step_wid1+handrail_wid/2+landing_rd_y
+	line2 (step_num_down-1)*step_tread+landing_1+landing_dep-x_landing-0.16-0.075/2,step_wid1+handrail_wid/2+landing_rd_y+0.075*sin(60),\
+		(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing-0.16+0.075/2,step_wid1+handrail_wid/2+landing_rd_y-0.075*sin(60)
+	line2 (step_num_down-1)*step_tread+landing_1+landing_dep-x_landing-0.16+0.075/2,step_wid1+handrail_wid/2+landing_rd_y+0.075*sin(60),\
+		(step_num_down-1)*step_tread+landing_1+landing_dep-x_landing-0.16-0.075/2,step_wid1+handrail_wid/2+landing_rd_y-0.075*sin(60)
+
+	hotspot2 (step_num_down-1)*step_tread+landing_1+landing_dep-0.16-x_landing,step_wid1+handrail_wid/2,code,landing_rd_y,1+128:code=code+1
+	hotspot2 (step_num_down-1)*step_tread+landing_1+landing_dep-0.16-x_landing,step_wid1+handrail_wid/2-1,code,landing_rd_y,3:code=code+1
+	hotspot2 (step_num_down-1)*step_tread+landing_1+landing_dep-0.16-x_landing,step_wid1+handrail_wid/2+landing_rd_y,code,landing_rd_y,2:code=code+1
+endif
+
+if floor_rd and switch_floor then
+	circle2  min(standard_x,0)-floor_1-floor_dep+x_floor+0.16,step_wid1+handrail_wid/2+floor_rd_y,0.15
+	circle2  min(standard_x,0)-floor_1-floor_dep+x_floor+0.16,step_wid1+handrail_wid/2+floor_rd_y,0.075
+	line2 min(standard_x,0)-floor_1-floor_dep+x_floor+0.16-0.075,step_wid1+handrail_wid/2+floor_rd_y,\
+		min(standard_x,0)-floor_1-floor_dep+x_floor+0.16+0.075,step_wid1+handrail_wid/2+floor_rd_y
+	line2 min(standard_x,0)-floor_1-floor_dep+x_floor+0.16-0.075/2,step_wid1+handrail_wid/2+floor_rd_y+0.075*sin(60),\
+		min(standard_x,0)-floor_1-floor_dep+x_floor+0.16+0.075/2,step_wid1+handrail_wid/2+floor_rd_y-0.075*sin(60)
+	line2 min(standard_x,0)-floor_1-floor_dep+x_floor+0.16+0.075/2,step_wid1+handrail_wid/2+floor_rd_y+0.075*sin(60),\
+		min(standard_x,0)-floor_1-floor_dep+x_floor+0.16-0.075/2,step_wid1+handrail_wid/2+floor_rd_y-0.075*sin(60)
+
+	hotspot2 min(standard_x,0)-floor_1-floor_dep+0.16+x_floor,step_wid1+handrail_wid/2,code,floor_rd_y,1+128:code=code+1
+	hotspot2 min(standard_x,0)-floor_1-floor_dep+0.16+x_floor,step_wid1+handrail_wid/2-1,code,floor_rd_y,3:code=code+1
+	hotspot2 min(standard_x,0)-floor_1-floor_dep+0.16+x_floor,step_wid1+handrail_wid/2+floor_rd_y,code,floor_rd_y,2:code=code+1
+endif
+
+
+
+
+
+
+
+
+
+
+
+
+if step_dir=2 then del 1
+if switch_turn then del 1
+
+
+!======================================================================文字記号
+style "moji1"
+
+if step_ditch then
+	y_plus=ditch_wid
+else
+	y_plus=0
+endif
+
+
+for i=1 to step_num_down
+	add2 step_tread/2*index_x,(0.1+y_down+y_plus)*index_y
+	text2 0,0,i
+	del 1
+
+	add2 step_tread*index_x,0*index_y
+next i
+del step_num_down
+
+
+for i=1 to step_num_up
+	add2 (step_num_down*step_tread-step_tread+landing_1-landing_2-step_tread/2)*index_x,(step_wid_tot-0.1-y_up-y_plus)*index_y
+	text2 0,0,step_num_down+i
+	del 1
+
+	add2 -step_tread*index_x,0*index_y
+next i
+del step_num_up
+
+
+add2 ((step_num_down-1)*step_tread+landing_1+landing_dep/2)*index_x,(step_wid1+handrail_wid/2+0.1)*index_y
+text2 0,0,"中間踊り場"
+del 1
+
+
+add2 ((step_num_down-1)*step_tread+landing_1+landing_dep/2)*index_x,(step_wid1+handrail_wid/2-0.1)*index_y
+text2 0,0,"水勾配  "+str(landing_rat,2,1)+"％"
+del 1
+
+if switch_floor then
+	add2 (min(standard_x,0)-floor_1-floor_dep/2)*index_x,(step_wid1+handrail_wid/2+0.1)*index_y
+	text2 0,0,"フロア踊り場"
+	del 1
+
+	add2 (min(standard_x,0)-floor_1-floor_dep/2)*index_x,(step_wid1+handrail_wid/2-0.1)*index_y
+	text2 0,0,"水勾配  "+str(floor_rat,2,1)+"％"
+	del 1
+endif
+
+
+
+

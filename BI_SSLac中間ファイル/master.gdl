@@ -1,0 +1,582 @@
+code=1
+x=1
+y=2
+z=3
+eps=1e-5
+
+
+!==========================================================RANGEINFO
+values "range_nVtx" range[4,]
+
+dim _range_Vxyz[][]
+_range_Vxyz[1][1]=0 : _range_Vxyz[1][2]=0
+
+for i=1 to range_nVtx
+    for j=1 to 3
+        _range_Vxyz[i][j]=range_Vxyz[i][j]
+    next j
+next i
+
+range_Vxyz=_range_Vxyz
+parameters range_Vxyz=_range_Vxyz
+
+
+values "range_nSrf" range[0,]
+
+dim _range_SrfID[][]
+_range_SrfID[1][1]=0 : _range_SrfID[1][2]=0
+
+for i=1 to range_nSrf
+    for j=1 to 3
+        _range_SrfID[i][j]=max(min(range_SrfID[i][j],range_nVtx-1),0)
+    next j
+next i
+
+range_SrfID=_range_SrfID
+parameters range_SrfID=range_SrfID
+
+
+
+!==========================================================SHAPEINFO
+values "shape_nSrf" range[0,]
+
+dim _shape_name[],_shape_kind[],_shape_nVtx[],_shape_Vxyz[][]
+_shape_name[1]=""
+_shape_kind[1]=0
+_shape_nVtx[1]=0
+_shape_Vxyz[1][1]=0 : _shape_Vxyz[1][2]=0
+
+for i=1 to shape_nSrf
+    _shape_name[i]=shape_name[i]
+    _shape_kind[i]=shape_kind[i]
+    _shape_nVtx[i]=shape_nVtx[i]
+
+    for j=1 to _shape_nVtx[i]
+        _shape_Vxyz[i][3*j-2]=shape_Vxyz[i][3*j-2]
+        _shape_Vxyz[i][3*j-1]=shape_Vxyz[i][3*j-1]
+        _shape_Vxyz[i][3*j]=shape_Vxyz[i][3*j]
+    next j
+next i
+
+shape_name=_shape_name
+shape_kind=_shape_kind
+shape_nVtx=_shape_nVtx
+shape_Vxyz=_shape_Vxyz
+
+parameters \
+shape_name=shape_name,
+shape_kind=shape_kind,
+shape_nVtx=shape_nVtx,
+shape_Vxyz=shape_Vxyz
+
+values "shape_nVtx" range[3,]
+values{2} "shape_kind" 1,"外壁",2,"内壁",3,"床",4,"流出入",5,"ファン",6,"外部開口",7,"内部開口"
+
+
+
+!==========================================================ZONEINFO
+values "zone_nZone" range[0,]
+
+dim _zone_name[],_zone_nVtx[],_zone_Vxyz[][],_zone_nSrf[],_zone_SrfID[][]
+_zone_name[1]=""
+_zone_nVtx[1]=0
+_zone_Vxyz[1][1]=0 : _zone_Vxyz[1][2]=0
+_zone_nSrf[1]=0
+_zone_SrfID[1][1]=0 : _zone_SrfID[1][2]=0
+
+for i=1 to zone_nZone
+    _zone_name[i]=zone_name[i]
+    _zone_nVtx[i]=zone_nVtx[i]
+
+    for j=1 to _zone_nVtx[i]
+        _zone_Vxyz[i][3*j-2]=zone_Vxyz[i][3*j-2]
+        _zone_Vxyz[i][3*j-1]=zone_Vxyz[i][3*j-1]
+        _zone_Vxyz[i][3*j]=zone_Vxyz[i][3*j]
+    next j
+
+    _zone_nSrf[i]=zone_nSrf[i]
+
+    for j=1 to _zone_nSrf[i]
+        _zone_SrfID[i][3*j-2]=max(min(zone_SrfID[i][3*j-2],_zone_nVtx[i]),0)
+        _zone_SrfID[i][3*j-1]=max(min(zone_SrfID[i][3*j-1],_zone_nVtx[i]),0)
+        _zone_SrfID[i][3*j]=max(min(zone_SrfID[i][3*j],_zone_nVtx[i]),0)
+    next j
+next i
+
+zone_name=_zone_name
+zone_nVtx=_zone_nVtx
+zone_Vxyz=_zone_Vxyz
+zone_nSrf=_zone_nSrf
+zone_SrfID=_zone_SrfID
+
+parameters \
+zone_name=_zone_name,
+zone_nVtx=_zone_nVtx,
+zone_Vxyz=_zone_Vxyz,
+zone_nSrf=_zone_nSrf,
+zone_SrfID=_zone_SrfID
+
+values "zone_nVtx" range[4,]
+
+
+!==========================================================集計
+dim _shape_dir[],_shape_zone[],_shape_area[]
+_shape_dir[1]=0
+_shape_zone[1]=0
+_shape_area[1]=0
+
+for i=1 to shape_nSrf
+    _shape_dir[i]=shape_dir[i]
+    _shape_zone[i]=shape_zone[i]
+
+    tempLen1=sqr((shape_Vxyz[i][4]-shape_Vxyz[i][1])^2+(shape_Vxyz[i][5]-shape_Vxyz[i][2])^2+(shape_Vxyz[i][6]-shape_Vxyz[i][3])^2)
+    tempLen2=sqr((shape_Vxyz[i][7]-shape_Vxyz[i][4])^2+(shape_Vxyz[i][8]-shape_Vxyz[i][5])^2+(shape_Vxyz[i][9]-shape_Vxyz[i][6])^2)
+    _shape_area[i]=tempLen1*tempLen2
+next i
+
+shape_dir=_shape_dir
+shape_zone=_shape_zone
+
+parameters \
+shape_dir=shape_dir,
+shape_zone=shape_zone
+
+values{2} "shape_dir" 1,"東",2,"西",3,"南",4,"北"
+
+dim _shape_zone_index[]
+_shape_zone_index[1]=0
+
+for i=1 to zone_nZone
+    _shape_zone_index[i]=i
+next i
+
+values "shape_zone" _shape_zone_index
+
+dim _outWallArea[][],_inWallArea[][],_outOpArea[][],_inOpArea[][]
+_outWallArea[1][1]=0 : _outWallArea[1][2]=0
+_inWallArea[1][1]=0 : _inWallArea[1][2]=0
+_outOpArea[1][1]=0 : _outOpArea[1][2]=0
+_inOpArea[1][1]=0 : _inOpArea[1][2]=0
+
+for i=1 to zone_nZone
+    !初期化
+    for j=1 to 4
+        _outWallArea[i][j]=0
+        _inWallArea[i][j]=0
+        _outOpArea[i][j]=0
+        _inOpArea[i][j]=0
+    next j
+
+    for j=1 to shape_nSrf
+        if shape_zone[j]=i then
+            !外壁面積
+            if shape_kind[j]=1 then
+                if shape_dir[j]=1 then _outWallArea[i][1]=_outWallArea[i][1]+_shape_area[j]
+                if shape_dir[j]=2 then _outWallArea[i][2]=_outWallArea[i][2]+_shape_area[j]
+                if shape_dir[j]=3 then _outWallArea[i][3]=_outWallArea[i][3]+_shape_area[j]
+                if shape_dir[j]=4 then _outWallArea[i][4]=_outWallArea[i][4]+_shape_area[j]
+            endif
+
+            !内壁面積
+            if shape_kind[j]=2 then
+                if shape_dir[j]=1 then _inWallArea[i][1]=_inWallArea[i][1]+_shape_area[j]
+                if shape_dir[j]=2 then _inWallArea[i][2]=_inWallArea[i][2]+_shape_area[j]
+                if shape_dir[j]=3 then _inWallArea[i][3]=_inWallArea[i][3]+_shape_area[j]
+                if shape_dir[j]=4 then _inWallArea[i][4]=_inWallArea[i][4]+_shape_area[j]
+            endif
+
+            !外部開口面積
+            if shape_kind[j]=6 then
+                if shape_dir[j]=1 then _outOpArea[i][1]=_outOpArea[i][1]+_shape_area[j]
+                if shape_dir[j]=2 then _outOpArea[i][2]=_outOpArea[i][2]+_shape_area[j]
+                if shape_dir[j]=3 then _outOpArea[i][3]=_outOpArea[i][3]+_shape_area[j]
+                if shape_dir[j]=4 then _outOpArea[i][4]=_outOpArea[i][4]+_shape_area[j]
+            endif
+
+            !内部開口面積
+            if shape_kind[j]=7 then
+                if shape_dir[j]=1 then _inOpArea[i][1]=_inOpArea[i][1]+_shape_area[j]
+                if shape_dir[j]=2 then _inOpArea[i][2]=_inOpArea[i][2]+_shape_area[j]
+                if shape_dir[j]=3 then _inOpArea[i][3]=_inOpArea[i][3]+_shape_area[j]
+                if shape_dir[j]=4 then _inOpArea[i][4]=_inOpArea[i][4]+_shape_area[j]
+            endif
+        endif
+    next j
+next i
+
+outWallArea=_outWallArea
+inWallArea=_inWallArea
+outOpArea=_outOpArea
+inOpArea=_inOpArea
+
+parameters \
+outWallArea=outWallArea,
+inWallArea=inWallArea,
+outOpArea=outOpArea,
+inOpArea=inOpArea
+
+
+dim _tempKind[]
+_tempKind[1 ]=2
+_tempKind[2 ]=2
+_tempKind[3 ]=1
+_tempKind[4 ]=1
+_tempKind[5 ]=1
+_tempKind[6 ]=1
+_tempKind[7 ]=1
+_tempKind[8 ]=2
+_tempKind[9 ]=2
+_tempKind[10]=2
+_tempKind[11]=2
+_tempKind[12]=2
+_tempKind[13]=2
+_tempKind[14]=2
+_tempKind[15]=2
+_tempKind[16]=2
+_tempKind[17]=1
+_tempKind[18]=1
+_tempKind[19]=1
+_tempKind[20]=1
+_tempKind[21]=1
+_tempKind[22]=1
+_tempKind[23]=1
+_tempKind[24]=6
+
+dim _tempPos[][]
+_tempPos[1][1 ]=3000
+_tempPos[1][2 ]=0
+_tempPos[1][3 ]=100
+_tempPos[1][4 ]=3000
+_tempPos[1][5 ]=3000
+_tempPos[1][6 ]=100
+_tempPos[1][7 ]=3000
+_tempPos[1][8 ]=3000
+_tempPos[1][9 ]=2600
+_tempPos[1][10]=3000
+_tempPos[1][11]=0
+_tempPos[1][12]=2600
+
+_tempPos[2][1 ]=5000
+_tempPos[2][2 ]=0
+_tempPos[2][3 ]=100
+_tempPos[2][4 ]=5000
+_tempPos[2][5 ]=2000
+_tempPos[2][6 ]=100
+_tempPos[2][7 ]=5000
+_tempPos[2][8 ]=2000
+_tempPos[2][9 ]=1600
+_tempPos[2][10]=5000
+_tempPos[2][11]=0
+_tempPos[2][12]=1600
+
+_tempPos[3][1 ]=3000
+_tempPos[3][2 ]=0
+_tempPos[3][3 ]=100
+_tempPos[3][4 ]=3000
+_tempPos[3][5 ]=4000
+_tempPos[3][6 ]=100
+_tempPos[3][7 ]=8000
+_tempPos[3][8 ]=4000
+_tempPos[3][9 ]=100
+_tempPos[3][10]=8000
+_tempPos[3][11]=0
+_tempPos[3][12]=100
+
+_tempPos[4][1 ]=3000
+_tempPos[4][2 ]=0
+_tempPos[4][3 ]=-100
+_tempPos[4][4 ]=3000
+_tempPos[4][5 ]=4000
+_tempPos[4][6 ]=-100
+_tempPos[4][7 ]=3000
+_tempPos[4][8 ]=4000
+_tempPos[4][9 ]=100
+_tempPos[4][10]=3000
+_tempPos[4][11]=0
+_tempPos[4][12]=100
+
+_tempPos[5][1 ]=0
+_tempPos[5][2 ]=0
+_tempPos[5][3 ]=-100
+_tempPos[5][4 ]=0
+_tempPos[5][5 ]=4000
+_tempPos[5][6 ]=-100
+_tempPos[5][7 ]=3000
+_tempPos[5][8 ]=4000
+_tempPos[5][9 ]=-100
+_tempPos[5][10]=3000
+_tempPos[5][11]=0
+_tempPos[5][12]=-100
+
+_tempPos[6][1 ]=3000
+_tempPos[6][2 ]=4000
+_tempPos[6][3 ]=2600
+_tempPos[6][4 ]=3000
+_tempPos[6][5 ]=0
+_tempPos[6][6 ]=2600
+_tempPos[6][7 ]=8000
+_tempPos[6][8 ]=0
+_tempPos[6][9 ]=2600
+_tempPos[6][10]=8000
+_tempPos[6][11]=4000
+_tempPos[6][12]=2600
+
+_tempPos[7][1 ]=0
+_tempPos[7][2 ]=4000
+_tempPos[7][3 ]=2600
+_tempPos[7][4 ]=0
+_tempPos[7][5 ]=0
+_tempPos[7][6 ]=2600
+_tempPos[7][7 ]=3000
+_tempPos[7][8 ]=0
+_tempPos[7][9 ]=2600
+_tempPos[7][10]=3000
+_tempPos[7][11]=4000
+_tempPos[7][12]=2600
+
+_tempPos[8][1 ]=-500
+_tempPos[8][2 ]=4500
+_tempPos[8][3 ]=4050
+_tempPos[8][4 ]=-500
+_tempPos[8][5 ]=-2000
+_tempPos[8][6 ]=4050
+_tempPos[8][7 ]=8500
+_tempPos[8][8 ]=-2000
+_tempPos[8][9 ]=4050
+_tempPos[8][10]=8500
+_tempPos[8][11]=4500
+_tempPos[8][12]=4050
+
+_tempPos[9][1 ]=0
+_tempPos[9][2 ]=-1500
+_tempPos[9][3 ]=100
+_tempPos[9][4 ]=0
+_tempPos[9][5 ]=0
+_tempPos[9][6 ]=100
+_tempPos[9][7 ]=0
+_tempPos[9][8 ]=0
+_tempPos[9][9 ]=4050
+_tempPos[9][10]=0
+_tempPos[9][11]=-1500
+_tempPos[9][12]=4050
+
+_tempPos[10][1 ]=0
+_tempPos[10][2 ]=0
+_tempPos[10][3 ]=2600
+_tempPos[10][4 ]=0
+_tempPos[10][5 ]=4000
+_tempPos[10][6 ]=2600
+_tempPos[10][7 ]=0
+_tempPos[10][8 ]=4000
+_tempPos[10][9 ]=4050
+_tempPos[10][10]=0
+_tempPos[10][11]=0
+_tempPos[10][12]=4050
+
+_tempPos[11][1 ]=8000
+_tempPos[11][2 ]=0
+_tempPos[11][3 ]=2600
+_tempPos[11][4 ]=8000
+_tempPos[11][5 ]=4000
+_tempPos[11][6 ]=2600
+_tempPos[11][7 ]=8000
+_tempPos[11][8 ]=4000
+_tempPos[11][9 ]=4050
+_tempPos[11][10]=8000
+_tempPos[11][11]=0
+_tempPos[11][12]=4050
+
+_tempPos[12][1 ]=3000
+_tempPos[12][2 ]=0
+_tempPos[12][3 ]=2600
+_tempPos[12][4 ]=3000
+_tempPos[12][5 ]=3000
+_tempPos[12][6 ]=2600
+_tempPos[12][7 ]=3000
+_tempPos[12][8 ]=3000
+_tempPos[12][9 ]=4050
+_tempPos[12][10]=3000
+_tempPos[12][11]=0
+_tempPos[12][12]=4050
+
+_tempPos[13][1 ]=0
+_tempPos[13][2 ]=0
+_tempPos[13][3 ]=2600
+_tempPos[13][4 ]=3000
+_tempPos[13][5 ]=0
+_tempPos[13][6 ]=2600
+_tempPos[13][7 ]=3000
+_tempPos[13][8 ]=0
+_tempPos[13][9 ]=4050
+_tempPos[13][10]=0
+_tempPos[13][11]=0
+_tempPos[13][12]=4050
+
+_tempPos[14][1 ]=3000
+_tempPos[14][2 ]=0
+_tempPos[14][3 ]=2600
+_tempPos[14][4 ]=8000
+_tempPos[14][5 ]=0
+_tempPos[14][6 ]=2600
+_tempPos[14][7 ]=8000
+_tempPos[14][8 ]=0
+_tempPos[14][9 ]=4050
+_tempPos[14][10]=3000
+_tempPos[14][11]=0
+_tempPos[14][12]=4050
+
+_tempPos[15][1 ]=3000
+_tempPos[15][2 ]=4000
+_tempPos[15][3 ]=2600
+_tempPos[15][4 ]=8000
+_tempPos[15][5 ]=4000
+_tempPos[15][6 ]=2600
+_tempPos[15][7 ]=8000
+_tempPos[15][8 ]=4000
+_tempPos[15][9 ]=4050
+_tempPos[15][10]=3000
+_tempPos[15][11]=4000
+_tempPos[15][12]=4050
+
+_tempPos[16][1 ]=0
+_tempPos[16][2 ]=4000
+_tempPos[16][3 ]=2600
+_tempPos[16][4 ]=3000
+_tempPos[16][5 ]=4000
+_tempPos[16][6 ]=2600
+_tempPos[16][7 ]=3000
+_tempPos[16][8 ]=4000
+_tempPos[16][9 ]=4050
+_tempPos[16][10]=0
+_tempPos[16][11]=4000
+_tempPos[16][12]=4050
+
+_tempPos[17][1 ]=0
+_tempPos[17][2 ]=0
+_tempPos[17][3 ]=-100
+_tempPos[17][4 ]=3000
+_tempPos[17][5 ]=0
+_tempPos[17][6 ]=-100
+_tempPos[17][7 ]=3000
+_tempPos[17][8 ]=0
+_tempPos[17][9 ]=2600
+_tempPos[17][10]=0
+_tempPos[17][11]=0
+_tempPos[17][12]=2600
+
+_tempPos[18][1 ]=3000
+_tempPos[18][2 ]=4000
+_tempPos[18][3 ]=-100
+_tempPos[18][4 ]=0
+_tempPos[18][5 ]=4000
+_tempPos[18][6 ]=-100
+_tempPos[18][7 ]=0
+_tempPos[18][8 ]=4000
+_tempPos[18][9 ]=2600
+_tempPos[18][10]=3000
+_tempPos[18][11]=4000
+_tempPos[18][12]=2600
+
+_tempPos[19][1 ]=0
+_tempPos[19][2 ]=0
+_tempPos[19][3 ]=-100
+_tempPos[19][4 ]=0
+_tempPos[19][5 ]=0
+_tempPos[19][6 ]=2600
+_tempPos[19][7 ]=0
+_tempPos[19][8 ]=4000
+_tempPos[19][9 ]=2600
+_tempPos[19][10]=0
+_tempPos[19][11]=4000
+_tempPos[19][12]=-100
+
+_tempPos[20][1 ]=8000
+_tempPos[20][2 ]=0
+_tempPos[20][3 ]=100
+_tempPos[20][4 ]=8000
+_tempPos[20][5 ]=4000
+_tempPos[20][6 ]=100
+_tempPos[20][7 ]=8000
+_tempPos[20][8 ]=4000
+_tempPos[20][9 ]=2600
+_tempPos[20][10]=8000
+_tempPos[20][11]=0
+_tempPos[20][12]=2600
+
+_tempPos[21][1 ]=3000
+_tempPos[21][2 ]=0
+_tempPos[21][3 ]=100
+_tempPos[21][4 ]=8000
+_tempPos[21][5 ]=0
+_tempPos[21][6 ]=100
+_tempPos[21][7 ]=8000
+_tempPos[21][8 ]=0
+_tempPos[21][9 ]=2600
+_tempPos[21][10]=3000
+_tempPos[21][11]=0
+_tempPos[21][12]=2600
+
+_tempPos[22][1 ]=8000
+_tempPos[22][2 ]=4000
+_tempPos[22][3 ]=100
+_tempPos[22][4 ]=3000
+_tempPos[22][5 ]=4000
+_tempPos[22][6 ]=100
+_tempPos[22][7 ]=3000
+_tempPos[22][8 ]=4000
+_tempPos[22][9 ]=2600
+_tempPos[22][10]=8000
+_tempPos[22][11]=4000
+_tempPos[22][12]=2600
+
+_tempPos[23][1 ]=500
+_tempPos[23][2 ]=0
+_tempPos[23][3 ]=50
+_tempPos[23][4 ]=1500
+_tempPos[23][5 ]=0
+_tempPos[23][6 ]=50
+_tempPos[23][7 ]=1500
+_tempPos[23][8 ]=0
+_tempPos[23][9 ]=2100
+_tempPos[23][10]=500
+_tempPos[23][11]=0
+_tempPos[23][12]=2100
+
+_tempPos[24][1 ]=620
+_tempPos[24][2 ]=0
+_tempPos[24][3 ]=300
+_tempPos[24][4 ]=1380
+_tempPos[24][5 ]=0
+_tempPos[24][6 ]=300
+_tempPos[24][7 ]=1380
+_tempPos[24][8 ]=0
+_tempPos[24][9 ]=600
+_tempPos[24][10]=620
+_tempPos[24][11]=0
+_tempPos[24][12]=600
+
+switch_simple=0
+
+if switch_simple then
+    shape_nSrf=24
+
+    for i=1 to shape_nSrf
+        shape_kind[i]=_tempKind[i]
+        shape_nVtx[i]=4
+
+        for j=1 to 4*3
+            shape_Vxyz[i][j]=_tempPos[i][j]/1000
+        next j
+    next i
+
+    parameters \
+    shape_nSrf=shape_nSrf,
+    shape_kind=shape_kind,
+    shape_nVtx=shape_nVtx,
+    shape_Vxyz=shape_Vxyz
+endif
+
+
+
+
+

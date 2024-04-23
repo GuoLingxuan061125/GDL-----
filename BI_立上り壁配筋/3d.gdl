@@ -1,0 +1,271 @@
+!=======================================================================壁躯体
+for i=1 to wallPoint
+    hotspot wallPos[i][x],wallPos[i][y],0
+    hotspot _wallNewPos[i][x],_wallNewPos[i][y],0
+
+    !x
+    hotspot 0            ,wallPos[i][y],0,code,wallPos[i][x],1+128:code=code+1
+    hotspot wallPos[i][x],wallPos[i][y],0,code,wallPos[i][x],2    :code=code+1
+    hotspot -1           ,wallPos[i][y],0,code,wallPos[i][x],3    :code=code+1
+
+    !y
+    hotspot wallPos[i][x],0            ,0,code,wallPos[i][y],1+128:code=code+1
+    hotspot wallPos[i][x],wallPos[i][y],0,code,wallPos[i][y],2    :code=code+1
+    hotspot wallPos[i][x],-1           ,0,code,wallPos[i][y],3    :code=code+1
+next i
+
+for i=1 to wallPoint-1
+    i2=i+1
+
+    lin_ wallPos[i][x],wallPos[i][y],0,wallPos[i2][x],wallPos[i2][y],0
+next i
+
+
+group "wall_body"
+    material mWall
+
+    !tube断面
+    put -wallThi/2,0,0
+    put wallThi/2,0,0
+    put wallThi/2,wallHei,0
+    put -wallThi/2,wallHei,0
+
+    !tubeルート
+    if closeFlag=0 then !閉じている
+        put 2*_wallNewPos[1][x]-_wallNewPos[2][x],2*_wallNewPos[1][y]-_wallNewPos[2][y],0,0
+        for i=1 to wallPoint
+            put _wallNewPos[i][x],_wallNewPos[i][y],0,0
+        next i
+        put 2*_wallNewPos[wallPoint][x]-_wallNewPos[wallPoint-1][x],2*_wallNewPos[wallPoint][y]-_wallNewPos[wallPoint-1][y],0,0
+    else !閉じていない
+        put _wallNewPos[wallPoint-1][x],_wallNewPos[wallPoint-1][y],0,0
+        for i=1 to wallPoint
+            put _wallNewPos[i][x],_wallNewPos[i][y],0,0
+        next i
+        put _wallNewPos[2][x],_wallNewPos[2][y],0,0
+    endif
+
+    tube 4,wallPoint+2,1+2+4+8+16+32,
+    get (nsp)
+endgroup
+
+if disWall then
+    placegroup "wall_body"
+endif
+
+
+!=======================================================================配筋
+!縦筋
+if verbarNum>0 then
+    if disSmooth=0 then
+        for i=1 to verbarNum
+            !頂点表示
+            if disPoint then 
+                for j=1 to verbarPoint[i]
+                    hotspot verbarPos[i][3*j-2],verbarPos[i][3*j-1],verbarPos[i][3*j]
+                next j
+            endif
+
+            !中心線表示
+            if disCL then
+                pen verbarPen[i]
+
+                for j=1 to verbarPoint[i]-1
+                    lin_ verbarPos[i][3*j-2],verbarPos[i][3*j-1],verbarPos[i][3*j],verbarPos[i][3*j+1],verbarPos[i][3*j+2],verbarPos[i][3*j+3]
+                next j
+            endif
+
+            !鉄筋表示
+            if disSD then
+                material verbarMat[i]
+
+                tube_r=verbarOd[i]/2
+                gosub "鉄筋断面計算sub"
+
+                put 2*verbarPos[i][1]-verbarPos[i][4],2*verbarPos[i][2]-verbarPos[i][5],2*verbarPos[i][3]-verbarPos[i][6],0
+                for j=1 to verbarPoint[i]
+                    put verbarPos[i][3*j-2],verbarPos[i][3*j-1],verbarPos[i][3*j],0
+                next j
+                put 2*verbarPos[i][3*verbarPoint[i]-2]-verbarPos[i][3*verbarPoint[i]-5],2*verbarPos[i][3*verbarPoint[i]-1]-verbarPos[i][3*verbarPoint[i]-4],\
+                    2*verbarPos[i][3*verbarPoint[i]]-verbarPos[i][3*verbarPoint[i]-3],0
+
+                tube SDresol+1,verbarPoint[i]+2,1+2+16+32+64,
+                get (nsp)
+            endif
+        next i
+    else
+        for i=1 to verbarNum
+            dim _vertices[][]
+
+            for j=1 to verbarPoint[i]
+
+                _vertices[j][x]=verbarPos[i][x+3*(j-1)]
+                _vertices[j][y]=verbarPos[i][y+3*(j-1)]
+                _vertices[j][z]=verbarPos[i][z+3*(j-1)]
+
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=disCL,
+            detail=SDresol,
+            elbowRad=2*verbarOd[i],
+            nVertex=verbarPoint[i],
+            vertices=_vertices,
+            pipeRad=verbarOd[i]/2,
+            matPipe=verbarMat[i]
+        next i
+    endif
+endif
+
+!横筋
+if horbarNum>0 then
+    if disSmooth=0 then
+        for i=1 to horbarNum
+            !頂点表示
+            if disPoint then 
+                for j=1 to horbarPoint[i]
+                    hotspot horbarPos[i][3*j-2],horbarPos[i][3*j-1],horbarPos[i][3*j]
+                next j
+            endif
+
+            !中心線表示
+            if disCL then
+                pen horbarPen[i]
+
+                for j=1 to horbarPoint[i]-1
+                    lin_ horbarPos[i][3*j-2],horbarPos[i][3*j-1],horbarPos[i][3*j],horbarPos[i][3*j+1],horbarPos[i][3*j+2],horbarPos[i][3*j+3]
+                next j
+            endif
+
+            !鉄筋表示
+            if disSD then
+                material horbarMat[i]
+
+                tube_r=horbarOd[i]/2
+                gosub "鉄筋断面計算sub"
+
+                put 2*horbarPos[i][1]-horbarPos[i][4],2*horbarPos[i][2]-horbarPos[i][5],2*horbarPos[i][3]-horbarPos[i][6],0
+                for j=1 to horbarPoint[i]
+                    put horbarPos[i][3*j-2],horbarPos[i][3*j-1],horbarPos[i][3*j],0
+                next j
+                put 2*horbarPos[i][3*horbarPoint[i]-2]-horbarPos[i][3*horbarPoint[i]-5],2*horbarPos[i][3*horbarPoint[i]-1]-horbarPos[i][3*horbarPoint[i]-4],\
+                    2*horbarPos[i][3*horbarPoint[i]]-horbarPos[i][3*horbarPoint[i]-3],0
+
+                tube SDresol+1,horbarPoint[i]+2,1+2+16+32+64,
+                get (nsp)
+            endif
+        next i
+    else
+        for i=1 to horbarNum
+            dim _vertices[][]
+
+            for j=1 to horbarPoint[i]
+
+                _vertices[j][x]=horbarPos[i][x+3*(j-1)]
+                _vertices[j][y]=horbarPos[i][y+3*(j-1)]
+                _vertices[j][z]=horbarPos[i][z+3*(j-1)]
+
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=disCL,
+            detail=SDresol,
+            elbowRad=2*horbarOd[i],
+            nVertex=horbarPoint[i],
+            vertices=_vertices,
+            pipeRad=horbarOd[i]/2,
+            matPipe=horbarMat[i]
+        next i
+    endif
+endif
+
+!キャップ筋
+if capbarNum>0 then
+    if disSmooth=0 then
+        for i=1 to capbarNum
+            !頂点表示
+            if disPoint then 
+                for j=1 to capbarPoint[i]
+                    hotspot capbarPos[i][3*j-2],capbarPos[i][3*j-1],capbarPos[i][3*j]
+                next j
+            endif
+
+            !中心線表示
+            if disCL then
+                pen capbarPen
+
+                for j=1 to capbarPoint[i]-1
+                    lin_ capbarPos[i][3*j-2],capbarPos[i][3*j-1],capbarPos[i][3*j],capbarPos[i][3*j+1],capbarPos[i][3*j+2],capbarPos[i][3*j+3]
+                next j
+            endif
+
+            !鉄筋表示
+            if disSD then
+                material capbarMat
+
+                tube_r=capbarOd/2
+                gosub "鉄筋断面計算sub"
+
+                put 2*capbarPos[i][1]-capbarPos[i][4],2*capbarPos[i][2]-capbarPos[i][5],2*capbarPos[i][3]-capbarPos[i][6],0
+                for j=1 to capbarPoint[i]
+                    put capbarPos[i][3*j-2],capbarPos[i][3*j-1],capbarPos[i][3*j],0
+                next j
+                put 2*capbarPos[i][3*capbarPoint[i]-2]-capbarPos[i][3*capbarPoint[i]-5],2*capbarPos[i][3*capbarPoint[i]-1]-capbarPos[i][3*capbarPoint[i]-4],\
+                    2*capbarPos[i][3*capbarPoint[i]]-capbarPos[i][3*capbarPoint[i]-3],0
+
+                tube SDresol+1,capbarPoint[i]+2,1+2+16+32+64,
+                get (nsp)
+            endif
+        next i
+    else
+        for i=1 to capbarNum
+            dim _vertices[][]
+
+            for j=1 to capbarPoint[i]
+
+                _vertices[j][x]=capbarPos[i][x+3*(j-1)]
+                _vertices[j][y]=capbarPos[i][y+3*(j-1)]
+                _vertices[j][z]=capbarPos[i][z+3*(j-1)]
+
+            next j
+
+            call "API_Pipe" PARAMETERS \
+            showCL=disCL,
+            detail=SDresol,
+            elbowRad=2*capbarOd,
+            nVertex=capbarPoint[i],
+            vertices=_vertices,
+            pipeRad=capbarOd/2,
+            matPipe=capbarMat
+        next i
+    endif
+endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+end
+
+
+!==========================================鉄筋断面座標リスト
+"鉄筋断面計算sub":
+
+	for t=1 to SDresol
+		put tube_r*cos((1-t)*360/SDresol),tube_r*sin((1-t)*360/SDresol),0
+	next t
+	
+	put tube_r,0,0
+
+return

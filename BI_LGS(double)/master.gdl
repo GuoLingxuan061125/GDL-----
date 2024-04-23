@@ -1,0 +1,3309 @@
+code=1
+eps=1e-5
+
+
+!LGS壁長さ
+len=sqr((coo_end[1]-coo_start[1])^2+(coo_end[2]-coo_start[2])^2)
+parameters len=len
+lock "len"
+absx=len-sqr(coo_end[1]^2+coo_end[2]^2)
+
+
+!回転角
+angle=0
+
+if coo_end[2]>=coo_start[2]-eps and coo_end[2]<=coo_start[2]+eps then
+	if coo_end[1]>=coo_start[1] then
+		angle=0
+	else
+		angle=180
+	endif
+endif
+
+if coo_end[2]>coo_start[2]+eps then
+	angle=acs((coo_end[1]-coo_start[1])/len)
+endif
+
+if coo_end[2]<coo_start[2]-eps then
+	angle=360-acs((coo_end[1]-coo_start[1])/len)
+endif
+
+
+!==============================================================================================================LGS設定
+values "lgs_gap" range[0,]
+
+!スタッド寸法
+values{2} "type" 6,"LGS 45",8,"LGS 65",9,"LGS 75",10,"LGS 90",11,"LGS 100"
+!values{2} "type" 1,"LGS 19",2,"LGS 25",3,"LGS 20*40□",4,"LGS 25*40□",5,"LGS 50□",6,"LGS 45",7,"LGS 50",8,"LGS 65",9,"LGS 75",10,"LGS 90",11,"LGS 100",20,"LGS 100SAT",12,"LGS 125",\
+!		  13,"SQ 40*40□",14,"SQ 45*40□",15,"SQ 50*40□",16,"SQ 65*45□",17,"SQ 75*45□",18,"SQ 90*45□",19,"SQ 100*45□"
+values "hei" range[,10]
+
+dim _wid_stud_list[]
+_wid_stud_list[6]=0.045
+_wid_stud_list[8]=0.065
+_wid_stud_list[9]=0.075
+_wid_stud_list[10]=0.09
+_wid_stud_list[11]=0.1
+
+dim _wid2_stud_list[]
+_wid2_stud_list[6]=0.045
+_wid2_stud_list[8]=0.045
+_wid2_stud_list[9]=0.045
+_wid2_stud_list[10]=0.045
+_wid2_stud_list[11]=0.045
+
+wid_stud=_wid_stud_list[type]
+wid2_stud=_wid2_stud_list[type]
+
+if type=8  then type_text="LGS 65"
+if type=9  then type_text="LGS 75"
+if type=10 then type_text="LGS 90"
+if type=11 then type_text="LGS 100"
+
+parameters type_text=type_text
+
+
+!==============================================================================================================ピッチ選択
+!ピッチ・スタッド寸法集計
+values{2} "pattern" 1,"303",2,"455",4,"227.5"
+
+if type=8 then !65
+	lgs_stud="LGS-65C"
+endif
+
+if type=9 then !75
+	lgs_stud="LGS-75C"
+endif
+
+if type=10 then !90
+	lgs_stud="LGS-90C"
+endif
+
+if type=11 then !100
+	lgs_stud="LGS-100C"
+endif
+
+parameters lgs_stud=lgs_stud
+
+
+!==============================================================================================================ピッチとズラシ
+if pattern=1 then 
+	pitch=0.91/3 : shift_stud=0
+	pattern_text="@303"
+endif
+
+if pattern=2 then 
+	pitch=0.91/2 : shift_stud=0
+	pattern_text="@455"
+endif
+
+if pattern=4 then 
+	pitch=0.91/4 : shift_stud=0
+	pattern_text="@227.5"
+endif
+
+parameters pattern_text=pattern_text
+
+
+!==============================================================================================================支持スパン高さ制限
+values "slab_top_offset" range[0,]
+values "ceilling_down_offset" range[0,]
+
+if type=8 then !65
+	if pattern=12 or pattern=13 then
+		limit_h="4.5<=" : values "hei" range[,4.5+slab_top_offset+ceilling_down_offset]
+	else
+		limit_h="4.0<=" : values "hei" range[,4+slab_top_offset+ceilling_down_offset]
+	endif
+endif
+
+if type=9 then !75
+	if pattern=1 or pattern=2 or pattern=18 or pattern=14 then 
+		limit_h="4.0<=" : values "hei" range[,4+slab_top_offset+ceilling_down_offset]
+	endif
+	if pattern=6 or pattern=11 or pattern=18 or pattern=19 then 
+		limit_h="なし"
+	endif
+	if pattern=12 or pattern=13 then 
+		limit_h="4.5<=" : values "hei" range[,4.5+slab_top_offset+ceilling_down_offset]
+	endif
+endif
+
+if type=10 then !90
+	if pattern=1 or pattern=2 or pattern=14 or pattern=15 then 
+		limit_h="4.5<=" : values "hei" range[,4.5+slab_top_offset+ceilling_down_offset]
+	endif
+	if pattern=5 or pattern=10 then 
+		limit_h="なし"
+	endif
+endif
+
+if type=11 then !100
+	if pattern=1 then 
+		limit_h="5.5<=" : values "hei" range[,5.5+slab_top_offset+ceilling_down_offset]
+	endif
+	if pattern=2 or pattern=14 then 
+		limit_h="5.0<=" : values "hei" range[,5+slab_top_offset+ceilling_down_offset]
+	endif
+	if pattern<>1 and pattern<>2 and pattern<>14 then 
+		limit_h="なし"
+	endif
+endif
+
+parameters limit_h=limit_h
+lock "limit_h"
+
+
+!==============================================================================================================ランナーー寸法
+if type=8 then !65
+	wid_run=0.065 : h1_run=0.04 : h2_run=0.04
+	lgs_runner="LGSランナー65"
+	lgs_refz="LGS開口補強ー65"
+	lgs_refx="LGS開口補強ー65"
+endif
+
+if type=9 then !75
+	wid_run=0.075 : h1_run=0.04 : h2_run=0.04
+	lgs_runner="LGSランナー75"
+	lgs_refz="LGS開口補強ー75"
+	lgs_refx="LGS開口補強ー75"
+endif
+
+if type=10 then !90
+	wid_run=0.090 : h1_run=0.04 : h2_run=0.04
+	lgs_runner="LGSランナー90"
+	lgs_refz="LGS開口補強ー90"
+	lgs_refx="LGS開口補強ー90"
+endif
+
+if type=11 then !100
+	wid_run=0.1 : h1_run=0.04 : h2_run=0.04
+	lgs_runner="LGSランナー100"
+	lgs_refz="LGS開口補強ー100"
+	lgs_refx="LGS開口補強ー100"
+endif
+
+if switch_lgs=0 then wid_run=wall_thi-2*0.001
+
+parameters \
+lgs_runner=lgs_runner,
+lgs_refz=lgs_refz,
+lgs_refx=lgs_refx
+
+
+!==============================================================================================================振れ止め本数
+num_stop=int((hei-0.4)/1.2) : wid_stop=0.025
+
+if num_stop>0 then
+	if wid_stop=0.019 then lgs_stop="LGS振れ止め19"
+	if wid_stop=0.025 then lgs_stop="LGS振れ止め25"
+else
+	lgs_stop="なし"
+endif
+
+num_stop=2*num_stop
+
+parameters \
+num_stop=num_stop,
+lgs_stop=lgs_stop
+lock "num_stop","lgs_runner","lgs_stud","lgs_refz","lgs_refx","lgs_stop"
+
+
+!==============================================================================================================開口補強寸法
+if type=8 then
+	wid_op=wid_stud : wid2_op=0.03
+endif
+
+if type=9 then
+	wid_op=wid_stud : wid2_op=0.03
+endif
+
+if type=10 then
+	wid_op=wid_stud : wid2_op=0.05
+endif
+
+if type=11 then
+	wid_op=wid_stud : wid2_op=0.05
+endif
+
+!変数隠し
+if interface_f1 then
+	lock "coo_start","coo_end","switch_op","win_num","win_xz","win_wid","win_hei","switch_beam","beam_num","beam_x","beam_wid","beam_hei",\
+         "switch_floor","floor_num","floor_x","floor_wid","floor_hei"
+			
+	hideparameter "interface_f1"
+endif
+
+!LGS非表示
+if switch_lgs=0 then hideparameter "dis_lgs","switch_stud2d","switch_detail","switch_stop2d","switch_sound2d","fill_sound","switch_ref_win","switch_ref_beam","switch_ref_detail","switch_2d_detail"
+!遮音材非表示
+if switch_sound=0 then hideparameter "fill_sound"
+
+
+!==============================================================================================================開口設定
+if switch_op then
+	values "win_num" range[1,]
+else
+	parameters win_num=0
+	hideparameter "win_type","win_xz","win_wid","win_hei","win_num","win_ref","win_side_ref","win_ref_offset","offset_door1","offset_door2","offset_op1","offset_op2","offset_op3"
+endif
+
+dim _win_type[]
+dim _win_xz[][]
+dim _win_wid[]
+dim _win_hei[]
+dim _win_ref[]
+dim _win_side_ref[][]
+dim _win_ref_offset[]
+_win_type[1]=1
+_win_xz[1][1]=0
+_win_xz[1][2]=0
+_win_wid[1]=0
+_win_hei[1]=0
+_win_ref[1]=1
+_win_side_ref[1][1]=1
+_win_side_ref[1][2]=1
+_win_ref_offset[1]=0
+
+dim win_xz2[][]
+dim win_wid2[]
+dim win_hei2[]
+win_xz2[1][1]=0
+win_xz2[1][2]=0
+win_wid2[1]=0
+win_hei2[1]=0
+
+for i=1 to win_num
+	_win_type[i]=win_type[i]
+	_win_xz[i][1]=win_xz[i][1]
+	_win_xz[i][2]=win_xz[i][2]
+	_win_wid[i]=win_wid[i]
+	_win_hei[i]=win_hei[i]
+	_win_ref[i]=win_ref[i]
+	_win_side_ref[i][1]=win_side_ref[i][1]
+	_win_side_ref[i][2]=win_side_ref[i][2]
+	_win_ref_offset[i]=win_ref_offset[i]
+
+	if _win_type[i]=1 then
+		win_xz2[i][1]=_win_xz[i][1]-offset_door1
+		win_xz2[i][2]=_win_xz[i][2]
+		win_wid2[i]=_win_wid[i]+2*offset_door1
+		win_hei2[i]=_win_hei[i]+offset_door2
+	endif
+	if _win_type[i]=2 then
+		win_xz2[i][1]=_win_xz[i][1]-offset_op1
+		win_xz2[i][2]=_win_xz[i][2]-offset_op3
+		win_wid2[i]=_win_wid[i]+2*offset_op1
+		win_hei2[i]=_win_hei[i]+offset_op2+offset_op3
+	endif
+next i
+
+!開口補強振れ止め本数
+num_win_stop=0
+dim _win_stop_num[]
+_win_stop_num[1]=0
+
+for i=1 to win_num
+	if num_stop>0 then
+		if win_xz2[i][2]+win_hei2[i]<hei-0.4 then
+			_win_stop_num[i]=int((hei-0.4-(win_xz2[i][2]+win_hei2[i]))/1.2)
+			num_win_stop=num_win_stop+_win_stop_num[i]
+		endif
+	endif
+next i
+
+parameters \
+win_type=_win_type,
+win_xz=_win_xz,
+win_wid=_win_wid,
+win_hei=_win_hei,
+win_ref=_win_ref,
+win_side_ref=_win_side_ref,
+win_ref_offset=_win_ref_offset,
+win_xz2=win_xz2,
+win_wid2=win_wid2,
+win_hei2=win_hei2
+
+values{2} "win_type" 1,"扉",2,"窓"
+values{2} "win_ref" 1,"あり",2,"なし"
+values{2} "win_side_ref" 1,"あり",2,"なし"
+
+parameters num_win_stop=num_win_stop
+lock "num_win_stop"
+
+
+!==============================================================================================================梁開口設定
+if switch_beam then
+	values "beam_num" range[1,]
+else
+	parameters beam_num=0
+	hideparameter "beam_num","beam_x","beam_wid","beam_hei","beam_ref"
+endif
+
+dim _beam_x[]
+dim _beam_wid[]
+dim _beam_hei[]
+dim _beam_ref[][]
+_beam_x[1]=0
+_beam_wid[1]=0
+_beam_hei[1]=0
+_beam_ref[1][1]=0
+_beam_ref[1][2]=0
+
+for i=1 to beam_num
+	_beam_x[i]=beam_x[i]
+	_beam_wid[i]=beam_wid[i]
+	_beam_hei[i]=beam_hei[i]
+	_beam_ref[i][1]=beam_ref[i][1]
+	_beam_ref[i][2]=beam_ref[i][2]
+next i
+
+parameters \
+beam_x=_beam_x,
+beam_wid=_beam_wid,
+beam_hei=_beam_hei,
+beam_ref=_beam_ref
+
+values{2} "beam_ref" 1,"あり",2,"なし"
+values "beam_wid" range(0,]
+values "beam_hei" range(0,]
+
+
+!==============================================================================================================LGS段差設定
+if switch_floor then
+	values "floor_num" range[1,]
+else
+	parameters floor_num=0
+	hideparameter "floor_num","floor_x","floor_wid","floor_hei"
+endif
+
+dim _floor_x[]
+dim _floor_wid[]
+dim _floor_hei[]
+_floor_x[1]=0
+_floor_wid[1]=0
+_floor_hei[1]=0
+
+for i=1 to floor_num
+	_floor_x[i]=floor_x[i]
+	_floor_wid[i]=floor_wid[i]
+	_floor_hei[i]=floor_hei[i]
+next i
+
+parameters \
+floor_x=_floor_x,
+floor_wid=_floor_wid,
+floor_hei=_floor_hei
+
+
+!==============================================================================================================スタッド本数と座標リスト計算
+dim _coo_stud[]
+_coo_stud[1]=0
+
+if switch_stud=0 then !自動計算
+	num_stud=0
+	stud_x=ceil((len-wid2_stud)/pitch)-1
+
+	for i=1 to stud_x
+		stud_flag=1
+
+		for j=1 to win_num
+			if i*pitch-absx>win_xz2[j][1]-(2-win_side_ref[j][1])*(wid2_op+2*wid2_stud) and i*pitch-absx<win_xz2[j][1]+win_wid2[j]+(2-win_side_ref[j][2])*(wid2_op+wid2_stud) then
+				stud_flag=0
+			endif
+		next j
+
+		for j=1 to beam_num
+			if i*pitch-absx>beam_x[j]-beam_ref[j][1]*2*wid2_stud-wid2_stud and i*pitch-absx<beam_x[j]+beam_wid[j]+beam_ref[j][2]*2*wid2_stud then
+				stud_flag=0
+			endif
+		next j
+		
+		if stud_flag=1 then
+			num_stud=num_stud+1
+			_coo_stud[num_stud]=i*pitch
+		endif
+	next i
+
+	for i=1 to win_num
+		if type<13 or type=20 then
+			win_stud_num=ceil(win_wid2[i]/pitch)-1
+			fact_pitch=win_wid2[i]/(win_stud_num+1)
+
+			for j=1 to win_stud_num
+				num_stud=num_stud+1
+				_coo_stud[num_stud]=win_xz2[i][1]-wid2_stud/2+absx+j*fact_pitch
+			next j
+		else
+			num_stud=num_stud+1
+			_coo_stud[num_stud]=win_xz2[i][1]+absx
+
+			num_stud=num_stud+1
+			_coo_stud[num_stud]=win_xz2[i][1]+win_wid2[i]-wid2_stud+absx
+
+			win_stud_num=ceil((win_wid2[i]-wid2_stud)/pitch)-1
+			fact_pitch=(win_wid2[i]-wid2_stud)/(win_stud_num+1)
+
+			for j=1 to win_stud_num
+				num_stud=num_stud+1
+				_coo_stud[num_stud]=win_xz2[i][1]+absx+j*fact_pitch
+			next j
+		endif
+	next i
+
+	for i=1 to beam_num
+		beam_stud_num=ceil(beam_wid[i]/pitch)-1
+		fact_pitch=beam_wid[i]/(beam_stud_num+1)
+
+		for j=1 to beam_stud_num
+			num_stud=num_stud+1
+			_coo_stud[num_stud]=beam_x[i]-wid2_stud/2+absx+j*fact_pitch
+		next j
+	next i
+
+	hideparameter "switch_studspot"
+	lock "num_stud","coo_stud"
+else !手動調整
+	values "num_stud" range[0,]
+
+	for i=1 to num_stud
+		_coo_stud[i]=coo_stud[i]
+	next i
+endif
+
+parameters \
+num_stud=num_stud,
+coo_stud=_coo_stud
+values "coo_stud" range[0,len]
+
+
+num_stud2=2*switch_start+num_stud+2*switch_end
+dim coo_stud2[]
+coo_stud2[1]=0
+
+if switch_start then put 0,0
+for i=1 to num_stud
+	put _coo_stud[i]
+next i
+if switch_end then put len,len
+
+for i=1 to num_stud2
+	coo_stud2[i]=get(1)
+next i
+
+for i=1 to num_stud2-1
+	for j=1 to num_stud2-i
+		if coo_stud2[j]>coo_stud2[j+1] then
+			tempPos=coo_stud2[j]
+			coo_stud2[j]=coo_stud2[j+1]
+			coo_stud2[j+1]=tempPos
+		endif
+	next j
+next i
+
+parameters num_stud2=num_stud2
+
+
+!==============================================================================================================ボード設定
+values{2} "part" 1,"間仕切",2,"区画間仕切",3,"二重壁",4,"下がり天井",5,"下がり壁",6,"腰壁"
+values{2} "fire_resistance1" 1,"一般",2,"下地共不燃",3,"下地共準不燃",4,"不燃",5,"準不燃"
+values{2} "fire_resistance2" 1,"一般",2,"下地共不燃",3,"下地共準不燃",4,"不燃",5,"準不燃"
+values{2} "board_start" 1,"始点",2,"終点",3,"自由調整"
+values{2} "board_start_z" 1,"下端",2,"上端",3,"自由調整"
+if board_start<>3 then hideparameter "offset_free"
+if board_start_z<>3 then hideparameter "offset_free_z"
+
+if part=1 then txt_part="間仕切"
+if part=2 then txt_part="区画間仕切"
+if part=3 then txt_part="二重壁"
+if part=4 then txt_part="下がり天井"
+if part=5 then txt_part="下がり壁"
+if part=6 then txt_part="腰壁"
+
+if fire_resistance1=1 then txt_fire1="一般"
+if fire_resistance1=2 then txt_fire1="下地共不燃"
+if fire_resistance1=3 then txt_fire1="下地共準不燃"
+if fire_resistance1=4 then txt_fire1="不燃"
+if fire_resistance1=5 then txt_fire1="準不燃"
+
+if fire_resistance2=1 then txt_fire2="一般"
+if fire_resistance2=2 then txt_fire2="下地共不燃"
+if fire_resistance2=3 then txt_fire2="下地共準不燃"
+if fire_resistance2=4 then txt_fire2="不燃"
+if fire_resistance2=5 then txt_fire2="準不燃"
+
+parameters \
+txt_part=txt_part,
+txt_fire1=txt_fire1,
+txt_fire2=txt_fire2
+
+dim wid_bo[],hei_bo[],thi_board[],type_board[],size_board[]
+wid_bo[1]=0.1 : wid_bo[2]=0.1 : wid_bo[3]=0.1
+hei_bo[1]=0.1 : hei_bo[2]=0.1 : hei_bo[3]=0.1
+thi_board[1]=0.006 : thi_board[2]=0.006 : thi_board[3]=0.006
+type_board[1]=1 : type_board[2]=1 : type_board[3]=1
+size_board[1]=1 : size_board[2]=1 : size_board[3]=1
+
+if switch_board then
+	values "num_board" range[1,3]
+
+	for i=1 to num_board
+		offset_start[i]=max(offset_start[i],-len-offset_end[i]+0.001)
+		offset_end[i]=max(offset_end[i],-len-offset_start[i]+0.001)
+		txt_type_board1[i]=""
+	next i
+
+    parameters \
+    offset_start=offset_start,
+    offset_end=offset_end
+
+	values "offset_down" range [slab_top_offset,]
+	values "offset_up" range [,-ceilling_down_offset]
+
+	if num_board>0 then
+		values{2} "thi_board_1" 0.0008,"0.8",0.006,"6.0",0.008,"8.0",0.009,"9.0",0.0095,"9.5",0.0125,"12.5",0.015,"15",0.021,"21"
+		thi_board[1]=thi_board_1
+		values{2} "type_board_1" 1,"石こうボード",2,"ケイカルボード",3,"硬質石こうボード",4,"耐水ボード",5,"強化石こうボード",6,"構造用石こうボード",7,"石こうラスボード",8,"化粧石こうボード",9,"不燃積層石こうボード",10,"吸放湿石こうボード",11,"亜鉛鉄板"
+		type_board[1]=type_board_1
+		values{2} "size_board_1" 1,"3x6版",2,"3x8版",3,"3x9版",4,"メートル版",5,"2x6版"
+		size_board[1]=size_board_1
+	endif
+	if num_board>1 then
+		values{2} "thi_board_2" 0.0008,"0.8",0.006,"6.0",0.008,"8.0",0.009,"9.0",0.0095,"9.5",0.0125,"12.5",0.015,"15",0.021,"21"
+		thi_board[2]=thi_board_2
+		values{2} "type_board_2" 1,"石こうボード",2,"ケイカルボード",3,"硬質石こうボード",4,"耐水ボード",5,"強化石こうボード",6,"構造用石こうボード",7,"石こうラスボード",8,"化粧石こうボード",9,"不燃積層石こうボード",10,"吸放湿石こうボード",11,"亜鉛鉄板"
+		type_board[2]=type_board_2
+		values{2} "size_board_2" 1,"3x6版",2,"3x8版",3,"3x9版",4,"メートル版",5,"2x6版"
+		size_board[2]=size_board_2
+	endif
+	if num_board>2 then
+		values{2} "thi_board_3" 0.0008,"0.8",0.006,"6.0",0.008,"8.0",0.009,"9.0",0.0095,"9.5",0.0125,"12.5",0.015,"15",0.021,"21"
+		thi_board[3]=thi_board_3
+		values{2} "type_board_3" 1,"石こうボード",2,"ケイカルボード",3,"硬質石こうボード",4,"耐水ボード",5,"強化石こうボード",6,"構造用石こうボード",7,"石こうラスボード",8,"化粧石こうボード",9,"不燃積層石こうボード",10,"吸放湿石こうボード",11,"亜鉛鉄板"
+		type_board[3]=type_board_3
+		values{2} "size_board_3" 1,"3x6版",2,"3x8版",3,"3x9版",4,"メートル版",5,"2x6版"
+		size_board[3]=size_board_3
+	endif
+
+	for i=1 to num_board
+		if type_board[i]=1  then txt_type_board1[i]="GB-R"
+		if type_board[i]=2  then txt_type_board1[i]="K"
+		if type_board[i]=3  then txt_type_board1[i]="GB-R-H"
+		if type_board[i]=4  then txt_type_board1[i]="GB-S"
+		if type_board[i]=5  then txt_type_board1[i]="GB-F"
+		if type_board[i]=6  then txt_type_board1[i]="GB-St-A・B"
+		if type_board[i]=7  then txt_type_board1[i]="GB-L"
+		if type_board[i]=8  then txt_type_board1[i]="GB-D"
+		if type_board[i]=9  then txt_type_board1[i]="GB-NC"
+		if type_board[i]=10 then txt_type_board1[i]="GB-Hc"
+		if type_board[i]=11 then txt_type_board1[i]="亜鉛鉄板"
+	next i
+
+    parameters txt_type_board1=txt_type_board1
+
+    for i=1 to num_board
+        if size_board[i]=1 then
+            wid_bo[i]=0.91
+            hei_bo[i]=1.82
+        endif
+        
+        if size_board[i]=2 then
+            wid_bo[i]=0.91
+            hei_bo[i]=2.42
+        endif
+        
+        if size_board[i]=3 then
+            wid_bo[i]=0.91
+            hei_bo[i]=2.73
+        endif
+        
+        if size_board[i]=4 then
+            wid_bo[i]=1
+            hei_bo[i]=2
+        endif
+
+        if size_board[i]=5 then
+            wid_bo[i]=0.606
+            hei_bo[i]=1.82
+        endif
+    next i
+else
+	parameters \
+	num_board=0,
+	num_seal=0,
+	seal1_l=0,
+	seal1_r=0,
+	seal1_u=0,
+	seal1_d=0,
+	soundseal1_l=0,
+	soundseal1_r=0,
+	soundseal1_u=0,
+	soundseal1_d=0
+	lock "offset_start","offset_end","offset_up","offset_down","switch_joiner","seal1_l","seal1_r","seal1_u","seal1_d","num_board","num_seal","soundseal1_l","soundseal1_r","soundseal1_u","soundseal1_d"
+	hideparameter "offset_start","offset_end","offset_up","offset_down","switch_joiner","num_board"
+endif
+
+if num_board<3 then
+	values{2} "size_board_3" 0,""
+	values{2} "thi_board_3" 0,""
+	values{2} "type_board_3" 0,""
+	lock "size_board_3","thi_board_3","type_board_3"
+	hideparameter "size_board_3","thi_board_3","type_board_3"
+endif
+
+if num_board<2 then
+	values{2} "size_board_2" 0,""
+	values{2} "thi_board_2" 0,""
+	values{2} "type_board_2" 0,""
+	lock "size_board_2","thi_board_2","type_board_2"
+	hideparameter "size_board_2","thi_board_2","type_board_2"
+endif
+
+if num_board<1 then
+	values{2} "size_board_1" 0,""
+	values{2} "thi_board_1" 0,""
+	values{2} "type_board_1" 0,""
+	lock "size_board_1","thi_board_1","type_board_1"
+	hideparameter "size_board_1","thi_board_1","type_board_1"
+endif
+
+dim wid_bo2[],hei_bo2[],thi_board2[],type_board2[],size_board2[]
+wid_bo2[1]=0.1 : wid_bo2[2]=0.1 : wid_bo2[3]=0.1
+hei_bo2[1]=0.1 : hei_bo2[2]=0.1 : hei_bo2[3]=0.1
+thi_board2[1]=0.006 : thi_board2[2]=0.006 : thi_board2[3]=0.006
+type_board2[1]=1 : type_board2[2]=1 : type_board2[3]=1
+size_board2[1]=1 : size_board2[2]=1 : size_board2[3]=1
+
+if switch_board2 then
+	values "num_board2" range[1,3]
+
+	for i=1 to num_board2
+		offset_start2[i]=max(offset_start2[i],-len-offset_end2[i]+0.001)
+		offset_end2[i]=max(offset_end2[i],-len-offset_start2[i]+0.001)
+		txt_type_board2[i]=""
+	next i
+
+    parameters \
+    offset_start2=offset_start2,
+    offset_end2=offset_end2
+
+	values "offset_down2" range[slab_top_offset,]
+	values "offset_up2" range[,-ceilling_down_offset]
+
+	if num_board2>0 then
+		values{2} "thi_board2_1" 0.0008,"0.8",0.006,"6.0",0.008,"8.0",0.009,"9.0",0.0095,"9.5",0.0125,"12.5",0.015,"15",0.021,"21"
+		thi_board2[1]=thi_board2_1
+		values{2} "type_board2_1" 1,"石こうボード",2,"ケイカルボード",3,"硬質石こうボード",4,"耐水ボード",5,"強化石こうボード",6,"構造用石こうボード",7,"石こうラスボード",8,"化粧石こうボード",9,"不燃積層石こうボード",10,"吸放湿石こうボード",11,"亜鉛鉄板"
+		type_board2[1]=type_board2_1
+		values{2} "size_board2_1" 1,"3x6版",2,"3x8版",3,"3x9版",4,"メートル版",5,"2x6版"
+		size_board2[1]=size_board2_1
+	endif
+	if num_board2>1 then
+		values{2} "thi_board2_2" 0.0008,"0.8",0.006,"6.0",0.008,"8.0",0.009,"9.0",0.0095,"9.5",0.0125,"12.5",0.015,"15",0.021,"21"
+		thi_board2[2]=thi_board2_2
+		values{2} "type_board2_2" 1,"石こうボード",2,"ケイカルボード",3,"硬質石こうボード",4,"耐水ボード",5,"強化石こうボード",6,"構造用石こうボード",7,"石こうラスボード",8,"化粧石こうボード",9,"不燃積層石こうボード",10,"吸放湿石こうボード",11,"亜鉛鉄板"
+		type_board2[2]=type_board2_2
+		values{2} "size_board2_2" 1,"3x6版",2,"3x8版",3,"3x9版",4,"メートル版",5,"2x6版"
+		size_board2[2]=size_board2_2
+	endif
+	if num_board2>2 then
+		values{2} "thi_board2_3" 0.0008,"0.8",0.006,"6.0",0.008,"8.0",0.009,"9.0",0.0095,"9.5",0.0125,"12.5",0.015,"15",0.021,"21"
+		thi_board2[3]=thi_board2_3
+		values{2} "type_board2_3" 1,"石こうボード",2,"ケイカルボード",3,"硬質石こうボード",4,"耐水ボード",5,"強化石こうボード",6,"構造用石こうボード",7,"石こうラスボード",8,"化粧石こうボード",9,"不燃積層石こうボード",10,"吸放湿石こうボード",11,"亜鉛鉄板"
+		type_board2[3]=type_board2_3
+		values{2} "size_board2_3" 1,"3x6版",2,"3x8版",3,"3x9版",4,"メートル版",5,"2x6版"
+		size_board2[3]=size_board2_3
+	endif
+	
+	for i=1 to num_board2
+		if type_board2[i]=1  then txt_type_board2[i]="GB-R"
+		if type_board2[i]=2  then txt_type_board2[i]="K"
+		if type_board2[i]=3  then txt_type_board2[i]="GB-R-H"
+		if type_board2[i]=4  then txt_type_board2[i]="GB-S"
+		if type_board2[i]=5  then txt_type_board2[i]="GB-F"
+		if type_board2[i]=6  then txt_type_board2[i]="GB-St-A・B"
+		if type_board2[i]=7  then txt_type_board2[i]="GB-L"
+		if type_board2[i]=8  then txt_type_board2[i]="GB-D"
+		if type_board2[i]=9  then txt_type_board2[i]="GB-NC"
+		if type_board2[i]=10 then txt_type_board2[i]="GB-Hc"
+		if type_board2[i]=11 then txt_type_board2[i]="亜鉛鉄板"
+	next i
+
+    parameters txt_type_board2=txt_type_board2
+
+    for i=1 to num_board2
+        if size_board2[i]=1 then
+            wid_bo2[i]=0.91
+            hei_bo2[i]=1.82
+        endif
+        
+        if size_board2[i]=2 then
+            wid_bo2[i]=0.91
+            hei_bo2[i]=2.42
+        endif
+        
+        if size_board2[i]=3 then
+            wid_bo2[i]=0.91
+            hei_bo2[i]=2.73
+        endif
+        
+        if size_board2[i]=4 then
+            wid_bo2[i]=1
+            hei_bo2[i]=2
+        endif
+
+        if size_board2[i]=5 then
+            wid_bo2[i]=0.606
+            hei_bo2[i]=1.82
+        endif
+    next i
+else
+	parameters \
+	num_board2=0,
+	num_seal2=0,
+	seal2_l=0,
+	seal2_r=0,
+	seal2_u=0,
+	seal2_d=0,
+	soundseal2_l=0,
+	soundseal2_r=0,
+	soundseal2_u=0,
+	soundseal2_d=0
+	lock "offset_start2","offset_end2","offset_up2","offset_down2","switch_joiner2","seal2_l","seal2_r","seal2_u","seal2_d","num_board2","num_seal2","soundseal2_l","soundseal2_r","soundseal2_u","soundseal2_d"
+	hideparameter "offset_start2","offset_end2","offset_up2","offset_down2","switch_joiner2","num_board2"
+endif
+
+if num_board2<3 then
+	values{2} "size_board2_3" 0,""
+	values{2} "thi_board2_3" 0,""
+	values{2} "type_board2_3" 0,""
+	lock "size_board2_3","thi_board2_3","type_board2_3"
+	hideparameter "size_board2_3","thi_board2_3","type_board2_3"
+endif
+
+if num_board2<2 then
+	values{2} "size_board2_2" 0,""
+	values{2} "thi_board2_2" 0,""
+	values{2} "type_board2_2" 0,""
+	lock "size_board2_2","thi_board2_2","type_board2_2"
+	hideparameter "size_board2_2","thi_board2_2","type_board2_2"
+endif
+
+if num_board2<1 then
+	values{2} "size_board2_1" 0,""
+	values{2} "thi_board2_1" 0,""
+	values{2} "type_board2_1" 0,""
+	lock "size_board2_1","thi_board2_1","type_board2_1"
+	hideparameter "size_board2_1","thi_board2_1","type_board2_1"
+endif
+
+!ボード総厚み
+thi_board_totle=0
+for i=1 to num_board
+	thi_board_totle=thi_board_totle+thi_board[i]
+next i
+
+thi_board2_totle=0
+for i=1 to num_board2
+	thi_board2_totle=thi_board2_totle+thi_board2[i]
+next i
+
+
+!==============================================================================================================シール設定
+dim switch_seal[][]
+switch_seal[1][1]=seal1_l
+switch_seal[1][2]=seal1_r
+switch_seal[1][3]=seal1_u
+switch_seal[1][4]=seal1_d
+switch_seal[2][1]=seal2_l
+switch_seal[2][2]=seal2_r
+switch_seal[2][3]=seal2_u
+switch_seal[2][4]=seal2_d
+
+dim switch_soundseal[][]
+switch_soundseal[1][1]=soundseal1_l
+switch_soundseal[1][2]=soundseal1_r
+switch_soundseal[1][3]=soundseal1_u
+switch_soundseal[1][4]=soundseal1_d
+switch_soundseal[2][1]=soundseal2_l
+switch_soundseal[2][2]=soundseal2_r
+switch_soundseal[2][3]=soundseal2_u
+switch_soundseal[2][4]=soundseal2_d
+
+if switch_board then
+	values "num_seal" range[1,num_board]
+	if part=2 and switch_sound then parameters num_seal=num_board
+else
+	hideparameter "num_seal"
+endif
+
+if switch_board2 then
+	values "num_seal2" range[1,num_board2]
+	if part=2 and switch_sound then parameters num_seal2=num_board2
+else
+	hideparameter "num_seal2"
+endif
+
+
+!==============================================================================================================鉄板設定
+if switch_board=0 then
+	parameters switch_plate1=0
+	lock "switch_plate1"
+endif
+
+values{2} "plate1_thi" 0.0008,"0.8mm",0.001,"1.0mm",0.0012,"1.2mm"
+
+if switch_plate1=0 then 
+	hideparameter "plate1_num","plate1_thi","plate1_wid","plate1_len","plate1_start","plate1_end"
+	parameters plate1_num=0
+endif
+
+values "plate1_num" range[0,]
+dim _plate1_start[][]
+dim _plate1_end[][]
+_plate1_start[1][1]=0
+_plate1_start[1][2]=0
+_plate1_end[1][1]=0
+_plate1_end[1][2]=0
+
+for i=1 to plate1_num
+	for j=1 to 2
+		_plate1_start[i][j]=plate1_start[i][j]
+		_plate1_end[i][j]=plate1_end[i][j]
+	next j
+next i
+
+parameters \
+plate1_start=_plate1_start,
+plate1_end=_plate1_end
+
+
+if switch_board2=0 then
+	parameters switch_plate2=0
+	lock "switch_plate2"
+endif
+
+values{2} "plate2_thi" 0.0008,"0.8mm",0.001,"1.0mm",0.0012,"1.2mm"
+
+if switch_plate2=0 then 
+	hideparameter "plate2_num","plate2_thi","plate2_wid","plate2_len","plate2_start","plate2_end"
+	parameters plate2_num=0
+endif
+
+values "plate2_num" range[0,]
+dim _plate2_start[][]
+dim _plate2_end[][]
+_plate2_start[1][1]=0
+_plate2_start[1][2]=0
+_plate2_end[1][1]=0
+_plate2_end[1][2]=0
+
+for i=1 to plate2_num
+	for j=1 to 2
+		_plate2_start[i][j]=plate2_start[i][j]
+		_plate2_end[i][j]=plate2_end[i][j]
+	next j
+next i
+
+parameters \
+plate2_start=_plate2_start,
+plate2_end=_plate2_end
+
+if switch_board_detail=0 then
+	parameters switch_board_num_detail=0
+	lock "switch_board_num_detail"
+endif
+
+
+!==============================================================================================================積算
+!========================================================ランナー長さ
+runner_len=2*len
+
+if switch_op then
+	for i=1 to win_num
+		if type<13 or type=20 then
+			if win_xz2[i][2]+win_hei2[i]>=hei-eps then
+				runner_len=runner_len-win_wid2[i]
+			endif
+
+			if win_xz2[i][2]<=eps then
+				runner_len=runner_len-win_wid2[i]+(2-win_ref[i])*win_wid2[i]
+			else
+				runner_len=runner_len+win_wid2[i]+(2-win_ref[i])*win_wid2[i]
+			endif
+		else
+			if win_xz2[i][2]+win_hei2[i]>=hei-eps then
+				runner_len=runner_len-win_wid2[i]
+			endif
+
+			if win_xz2[i][2]<=eps then
+				runner_len=runner_len-win_wid2[i]
+			endif
+		endif
+	next i
+endif
+
+runner_len=2*runner_len
+parameters runner_len=runner_len
+
+
+!========================================================振れ止め長さ
+!================振れ止めZ座標
+stop_len=0
+
+if num_stop>0 then
+	dim _coo_stop[]
+	for i=1 to num_stop
+		_coo_stop[i]=i*1.2
+	next i
+
+	stop_len=num_stop*len
+
+	!================マイナス開口部
+	if switch_op then
+		for i=1 to win_num
+			for j=1 to num_stop
+				stop_len=stop_len-min(win_wid2[i],len)
+			next j
+		next i
+	endif
+
+	!================マイナス梁開口
+	if switch_beam then
+		for i=1 to beam_num	
+			for j=1 to num_stop
+				if _coo_stop[j]>=(hei-beam_hei[i]) then 
+					stop_len=stop_len-beam_wid[i]
+				endif
+			next j
+		next i
+	endif
+
+	for i=1 to win_num
+		stop_len=stop_len+_win_stop_num[i]*win_wid2[i]
+	next i
+endif
+
+stop_len=2*stop_len
+parameters stop_len=stop_len
+
+
+!========================================================補強材長さ
+!横補強
+num_ref2=0
+dim _ref2_len[]
+_ref2_len[1]=0
+refx_len=0
+
+!縦補強
+num_ref=0
+dim _ref_len[]
+_ref_len[1]=0
+refz_len=0
+
+!縦補強スタッド
+num_refstud=0
+dim _refstud_len[]
+_refstud_len[1]=0
+
+if switch_op and switch_lgs then
+	!================補強材(横)
+	for i=1 to win_num
+		if win_type[i]=1 and win_ref[i]=1 then 
+			refx_len=refx_len+2*win_wid2[i]
+		endif
+		if win_type[i]=2 then 
+			refx_len=refx_len+2*win_wid2[i]
+			if win_ref[i]=1 then
+				refx_len=refx_len+2*win_wid2[i]
+			endif
+		endif
+	next i
+
+	num_ref2=0
+	
+	for i=1 to win_num
+		if win_type[i]=1 then
+			if win_ref[i]=1 then
+				num_ref2=num_ref2+1
+				_ref2_len[num_ref2]=win_wid2[i]
+				num_ref2=num_ref2+1
+				_ref2_len[num_ref2]=win_wid2[i]
+			endif
+		endif
+		if win_type[i]=2 then
+			num_ref2=num_ref2+1
+			_ref2_len[num_ref2]=win_wid2[i]
+			num_ref2=num_ref2+1
+			_ref2_len[num_ref2]=win_wid2[i]
+
+			if win_ref[i]=1 then
+				num_ref2=num_ref2+1
+				_ref2_len[num_ref2]=win_wid2[i]
+				num_ref2=num_ref2+1
+				_ref2_len[num_ref2]=win_wid2[i]
+			endif
+		endif
+	next i
+
+	!================補強材(縦)
+	for i=1 to win_num
+		if win_side_ref[i][1]=1 then 
+			refz_1=hei-0.01+win_ref_offset[i]
+
+			!================マイナス梁開口
+			for j=1 to beam_num
+				if win_xz2[i][1]-wid2_op/2>=beam_x[j] and win_xz2[i][1]-wid2_op/2<=beam_x[j]+beam_wid[j] then refz_1=refz_1-beam_hei[j]+0.009
+			next j
+	
+			!================マイナス段差開口
+			for j=1 to floor_num
+				if win_xz2[i][1]-wid2_op/2>=floor_x[j] and win_xz2[i][1]-wid2_op/2<=floor_x[j]+floor_wid[j] then refz_1=refz_1-floor_hei[j]
+			next j
+	
+			!================マイナス上端傾斜
+			if roof_cut then
+				counter_beam1=0
+		
+				if win_xz2[i][1]-wid2_op/2+absx>=0 and win_xz2[i][1]-wid2_op/2+absx<=cut_xzL[1][1] then
+					if switch_beam then
+						for j=1 to beam_num
+							if win_xz2[i][1]-wid2_op/2>=beam_x[j] and win_xz2[i][1]-wid2_op/2<=beam_x[j]+beam_wid[j] then
+								counter_beam1=counter_beam1+1
+							endif
+						next j
+					endif
+		
+					if counter_beam1=0 and cut_xzL[1][1]>0 then refz_1=refz_1-(cut_xzL[1][1]-(win_xz2[i][1]-wid2_op/2+absx))*(cut_xzL[1][2]/cut_xzL[1][1])
+				endif
+			
+				counter_beam2=0
+			
+				if win_xz2[i][1]-wid2_op/2+absx>=len-cut_xzR[1][1] and win_xz2[i][1]-wid2_op/2+absx<=len then
+					if switch_beam then
+						for j=1 to beam_num
+							if win_xz2[i][1]-wid2_op/2>=beam_x[j] and win_xz2[i][1]-wid2_op/2<=beam_x[j]+beam_wid[j] then
+								counter_beam2=counter_beam2+1
+							endif
+						next j
+					endif
+		
+					if counter_beam2=0 and cut_xzR[1][1]>0 then refz_1=refz_1-(cut_xzR[1][1]+(win_xz2[i][1]-wid2_op/2+absx)-len)*(cut_xzR[1][2]/cut_xzR[1][1])
+				endif
+			endif
+
+			num_ref=num_ref+1
+			_ref_len[num_ref]=refz_1
+			num_ref=num_ref+1
+			_ref_len[num_ref]=refz_1			
+			refz_len=refz_len+2*refz_1
+
+			num_refstud=num_refstud+1
+			_refstud_len[num_refstud]=refz_1
+			num_refstud=num_refstud+1
+			_refstud_len[num_refstud]=refz_1
+		endif
+
+		if win_side_ref[i][2]=1 then 
+			refz_2=hei-0.01+win_ref_offset[i]
+
+			!================マイナス梁開口
+			for j=1 to beam_num
+				if win_xz2[i][1]+win_wid2[i]+wid2_op/2>=beam_x[j] and win_xz2[i][1]+win_wid2[i]+wid2_op/2<=beam_x[j]+beam_wid[j] then refz_2=refz_2-beam_hei[j]+0.009
+			next j
+	
+			!================マイナス段差開口
+			for j=1 to floor_num
+				if win_xz2[i][1]+win_wid2[i]+wid2_op/2>=floor_x[j] and win_xz2[i][1]+win_wid2[i]+wid2_op/2<=floor_x[j]+floor_wid[j] then refz_2=refz_2-floor_hei[j]
+			next j
+	
+			!================マイナス上端傾斜
+			if roof_cut then
+				counter_beam1=0
+		
+				if win_xz2[i][1]+win_wid2[i]+wid2_op/2+absx>=0 and win_xz2[i][1]+win_wid2[i]+wid2_op/2+absx<=cut_xzL[1][1] then
+					if switch_beam then
+						for j=1 to beam_num
+							if win_xz2[i][1]+win_wid2[i]+wid2_op/2>=beam_x[j] and win_xz2[i][1]+win_wid2[i]+wid2_op/2<=beam_x[j]+beam_wid[j] then
+								counter_beam1=counter_beam1+1
+							endif
+						next j
+					endif
+		
+					if counter_beam1=0 and cut_xzL[1][1]>0 then refz_2=refz_2-(cut_xzL[1][1]-(win_xz2[i][1]+win_wid2[i]+wid2_op/2+absx))*(cut_xzL[1][2]/cut_xzL[1][1])
+				endif
+			
+				counter_beam2=0
+			
+				if win_xz2[i][1]+win_wid2[i]+wid2_op/2+absx>=len-cut_xzR[1][1] and win_xz2[i][1]+win_wid2[i]+wid2_op/2+absx<=len then
+					if switch_beam then
+						for j=1 to beam_num
+							if win_xz2[i][1]+win_wid2[i]+wid2_op/2>=beam_x[j] and win_xz2[i][1]+win_wid2[i]+wid2_op/2<=beam_x[j]+beam_wid[j] then
+								counter_beam2=counter_beam2+1
+							endif
+						next j
+					endif
+		
+					if counter_beam2=0 and cut_xzR[1][1]>0 then refz_2=refz_2-(cut_xzR[1][1]+(win_xz2[i][1]+win_wid2[i]+wid2_op/2+absx)-len)*(cut_xzR[1][2]/cut_xzR[1][1])
+				endif
+			endif
+
+			num_ref=num_ref+1
+			_ref_len[num_ref]=refz_2
+			num_ref=num_ref+1
+			_ref_len[num_ref]=refz_2
+			refz_len=refz_len+2*refz_2
+
+			num_refstud=num_refstud+1
+			_refstud_len[num_refstud]=refz_2
+			num_refstud=num_refstud+1
+			_refstud_len[num_refstud]=refz_2
+		endif	
+	next i
+endif
+
+parameters \
+num_ref2=num_ref2,
+ref2_len=_ref2_len,
+refx_len=refx_len,
+num_ref=num_ref,
+ref_len=_ref_len,
+refz_len=refz_len,
+num_refstud=num_refstud,
+refstud_len=_refstud_len
+
+
+!========================================================スタッド長さリスト
+dim _stud_len[]
+_stud_len[1]=0
+
+for i=1 to num_stud2
+	stud_len_def=hei-0.01
+	
+	!================マイナス梁開口
+	if switch_beam then
+		for j=1 to beam_num
+			if coo_stud2[i]>=beam_x[j]+absx and coo_stud2[i]<=beam_x[j]+beam_wid[j]+absx then
+				stud_len_def=stud_len_def-beam_hei[j]+0.008
+			endif
+		next j
+	endif
+	
+	!================マイナス段差開口
+	if switch_floor then
+		for j=1 to floor_num
+			if coo_stud2[i]>=floor_x[j]+absx and coo_stud2[i]<=floor_x[j]+floor_wid[j]+absx then
+				stud_len_def=stud_len_def-floor_hei[j]
+			endif
+		next j
+	endif
+
+	!================マイナス開口部
+	if switch_op then
+		for j=1 to win_num
+			if coo_stud2[i]>=win_xz2[j][1]+absx and coo_stud2[i]<=win_xz2[j][1]+win_wid2[j]+absx then 
+				if win_type[j]=1 then 
+					if win_xz2[j][2]+win_hei2[j]+wid2_op>=hei then
+						stud_len_def=0
+					else
+						stud_len_def=stud_len_def-win_hei2[j]-win_xz2[j][2]-wid2_op
+					endif
+				endif
+				if win_type[j]=2 then 
+					if win_xz2[j][2]+win_hei2[j]+wid2_op>=hei then
+						stud_len_def=stud_len_def-(hei-win_xz2[j][2]+wid2_op)+0.008
+					else
+						stud_len_def=stud_len_def-win_hei2[j]-2*wid2_op-0.002
+					endif
+				endif
+			endif
+		next j
+	endif
+
+	!================マイナス上端傾斜
+	if roof_cut then
+		counter_beam1=0
+
+		if coo_stud2[i]>=0 and coo_stud2[i]<=cut_xzL[1][1] then
+			if switch_beam then
+				for j=1 to beam_num
+					if coo_stud2[i]>=beam_x[j]+absx and coo_stud2[i]<=beam_x[j]+beam_wid[j]+absx then
+						counter_beam1=counter_beam1+1
+					endif
+				next j
+			endif
+
+			if counter_beam1=0 and cut_xzL[1][1]>0 then stud_len_def=stud_len_def-(cut_xzL[1][1]-coo_stud2[i])*(cut_xzL[1][2]/cut_xzL[1][1])
+		endif
+	
+		counter_beam2=0
+	
+		if coo_stud2[i]>=len-cut_xzR[1][1] and coo_stud2[i]<=len then
+			if switch_beam then
+				for j=1 to beam_num
+					if coo_stud2[i]>=beam_x[j]+absx and coo_stud2[i]<=beam_x[j]+beam_wid[j]+absx then
+						counter_beam2=counter_beam2+1
+					endif
+				next j
+			endif
+
+			if counter_beam2=0 and cut_xzR[1][1]>0 then stud_len_def=stud_len_def-(cut_xzR[1][1]+coo_stud2[i]-len)*(cut_xzR[1][2]/cut_xzR[1][1])
+		endif
+	endif
+
+	if switch_lgs then
+		_stud_len[i]=max(stud_len_def,0)
+	else
+		_stud_len[i]=0
+	endif
+next i
+
+parameters stud_len=_stud_len
+
+
+!========================================================梁開口スタッド長さリスト
+num_beamstud=0
+dim _beam_len[]
+_beam_len[1]=0
+
+if switch_beam and switch_lgs then
+	for i=1 to beam_num
+		beam_len1=hei-0.01
+		beam_len2=hei-0.01
+		
+		!================マイナス開口部
+		for j=1 to win_num
+			if beam_x[i]-wid2_stud/2>=win_xz2[j][1] and beam_x[i]-wid2_stud/2<=win_xz2[j][1]+win_wid2[j] then
+				if win_type[j]=1 then beam_len1=beam_len1-win_hei2[j]-wid2_op-win_xz2[j][2]
+				if win_type[j]=2 then beam_len1=beam_len1-win_hei2[j]-2*wid2_op-0.002
+			endif
+			if beam_x[i]+beam_wid[i]+wid2_stud/2>=win_xz2[j][1] and beam_x[i]+beam_wid[i]+wid2_stud/2<=win_xz2[j][1]+win_wid2[j] then
+				if win_type[j]=1 then beam_len2=beam_len2-win_hei2[j]-wid2_op-win_xz2[j][2]
+				if win_type[j]=2 then beam_len2=beam_len2-win_hei2[j]-2*wid2_op-0.002
+			endif
+		next j
+
+		!================マイナス段差開口
+		for j=1 to floor_num
+			if beam_x[i]-wid2_stud/2>=floor_x[j] and beam_x[i]-wid2_stud/2<=floor_x[j]+floor_wid[j] then beam_len1=beam_len1-floor_hei[j]
+			if beam_x[i]+beam_wid[i]+wid2_stud/2>=floor_x[j] and beam_x[i]+beam_wid[i]+wid2_stud/2<=floor_x[j]+floor_wid[j] then beam_len2=beam_len2-floor_hei[j]
+		next j
+
+		if beam_ref[i][1]=1 then
+			num_beamstud=num_beamstud+1
+			_beam_len[num_beamstud]=max(beam_len1,0)
+			num_beamstud=num_beamstud+1
+			_beam_len[num_beamstud]=max(beam_len1,0)
+		endif
+
+		if beam_ref[i][2]=1 then
+			num_beamstud=num_beamstud+1
+			_beam_len[num_beamstud]=max(beam_len2,0)
+			num_beamstud=num_beamstud+1
+			_beam_len[num_beamstud]=max(beam_len2,0)
+		endif
+	next i
+endif
+
+parameters \
+num_beamstud=num_beamstud,
+beam_len=_beam_len
+
+
+!========================================================スタッド総本数と長さリスト(開口スタッド含め、開口補強抜き)
+stud_totle=0
+dim _coo_stud_total[]
+_coo_stud_total[1]=0
+
+for i=1 to num_stud2
+	stud_totle=stud_totle+1
+	_coo_stud_total[stud_totle]=stud_len[i]
+next i
+
+for i=1 to num_refstud
+	stud_totle=stud_totle+1
+	_coo_stud_total[stud_totle]=refstud_len[i]
+next i
+
+for i=1 to num_beamstud
+	stud_totle=stud_totle+1
+	_coo_stud_total[stud_totle]=beam_len[i]
+next i
+
+parameters \
+stud_totle=stud_totle,
+coo_stud_totle=_coo_stud_total
+
+
+!========================================================ボード面積
+!================表
+for i=1 to 3
+	area_board[i]=0
+next i
+
+if switch_board then
+	for i=1 to num_board
+		area_totle=(len+offset_start[i]+offset_end[i])*(hei-offset_down[i]+offset_up[i])
+		
+		if switch_op then
+			for j=1 to win_num
+				if win_type[j]=1 then
+					area_totle=area_totle-min((win_wid2[j]-2*offset_win),len)*min((win_hei2[j]-offset_win2),hei)
+				else
+					area_totle=area_totle-min((win_wid2[j]-2*offset_win),len)*min((win_hei2[j]-offset_win2-offset_win3),hei)
+				endif
+			next j
+		endif	
+		
+		if switch_beam then
+			for j=1 to beam_num
+				if -offset_up[i]<=beam_hei[j] then area_totle=area_totle-beam_wid[j]*(beam_hei[j]+offset_up[i])
+			next j
+		endif
+	
+		if switch_floor then
+			for j=1 to floor_num
+				if offset_down[i]<=floor_hei[j] then area_totle=area_totle-floor_wid[j]*(floor_hei[j]-offset_down[i])
+			next j
+		endif
+		
+		if roof_cut then
+			area_totle=area_totle-cut_xzL[1][1]*cut_xzL[1][2]/2-offset_start[i]*cut_xzL[1][2]-cut_xzR[1][1]*cut_xzR[1][2]/2-offset_end[i]*cut_xzR[1][2]
+		endif
+	
+		area_board[i]=max(area_totle,0.001)
+	next i
+endif
+
+parameters area_board=area_board
+
+
+!================裏
+for i=1 to 3
+	area_board2[i]=0
+next i
+
+if switch_board2 then
+	for i=1 to num_board2
+		area_totle=(len+offset_start2[i]+offset_end2[i])*(hei-offset_down2[i]+offset_up2[i])
+		
+		if switch_op then
+			for j=1 to win_num
+				if win_type[j]=1 then
+					area_totle=area_totle-min((win_wid2[j]-2*offset_win),len)*min((win_hei2[j]-offset_win2),hei)
+				else
+					area_totle=area_totle-min((win_wid2[j]-2*offset_win),len)*min((win_hei2[j]-offset_win2-offset_win3),hei)
+				endif
+			next j
+		endif	
+		
+		if switch_beam then
+			for j=1 to beam_num
+				if -offset_up2[i]<=beam_hei[j] then area_totle=area_totle-beam_wid[j]*(beam_hei[j]+offset_up2[i])
+			next j
+		endif
+	
+		if switch_floor then
+			for j=1 to floor_num
+				if offset_down2[i]<=floor_hei[j] then area_totle=area_totle-floor_wid[j]*(floor_hei[j]-offset_down2[i])
+			next j
+		endif
+		
+		if roof_cut then
+			area_totle=area_totle-cut_xzL[1][1]*cut_xzL[1][2]/2-offset_start2[i]*cut_xzL[1][2]-cut_xzR[1][1]*cut_xzR[1][2]/2-offset_end2[i]*cut_xzR[1][2]
+		endif
+	
+		area_board2[i]=max(area_totle,0.001)
+	next i
+endif
+
+parameters area_board2=area_board2
+
+
+!========================================================LGS面積
+lgs_area=hei*len
+win_area=0
+op_area=0
+slope_area=0
+
+if switch_op then
+	for i=1 to win_num
+		lgs_area=lgs_area-min(win_wid2[i],len)*min(win_hei2[i],hei)
+		win_area=win_area+min(win_wid2[i],len)*min(win_hei2[i],hei)
+	next i
+endif
+
+if switch_beam then
+	for i=1 to beam_num
+		lgs_area=lgs_area-beam_wid[i]*beam_hei[i]
+		op_area=op_area+beam_wid[i]*beam_hei[i]
+	next i
+endif
+
+if switch_floor then
+	for i=1 to floor_num
+		lgs_area=lgs_area-floor_wid[i]*floor_hei[i]
+		op_area=op_area+floor_wid[i]*floor_hei[i]
+	next i
+endif
+
+if roof_cut then
+	lgs_area=lgs_area-cut_xzL[1][1]*cut_xzL[1][2]/2-cut_xzR[1][1]*cut_xzR[1][2]/2
+	slope_area=slope_area+cut_xzL[1][1]*cut_xzL[1][2]/2+cut_xzR[1][1]*cut_xzR[1][2]/2
+endif
+
+parameters \
+lgs_area=lgs_area,
+win_area=win_area,
+op_area=op_area,
+slope_area=slope_area
+
+
+!========================================================耐火シール長さ
+!================表
+seal_len=0
+
+if switch_board then
+	if switch_seal[1][1]=1 then !左
+		seal_left=hei+offset_up[num_seal]-offset_down[num_seal]
+
+		if switch_beam then
+			for i=1 to beam_num
+				if -offset_start[num_seal]>=beam_x[i]+absx and -offset_start[num_seal]<=beam_x[i]+beam_wid[i]+absx then
+					seal_left=seal_left-beam_hei[i]-offset_up[num_seal]
+				endif
+			next i
+		endif
+	
+		if switch_floor then
+			for i=1 to floor_num
+				if -offset_start[num_seal]>=floor_x[i]+absx and -offset_start[num_seal]<=floor_x[i]+floor_wid[i]+absx then
+					seal_left=seal_left-floor_hei[i]+offset_down[num_seal]
+				endif
+			next i
+		endif
+
+		if roof_cut then
+			seal_left=seal_left-cut_xzL[1][2]
+		endif
+	else
+		seal_left=0
+	endif
+
+	if switch_seal[1][2]=1 then !右
+		seal_right=hei+offset_up[num_seal]-offset_down[num_seal]
+
+		if switch_beam then
+			for i=1 to beam_num
+				if len+offset_end[num_seal]>=beam_x[i]+absx and len+offset_end[num_seal]<=beam_x[i]+beam_wid[i]+absx then
+					seal_right=seal_right-beam_hei[i]-offset_up[num_seal]
+				endif
+			next i
+		endif
+	
+		if switch_floor then
+			for i=1 to floor_num
+				if len+offset_end[num_seal]>=floor_x[i]+absx and len+offset_end[num_seal]<=floor_x[i]+floor_wid[i]+absx then
+					seal_right=seal_right-floor_hei[i]+offset_down[num_seal]
+				endif
+			next i
+		endif
+
+		if roof_cut then
+			seal_right=seal_right-cut_xzR[1][2]
+		endif
+	else
+		seal_right=0
+	endif
+
+	if switch_seal[1][3]=1 then !上
+		seal_up=len+offset_start[num_seal]+offset_end[num_seal]
+
+		if switch_op then
+			for i=1 to win_num
+				if win_xz2[i][2]+win_hei2[i]-offset_win2>=hei then seal_up=seal_up-min((win_wid2[i]-2*offset_win),len)
+			next i
+		endif
+
+		if switch_beam then
+			for i=1 to beam_num
+				if -offset_start[num_seal]<beam_x[i]+absx then seal_up=seal_up+beam_hei[i]+offset_up[num_seal]
+				if len+offset_end[num_seal]>beam_x[i]+beam_wid[i]+absx then seal_up=seal_up+beam_hei[i]+offset_up[num_seal]
+			next i
+		endif
+
+		if roof_cut then
+			seal_up=seal_up-cut_xzL[1][1]-cut_xzR[1][1]+sqr(cut_xzL[1][1]^2+cut_xzL[1][2]^2)+sqr(cut_xzR[1][1]^2+cut_xzR[1][2]^2)
+		endif
+	else
+		seal_up=0
+	endif
+
+	if switch_seal[1][4]=1 then !下
+		seal_down=len+offset_start[num_seal]+offset_end[num_seal]
+	
+		if switch_op then
+			for i=1 to win_num
+				if win_type[i]=1 then seal_down=seal_down-min((win_wid2[i]-2*offset_win),len)
+			next i
+		endif
+
+		if switch_floor then
+			for i=1 to floor_num
+				if -offset_start[num_seal]<floor_x[i]+absx then seal_down=seal_down+floor_hei[i]-offset_down[num_seal]
+				if len+offset_end[num_seal]>floor_x[i]+floor_wid[i]+absx then seal_down=seal_down+floor_hei[i]-offset_down[num_seal]
+			next i
+		endif
+	else
+		seal_down=0
+	endif
+ 
+	seal_len=seal_left+seal_right+seal_up+seal_down
+endif
+
+parameters seal_len=seal_len
+
+
+!================裏
+seal_len2=0
+
+if switch_board2 then	
+	if switch_seal[2][1]=1 then !左
+		seal_left2=hei+offset_up2[num_seal2]-offset_down2[num_seal2]
+
+		if switch_beam then
+			for i=1 to beam_num
+				if -offset_start2[num_seal2]>=beam_x[i]+absx and -offset_start2[num_seal2]<=beam_x[i]+beam_wid[i]+absx then
+					seal_left2=seal_left2-beam_hei[i]-offset_up2[num_seal2]
+				endif
+			next i
+		endif
+	
+		if switch_floor then
+			for i=1 to floor_num
+				if -offset_start2[num_seal2]>=floor_x[i]+absx and -offset_start2[num_seal2]<=floor_x[i]+floor_wid[i]+absx then
+					seal_left2=seal_left2-floor_hei[i]+offset_down2[num_seal2]
+				endif
+			next i
+		endif
+
+		if roof_cut then
+			seal_left2=seal_left2-cut_xzL[1][2]
+		endif
+	else
+		seal_left2=0
+	endif
+	
+	if switch_seal[2][2]=1 then !右
+		seal_right2=hei+offset_up2[num_seal2]-offset_down2[num_seal2]
+
+		if switch_beam then
+			for i=1 to beam_num
+				if len+offset_end2[num_seal2]>=beam_x[i]+absx and len+offset_end2[num_seal2]<=beam_x[i]+beam_wid[i]+absx then
+					seal_right2=seal_right2-beam_hei[i]-offset_up2[num_seal2]
+				endif
+			next i
+		endif
+	
+		if switch_floor then
+			for i=1 to floor_num
+				if len+offset_end2[num_seal2]>=floor_x[i]+absx and len+offset_end2[num_seal2]<=floor_x[i]+floor_wid[i]+absx then
+					seal_right2=seal_right2-floor_hei[i]+offset_down2[num_seal2]
+				endif
+			next i
+		endif
+
+		if roof_cut then
+			seal_right2=seal_right2-cut_xzR[1][2]
+		endif
+	else
+		seal_right2=0
+	endif
+	
+	if switch_seal[2][3]=1 then !上
+		seal_up2=len+offset_start2[num_seal2]+offset_start2[num_seal2]
+
+		if switch_op then
+			for i=1 to win_num
+				if win_xz2[i][2]+win_hei2[i]-offset_win2>=hei then seal_up2=seal_up2-min((win_wid2[i]-2*offset_win),len)
+			next i
+		endif
+
+		if switch_beam then
+			for i=1 to beam_num
+				if -offset_start2[num_seal2]<beam_x[i]+absx then seal_up2=seal_up2+beam_hei[i]+offset_up2[num_seal2]
+				if len+offset_end2[num_seal2]>beam_x[i]+beam_wid[i]+absx then seal_up2=seal_up2+beam_hei[i]+offset_up2[num_seal2]
+			next i
+		endif
+
+		if roof_cut then
+			seal_up2=seal_up2-cut_xzL[1][1]-cut_xzR[1][1]+sqr(cut_xzL[1][1]^2+cut_xzL[1][2]^2)+sqr(cut_xzR[1][1]^2+cut_xzR[1][2]^2)
+		endif
+	else
+		seal_up2=0
+	endif
+	
+	if switch_seal[2][4]=1 then !下
+		seal_down2=len+offset_start2[num_seal2]+offset_start2[num_seal2]
+	
+		if switch_op then
+			for i=1 to win_num
+				if win_type[i]=1 then seal_down2=seal_down2-min((win_wid2[i]-2*offset_win),len)
+			next i
+		endif
+
+		if switch_floor then
+			for i=1 to floor_num
+				if -offset_start2[num_seal2]<floor_x[i]+absx then seal_down2=seal_down2+floor_hei[i]-offset_down2[num_seal2]
+				if len+offset_end2[num_seal2]>floor_x[i]+floor_wid[i]+absx then seal_down2=seal_down2+floor_hei[i]-offset_down2[num_seal2]
+			next i
+		endif
+	else
+		seal_down2=0
+	endif
+
+	seal_len2=seal_left2+seal_right2+seal_up2+seal_down2
+endif
+
+parameters seal_len2=seal_len2
+
+
+!========================================================遮音シール長さ
+!================表
+soundseal_len=0
+
+if switch_board then
+	if switch_soundseal[1][1]=1 then !左
+		soundseal_left=hei+offset_up[num_seal]-offset_down[num_seal]
+
+		if switch_beam then
+			for i=1 to beam_num
+				if -offset_start[num_seal]>=beam_x[i]+absx and -offset_start[num_seal]<=beam_x[i]+beam_wid[i]+absx then
+					soundseal_left=soundseal_left-beam_hei[i]-offset_up[num_seal]
+				endif
+			next i
+		endif
+	
+		if switch_floor then
+			for i=1 to floor_num
+				if -offset_start[num_seal]>=floor_x[i]+absx and -offset_start[num_seal]<=floor_x[i]+floor_wid[i]+absx then
+					soundseal_left=soundseal_left-floor_hei[i]+offset_down[num_seal]
+				endif
+			next i
+		endif
+
+		if roof_cut then
+			soundseal_left=soundseal_left-cut_xzL[1][2]
+		endif
+	else
+		soundseal_left=0
+	endif
+	
+	if switch_soundseal[1][2]=1 then !右
+		soundseal_right=hei+offset_up[num_seal]-offset_down[num_seal]
+
+		if switch_beam then
+			for i=1 to beam_num
+				if len+offset_end[num_seal]>=beam_x[i]+absx and len+offset_end[num_seal]<=beam_x[i]+beam_wid[i]+absx then
+					soundseal_right=soundseal_right-beam_hei[i]-offset_up[num_seal]
+				endif
+			next i
+		endif
+	
+		if switch_floor then
+			for i=1 to floor_num
+				if len+offset_end[num_seal]>=floor_x[i]+absx and len+offset_end[num_seal]<=floor_x[i]+floor_wid[i]+absx then
+					soundseal_right=soundseal_right-floor_hei[i]+offset_down[num_seal]
+				endif
+			next i
+		endif
+
+		if roof_cut then
+			soundseal_right=soundseal_right-cut_xzR[1][2]
+		endif
+	else
+		soundseal_right=0
+	endif
+	
+	if switch_soundseal[1][3]=1 then !上
+		soundseal_up=len+offset_start[num_seal]+offset_end[num_seal]
+
+		if switch_op then
+			for i=1 to win_num
+				if win_xz2[i][2]+win_hei2[i]-offset_win2>=hei then soundseal_up=soundseal_up-min((win_wid2[i]-2*offset_win),len)
+			next i
+		endif
+
+		if switch_beam then
+			for i=1 to beam_num
+				if -offset_start[num_seal]<beam_x[i]+absx then soundseal_up=soundseal_up+beam_hei[i]+offset_up[num_seal]
+				if len+offset_end[num_seal]>beam_x[i]+beam_wid[i]+absx then soundseal_up=soundseal_up+beam_hei[i]+offset_up[num_seal]
+			next i
+		endif
+
+		if roof_cut then
+			soundseal_up=soundseal_up-cut_xzL[1][1]-cut_xzR[1][1]+sqr(cut_xzL[1][1]^2+cut_xzL[1][2]^2)+sqr(cut_xzR[1][1]^2+cut_xzR[1][2]^2)
+		endif
+	else
+		soundseal_up=0
+	endif
+
+	if switch_soundseal[1][4]=1 then !下
+		soundseal_down=len+offset_start[num_seal]+offset_end[num_seal]
+	
+		if switch_op then
+			for i=1 to win_num
+				if win_type[i]=1 then soundseal_down=soundseal_down-min((win_wid2[i]-2*offset_win),len)
+			next i
+		endif
+
+		if switch_floor then
+			for i=1 to floor_num
+				if -offset_start[num_seal]<floor_x[i]+absx then soundseal_down=soundseal_down+floor_hei[i]-offset_down[num_seal]
+				if len+offset_end[num_seal]>floor_x[i]+floor_wid[i]+absx then soundseal_down=soundseal_down+floor_hei[i]-offset_down[num_seal]
+			next i
+		endif
+	else
+		soundseal_down=0
+	endif
+ 
+	soundseal_len=soundseal_left+soundseal_right+soundseal_up+soundseal_down
+endif
+
+parameters soundseal_len=soundseal_len
+
+
+!================裏
+soundseal_len2=0
+
+if switch_board2 then	
+	if switch_soundseal[2][1]=1 then !左
+		soundseal_left2=hei+offset_up2[num_seal2]-offset_down2[num_seal2]
+
+		if switch_beam then
+			for i=1 to beam_num
+				if -offset_start2[num_seal2]>=beam_x[i]+absx and -offset_start2[num_seal2]<=beam_x[i]+beam_wid[i]+absx then
+					soundseal_left2=soundseal_left2-beam_hei[i]-offset_up2[num_seal2]
+				endif
+			next i
+		endif
+	
+		if switch_floor then
+			for i=1 to floor_num
+				if -offset_start2[num_seal2]>=floor_x[i]+absx and -offset_start2[num_seal2]<=floor_x[i]+floor_wid[i]+absx then
+					soundseal_left2=soundseal_left2-floor_hei[i]+offset_down2[num_seal2]
+				endif
+			next i
+		endif
+
+		if roof_cut then
+			soundseal_left2=soundseal_left2-cut_xzL[1][2]
+		endif
+	else
+		soundseal_left2=0
+	endif
+	
+	if switch_soundseal[2][2]=1 then !右
+		soundseal_right2=hei+offset_up2[num_seal2]-offset_down2[num_seal2]
+
+		if switch_beam then
+			for i=1 to beam_num
+				if len+offset_end2[num_seal2]>=beam_x[i]+absx and len+offset_end2[num_seal2]<=beam_x[i]+beam_wid[i]+absx then
+					soundseal_right2=soundseal_right2-beam_hei[i]-offset_up2[num_seal2]
+				endif
+			next i
+		endif
+	
+		if switch_floor then
+			for i=1 to floor_num
+				if len+offset_end2[num_seal2]>=floor_x[i]+absx and len+offset_end2[num_seal2]<=floor_x[i]+floor_wid[i]+absx then
+					soundseal_right2=soundseal_right2-floor_hei[i]+offset_down2[num_seal2]
+				endif
+			next i
+		endif
+
+		if roof_cut then
+			soundseal_right2=soundseal_right2-cut_xzR[1][2]
+		endif
+	else
+		soundseal_right2=0
+	endif
+	
+	if switch_soundseal[2][3]=1 then !上
+		soundseal_up2=len+offset_start2[num_seal2]+offset_start2[num_seal2]
+
+		if switch_op then
+			for i=1 to win_num
+				if win_xz2[i][2]+win_hei2[i]-offset_win2>=hei then soundseal_up2=soundseal_up2-min((win_wid2[i]-2*offset_win),len)
+			next i
+		endif
+
+		if switch_beam then
+			for i=1 to beam_num
+				if -offset_start2[num_seal2]<beam_x[i]+absx then soundseal_up2=soundseal_up2+beam_hei[i]+offset_up2[num_seal2]
+				if len+offset_end2[num_seal2]>beam_x[i]+beam_wid[i]+absx then soundseal_up2=soundseal_up2+beam_hei[i]+offset_up2[num_seal2]
+			next i
+		endif
+
+		if roof_cut then
+			soundseal_up2=soundseal_up2-cut_xzL[1][1]-cut_xzR[1][1]+sqr(cut_xzL[1][1]^2+cut_xzL[1][2]^2)+sqr(cut_xzR[1][1]^2+cut_xzR[1][2]^2)
+		endif
+	else
+		soundseal_up2=0
+	endif
+	
+	if switch_soundseal[2][4]=1 then !下
+		soundseal_down2=len+offset_start2[num_seal2]+offset_start2[num_seal2]
+	
+		if switch_op then
+			for i=1 to win_num
+				if win_type[i]=1 then soundseal_down2=soundseal_down2-min((win_wid2[i]-2*offset_win),len)
+			next i
+		endif
+
+		if switch_floor then
+			for i=1 to floor_num
+				if -offset_start2[num_seal2]<floor_x[i]+absx then soundseal_down2=soundseal_down2+floor_hei[i]-offset_down2[num_seal2]
+				if len+offset_end2[num_seal2]>floor_x[i]+floor_wid[i]+absx then soundseal_down2=soundseal_down2+floor_hei[i]-offset_down2[num_seal2]
+			next i
+		endif
+	else
+		soundseal_down2=0
+	endif
+
+	soundseal_len2=soundseal_left2+soundseal_right2+soundseal_up2+soundseal_down2
+endif
+
+parameters soundseal_len2=soundseal_len2
+
+
+!==============================================================================================================上端傾斜設定
+values "cut_xzL" range[0,]
+values "cut_xzR" range[0,]
+
+if cut_xzL[1][1]>len then parameters cut_xzL[1][1]=len
+if cut_xzR[1][1]>len-cut_xzL[1][1] then parameters cut_xzR[1][1]=len-cut_xzL[1][1]
+if cut_xzL[1][2]>hei then parameters cut_xzL[1][2]=hei
+if cut_xzR[1][2]>hei then parameters cut_xzR[1][2]=hei
+
+if roof_cut=0 then
+	hideparameter "cut_xzL","cut_xzR"
+else
+	values "offset_up" range[,0]
+	values "offset_up2" range[,0]
+endif
+
+
+!==============================================================================================================Cチャンネル
+values{2} "c_turn" 1,"水平",2,"垂直"
+
+values{2} "c_pitch" 0.9,"900",0.7,"700"
+
+if switch_c=0 then
+	hideparameter "m_c","c_pitch","c_turn","c_wid"
+endif
+
+c_thi=0.001
+c_num=ceil(len/c_pitch)-1
+dim c_x[]
+c_x[1]=0
+
+for i=1 to c_num
+	c_x[i]=i*c_pitch
+next i
+
+parameters c_num=c_num
+
+
+!==============================================================================================================化粧板設定
+values{2} "type_panel" 1,"キッチンパネル",2,"不燃化粧板",3,"メラミン化粧板",4,"化粧ケイカル(目透)",5,"化粧ケイカル(突付)",6,"グラスウールボード",7,"カラーガラス",8,"練付合板"
+
+txt_type_panel1=""
+wid_panel=0.9
+hei_panel=0.9
+
+if switch_panel then
+	if type_panel=1 then txt_type_panel1="キッチンパネル"
+	if type_panel=2 then txt_type_panel1="不燃化粧板"
+	if type_panel=3 then txt_type_panel1="メラミン化粧板"
+	if type_panel=4 then txt_type_panel1="化粧ケイカル(目透)"
+	if type_panel=5 then txt_type_panel1="化粧ケイカル(突付)"
+	if type_panel=6 then txt_type_panel1="グラスウールボード"
+	if type_panel=7 then txt_type_panel1="カラーガラス"
+	if type_panel=8 then txt_type_panel1="練付合板"
+
+    parameters txt_type_panel1=txt_type_panel1
+
+	if type_panel=1 then
+		values{2} "thi_panel" 0.003,"3mm"
+		values{2} "size_panel" 1,"3x6",2,"3x8",3,"3x9",4,"4x8"
+	endif
+	
+	if type_panel=2 then
+		values{2} "thi_panel" 0.003,"3mm",0.004,"4mm",0.006,"6mm",0.0145,"14.5mm"
+		values{2} "size_panel" 0,"900*900",1,"3x6",2,"3x8",3,"3x9"
+	endif
+	
+	if type_panel=3 then
+		values{2} "thi_panel" 0.00095,"0.95mm",0.0012,"1.2mm"
+		values{2} "size_panel" 1,"3x6",4,"4x8"
+	endif
+	
+	if type_panel=4 or type_panel=5 then
+		values{2} "thi_panel" 0.006,"6mm"
+		values{2} "size_panel" 1,"3x6",2,"3x8",3,"3x9"
+	endif
+	
+	if type_panel=6 then
+		values{2} "thi_panel" 0.025,"25mm",0.05,"50mm"
+		values{2} "size_panel" 6,"605*910",1,"3x6"
+	endif
+
+	if type_panel=7 then
+		values{2} "thi_panel" 0.006,"6mm",0.008,"8mm",0.009,"9mm",0.0095,"9.5mm",0.0125,"12.5mm",0.015,"15mm",0.021,"21mm"
+		values{2} "size_panel" 0,"900*900",1,"3x6",2,"3x8",3,"3x9"
+	endif
+
+	if type_panel=8 then
+		values{2} "thi_panel" 0.006,"6mm",0.008,"8mm",0.009,"9mm",0.0095,"9.5mm",0.0125,"12.5mm",0.015,"15mm",0.021,"21mm"
+		values{2} "size_panel" 0,"900*900",1,"3x6",2,"3x8",3,"3x9"
+	endif
+	
+	if size_panel=0 then 
+		wid_panel=0.9
+		hei_panel=0.9
+	endif
+	
+	if size_panel=1 then 
+		wid_panel=0.91
+		hei_panel=1.82
+	endif
+	
+	if size_panel=2 then 
+		wid_panel=0.91
+		hei_panel=2.42
+	endif
+	
+	if size_panel=3 then 
+		wid_panel=0.91
+		hei_panel=2.73
+	endif
+	
+	if size_panel=4 then 
+		wid_panel=1.21
+		hei_panel=2.42
+	endif
+	
+	if size_panel=6 then 
+		wid_panel=0.605
+		hei_panel=0.91
+	endif
+else
+	values{2} "type_panel" 0,""
+	values{2} "thi_panel" 0,""
+	values{2} "size_panel" 0,""
+	hideparameter "type_panel","thi_panel","size_panel","offset_start_p","offset_end_p","offset_up_p","offset_down_p"
+	lock "type_panel","thi_panel","size_panel","offset_start_p","offset_end_p","offset_up_p","offset_down_p"
+endif
+
+values{2} "type_panel2" 1,"キッチンパネル",2,"不燃化粧板",3,"メラミン化粧板",4,"化粧ケイカル(目透)",5,"化粧ケイカル(突付)",6,"グラスウールボード",7,"カラーガラス",8,"練付合板"
+
+txt_type_panel2=""
+wid_panel2=0.9
+hei_panel2=0.9
+
+if switch_panel2 then
+	if type_panel2=1 then txt_type_panel2="キッチンパネル"
+	if type_panel2=2 then txt_type_panel2="不燃化粧板"
+	if type_panel2=3 then txt_type_panel2="メラミン化粧板"
+	if type_panel2=4 then txt_type_panel2="化粧ケイカル(目透)"
+	if type_panel2=5 then txt_type_panel2="化粧ケイカル(突付)"
+	if type_panel2=6 then txt_type_panel2="グラスウールボード"
+	if type_panel2=7 then txt_type_panel2="カラーガラス"
+	if type_panel2=8 then txt_type_panel2="練付合板"
+
+    parameters txt_type_panel2=txt_type_panel2
+	
+	if type_panel2=1 then
+		values{2} "thi_panel2" 0.003,"3mm"
+		values{2} "size_panel2" 1,"3x6",2,"3x8",3,"3x9",4,"4x8"
+	endif
+	
+	if type_panel2=2 then
+		values{2} "thi_panel2" 0.003,"3mm",0.004,"4mm",0.006,"6mm",0.0145,"14.5mm"
+		values{2} "size_panel2" 0,"900*900",1,"3x6",2,"3x8",3,"3x9"
+	endif
+	
+	if type_panel2=3 then
+		values{2} "thi_panel2" 0.00095,"0.95mm",0.0012,"1.2mm"
+		values{2} "size_panel2" 1,"3x6",4,"4x8"
+	endif
+	
+	if type_panel2=4 or type_panel2=5 then
+		values{2} "thi_panel2" 0.006,"6mm"
+		values{2} "size_panel2" 1,"3x6",2,"3x8",3,"3x9"
+	endif
+	
+	if type_panel2=6 then
+		values{2} "thi_panel2" 0.025,"25mm",0.05,"50mm"
+		values{2} "size_panel2" 6,"605*910",1,"3x6"
+	endif
+
+	if type_panel2=7 then
+		values{2} "thi_panel2" 0.006,"6.0",0.008,"8.0",0.009,"9.0",0.0095,"9.5",0.0125,"12.5",0.015,"15",0.021,"21"
+		values{2} "size_panel2" 0,"900*900",1,"3x6",2,"3x8",3,"3x9"
+	endif
+
+	if type_panel2=8 then
+		values{2} "thi_panel2" 0.006,"6.0",0.008,"8.0",0.009,"9.0",0.0095,"9.5",0.0125,"12.5",0.015,"15",0.021,"21"
+		values{2} "size_panel2" 0,"900*900",1,"3x6",2,"3x8",3,"3x9"
+	endif
+	
+	if size_panel2=0 then 
+		wid_panel2=0.9
+		hei_panel2=0.9
+	endif
+	
+	if size_panel2=1 then 
+		wid_panel2=0.91		
+		hei_panel2=1.82
+	endif
+	
+	if size_panel2=2 then 
+		wid_panel2=0.91
+		hei_panel2=2.42
+	endif
+	
+	if size_panel2=3 then 
+		wid_panel2=0.91
+		hei_panel2=2.73
+	endif
+	
+	if size_panel2=4 then 
+		wid_panel2=1.21
+		hei_panel2=2.42
+	endif
+	
+	if size_panel2=6 then 
+		wid_panel2=0.605
+		hei_panel2=0.91
+	endif
+else
+	values{2} "type_panel2" 0,""
+	values{2} "thi_panel2" 0,""
+	values{2} "size_panel2" 0,""
+	hideparameter "type_panel2","thi_panel2","size_panel2","offset_start_p2","offset_end_p2","offset_up_p2","offset_down_p2"
+	lock "type_panel2","thi_panel2","size_panel2","offset_start_p2","offset_end_p2","offset_up_p2","offset_down_p2"
+endif
+
+
+!==============================================================================================================デッキ充填長さ計算
+deck_left=0
+if switch_deck_l=1 then !左
+	deck_left=hei
+
+	if switch_beam then
+		for i=1 to beam_num
+			if 0>=beam_x[i]+absx and 0<=beam_x[i]+beam_wid[i]+absx then
+				deck_left=deck_left-beam_hei[i]
+			endif
+		next i
+	endif
+
+	if switch_floor then
+		for i=1 to floor_num
+			if 0>=floor_x[i]+absx and 0<=floor_x[i]+floor_wid[i]+absx then
+				deck_left=deck_left-floor_hei[i]
+			endif
+		next i
+	endif
+
+	if roof_cut then
+		deck_left=deck_left-cut_xzL[1][2]
+	endif
+endif
+
+deck_right=0
+if switch_deck_r=1 then !右
+	deck_right=hei
+
+	if switch_beam then
+		for i=1 to beam_num
+			if len>=beam_x[i]+absx and len<=beam_x[i]+beam_wid[i]+absx then
+				deck_right=deck_right-beam_hei[i]
+			endif
+		next i
+	endif
+
+	if switch_floor then
+		for i=1 to floor_num
+			if len>=floor_x[i]+absx and len<=floor_x[i]+floor_wid[i]+absx then
+				deck_right=deck_right-floor_hei[i]
+			endif
+		next i
+	endif
+
+	if roof_cut then
+		deck_right=deck_right-cut_xzR[1][2]
+	endif
+endif
+
+deck_up=0
+if switch_deck_u=1 then !上
+	deck_up=len
+
+	if switch_op then
+		for i=1 to win_num
+			if win_xz2[i][2]+win_hei2[i]>=hei then deck_up=deck_up-min(win_wid2[i],len)
+		next i
+	endif
+
+	if switch_beam then
+		for i=1 to beam_num
+			if 0<beam_x[i]+absx then deck_up=deck_up+beam_hei[i]
+			if len>beam_x[i]+beam_wid[i]+absx then deck_up=deck_up+beam_hei[i]
+		next i
+	endif
+
+	if roof_cut then
+		deck_up=deck_up-cut_xzL[1][1]-cut_xzR[1][1]+sqr(cut_xzL[1][1]^2+cut_xzL[1][2]^2)+sqr(cut_xzR[1][1]^2+cut_xzR[1][2]^2)
+	endif
+endif
+
+parameters \
+deck_len=deck_up,
+deck_len2=deck_left+deck_right
+
+
+!==============================================================================================================化粧板面積計算
+!==================================================表
+area_panel=0
+
+if switch_panel then
+	area_panel=(len+offset_start_p+offset_end_p)*(hei-offset_down_p+offset_up_p) !初期面積
+
+	if switch_op then !マイナス開口面積	
+		for i=1 to win_num
+			if win_xz2[i][1]+absx<len+offset_end_p and win_xz2[i][1]+win_wid2[i]+absx>-offset_start_p then !x軸重合あり
+				if win_xz2[i][2]>=offset_down_p and win_xz2[i][2]+win_hei2[i]<=hei+offset_up_p then !z軸完全重合
+					if win_type[i]=1 then area_panel=area_panel-(min(len+offset_end_p,win_xz2[i][1]+win_wid2[i]+absx-offset_win)-max(-offset_start_p,win_xz2[i][1]+absx+offset_win))*(win_hei2[i]-offset_win2)
+					if win_type[i]=2 then area_panel=area_panel-(min(len+offset_end_p,win_xz2[i][1]+win_wid2[i]+absx-offset_win)-max(-offset_start_p,win_xz2[i][1]+absx+offset_win))*(win_hei2[i]-offset_win2-offset_win3)
+				endif
+
+				if win_xz2[i][2]<offset_down_p and win_xz2[i][2]+win_hei2[i]>hei+offset_up_p then !z軸完全超える
+					if win_type[i]=1 then area_panel=area_panel-(min(len+offset_end_p,win_xz2[i][1]+win_wid2[i]+absx-offset_win)-max(-offset_start_p,win_xz2[i][1]+absx+offset_win))*(hei+offset_up_p-offset_down_p)
+					if win_type[i]=2 then area_panel=area_panel-(min(len+offset_end_p,win_xz2[i][1]+win_wid2[i]+absx-offset_win)-max(-offset_start_p,win_xz2[i][1]+absx+offset_win))*(hei+offset_up_p-offset_down_p)
+				endif
+
+				if win_xz2[i][2]<offset_down_p and win_xz2[i][2]+win_hei2[i]>offset_down_p and win_xz2[i][2]+win_hei2[i]<hei+offset_up_p then !z軸下部重合
+					if win_type[i]=1 then area_panel=area_panel-(min(len+offset_end_p,win_xz2[i][1]+win_wid2[i]+absx-offset_win)-max(-offset_start_p,win_xz2[i][1]+absx+offset_win))*(win_xz2[i][2]+win_hei2[i]-offset_down_p-offset_win2)
+					if win_type[i]=2 then area_panel=area_panel-(min(len+offset_end_p,win_xz2[i][1]+win_wid2[i]+absx-offset_win)-max(-offset_start_p,win_xz2[i][1]+absx+offset_win))*(win_xz2[i][2]+win_hei2[i]-offset_down_p-offset_win2)
+				endif
+
+				if win_xz2[i][2]>offset_down_p and win_xz2[i][2]<hei+offset_up_p and win_xz2[i][2]+win_hei2[i]>hei+offset_up_p then !z軸上部重合
+					if win_type[i]=1 then area_panel=area_panel-(min(len+offset_end_p,win_xz2[i][1]+win_wid2[i]+absx-offset_win)-max(-offset_start_p,win_xz2[i][1]+absx+offset_win))*(hei+offset_up_p-win_xz2[i][2])
+					if win_type[i]=2 then area_panel=area_panel-(min(len+offset_end_p,win_xz2[i][1]+win_wid2[i]+absx-offset_win)-max(-offset_start_p,win_xz2[i][1]+absx+offset_win))*(hei+offset_up_p-win_xz2[i][2]-offset_win3)
+				endif
+			endif
+		next i
+	endif	
+
+	if switch_beam then !マイナス梁開口面積
+		for i=1 to beam_num
+			if beam_x[i]+absx<len+offset_end_p and beam_x[i]+beam_wid[i]+absx>-offset_start_p then !x軸重合あり
+				if hei-beam_hei[i]<hei+offset_up_p then !z軸重合あり
+					area_panel=area_panel-(min(len+offset_end_p,beam_x[i]+beam_wid[i]+absx)-max(-offset_start_p,beam_x[i]+absx))*((hei+offset_up_p)-(hei-beam_hei[i]))
+				endif
+			endif
+		next i
+	endif
+
+	if switch_floor then
+		for i=1 to floor_num
+			if floor_x[i]+absx<len+offset_end_p and floor_x[i]+floor_wid[i]+absx>-offset_start_p then !x軸重合あり
+				if floor_hei[i]>offset_down_p then !z軸重合あり
+					area_panel=area_panel-(min(len+offset_end_p,floor_x[i]+floor_wid[i]+absx)-max(-offset_start_p,floor_x[i]+absx))*(floor_hei[i]-offset_down_p)
+				endif
+
+			endif
+		next i
+	endif
+
+	if roof_cut then
+		area_panel=area_panel-cut_xzL[1][1]*cut_xzL[1][2]/2-offset_start_p*cut_xzL[1][2]-cut_xzR[1][1]*cut_xzR[1][2]/2-offset_end_p*cut_xzR[1][2]
+	endif
+endif
+
+parameters area_panel=area_panel
+
+
+!==================================================裏
+area_panel2=0
+
+if switch_panel2 then
+	area_panel2=(len+offset_start_p2+offset_end_p2)*(hei-offset_down_p2+offset_up_p2) !初期面積
+
+	if switch_op then !マイナス開口面積
+		for i=1 to win_num
+			if win_xz2[i][1]+absx>=-offset_start_p2 and win_xz2[i][1]+win_wid2[i]+absx<=len+offset_end_p2 then !x軸完全重合
+				if win_xz2[i][2]>=offset_down_p2 and win_xz2[i][2]+win_hei2[i]<=hei+offset_up_p2 then !z軸完全重合
+					if win_type[i]=1 then area_panel2=area_panel2-(win_wid2[i]-2*offset_win)*(win_hei2[i]-offset_win2)
+					if win_type[i]=2 then area_panel2=area_panel2-(win_wid2[i]-2*offset_win)*(win_hei2[i]-offset_win2-offset_win3)
+				endif
+
+				if win_xz2[i][2]<offset_down_p2 and win_xz2[i][2]+win_hei2[i]>hei+offset_up_p2 then !z軸完全超える
+					if win_type[i]=1 then area_panel2=area_panel2-(win_wid2[i]-2*offset_win)*(hei+offset_up_p2-offset_down_p2)
+					if win_type[i]=2 then area_panel2=area_panel2-(win_wid2[i]-2*offset_win)*(hei+offset_up_p2-offset_down_p2)
+				endif
+
+				if win_xz2[i][2]<offset_down_p2 and win_xz2[i][2]+win_hei2[i]>offset_down_p2 and win_xz2[i][2]+win_hei2[i]<hei+offset_up_p2 then !z軸下部重合
+					if win_type[i]=1 then area_panel2=area_panel2-(win_wid2[i]-2*offset_win)*(win_xz2[i][2]+win_hei2[i]-offset_down_p2-offset_win2)
+					if win_type[i]=2 then area_panel2=area_panel2-(win_wid2[i]-2*offset_win)*(win_xz2[i][2]+win_hei2[i]-offset_down_p2-offset_win2)
+				endif
+
+				if win_xz2[i][2]>offset_down_p2 and win_xz2[i][2]<hei+offset_up_p2 and win_xz2[i][2]+win_hei2[i]>hei+offset_up_p2 then !z軸上部重合
+					if win_type[i]=1 then area_panel2=area_panel2-(win_wid2[i]-2*offset_win)*(hei+offset_up_p2-win_xz2[i][2])
+					if win_type[i]=2 then area_panel2=area_panel2-(win_wid2[i]-2*offset_win)*(hei+offset_up_p2-win_xz2[i][2]-offset_win3)
+				endif
+			endif
+
+			if win_xz2[i][1]+absx<-offset_start_p2 and win_xz2[i][1]+win_wid2[i]+absx>-offset_start_p2 and win_xz2[i][1]+win_wid2[i]+absx<len+offset_end_p2 then !x軸左部重合
+				if win_xz2[i][2]>=offset_down_p2 and win_xz2[i][2]+win_hei2[i]<=hei+offset_up_p2 then !z軸完全重合
+					if win_type[i]=1 then area_panel2=area_panel2-(win_xz2[i][1]+win_wid2[i]+absx+offset_start_p2-offset_win)*(win_hei2[i]-offset_win2)
+					if win_type[i]=2 then area_panel2=area_panel2-(win_xz2[i][1]+win_wid2[i]+absx+offset_start_p2-offset_win)*(win_hei2[i]-offset_win2-offset_win3)
+				endif
+
+				if win_xz2[i][2]<offset_down_p2 and win_xz2[i][2]+win_hei2[i]>hei+offset_up_p2 then !z軸完全超える
+					if win_type[i]=1 then area_panel2=area_panel2-(win_xz2[i][1]+win_wid2[i]+absx+offset_start_p2-offset_win)*(hei+offset_up_p2-offset_down_p2)
+					if win_type[i]=2 then area_panel2=area_panel2-(win_xz2[i][1]+win_wid2[i]+absx+offset_start_p2-offset_win)*(hei+offset_up_p2-offset_down_p2)
+				endif
+
+				if win_xz2[i][2]<offset_down_p2 and win_xz2[i][2]+win_hei2[i]>offset_down_p2 and win_xz2[i][2]+win_hei2[i]<hei+offset_up_p2 then !z軸下部重合
+					if win_type[i]=1 then area_panel2=area_panel2-(win_xz2[i][1]+win_wid2[i]+absx+offset_start_p2-offset_win)*(win_xz2[i][2]+win_hei2[i]-offset_down_p2-offset_win2)
+					if win_type[i]=2 then area_panel2=area_panel2-(win_xz2[i][1]+win_wid2[i]+absx+offset_start_p2-offset_win)*(win_xz2[i][2]+win_hei2[i]-offset_down_p2-offset_win2)
+				endif
+
+				if win_xz2[i][2]>offset_down_p2 and win_xz2[i][2]<hei+offset_up_p2 and win_xz2[i][2]+win_hei2[i]>hei+offset_up_p2 then !z軸上部重合
+					if win_type[i]=1 then area_panel2=area_panel2-(win_xz2[i][1]+win_wid2[i]+absx+offset_start_p2-offset_win)*(hei+offset_up_p2-win_xz2[i][2])
+					if win_type[i]=2 then area_panel2=area_panel2-(win_xz2[i][1]+win_wid2[i]+absx+offset_start_p2-offset_win)*(hei+offset_up_p2-win_xz2[i][2]-offset_win3)
+				endif
+			endif
+
+			if win_xz2[i][1]+absx>-offset_start_p2 and win_xz2[i][1]+absx<len+offset_end_p2 and win_xz2[i][1]+win_wid2[i]+absx>len+offset_end_p2 then !x軸右部重合
+				if win_xz2[i][2]>=offset_down_p2 and win_xz2[i][2]+win_hei2[i]<=hei+offset_up_p2 then !z軸完全重合
+					if win_type[i]=1 then area_panel2=area_panel2-(len+offset_end_p2-win_xz2[i][1]-absx-offset_win)*(win_hei2[i]-offset_win2)
+					if win_type[i]=2 then area_panel2=area_panel2-(len+offset_end_p2-win_xz2[i][1]-absx-offset_win)*(win_hei2[i]-offset_win2-offset_win3)
+				endif
+
+				if win_xz2[i][2]<offset_down_p2 and win_xz2[i][2]+win_hei2[i]>hei+offset_up_p2 then !z軸完全超える
+					if win_type[i]=1 then area_panel2=area_panel2-(len+offset_end_p2-win_xz2[i][1]-absx-offset_win)*(hei+offset_up_p2-offset_down_p2)
+					if win_type[i]=2 then area_panel2=area_panel2-(len+offset_end_p2-win_xz2[i][1]-absx-offset_win)*(hei+offset_up_p2-offset_down_p2)
+				endif
+
+				if win_xz2[i][2]<offset_down_p2 and win_xz2[i][2]+win_hei2[i]>offset_down_p2 and win_xz2[i][2]+win_hei2[i]<hei+offset_up_p2 then !z軸下部重合
+					if win_type[i]=1 then area_panel2=area_panel2-(len+offset_end_p2-win_xz2[i][1]-absx-offset_win)*(win_xz2[i][2]+win_hei2[i]-offset_down_p2-offset_win2)
+					if win_type[i]=2 then area_panel2=area_panel2-(len+offset_end_p2-win_xz2[i][1]-absx-offset_win)*(win_xz2[i][2]+win_hei2[i]-offset_down_p2-offset_win2)
+				endif
+
+				if win_xz2[i][2]>offset_down_p2 and win_xz2[i][2]<hei+offset_up_p2 and win_xz2[i][2]+win_hei2[i]>hei+offset_up_p2 then !z軸上部重合
+					if win_type[i]=1 then area_panel2=area_panel2-(len+offset_end_p2-win_xz2[i][1]-absx-offset_win)*(hei+offset_up_p2-win_xz2[i][2])
+					if win_type[i]=2 then area_panel2=area_panel2-(len+offset_end_p2-win_xz2[i][1]-absx-offset_win)*(hei+offset_up_p2-win_xz2[i][2]-offset_win3)
+				endif
+			endif
+		next i
+	endif	
+
+	if switch_beam then !マイナス梁開口面積
+		for i=1 to beam_num
+			if beam_x[i]+absx>=-offset_start_p2 and beam_x[i]+beam_wid[i]+absx<=len+offset_end_p2 then !x軸完全重合
+				if hei-beam_hei[i]<hei+offset_up_p2 then !z軸重合あり
+					area_panel2=area_panel2-beam_wid[i]*((hei+offset_up_p2)-(hei-beam_hei[i]))
+				endif
+			endif
+
+			if beam_x[i]+absx<=-offset_start_p2 and beam_x[i]+beam_wid[i]+absx>-offset_start_p2 and beam_x[i]+beam_wid[i]+absx<len+offset_end_p2 then !x軸左部重合
+				if hei-beam_hei[i]<hei+offset_up_p2 then !z軸重合あり
+					area_panel2=area_panel2-(beam_x[i]+beam_wid[i]+absx+offset_start_p2)*((hei+offset_up_p2)-(hei-beam_hei[i]))
+				endif
+			endif
+
+			if beam_x[i]+absx>-offset_start_p2 and beam_x[i]+absx<len+offset_end_p2 and beam_x[i]+beam_wid[i]+absx>=len+offset_end_p2 then !x軸右部重合
+				if hei-beam_hei[i]<hei+offset_up_p2 then !z軸重合あり
+					area_panel2=area_panel2-(len+offset_end_p2-beam_x[i]-absx)*((hei+offset_up_p2)-(hei-beam_hei[i]))
+				endif
+			endif
+		next i
+	endif
+
+	if switch_floor then
+		for i=1 to floor_num
+			if floor_x[i]+absx>=-offset_start_p2 and floor_x[i]+floor_wid[i]+absx<=len+offset_end_p2 then !x軸完全重合
+				if floor_hei[i]>offset_down_p2 then !z軸重合あり
+					area_panel2=area_panel2-floor_wid[i]*(floor_hei[i]-offset_down_p2)
+				endif
+			endif
+
+			if floor_x[i]+absx<=-offset_start_p2 and floor_x[i]+floor_wid[i]+absx>-offset_start_p2 and floor_x[i]+floor_wid[i]+absx<len+offset_end_p2 then !x軸左部重合
+				if floor_hei[i]>offset_down_p2 then !z軸重合あり
+					area_panel2=area_panel2-(floor_x[i]+floor_wid[i]+absx+offset_start_p2)*(floor_hei[i]-offset_down_p2)
+				endif
+			endif
+
+			if floor_x[i]+absx>-offset_start_p2 and floor_x[i]+absx<len+offset_end_p2 and floor_x[i]+floor_wid[i]+absx>=len+offset_end_p2 then !x軸右部重合
+				if floor_hei[i]>offset_down_p2 then !z軸重合あり
+					area_panel2=area_panel2-(len+offset_end_p2-floor_x[i]-absx)*(floor_hei[i]-offset_down_p2)
+				endif
+			endif
+		next i
+	endif
+
+	if roof_cut then
+		area_panel2=area_panel2-cut_xzL[1][1]*cut_xzL[1][2]/2-offset_start_p2*cut_xzL[1][2]-cut_xzR[1][1]*cut_xzR[1][2]/2-offset_end_p2*cut_xzR[1][2]
+	endif
+endif
+
+parameters area_panel2=area_panel2
+
+
+!==============================================================================================================見切り材長さ計算
+!==================================================表横
+moldingx_len=0
+
+if switch_panel then
+	if switch_molding[1][3] then !上
+		molding_up=len+offset_start_p+offset_end_p
+
+		if switch_op then
+			for i=1 to win_num	
+				if win_xz2[i][2]+win_hei[i]>=hei+offset_up_p then !z軸重合あり
+					if win_xz2[i][1]+absx<len+offset_end_p and win_xz2[i][1]+win_wid2[i]+absx>-offset_start_p then !x軸重合あり
+						molding_up=molding_up-(min(len+offset_end_p,win_xz2[i][1]+win_wid2[i]+absx-offset_win)-max(-offset_start_p,win_xz2[i][1]+absx+offset_win))
+					endif
+				endif
+			next i
+		endif
+		
+		if switch_beam then
+			for i=1 to beam_num
+				if hei-beam_hei[i]<hei+offset_up_p then !z軸重合あり
+					if beam_x[i]+absx<len+offset_end_p and beam_x[i]+beam_wid[i]+absx>-offset_start_p then !x軸重合あり
+						molding_up=molding_up-(min(len+offset_end_p,beam_x[i]+beam_wid[i]+absx)-max(-offset_start_p,beam_x[i]+absx))
+					endif
+				endif
+			next i
+		endif
+	else
+		molding_up=0
+	endif
+	
+	if switch_molding[1][4] then !下
+		molding_down=len+offset_start_p+offset_end_p
+
+		if switch_op then
+			for i=1 to win_num
+				if win_xz2[i][2]<offset_down_p then !z軸重合あり
+					if win_xz2[i][1]+absx<len+offset_end_p and win_xz2[i][1]+win_wid2[i]+absx>-offset_start_p then !x軸重合あり
+						molding_down=molding_down-(min(len+offset_end_p,win_xz2[i][1]+win_wid2[i]+absx-offset_win)-max(-offset_start_p,win_xz2[i][1]+absx+offset_win))
+					endif
+				endif
+			next i
+		endif
+
+		if switch_floor then
+			for i=1 to floor_num
+				if floor_hei[i]>offset_down_p then !z軸重合あり
+					if floor_x[i]+absx<len+offset_end_p and floor_x[i]+floor_wid[i]+absx>-offset_start_p then !x軸重合あり
+						molding_down=molding_down-(min(len+offset_end_p,floor_x[i]+floor_wid[i]+absx)-max(-offset_start_p,floor_x[i]+absx))
+					endif
+				endif
+			next i
+		endif
+	else
+		molding_down=0
+	endif
+
+	moldingx_len=molding_up+molding_down
+endif
+
+parameters moldingx_len=moldingx_len
+
+
+!==================================================表縦
+moldingz_len=0
+
+if switch_panel then
+	if switch_molding[1][1] then !左
+		molding_left=hei+offset_up_p-offset_down_p
+
+		if switch_op then
+			for i=1 to win_num
+				if win_xz2[i][1]+absx<=-offset_start_p and win_xz2[i][1]+win_wid[i]+absx>=-offset_start_p then !x軸重合あり
+					if win_xz2[i][2]<hei+offset_up_p and win_xz2[i][2]+win_hei2[i]>offset_down_p then !z軸重合あり
+						if win_type[i]=1 then molding_left=molding_left-(min(hei+offset_up_p,win_xz2[i][2]+win_hei2[i]-offset_win2)-max(offset_down_p,win_xz2[i][2]))
+						if win_type[i]=2 then molding_left=molding_left-(min(hei+offset_up_p,win_xz2[i][2]+win_hei2[i]-offset_win2)-max(offset_down_p,win_xz2[i][2]+offset_win3))
+					endif
+				endif
+			next i
+		endif
+
+		if switch_beam then
+			for i=1 to beam_num
+				if beam_x[i]+absx<=-offset_start_p and beam_x[i]+beam_wid[i]+absx>=-offset_start_p then !x軸重合あり
+					if hei-beam_hei[i]<hei+offset_up_p then !z軸重合あり
+						molding_left=molding_left-((hei+offset_up_p)-(hei-beam_hei[i]))
+					endif
+				endif
+			next i
+		endif
+
+		if switch_floor then
+			for i=1 to floor_num
+				if floor_x[i]+absx<=-offset_start_p and floor_x[i]+floor_wid[i]+absx>=-offset_start_p then !x軸重合あり
+					if floor_hei[i]>offset_down_p then !z軸重合あり
+						molding_left=molding_left-(floor_hei[i]-offset_down_p)
+					endif
+				endif
+			next i
+		endif
+	else
+		molding_left=0
+	endif
+
+	if switch_molding[1][2] then !右
+		molding_right=hei+offset_up_p-offset_down_p
+
+		if switch_op then
+			for i=1 to win_num
+				if win_xz2[i][1]+absx<=len+offset_end_p and win_xz2[i][1]+win_wid[i]+absx>=len+offset_end_p then !x軸重合あり
+					if win_xz2[i][2]<hei+offset_up_p and win_xz2[i][2]+win_hei2[i]>offset_down_p then !z軸重合あり
+						if win_type[i]=1 then molding_right=molding_right-(min(hei+offset_up_p,win_xz2[i][2]+win_hei2[i]-offset_win2)-max(offset_down_p,win_xz2[i][2]))
+						if win_type[i]=2 then molding_right=molding_right-(min(hei+offset_up_p,win_xz2[i][2]+win_hei2[i]-offset_win2)-max(offset_down_p,win_xz2[i][2]+offset_win3))
+					endif
+				endif
+			next i
+		endif
+
+		if switch_beam then
+			for i=1 to beam_num
+				if beam_x[i]+absx<=len+offset_end_p and beam_x[i]+beam_wid[i]+absx>=len+offset_end_p then !x軸重合あり
+					if hei-beam_hei[i]<hei+offset_up_p then !z軸重合あり
+						molding_right=molding_right-((hei+offset_up_p)-(hei-beam_hei[i]))
+					endif
+				endif
+			next i
+		endif
+
+		if switch_floor then
+			for i=1 to floor_num
+				if floor_x[i]+absx<=len+offset_end_p and floor_x[i]+floor_wid[i]+absx>=len+offset_end_p then !x軸重合あり
+					if floor_hei[i]>offset_down_p then !z軸重合あり
+						molding_right=molding_right-(floor_hei[i]-offset_down_p)
+					endif
+				endif
+			next i
+		endif
+	else
+		molding_right=0
+	endif
+
+	moldingz_len=molding_left+molding_right
+endif
+
+parameters moldingz_len=moldingz_len
+
+
+!==================================================裏横
+moldingx_len2=0
+
+if switch_panel2 then
+	if switch_molding[2][3] then !上
+		molding_up2=len+offset_start_p2+offset_end_p2
+
+		if switch_op then
+			for i=1 to win_num	
+				if win_xz2[i][2]+win_hei[i]>=hei+offset_up_p2 then !z軸重合あり
+					if win_xz2[i][1]+absx<len+offset_end_p2 and win_xz2[i][1]+win_wid2[i]+absx>-offset_start_p2 then !x軸重合あり
+						molding_up2=molding_up2-(min(len+offset_end_p2,win_xz2[i][1]+win_wid2[i]+absx-offset_win)-max(-offset_start_p2,win_xz2[i][1]+absx+offset_win))
+					endif
+				endif
+			next i
+		endif
+		
+		if switch_beam then
+			for i=1 to beam_num
+				if hei-beam_hei[i]<hei+offset_up_p2 then !z軸重合あり
+					if beam_x[i]+absx<len+offset_end_p2 and beam_x[i]+beam_wid[i]+absx>-offset_start_p2 then !x軸重合あり
+						molding_up2=molding_up2-(min(len+offset_end_p2,beam_x[i]+beam_wid[i]+absx)-max(-offset_start_p2,beam_x[i]+absx))
+					endif
+				endif
+			next i
+		endif
+	else
+		molding_up2=0
+	endif
+	
+	if switch_molding[2][4] then !下
+		molding_down2=len+offset_start_p2+offset_end_p2
+
+		if switch_op then
+			for i=1 to win_num
+				if win_xz2[i][2]<offset_down_p2 then !z軸重合あり
+					if win_xz2[i][1]+absx<len+offset_end_p2 and win_xz2[i][1]+win_wid2[i]+absx>-offset_start_p2 then !x軸重合あり
+						molding_down2=molding_down2-(min(len+offset_end_p2,win_xz2[i][1]+win_wid2[i]+absx-offset_win)-max(-offset_start_p2,win_xz2[i][1]+absx+offset_win))
+					endif
+				endif
+			next i
+		endif
+
+		if switch_floor then
+			for i=1 to floor_num
+				if floor_hei[i]>offset_down_p2 then !z軸重合あり
+					if floor_x[i]+absx<len+offset_end_p2 and floor_x[i]+floor_wid[i]+absx>-offset_start_p2 then !x軸重合あり
+						molding_down2=molding_down2-(min(len+offset_end_p2,floor_x[i]+floor_wid[i]+absx)-max(-offset_start_p2,floor_x[i]+absx))
+					endif
+				endif
+			next i
+		endif
+	else
+		molding_down2=0
+	endif
+
+	moldingx_len2=molding_up2+molding_down2
+endif
+
+parameters moldingx_len2=moldingx_len2
+
+
+!==================================================裏縦
+moldingz_len2=0
+
+if switch_panel2 then
+	if switch_molding[2][1] then !左
+		molding_left2=hei+offset_up_p2-offset_down_p2
+
+		if switch_op then
+			for i=1 to win_num
+				if win_xz2[i][1]+absx<=-offset_start_p2 and win_xz2[i][1]+win_wid[i]+absx>=-offset_start_p2 then !x軸重合あり
+					if win_xz2[i][2]<hei+offset_up_p2 and win_xz2[i][2]+win_hei2[i]>offset_down_p2 then !z軸重合あり
+						if win_type[i]=1 then molding_left2=molding_left2-(min(hei+offset_up_p2,win_xz2[i][2]+win_hei2[i]-offset_win2)-max(offset_down_p2,win_xz2[i][2]))
+						if win_type[i]=2 then molding_left2=molding_left2-(min(hei+offset_up_p2,win_xz2[i][2]+win_hei2[i]-offset_win2)-max(offset_down_p2,win_xz2[i][2]+offset_win3))
+					endif
+				endif
+			next i
+		endif
+
+		if switch_beam then
+			for i=1 to beam_num
+				if beam_x[i]+absx<=-offset_start_p2 and beam_x[i]+beam_wid[i]+absx>=-offset_start_p2 then !x軸重合あり
+					if hei-beam_hei[i]<hei+offset_up_p2 then !z軸重合あり
+						molding_left2=molding_left2-((hei+offset_up_p2)-(hei-beam_hei[i]))
+					endif
+				endif
+			next i
+		endif
+
+		if switch_floor then
+			for i=1 to floor_num
+				if floor_x[i]+absx<=-offset_start_p2 and floor_x[i]+floor_wid[i]+absx>=-offset_start_p2 then !x軸重合あり
+					if floor_hei[i]>offset_down_p2 then !z軸重合あり
+						molding_left2=molding_left2-(floor_hei[i]-offset_down_p2)
+					endif
+				endif
+			next i
+		endif
+	else
+		molding_left2=0
+	endif
+
+	if switch_molding[2][2] then !右
+		molding_right2=hei+offset_up_p2-offset_down_p2
+
+		if switch_op then
+			for i=1 to win_num
+				if win_xz2[i][1]+absx<=len+offset_end_p2 and win_xz2[i][1]+win_wid[i]+absx>=len+offset_end_p2 then !x軸重合あり
+					if win_xz2[i][2]<hei+offset_up_p2 and win_xz2[i][2]+win_hei2[i]>offset_down_p2 then !z軸重合あり
+						if win_type[i]=1 then molding_right2=molding_right2-(min(hei+offset_up_p2,win_xz2[i][2]+win_hei2[i]-offset_win2)-max(offset_down_p2,win_xz2[i][2]))
+						if win_type[i]=2 then molding_right2=molding_right2-(min(hei+offset_up_p2,win_xz2[i][2]+win_hei2[i]-offset_win2)-max(offset_down_p2,win_xz2[i][2]+offset_win3))
+					endif
+				endif
+			next i
+		endif
+
+		if switch_beam then
+			for i=1 to beam_num
+				if beam_x[i]+absx<=len+offset_end_p2 and beam_x[i]+beam_wid[i]+absx>=len+offset_end_p2 then !x軸重合あり
+					if hei-beam_hei[i]<hei+offset_up_p2 then !z軸重合あり
+						molding_right2=molding_right2-((hei+offset_up_p2)-(hei-beam_hei[i]))
+					endif
+				endif
+			next i
+		endif
+
+		if switch_floor then
+			for i=1 to floor_num
+				if floor_x[i]+absx<=len+offset_end_p2 and floor_x[i]+floor_wid[i]+absx>=len+offset_end_p2 then !x軸重合あり
+					if floor_hei[i]>offset_down_p2 then !z軸重合あり
+						molding_right2=molding_right2-(floor_hei[i]-offset_down_p2)
+					endif
+				endif
+			next i
+		endif
+	else
+		molding_right2=0
+	endif
+
+	moldingz_len2=molding_left2+molding_right2
+endif
+
+parameters moldingz_len2=moldingz_len2
+
+
+!=======================================================================ボード枚数集計
+!=================表
+dim x_board[],y_board[],num_full[],x_coo_start[][],x_coo_end[][],y_coo_start[][],y_coo_end[][],\
+    x_coo_start_all[][],x_coo_end_all[][],y_coo_start_all[][],y_coo_end_all[][],area_full[][],area_double[][],area_fact[][]
+x_board[1]=0
+y_board[1]=0
+num_full[1]=0
+x_coo_start[1][2]=0
+x_coo_end[1][2]=0
+y_coo_start[1][2]=0
+y_coo_end[1][2]=0
+x_coo_start_all[1][2]=0
+x_coo_end_all[1][2]=0
+y_coo_start_all[1][2]=0
+y_coo_end_all[1][2]=0
+area_full[1][2]=0 !ボード面積リスト(減算なし)(表)
+area_double[1][2]=0 !開口と重なる面積リスト(表)
+area_fact[1][2]=0 !ボード実際面積リスト(表)
+
+for i=1 to num_board !ループ数計算
+	if fra(i/2)=0 then
+		x_board[i]=ceil((len+offset_start[i]+offset_end[i]+pitch)/wid_bo[i])
+	else
+		x_board[i]=ceil((len+offset_start[i]+offset_end[i])/wid_bo[i])
+	endif
+
+	y_board[i]=ceil((hei+offset_up[i]-offset_down[i])/hei_bo[i])
+	num_full[i]=x_board[i]*y_board[i]
+next i
+
+
+for i=1 to num_board !ボード座標計算
+	if fra(i/2)=0 then
+		x_coo_start[i][1]=-offset_start[i]
+
+		if x_board[i]>1 then
+			x_0=-offset_start[i]-pitch
+
+			for j=2 to x_board[i]
+				x_0=x_0+wid_bo[i]
+				x_coo_start[i][j]=x_0
+			next j
+
+			for j=1 to x_board[i]-1
+				x_coo_end[i][j]=x_coo_start[i][j+1]
+			next j
+		endif
+
+		x_coo_end[i][x_board[i]]=len+offset_end[i]
+	else
+		x_0=-offset_start[i]
+
+		for j=1 to x_board[i]
+			x_coo_start[i][j]=x_0
+			x_0=x_0+wid_bo[i]
+		next j
+
+		if x_board[i]>1 then
+			for j=1 to x_board[i]-1
+				x_coo_end[i][j]=x_coo_start[i][j+1]
+			next j
+		endif
+		x_coo_end[i][x_board[i]]=len+offset_end[i]
+	endif
+
+	y_0=offset_down[i]
+
+	for j=1 to y_board[i]
+		y_coo_start[i][j]=y_0
+		y_0=y_0+hei_bo[i]
+	next j
+
+	if y_board[i]>1 then
+		for j=1 to y_board[i]-1
+			y_coo_end[i][j]=y_coo_start[i][j+1]
+		next j
+	endif
+	y_coo_end[i][y_board[i]]=hei+offset_up[i]
+
+	for n=1 to y_board[i]
+		for j=1 to x_board[i]
+			x_coo_start_all[i][j+(n-1)*x_board[i]]=x_coo_start[i][j]
+			x_coo_end_all[i][j+(n-1)*x_board[i]]=x_coo_end[i][j]
+			y_coo_start_all[i][j+(n-1)*x_board[i]]=y_coo_start[i][n]
+			y_coo_end_all[i][j+(n-1)*x_board[i]]=y_coo_end[i][n]
+		next j
+	next n
+
+	for j=1 to num_full[i]
+		area_full[i][j]=abs(x_coo_end_all[i][j]-x_coo_start_all[i][j])*abs(y_coo_end_all[i][j]-y_coo_start_all[i][j])
+	next j
+next i
+
+
+for i=1 to num_board !開口と重なる面積計算
+	for j=1 to num_full[i]
+		area_double_0=0
+	
+		if switch_op then
+			for n=1 to win_num
+				if win_xz2[n][1]+absx<x_coo_end_all[i][j] and win_xz2[n][1]+win_wid2[n]+absx>x_coo_start_all[i][j] then
+					if win_xz2[n][2]<y_coo_end_all[i][j] and win_xz2[n][2]+win_hei2[n]>y_coo_start_all[i][j] then
+						area_double_0=area_double_0+(min(win_xz2[n][1]+win_wid2[n]+absx,x_coo_end_all[i][j])-max(win_xz2[n][1]+absx,x_coo_start_all[i][j]))*\
+							(min(win_xz2[n][2]+win_hei2[n],y_coo_end_all[i][j])-max(win_xz2[n][2],y_coo_start_all[i][j]))
+					endif
+				endif
+			next n
+		endif
+
+		if switch_beam then
+			for n=1 to beam_num
+				if beam_x[n]+absx<x_coo_end_all[i][j] and beam_x[n]+beam_wid[n]+absx>x_coo_start_all[i][j] then
+					if hei-beam_hei[n]<y_coo_end_all[i][j] then
+						area_double_0=area_double_0+(min(beam_x[n]+beam_wid[n]+absx,x_coo_end_all[i][j])-max(beam_x[n]+absx,x_coo_start_all[i][j]))*\
+							(y_coo_end_all[i][j]-(hei-beam_hei[n]))
+					endif
+				endif
+			next n
+		endif
+
+		if switch_floor then
+			for n=1 to floor_num
+				if floor_x[n]+absx<x_coo_end_all[i][j] and floor_x[n]+floor_wid[n]+absx>x_coo_start_all[i][j] then
+					if floor_hei[n]>y_coo_start_all[i][j] then
+						area_double_0=area_double_0+(min(floor_x[n]+floor_wid[n]+absx,x_coo_end_all[i][j])-max(floor_x[n]+absx,x_coo_start_all[i][j]))*\
+							(floor_hei[n]-y_coo_start_all[i][j])
+					endif
+				endif
+			next n
+		endif
+
+		area_double[i][j]=area_double_0
+		area_fact[i][j]=area_full[i][j]-area_double[i][j]
+	next j
+next i
+
+for i=1 to 3
+	totle_num_board[i]=0
+next i
+
+if switch_board then
+	for i=1 to num_board !枚数計算
+		totle_b=0
+	
+		for j=1 to num_full[i]
+			area_n=area_fact[i][j]/(wid_bo[i]*hei_bo[i])
+	
+			if area_n>0.5 then
+				totle_b=totle_b+1
+			else
+				totle_b=totle_b+area_n
+			endif
+		next j
+	
+		totle_num_board[i]=totle_b
+	next i
+endif
+
+parameters totle_num_board=totle_num_board
+
+
+!=================裏
+dim x_board2[],y_board2[],num_full2[],x_coo_start2[][],x_coo_end2[][],y_coo_start2[][],y_coo_end2[][],\
+    x_coo_start2_all[][],x_coo_end2_all[][],y_coo_start2_all[][],y_coo_end2_all[][],area_full2[][],area_double2[][],area_fact2[][]
+x_board2[1]=0
+y_board2[1]=0
+num_full2[1]=0
+x_coo_start2[1][2]=0
+x_coo_end2[1][2]=0
+y_coo_start2[1][2]=0
+y_coo_end2[1][2]=0
+x_coo_start2_all[1][2]=0
+x_coo_end2_all[1][2]=0
+y_coo_start2_all[1][2]=0
+y_coo_end2_all[1][2]=0
+area_full2[1][2]=0 !ボード面積リスト(減算なし)(裏)
+area_double2[1][2]=0 !開口と重なる面積リスト(裏)
+area_fact2[1][2]=0 !ボード実際面積リスト(裏)
+
+
+for i=1 to num_board2 !ループ数計算
+	if fra(i/2)=0 then
+		x_board2[i]=ceil((len+offset_start2[i]+offset_end2[i]+pitch)/wid_bo2[i])
+	else
+		x_board2[i]=ceil((len+offset_start2[i]+offset_end2[i])/wid_bo2[i])
+	endif
+
+	y_board2[i]=ceil((hei+offset_up2[i]-offset_down2[i])/hei_bo2[i])
+	num_full2[i]=x_board2[i]*y_board2[i]
+next i
+
+
+for i=1 to num_board2 !ボード座標計算
+	if fra(i/2)=0 then
+		x_coo_start2[i][1]=-offset_start2[i]
+
+		if x_board2[i]>1 then
+			x_0=-offset_start2[i]-pitch
+
+			for j=2 to x_board2[i]
+				x_0=x_0+wid_bo2[i]
+				x_coo_start2[i][j]=x_0
+			next j
+
+			for j=1 to x_board2[i]-1
+				x_coo_end2[i][j]=x_coo_start2[i][j+1]
+			next j
+		endif
+
+		x_coo_end2[i][x_board2[i]]=len+offset_end2[i]
+	else
+		x_0=-offset_start2[i]
+
+		for j=1 to x_board2[i]
+			x_coo_start2[i][j]=x_0
+			x_0=x_0+wid_bo2[i]
+		next j
+
+		if x_board2[i]>1 then
+			for j=1 to x_board2[i]-1
+				x_coo_end2[i][j]=x_coo_start2[i][j+1]
+			next j
+		endif
+		x_coo_end2[i][x_board2[i]]=len+offset_end2[i]
+	endif
+
+	y_0=offset_down2[i]
+
+	for j=1 to y_board2[i]
+		y_coo_start2[i][j]=y_0
+		y_0=y_0+hei_bo2[i]
+	next j
+
+	if y_board2[i]>1 then
+		for j=1 to y_board2[i]-1
+			y_coo_end2[i][j]=y_coo_start2[i][j+1]
+		next j
+	endif
+	y_coo_end2[i][y_board2[i]]=hei+offset_up2[i]
+
+	for n=1 to y_board2[i]
+		for j=1 to x_board2[i]
+			x_coo_start2_all[i][j+(n-1)*x_board2[i]]=x_coo_start2[i][j]
+			x_coo_end2_all[i][j+(n-1)*x_board2[i]]=x_coo_end2[i][j]
+			y_coo_start2_all[i][j+(n-1)*x_board2[i]]=y_coo_start2[i][n]
+			y_coo_end2_all[i][j+(n-1)*x_board2[i]]=y_coo_end2[i][n]
+		next j
+	next n
+
+	for j=1 to num_full2[i]
+		area_full2[i][j]=abs(x_coo_end2_all[i][j]-x_coo_start2_all[i][j])*abs(y_coo_end2_all[i][j]-y_coo_start2_all[i][j])
+	next j
+next i
+
+
+for i=1 to num_board2 !開口と重なる面積計算
+	for j=1 to num_full2[i]
+		area_double2_0=0
+	
+		if switch_op then
+			for n=1 to win_num
+				if win_xz2[n][1]+absx<x_coo_end2_all[i][j] and win_xz2[n][1]+win_wid2[n]+absx>x_coo_start2_all[i][j] then
+					if win_xz2[n][2]<y_coo_end2_all[i][j] and win_xz2[n][2]+win_hei2[n]>y_coo_start2_all[i][j] then
+						area_double2_0=area_double2_0+(min(win_xz2[n][1]+win_wid2[n]+absx,x_coo_end2_all[i][j])-max(win_xz2[n][1]+absx,x_coo_start2_all[i][j]))*\
+							(min(win_xz2[n][2]+win_hei2[n],y_coo_end2_all[i][j])-max(win_xz2[n][2],y_coo_start2_all[i][j]))
+					endif
+				endif
+			next n
+		endif
+
+		if switch_beam then
+			for n=1 to beam_num
+				if beam_x[n]+absx<x_coo_end2_all[i][j] and beam_x[n]+beam_wid[n]+absx>x_coo_start2_all[i][j] then
+					if hei-beam_hei[n]<y_coo_end2_all[i][j] then
+						area_double2_0=area_double2_0+(min(beam_x[n]+beam_wid[n]+absx,x_coo_end2_all[i][j])-max(beam_x[n]+absx,x_coo_start2_all[i][j]))*\
+							(y_coo_end2_all[i][j]-(hei-beam_hei[n]))
+					endif
+				endif
+			next n
+		endif
+
+		if switch_floor then
+			for n=1 to floor_num
+				if floor_x[n]+absx<x_coo_end2_all[i][j] and floor_x[n]+floor_wid[n]+absx>x_coo_start2_all[i][j] then
+					if floor_hei[n]>y_coo_start2_all[i][j] then
+						area_double2_0=area_double2_0+(min(floor_x[n]+floor_wid[n]+absx,x_coo_end2_all[i][j])-max(floor_x[n]+absx,x_coo_start2_all[i][j]))*\
+							(floor_hei[n]-y_coo_start2_all[i][j])
+					endif
+				endif
+			next n
+		endif
+
+		area_double2[i][j]=area_double2_0
+		area_fact2[i][j]=area_full2[i][j]-area_double2[i][j]
+	next j
+next i
+
+for i=1 to 3
+	totle_num_board2[i]=0
+next i
+
+if switch_board2 then
+	for i=1 to num_board2 !枚数計算
+		totle_b=0
+	
+		for j=1 to num_full2[i]
+			area_n=area_fact2[i][j]/(wid_bo2[i]*hei_bo2[i])
+	
+			if area_n>0.5 then
+				totle_b=totle_b+1
+			else
+				totle_b=totle_b+area_n
+			endif
+		next j
+
+		totle_num_board2[i]=totle_b
+	next i
+endif
+
+parameters totle_num_board2=totle_num_board2
+
+
+!=======================================================================鉄板枚数集計
+dim _plate1_totnum[]
+dim _plate1_totlen[]
+_plate1_totnum[1]=0
+_plate1_totlen[1]=0
+
+for i=1 to plate1_num
+	_plate1_totlen[i]=sqr((plate1_end[i][1]-plate1_start[i][1])^2+(plate1_end[i][2]-plate1_start[i][2])^2)
+
+	if plate_totnum_ceil=0 then
+		_plate1_totnum[i]=(_plate1_totlen[i]/plate1_len)
+	else
+		_plate1_totnum[i]=ceil(_plate1_totlen[i]/plate1_len)
+	endif
+next i
+
+parameters \
+plate1_totlen=_plate1_totlen,
+plate1_totnum=_plate1_totnum
+
+
+dim _plate2_totnum[]
+dim _plate2_totlen[]
+_plate2_totnum[1]=0
+_plate2_totlen[1]=0
+
+for i=1 to plate2_num
+	_plate2_totlen[i]=sqr((plate2_end[i][1]-plate2_start[i][1])^2+(plate2_end[i][2]-plate2_start[i][2])^2)
+	if plate_totnum_ceil=0 then
+		_plate2_totnum[i]=(_plate2_totlen[i]/plate2_len)
+	else
+		_plate2_totnum[i]=ceil(_plate2_totlen[i]/plate2_len)
+	endif
+next i
+
+parameters \
+plate2_totlen=_plate2_totlen,
+plate2_totnum=_plate2_totnum
+
+
+!=======================================================================化粧板枚数集計
+!=================表
+!ループ数計算
+x_panel=ceil((len+offset_start_p+offset_end_p)/wid_panel)
+y_panel=ceil((hei+offset_up_p-offset_down_p)/hei_panel)
+num_full_p=x_panel*y_panel
+
+
+!ボード座標計算
+dim x_coo_start_p[][],x_coo_end_p[][],y_coo_start_p[][],y_coo_end_p[][],x_coo_start_p_all[][],x_coo_end_p_all[][],\
+    y_coo_start_p_all[][],y_coo_end_p_all[][],area_full_p[][],area_double_p[][],area_fact_p[][]
+x_coo_start_p[1][2]=0
+x_coo_end_p[1][2]=0
+y_coo_start_p[1][2]=0
+y_coo_end_p[1][2]=0
+x_coo_start_p_all[1][2]=0
+x_coo_end_p_all[1][2]=0
+y_coo_start_p_all[1][2]=0
+y_coo_end_p_all[1][2]=0
+area_full_p[1][2]=0
+area_double_p[1][2]=0
+area_fact_p[1][2]=0
+
+for j=1 to x_panel
+	x_coo_start_p[1][j]=-offset_start_p+(j-1)*wid_panel
+next j
+
+for j=1 to x_panel-1
+    x_coo_end_p[1][j]=x_coo_start_p[1][j+1]
+next j
+if x_panel then x_coo_end_p[1][x_panel]=len+offset_end_p
+
+for j=1 to y_panel
+	y_coo_start_p[1][j]=offset_down_p+(j-1)*hei_panel
+next j
+
+for j=1 to y_panel-1
+    y_coo_end_p[1][j]=y_coo_start_p[1][j+1]
+next j
+if y_panel then y_coo_end_p[1][y_panel]=hei+offset_up_p
+
+for n=1 to y_panel
+	for j=1 to x_panel
+		x_coo_start_p_all[1][j+(n-1)*x_panel]=x_coo_start_p[1][j]
+		x_coo_end_p_all[1][j+(n-1)*x_panel]=x_coo_end_p[1][j]
+		y_coo_start_p_all[1][j+(n-1)*x_panel]=y_coo_start_p[1][n]
+		y_coo_end_p_all[1][j+(n-1)*x_panel]=y_coo_end_p[1][n]
+	next j
+next n
+
+for j=1 to num_full_p
+	area_full_p[1][j]=abs(x_coo_end_p_all[1][j]-x_coo_start_p_all[1][j])*abs(y_coo_end_p_all[1][j]-y_coo_start_p_all[1][j])
+next j
+
+
+!開口と重なる面積計算
+for j=1 to num_full_p
+	area_double_p_0=0
+
+	if switch_op then
+		for n=1 to win_num
+			if win_xz2[n][1]+absx<x_coo_end_p_all[1][j] and win_xz2[n][1]+win_wid2[n]+absx>x_coo_start_p_all[1][j] then
+				if win_xz2[n][2]<y_coo_end_p_all[1][j] and win_xz2[n][2]+win_hei2[n]>y_coo_start_p_all[1][j] then
+					area_double_p_0=area_double_p_0+(min(win_xz2[n][1]+win_wid2[n]+absx,x_coo_end_p_all[1][j])-max(win_xz2[n][1]+absx,x_coo_start_p_all[1][j]))*\
+						(min(win_xz2[n][2]+win_hei2[n],y_coo_end_p_all[1][j])-max(win_xz2[n][2],y_coo_start_p_all[1][j]))
+				endif
+			endif
+		next n
+	endif
+
+	if switch_beam then
+		for n=1 to beam_num
+			if beam_x[n]+absx<x_coo_end_p_all[1][j] and beam_x[n]+beam_wid[n]+absx>x_coo_start_p_all[1][j] then
+				if hei-beam_hei[n]<y_coo_end_p_all[1][j] then
+					area_double_p_0=area_double_p_0+(min(beam_x[n]+beam_wid[n]+absx,x_coo_end_p_all[1][j])-max(beam_x[n]+absx,x_coo_start_p_all[1][j]))*\
+						(y_coo_end_p_all[1][j]-(hei-beam_hei[n]))
+				endif
+			endif
+		next n
+	endif
+
+	if switch_floor then
+		for n=1 to floor_num
+			if floor_x[n]+absx<x_coo_end_p_all[1][j] and floor_x[n]+floor_wid[n]+absx>x_coo_start_p_all[1][j] then
+				if floor_hei[n]>y_coo_start_p_all[1][j] then
+					area_double_p_0=area_double_p_0+(min(floor_x[n]+floor_wid[n]+absx,x_coo_end_p_all[1][j])-max(floor_x[n]+absx,x_coo_start_p_all[1][j]))*\
+						(floor_hei[n]-y_coo_start_p_all[1][j])
+				endif
+			endif
+		next n
+	endif
+
+	area_double_p[1][j]=area_double_p_0
+	area_fact_p[1][j]=area_full_p[1][j]-area_double_p[1][j]
+next j
+
+
+!枚数計算
+totle_b=0
+
+for j=1 to num_full_p
+	area_n=area_fact_p[1][j]/(wid_panel*hei_panel)
+
+	if area_n>0.5 then
+		totle_b=totle_b+1
+	else
+		totle_b=totle_b+area_n
+	endif
+next j
+
+totle_num_panel=0
+if switch_panel then
+	totle_num_panel=totle_b
+endif
+parameters totle_num_panel=totle_num_panel
+
+
+!=================裏
+!ループ数計算
+x_panel2=ceil((len+offset_start_p2+offset_end_p2)/wid_panel2)
+y_panel2=ceil((hei+offset_up_p2-offset_down_p2)/hei_panel2)
+num_full_p2=x_panel2*y_panel2
+
+
+!ボード座標計算
+dim x_coo_start_p2[][],x_coo_end_p2[][],y_coo_start_p2[][],y_coo_end_p2[][],x_coo_start_p2_all[][],x_coo_end_p2_all[][],\
+    y_coo_start_p2_all[][],y_coo_end_p2_all[][],area_full_p2[][],area_double_p2[][],area_fact_p2[][]
+x_coo_start_p2[1][2]=0
+x_coo_end_p2[1][2]=0
+y_coo_start_p2[1][2]=0
+y_coo_end_p2[1][2]=0
+x_coo_start_p2_all[1][2]=0
+x_coo_end_p2_all[1][2]=0
+y_coo_start_p2_all[1][2]=0
+y_coo_end_p2_all[1][2]=0
+area_full_p2[1][2]=0
+area_double_p2[1][2]=0
+area_fact_p2[1][2]=0
+
+
+for j=1 to x_panel2
+	x_coo_start_p2[1][j]=-offset_start_p2+(j-1)*wid_panel2
+next j
+
+for j=1 to x_panel2-1
+    x_coo_end_p2[1][j]=x_coo_start_p2[1][j+1]
+next j
+if x_panel2 then x_coo_end_p2[1][x_panel2]=len+offset_end_p2
+
+for j=1 to y_panel2
+	y_coo_start_p2[1][j]=offset_down_p2+(j-1)*hei_panel2
+next j
+
+for j=1 to y_panel2-1
+    y_coo_end_p2[1][j]=y_coo_start_p2[1][j+1]
+next j
+if y_panel2 then y_coo_end_p2[1][y_panel2]=hei+offset_up_p2
+
+for n=1 to y_panel2
+	for j=1 to x_panel2
+		x_coo_start_p2_all[1][j+(n-1)*x_panel2]=x_coo_start_p2[1][j]
+		x_coo_end_p2_all[1][j+(n-1)*x_panel2]=x_coo_end_p2[1][j]
+		y_coo_start_p2_all[1][j+(n-1)*x_panel2]=y_coo_start_p2[1][n]
+		y_coo_end_p2_all[1][j+(n-1)*x_panel2]=y_coo_end_p2[1][n]
+	next j
+next n
+
+for j=1 to num_full_p2
+	area_full_p2[1][j]=abs(x_coo_end_p2_all[1][j]-x_coo_start_p2_all[1][j])*abs(y_coo_end_p2_all[1][j]-y_coo_start_p2_all[1][j])
+next j
+
+
+!開口と重なる面積計算
+for j=1 to num_full_p2
+	area_double_p2_0=0
+
+	if switch_op then
+		for n=1 to win_num
+			if win_xz2[n][1]+absx<x_coo_end_p2_all[1][j] and win_xz2[n][1]+win_wid2[n]+absx>x_coo_start_p2_all[1][j] then
+				if win_xz2[n][2]<y_coo_end_p2_all[1][j] and win_xz2[n][2]+win_hei2[n]>y_coo_start_p2_all[1][j] then
+					area_double_p2_0=area_double_p2_0+(min(win_xz2[n][1]+win_wid2[n]+absx,x_coo_end_p2_all[1][j])-max(win_xz2[n][1]+absx,x_coo_start_p2_all[1][j]))*\
+						(min(win_xz2[n][2]+win_hei2[n],y_coo_end_p2_all[1][j])-max(win_xz2[n][2],y_coo_start_p2_all[1][j]))
+				endif
+			endif
+		next n
+	endif
+
+	if switch_beam then
+		for n=1 to beam_num
+			if beam_x[n]+absx<x_coo_end_p2_all[1][j] and beam_x[n]+beam_wid[n]+absx>x_coo_start_p2_all[1][j] then
+				if hei-beam_hei[n]<y_coo_end_p2_all[1][j] then
+					area_double_p2_0=area_double_p2_0+(min(beam_x[n]+beam_wid[n]+absx,x_coo_end_p2_all[1][j])-max(beam_x[n]+absx,x_coo_start_p2_all[1][j]))*\
+						(y_coo_end_p2_all[1][j]-(hei-beam_hei[n]))
+				endif
+			endif
+		next n
+	endif
+
+	if switch_floor then
+		for n=1 to floor_num
+			if floor_x[n]+absx<x_coo_end_p2_all[1][j] and floor_x[n]+floor_wid[n]+absx>x_coo_start_p2_all[1][j] then
+				if floor_hei[n]>y_coo_start_p2_all[1][j] then
+					area_double_p2_0=area_double_p2_0+(min(floor_x[n]+floor_wid[n]+absx,x_coo_end_p2_all[1][j])-max(floor_x[n]+absx,x_coo_start_p2_all[1][j]))*\
+						(floor_hei[n]-y_coo_start_p2_all[1][j])
+				endif
+			endif
+		next n
+	endif
+
+	area_double_p2[1][j]=area_double_p2_0
+	area_fact_p2[1][j]=area_full_p2[1][j]-area_double_p2[1][j]
+next j
+
+
+!枚数計算
+totle_b=0
+
+for j=1 to num_full_p2
+	area_n=area_fact_p2[1][j]/(wid_panel2*hei_panel2)
+
+	if area_n>0.5 then
+		totle_b=totle_b+1
+	else
+		totle_b=totle_b+area_n
+	endif
+next j
+
+totle_num_panel2=0
+if switch_panel2 then
+	totle_num_panel2=totle_b
+endif
+totle_num_panel2=totle_num_panel2
+
+
+!LGSなしの場合
+if switch_lgs=0 then
+	parameters \
+	type_text="",
+	pattern_text="",
+	limit_h="",
+	lgs_runner="",
+	lgs_stud="",
+	lgs_refz="",
+	lgs_refx="",
+	lgs_stop="",
+	num_stop=0,
+	num_win_stop=0,
+	lgs_area=0,
+	runner_len=0,
+	stop_len=0,
+	num_stud2=0,
+	refz_len=0,
+	refx_len=0
+
+	hideparameter "lgs_runner","lgs_stud","lgs_refz","lgs_refx","lgs_stop","num_stop","num_win_stop","lgs_area","runner_len","stop_len","num_stud2","stud_len","num_ref","ref_len","num_ref2","ref2_len","num_refstud","refstud_len",\
+		"num_beamstud","beam_len","refz_len","refx_len"
+else
+	hideparameter "wall_thi"
+endif
+
+
+
+!=======================================================================ハット目地長さ
+joiner_len=0
+
+if switch_op then
+	for i=1 to win_num
+		if switch_board and switch_joiner then
+			if win_xz2[i][2]+win_hei2[i]<hei then joiner_len=joiner_len+2*(hei-(win_xz2[i][2]+win_hei2[i]-offset_win2))
+			if win_type[i]=2 and win_xz2[i][2]>0 then joiner_len=joiner_len+2*(win_xz2[i][2]+offset_win3)
+		endif
+		
+		if switch_board2 and switch_joiner2 then
+			if win_xz2[i][2]+win_hei2[i]<hei then joiner_len=joiner_len+2*(hei-(win_xz2[i][2]+win_hei2[i]-offset_win2))
+			if win_type[i]=2 and win_xz2[i][2]>0 then joiner_len=joiner_len+2*(win_xz2[i][2]+offset_win3)
+		endif
+	next i
+endif
+
+parameters joiner_len=joiner_len
+
+
+
+
+
+
+

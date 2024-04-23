@@ -1,0 +1,149 @@
+define style "moji" fontType,fontSize*10/glob_scale,5,0
+
+
+!========================================給湯器
+    pen contourPen
+
+    hotspot2 0,0
+    hotspot2 heaterSize1,0
+    hotspot2 0,heaterSize2
+    hotspot2 heaterSize1,heaterSize2
+
+    !hotspot2 0          ,0,code,heaterSize1,1+128 : code=code+1
+    !hotspot2 heaterSize1,0,code,heaterSize1,2     : code=code+1
+    !hotspot2 -1         ,0,code,heaterSize1,3     : code=code+1
+    !
+    !hotspot2 0,0          ,code,heaterSize2,1+128 : code=code+1
+    !hotspot2 0,heaterSize2,code,heaterSize2,2     : code=code+1
+    !hotspot2 0,-1         ,code,heaterSize2,3     : code=code+1
+
+    !rect2 0,0,heaterSize1,heaterSize2
+
+
+!========================================給湯器パイプ
+    h_pipeMardRad=0.03 !給湯器パイプ始点マーク半径
+
+    for i=1 to h_pipeNum
+        pen h_pipePen[i]
+
+        !始点マーク
+            if heaterDir=1 then add2 0,-h_pipeMardRad
+            if heaterDir=2 then add2 0,h_pipeMardRad
+            if heaterDir=3 then add2 h_pipeMardRad,0
+            if heaterDir=4 then add2 -h_pipeMardRad,0
+                circle2 _h_pipePos[i][x],_h_pipePos[i][y],h_pipeMardRad
+            del 1
+
+            for j=1 to _h_pipeTNum[i]
+                hotspot2 _h_pipeTPos[i][2*(j-1)+x],_h_pipeTPos[i][2*(j-1)+y]
+            next j
+
+            for j=1 to _h_pipeBrNum[i]
+                for n=1 to _h_pipeBrTNum[i][j]
+                    index=(h_pipeBrVNum+1)*2*(j-1)+2*(n-1)
+                    hotspot _h_pipeBrTPos[i][index+x],_h_pipeBrTPos[i][index+y],h_pipeLevel[i]
+                next n
+            next j
+        
+        !パイプ中心線
+            !for j=1 to _h_pipeElbowVNum[i]
+            !    put _h_pipeElbowPos[i][2*(j-1)+x],_h_pipeElbowPos[i][2*(j-1)+y],_h_pipeElbowFlag[i][j]
+            !next j
+            !
+            !poly2_ _h_pipeElbowVNum[i],1,
+            !get(3*_h_pipeElbowVNum[i])
+
+            project2{3}  3,270,1,1+2+4+8+16,parameters h_pipeDisCL=0,h_pipeDisBody=0,h_pipeDisCutCL=1
+    next i
+
+
+!========================================パイプ頂点設定
+    if h_pipeDisSpot=1 then
+        for i=1 to h_pipeNum
+            for j=1 to h_pipeVNum
+                add2 _h_pipePos[i][2*(j-1)+x],_h_pipePos[i][2*(j-1)+y]
+                    x1=h_pipeVPos[i][2*(j-1)+x]
+                    y1=h_pipeVPos[i][2*(j-1)+y]
+
+                    if abs(x1)<eps and abs(y1)<eps then
+                        hotspot2 0                       ,y1,code,h_pipeVPos[i][2*(j-1)+x],1+128 : code=code+1
+                        hotspot2 h_pipeVPos[i][2*(j-1)+x],y1,code,h_pipeVPos[i][2*(j-1)+x],2     : code=code+1
+                        hotspot2 -1                      ,y1,code,h_pipeVPos[i][2*(j-1)+x],3     : code=code+1
+
+                        hotspot2 x1,0                       ,code,h_pipeVPos[i][2*(j-1)+y],1+128 : code=code+1
+                        hotspot2 x1,h_pipeVPos[i][2*(j-1)+y],code,h_pipeVPos[i][2*(j-1)+y],2     : code=code+1
+                        hotspot2 x1,-1                      ,code,h_pipeVPos[i][2*(j-1)+y],3     : code=code+1
+                    else
+                        hotspot2 x1,y1
+                    endif
+                del 1
+            next j
+        next i
+    endif
+
+
+!========================================分岐パイプ頂点設定
+    if h_pipeDisSpot=2 then
+        style "moji"
+
+        for i=1 to h_pipeNum
+            pen h_pipePen[i]
+
+            !パイプ番号
+                for j=1 to _h_pipeTNum[i]-1
+                    add2 (_h_pipeTPos[i][(2*(j-1)+x)]+_h_pipeTPos[i][(2*j+x)])/2,(_h_pipeTPos[i][(2*(j-1)+y)]+_h_pipeTPos[i][(2*j+y)])/2
+                        text2 0,0,j
+                    del 1
+                next j
+
+            !分岐パイプ始点offset
+                if h_pipeBrDisOffset then
+                    for j=1 to _h_pipeBrNum[i]
+                        x1=_h_pipeBrStart[i][2*(j-1)+x]
+                        y1=_h_pipeBrStart[i][2*(j-1)+y]
+                        rtz=_h_pipeBrRtz[i][j]
+
+                        hotspot2 x1                              ,y1                              ,code,h_pipeBrOffset[i][j],1+128 : code=code+1
+                        hotspot2 x1+h_pipeBrOffset[i][j]*cos(rtz),y1+h_pipeBrOffset[i][j]*sin(rtz),code,h_pipeBrOffset[i][j],2     : code=code+1
+                        hotspot2 x1+(-1)*cos(rtz)                ,y1+(-1)*sin(rtz)                ,code,h_pipeBrOffset[i][j],3     : code=code+1
+                    next j
+                endif
+
+            !分岐パイプ調整hotspot
+                for j=1 to _h_pipeBrNum[i]
+                    index1=(h_pipeBrVNum+1)*2*(j-1)
+                    index2=h_pipeBrVNum*2*(j-1)
+
+                    for n=1 to h_pipeBrVNum
+                        add2 _h_pipeBrPos[i][index1+2*(n-1)+x],_h_pipeBrPos[i][index1+2*(n-1)+y]
+                            x1=h_pipeBrVPos[i][index2+2*(n-1)+x]
+                            y1=h_pipeBrVPos[i][index2+2*(n-1)+y]
+
+                            if abs(x1)<eps and abs(y1)<eps then
+                                hotspot2 0                                ,y1,code,h_pipeBrVPos[i][index2+2*(n-1)+x],1+128 : code=code+1
+                                hotspot2 h_pipeBrVPos[i][index2+2*(n-1)+x],y1,code,h_pipeBrVPos[i][index2+2*(n-1)+x],2     : code=code+1
+                                hotspot2 -1                               ,y1,code,h_pipeBrVPos[i][index2+2*(n-1)+x],3     : code=code+1
+
+                                hotspot2 x1,0                                ,code,h_pipeBrVPos[i][index2+2*(n-1)+y],1+128 : code=code+1
+                                hotspot2 x1,h_pipeBrVPos[i][index2+2*(n-1)+y],code,h_pipeBrVPos[i][index2+2*(n-1)+y],2     : code=code+1
+                                hotspot2 x1,-1                               ,code,h_pipeBrVPos[i][index2+2*(n-1)+y],3     : code=code+1
+                            else
+                                hotspot2 x1,y1
+                            endif
+                        del 1
+                    next n
+                next j
+
+            !分岐パイプ番号
+                for j=1 to _h_pipeBrNum[i]
+                    index1=(h_pipeBrVNum+1)*2*(j-1)
+
+                    add2 (_h_pipeBrPos[i][index1+1]+_h_pipeBrPos[i][index1+3])/2,(_h_pipeBrPos[i][index1+2]+_h_pipeBrPos[i][index1+4])/2
+                        add2 0,fontSize/300
+                            circle2 0,0,fontSize/150
+                        del 1
+                        text2 0,0,j
+                    del 1
+                next j
+        next i
+    endif

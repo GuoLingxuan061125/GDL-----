@@ -1,0 +1,966 @@
+code=1
+eps=1e-5
+x=1
+y=2
+z=3
+
+
+wallHei=wall_hei
+wallThi=wall_thi
+
+
+!==========================================================================参照リスト==========================================================================
+!=======================================継ぎ手定着長さL1
+dim l1_list[][]
+l1_list[1][18]=45
+l1_list[1][21]=40
+l1_list[1][24]=35
+l1_list[1][27]=35
+l1_list[1][30]=35
+l1_list[1][33]=35
+l1_list[1][36]=35
+l1_list[1][39]=30
+l1_list[1][42]=30
+l1_list[1][45]=30
+l1_list[1][48]=30
+l1_list[1][51]=30
+l1_list[1][54]=30
+l1_list[1][57]=30
+l1_list[1][60]=30
+l1_list[2][18]=50
+l1_list[2][21]=45
+l1_list[2][24]=40
+l1_list[2][27]=40
+l1_list[2][30]=35
+l1_list[2][33]=35
+l1_list[2][36]=35
+l1_list[2][39]=35
+l1_list[2][42]=35
+l1_list[2][45]=35
+l1_list[2][48]=30
+l1_list[2][51]=30
+l1_list[2][54]=30
+l1_list[2][57]=30
+l1_list[2][60]=30
+l1_list[3][18]=0
+l1_list[3][21]=50
+l1_list[3][24]=45
+l1_list[3][27]=45
+l1_list[3][30]=40
+l1_list[3][33]=40
+l1_list[3][36]=40
+l1_list[3][39]=40
+l1_list[3][42]=40
+l1_list[3][45]=40
+l1_list[3][48]=35
+l1_list[3][51]=35
+l1_list[3][54]=35
+l1_list[3][57]=35
+l1_list[3][60]=35
+l1_list[4][18]=0
+l1_list[4][21]=0
+l1_list[4][24]=55
+l1_list[4][27]=55
+l1_list[4][30]=50
+l1_list[4][33]=50
+l1_list[4][36]=50
+l1_list[4][39]=45
+l1_list[4][42]=45
+l1_list[4][45]=45
+l1_list[4][48]=40
+l1_list[4][51]=40
+l1_list[4][54]=40
+l1_list[4][57]=40
+l1_list[4][60]=40
+
+!=======================================定着長さL2
+dim l2_list[][]
+l2_list[1][18]=40
+l2_list[1][21]=35
+l2_list[1][24]=30
+l2_list[1][27]=30
+l2_list[1][30]=30
+l2_list[1][33]=30
+l2_list[1][36]=30
+l2_list[1][39]=25
+l2_list[1][42]=25
+l2_list[1][45]=25
+l2_list[1][48]=25
+l2_list[1][51]=25
+l2_list[1][54]=25
+l2_list[1][57]=25
+l2_list[1][60]=25
+l2_list[2][18]=40
+l2_list[2][21]=35
+l2_list[2][24]=35
+l2_list[2][27]=35
+l2_list[2][30]=30
+l2_list[2][33]=30
+l2_list[2][36]=30
+l2_list[2][39]=30
+l2_list[2][42]=30
+l2_list[2][45]=30
+l2_list[2][48]=25
+l2_list[2][51]=25
+l2_list[2][54]=25
+l2_list[2][57]=25
+l2_list[2][60]=25
+l2_list[3][18]=0
+l2_list[3][21]=40
+l2_list[3][24]=40
+l2_list[3][27]=40
+l2_list[3][30]=35
+l2_list[3][33]=35
+l2_list[3][36]=35
+l2_list[3][39]=35
+l2_list[3][42]=35
+l2_list[3][45]=35
+l2_list[3][48]=30
+l2_list[3][51]=30
+l2_list[3][54]=30
+l2_list[3][57]=30
+l2_list[3][60]=30
+l2_list[4][18]=0
+l2_list[4][21]=0
+l2_list[4][24]=45
+l2_list[4][27]=45
+l2_list[4][30]=40
+l2_list[4][33]=40
+l2_list[4][36]=40
+l2_list[4][39]=40
+l2_list[4][42]=40
+l2_list[4][45]=40
+l2_list[4][48]=35
+l2_list[4][51]=35
+l2_list[4][54]=35
+l2_list[4][57]=35
+l2_list[4][60]=35
+
+!=======================================材質・線色コードリスト
+dim scode_list[]
+scode_list[10]=1
+scode_list[13]=2
+scode_list[16]=3
+scode_list[19]=4
+scode_list[22]=5
+scode_list[25]=6
+scode_list[29]=7
+scode_list[32]=8
+scode_list[35]=9
+scode_list[38]=10
+scode_list[41]=11
+
+!=======================================外径リスト
+dim od_list[]
+od_list[10]=0.011 !d10
+od_list[13]=0.014 !d13
+od_list[16]=0.018 !d16
+od_list[19]=0.021 !d19
+od_list[22]=0.025 !d22
+od_list[25]=0.028 !d25
+od_list[29]=0.033 !d29
+od_list[32]=0.036 !d32
+od_list[35]=0.040 !d35
+od_list[38]=0.043 !d38
+od_list[41]=0.046 !d41
+
+
+
+!==========================================================================壁設定==========================================================================
+values{2} "baselinePos" 1,"中心",2,"外側",3,"内側"
+
+wallOffset=0
+if baselinePos=1 then wallOffset=0
+if baselinePos=2 then wallOffset=wallThi/2
+if baselinePos=3 then wallOffset=-wallThi/2
+
+values "wallPoint" range[2,]
+
+!=======================================頂点座標
+dim _wallPos[][]
+_wallPos[1][x]=0
+_wallPos[1][y]=0
+
+for i=1 to wallPoint
+    _wallPos[i][x]=wall_pos[i][x]
+    _wallPos[i][y]=wall_pos[i][y]
+next i
+
+parameters wall_pos=_wallPos
+parameters wallPos=_wallPos
+
+!閉じる判定
+if wallPoint>2 and _wallPos[wallPoint][x]<=_wallPos[1][x]+eps and _wallPos[wallPoint][x]>=_wallPos[1][x]-eps and \
+    _wallPos[wallPoint][y]<=_wallPos[1][y]+eps and _wallPos[wallPoint][y]>=_wallPos[1][y]-eps then
+    closeFlag=1
+else
+    closeFlag=0
+endif
+
+!=======================================中心線座標
+!回転角
+dim _wallRtz[]
+_wallRtz[1]=0
+
+for i=1 to wallPoint-1
+    i2=i+1
+
+    if _wallPos[i2][y]>_wallPos[i][y]+eps then
+        _wallRtz[i]=acs((_wallPos[i2][x]-_wallPos[i][x])/(sqr((_wallPos[i2][x]-_wallPos[i][x])^2+(_wallPos[i2][y]-_wallPos[i][y])^2)+eps))
+    endif
+
+    if _wallPos[i2][y]<=_wallPos[i][y]+eps and _wallPos[i2][y]>=_wallPos[i][y]-eps then
+        if _wallPos[i2][x]>=_wallPos[i][x] then
+            _wallRtz[i]=0
+        else
+            _wallRtz[i]=180
+        endif
+    endif
+
+    if _wallPos[i2][y]<_wallPos[i][y]-eps then
+        _wallRtz[i]=360-acs((_wallPos[i2][x]-_wallPos[i][x])/(sqr((_wallPos[i2][x]-_wallPos[i][x])^2+(_wallPos[i2][y]-_wallPos[i][y])^2)+eps))
+    endif
+next i
+
+!方程式のabc(ax+by+c=0)
+dim _wallEquA[]
+dim _wallEquB[]
+dim _wallEquC[]
+_wallEquA[1]=0
+_wallEquB[1]=0
+_wallEquC[1]=0
+
+for i=1 to wallPoint-1
+    i2=i+1
+
+    _wallEquA[i]=_wallPos[i2][y]-_wallPos[i][y]
+    _wallEquB[i]=_wallPos[i][x]-_wallPos[i2][x]
+    _wallEquC[i]=_wallPos[i2][x]*_wallPos[i][y]-_wallPos[i][x]*_wallPos[i2][y]
+next i
+
+!オフセットした頂点
+dim _wallOffsetPos[][]
+_wallOffsetPos[1][x]=0
+_wallOffsetPos[1][y]=0
+
+for i=1 to wallPoint-1
+    _wallOffsetPos[i][x]=_wallPos[i][x]-wallOffset*sin(_wallRtz[i])
+    _wallOffsetPos[i][y]=_wallPos[i][y]+wallOffset*cos(_wallRtz[i])
+next i
+
+!オフセットした各辺の方程式のc(ax+by+c=0)
+dim _wallNewEquC[]
+_wallNewEquC[1]=0
+
+for i=1 to wallPoint-1
+    _wallNewEquC[i]=-(_wallEquA[i]*_wallOffsetPos[i][x]+_wallEquB[i]*_wallOffsetPos[i][y])
+next i
+
+!中心線座標
+dim _wallNewPos[][]
+_wallNewPos[1][x]=0
+_wallNewPos[1][y]=0
+
+if closeFlag=0 then
+    _wallNewPos[1][x]=_wallPos[1][x]-wallOffset*sin(_wallRtz[1])
+    _wallNewPos[1][y]=_wallPos[1][y]+wallOffset*cos(_wallRtz[1])
+    _wallNewPos[wallPoint][x]=_wallPos[wallPoint][x]-wallOffset*sin(_wallRtz[wallPoint-1])
+    _wallNewPos[wallPoint][y]=_wallPos[wallPoint][y]+wallOffset*cos(_wallRtz[wallPoint-1])
+else
+    i=wallPoint-1
+    i2=1
+
+    _wallNewPos[1][x]=(_wallNewEquC[i2]*_wallEquB[i]-_wallNewEquC[i]*_wallEquB[i2])/(_wallEquA[i]*_wallEquB[i2]-_wallEquA[i2]*_wallEquB[i])
+    _wallNewPos[1][y]=(_wallNewEquC[i]*_wallEquA[i2]-_wallNewEquC[i2]*_wallEquA[i])/(_wallEquA[i]*_wallEquB[i2]-_wallEquA[i2]*_wallEquB[i])
+    _wallNewPos[wallPoint][x]=_wallNewPos[1][x]
+    _wallNewPos[wallPoint][y]=_wallNewPos[1][y]
+endif
+
+if wallPoint>2 then
+    for i=1 to wallPoint-2
+        i2=i+1
+
+        _wallNewPos[i2][x]=(_wallNewEquC[i2]*_wallEquB[i]-_wallNewEquC[i]*_wallEquB[i2])/(_wallEquA[i]*_wallEquB[i2]-_wallEquA[i2]*_wallEquB[i])
+        _wallNewPos[i2][y]=(_wallNewEquC[i]*_wallEquA[i2]-_wallNewEquC[i2]*_wallEquA[i])/(_wallEquA[i]*_wallEquB[i2]-_wallEquA[i2]*_wallEquB[i])
+    next i
+endif
+
+!辺長さ
+dim _wallLen[]
+_wallLen[1]=0
+
+for i=1 to wallPoint-1
+    i2=i+1
+
+    _wallLen[i]=sqr((_wallNewPos[i2][x]-_wallNewPos[i][x])^2+(_wallNewPos[i2][y]-_wallNewPos[i][y])^2)
+next i
+
+
+!==========================================================================配筋設定==========================================================================
+values "SDresol" range[3,]
+
+values{2} "conFc" 18,"18 N/㎟",21,"21 N/㎟",24,"24 N/㎟",27,"27 N/㎟",30,"30 N/㎟",33,"33 N/㎟",36,"36 N/㎟",39,"39 N/㎟",42,"42 N/㎟",45,"45 N/㎟",\
+				  48,"48 N/㎟",51,"51 N/㎟",54,"54 N/㎟",57,"57 N/㎟",60,"60 N/㎟"
+
+if conFc=18 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345"
+if conFc=21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390"
+if conFc>21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390",4,"SD490"
+
+l1=l1_list[sdType][conFc]
+l2=l2_list[sdType][conFc]
+values "L1Plus" range[0,]
+values "L2Plus" range[0,]
+values "elbowRad" range[1,]
+values "topHookFra" range[4,]
+parameters l1=l1,l2=l2
+lock "L1","L2"
+
+values{2} "pattern" 1,"シングル",2,"ダブル",3,"千鳥"
+values{2} "posPattern" 1,"縦筋が外側",2,"縦筋が内側"
+values{2} "downAnchor" 1,"直線L2定着",2,"折り曲げ定着"
+if downAnchor<>2 then hideparameter "lowerBodyThi","lowerBodyCover"
+if downAnchor<>2 or pattern<>1 then hideparameter "turnDownAnchor"
+values{2} "startAnchor" 1,"定着なし",2,"直線定着(L1)",3,"直線定着(L2)",4,"通し筋(L1/2)",5,"折り曲げ定着(L2)"
+values{2} "endAnchor" 1,"定着なし",2,"直線定着(L1)",3,"直線定着(L2)",4,"通し筋(L1/2)",5,"折り曲げ定着(L2)"
+if startAnchor<>5 then hideparameter "startAnchorLen","startAnchorAngle"
+if endAnchor<>5 then hideparameter "endAnchorLen","endAnchorAngle"
+
+if pattern=1 then patternCount=1
+if pattern=2 then patternCount=2
+if pattern=3 then patternCount=2
+
+if pattern<>1 then hideparameter "switchTopHook","topHookFra","posPattern"
+if pattern<>2 then hideparameter "switchCapbar"
+if pattern<>3 then hideparameter "ver2_steel","hor2_steel"
+
+values "edgeCover" range[0,]
+values "outsideCover" range[0,]
+values "insideCover" range[0,]
+values "topCover" range[0,]
+
+
+!==========================================================================呼び径・ピッチ設定==========================================================================
+values{2} "ver_steel" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "ver2_steel" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values "ver_pitch" range[0.1,]
+values "verbarEdgePos" range[0,]
+verbarNd=ver_steel
+verbar2Nd=ver2_steel
+verbarPitch=ver_pitch
+parameters verbarNd=verbarNd,verbar2Nd=verbar2Nd,verbarPitch=verbarPitch
+
+values{2} "hor_steel" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "hord_steel" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "hort_steel" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "hor2_steel" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values "hord_num" 1,2
+values "hort_num" 1,2
+values "hor_pitch" range[0.1,]
+values "horbarDownPos" range[0,]
+values "horbarTopPos" range[0,]
+horbarNd=hor_steel
+horbarTopNd=hort_steel
+horbarDownNd=hord_steel
+horbar2Nd=hor2_steel
+horbarPitch=hor_pitch
+parameters horbarNd=horbarNd,horbarTopNd=horbarTopNd,horbarDownNd=horbarDownNd,horbar2Nd=horbar2Nd,horbarPitch=horbarPitch
+
+values "connectLen" range[3,]
+
+if pattern<>3 then 
+    verbarMaxNd=verbarNd
+    horbarMaxNd=max(horbarNd,horbarTopNd,horbarDownNd)
+else
+    verbarMaxNd=max(verbarNd,verbar2Nd)
+    horbarMaxNd=max(horbarNd,horbarTopNd,horbarDownNd,horbar2Nd)
+endif
+
+verbarMaxOd=od_list[verbarMaxNd]
+horbarMaxOd=od_list[horbarMaxNd]
+
+
+!==========================================================================配筋情報==========================================================================
+!=======================================縦筋
+verbarNum=0
+dim _verbarLines[] !縦筋列数
+dim _verbarXpos[][] !縦筋X位置(各辺の始点から)
+dim _verbarOd[]
+dim _verbarPen[]
+dim _verbarMat[]
+dim _ver_all_r[]
+dim _verbarPoint[] 
+dim _verbarPos[][]
+_verbarLines[1]=0
+_verbarXpos[1][1]=0
+_verbarXpos[1][2]=0
+_verbarOd[1]=0
+_verbarPen[1]=0
+_verbarMat[1]=0
+_ver_all_r[1]=0
+_verbarPoint[1]=0
+_verbarPos[1][2]=0
+_verbarPos[1][2]=0
+
+for i=1 to wallPoint-1 !壁面数
+    _verbarLines[i]=ceil((_wallLen[i]-2*verbarEdgePos)/verbarPitch)+1
+    verbarPitch=(_wallLen[i]-2*verbarEdgePos)/(_verbarLines[i]-1)
+
+    for j=1 to _verbarLines[i] !縦筋列数(面ごと)
+        if pattern=3 then
+            if fra(j/2)<>0 then
+                tempNd=verbarNd
+            else
+                tempNd=verbar2Nd
+            endif
+        else
+            tempNd=verbarNd
+        endif
+
+        !上端z座標
+        if pattern=1 and switchTopHook then
+            verbarTopZpos=wallHei-topCover-od_list[tempNd]/2
+        else
+            verbarTopZpos=wallHei-topCover
+        endif
+
+        !下端z座標
+        if downAnchor=1 then
+            verbarDownZpos=-(L2+L2Plus)*tempNd/1000
+        endif
+
+        if downAnchor=2 then
+            verbarDownZpos=-lowerBodyThi+lowerBodyCover+od_list[tempNd]/2
+        endif
+
+        for n=1 to patternCount !シングル・ダブル
+            _verbarXpos[i][j]=verbarEdgePos+(j-1)*verbarPitch
+            if pattern=3 then
+                if fra(n/2)<>0 then
+                    xpos=_verbarXpos[i][j]
+                else
+                    xpos=_verbarXpos[i][j]+verbarPitch/2
+                endif
+            else
+                xpos=_verbarXpos[i][j]
+            endif
+
+            if pattern=1 then
+                if posPattern=1 then
+                    ypos=-wallThi/2+outsideCover+verbarMaxOd-od_list[tempNd]/2
+                else
+                    ypos=wallThi/2-insideCover-verbarMaxOd+od_list[tempNd]/2
+                endif
+            else
+                if n=1 then ypos=-wallThi/2+outsideCover+verbarMaxOd-od_list[tempNd]/2
+                if n=2 then ypos=wallThi/2-insideCover-verbarMaxOd+od_list[tempNd]/2
+            endif
+            
+            if pattern<>3 or j<>_verbarLines[i] or n<>2 then
+                verbarNum=verbarNum+1
+                _verbarOd[verbarNum]=od_list[tempNd]
+                _verbarPen[verbarNum]=SDpen[scode_list[tempNd]]
+                _verbarMat[verbarNum]=SDmat[scode_list[tempNd]]
+                _ver_all_r[verbarNum]=od_list[tempNd]/2
+
+                _verbarPoint[verbarNum]=2
+
+                if downAnchor=2 then
+                    if pattern=1 then
+                        if turnDownAnchor=0 then
+                            downAnchorLen=elbowRad*od_list[tempNd]+(L2+L2Plus)*tempNd/1000
+                        else
+                            downAnchorLen=-(elbowRad*od_list[tempNd]+(L2+L2Plus)*tempNd/1000)
+                        endif
+                    else
+                        if n=1 then
+                            downAnchorLen=-(elbowRad*od_list[tempNd]+(L2+L2Plus)*tempNd/1000)
+                        else
+                            downAnchorLen=elbowRad*od_list[tempNd]+(L2+L2Plus)*tempNd/1000
+                        endif
+                    endif
+
+                    _verbarPoint[verbarNum]=_verbarPoint[verbarNum]+1
+                    put _wallNewPos[i][x]+xpos*cos(_wallRtz[i])-(ypos+downAnchorLen)*sin(_wallRtz[i])
+                    put _wallNewPos[i][y]+xpos*sin(_wallRtz[i])+(ypos+downAnchorLen)*cos(_wallRtz[i])
+                    put verbarDownZpos
+                endif
+
+                put _wallNewPos[i][x]+xpos*cos(_wallRtz[i])-ypos*sin(_wallRtz[i])
+                put _wallNewPos[i][y]+xpos*sin(_wallRtz[i])+ypos*cos(_wallRtz[i])
+                put verbarDownZpos
+
+                put _wallNewPos[i][x]+xpos*cos(_wallRtz[i])-ypos*sin(_wallRtz[i])
+                put _wallNewPos[i][y]+xpos*sin(_wallRtz[i])+ypos*cos(_wallRtz[i])
+                put verbarTopZpos
+
+                if pattern=1 and switchTopHook then
+                    if posPattern=1 then
+                        topHookPos=wall_thi-outsideCover-insideCover-od_list[tempNd]
+                    else
+                        topHookPos=-(wall_thi-outsideCover-insideCover-od_list[tempNd])
+                    endif
+
+                    _verbarPoint[verbarNum]=_verbarPoint[verbarNum]+1
+                    put _wallNewPos[i][x]+xpos*cos(_wallRtz[i])-(ypos+topHookPos)*sin(_wallRtz[i])
+                    put _wallNewPos[i][y]+xpos*sin(_wallRtz[i])+(ypos+topHookPos)*cos(_wallRtz[i])
+                    put verbarTopZpos
+
+                    _verbarPoint[verbarNum]=_verbarPoint[verbarNum]+1
+                    put _wallNewPos[i][x]+xpos*cos(_wallRtz[i])-(ypos+topHookPos)*sin(_wallRtz[i])
+                    put _wallNewPos[i][y]+xpos*sin(_wallRtz[i])+(ypos+topHookPos)*cos(_wallRtz[i])
+                    put verbarTopZpos-elbowRad*od_list[tempNd]-topHookFra*tempNd/1000
+                endif
+
+                for q=1 to 3*_verbarPoint[verbarNum]
+                    _verbarPos[verbarNum][q]=get(1)
+                next q
+            endif
+        next n
+    next j
+next i
+
+parameters \
+verbarOd=_verbarOd,
+verbarPen=_verbarPen,
+verbarMat=_verbarMat,
+verbarNum=verbarNum,
+verbarPoint=_verbarPoint,
+verbarPos=_verbarPos
+
+parameters \
+ver_all_r=_ver_all_r,
+ver_all_pen=_verbarPen,
+ver_all_mat=_verbarMat,
+ver_all_num=verbarNum,
+ver_all_spnum=_verbarPoint,
+ver_all_coor=_verbarPos
+
+!lock "verbarOd","verbarPen","verbarMat","ver_all_r","ver_all_pen","ver_all_mat"
+
+
+!=======================================横筋
+horbarNum=0
+dim _horbarOd[]
+dim _horbarPen[]
+dim _horbarMat[]
+dim _horbarPoint[]
+dim _horbarPos[][]
+dim _hor_tot_r[]
+_horbarOd[1]=0
+_horbarPen[1]=0
+_horbarMat[1]=0
+_hor_tot_r[1]=0
+_horbarPoint[1]=0
+_horbarPos[1][1]=0
+_horbarPos[1][2]=0
+
+zOffsetFlag=1 !継ぎ手上下ずらす用変数
+
+horbarLines=ceil((wallHei-horbarDownPos-horbarTopPos)/horbarPitch)+1
+horbarPitch=(wallHei-horbarDownPos-horbarTopPos)/(horbarLines-1)
+
+for i=1 to wallPoint-1 !壁面数
+    if i>1 then
+        i1=i-1
+    else
+        i1=wallPoint-1
+    endif
+
+    if i<wallPoint-1 then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    !継ぎ手数
+    if i=1 and closeFlag=0 then
+        centerLineStartLen=-edgeCover
+    else
+        centerLineStartLen=(L1+L1Plus)/2*horbarMaxNd/1000
+    endif
+
+    if i=wallPoint-1 and closeFlag=0 then
+        centerLineEndLen=-edgeCover
+    else
+        centerLineEndLen=(L1+L1Plus)/2*horbarMaxNd/1000
+    endif
+
+    centerLineLen=_wallLen[i]+centerLineStartLen+centerLineEndLen
+
+    horbarCount=ceil(centerLineLen/connectLen)
+    horbarCount=ceil((centerLineLen+(horbarCount-1)*(L1+L1Plus)*horbarMaxNd/1000)/connectLen)
+    horbarUnitLen=centerLineLen/horbarCount
+
+    for j=1 to horbarCount !継ぎ手数(面ごと)
+        zOffsetFlag=1-zOffsetFlag
+
+        for m=1 to horbarLines !横筋段数
+            if m=1 then 
+                tempNd=horbarDownNd
+            endif
+
+            if m>1 and m<horbarLines then
+                if pattern=3 then
+                    if fra(m/2)<>0 then
+                        tempNd=horbarNd
+                    else
+                        tempNd=horbar2Nd
+                    endif
+                else
+                    tempNd=horbarNd
+                endif
+            endif
+
+            if m=horbarLines then
+                tempNd=horbarTopNd
+            endif
+
+            !z座標
+            if m=1 then
+                horbarZpos=horbarDownPos+(m-1)*horbarPitch+zOffsetFlag*od_list[tempNd]*hord_num
+            endif
+
+            if m>1 and m<horbarLines then
+                horbarZpos=horbarDownPos+(m-1)*horbarPitch-zOffsetFlag*od_list[tempNd]
+            endif
+
+            if m=horbarLines then
+                horbarZpos=horbarDownPos+(m-1)*horbarPitch-zOffsetFlag*od_list[tempNd]*hort_num
+            endif
+
+            for n=1 to patternCount !シングル・ダブル
+                if pattern=1 then
+                    if posPattern=1 then
+                        ypos=-wallThi/2+outsideCover+od_list[verbarMaxNd]+od_list[tempNd]/2
+                    else
+                        ypos=wallThi/2-insideCover-od_list[verbarMaxNd]-od_list[tempNd]/2
+                    endif
+                else
+                    if n=1 then ypos=-wallThi/2+outsideCover+od_list[verbarMaxNd]+od_list[tempNd]/2
+                    if n=2 then ypos=wallThi/2-insideCover-od_list[verbarMaxNd]-od_list[tempNd]/2
+                endif
+
+                if i=1 and closeFlag=0 then
+                    !端部定着(始点)
+                    if startAnchor=1 then !定着なし
+                        centerLineStartXpos=edgeCover
+                    endif
+
+                    if startAnchor=2 then !直線定着(L1)
+                        centerLineStartXpos=-(L1+L1Plus)*tempNd/1000
+                    endif
+
+                    if startAnchor=3 then !直線定着(L2)
+                        centerLineStartXpos=-(l2+L1Plus)*tempNd/1000
+                    endif
+
+                    if startAnchor=4 then !通し筋(L1/2)
+                        centerLineStartXpos=-(L1+L1Plus)/2*tempNd/1000
+                    endif
+
+                    if startAnchor=5 then !折り曲げ定着(L2)
+                        centerLineStartXpos=-startAnchorLen
+                    endif
+                else
+                    centerLineStartXpos=ypos/tan((_wallRtz[i1]-180-_wallRtz[i])/2)
+                endif
+
+                if i=wallPoint-1 and closeFlag=0 then
+                    !端部定着(終点)
+                    if endAnchor=1 then !定着なし
+                        centerLineEndXpos=_wallLen[i]-edgeCover
+                    endif
+
+                    if endAnchor=2 then !直線定着(L1)
+                        centerLineEndXpos=_wallLen[i]+(L1+L1Plus)*tempNd/1000
+                    endif
+
+                    if endAnchor=3 then !直線定着(L2)
+                        centerLineEndXpos=_wallLen[i]+(l2+L1Plus)*tempNd/1000
+                    endif
+
+                    if endAnchor=4 then !通し筋(L1/2)
+                        centerLineEndXpos=_wallLen[i]+(L1+L1Plus)/2*tempNd/1000
+                    endif
+
+                    if endAnchor=5 then !折り曲げ定着(L2)
+                        centerLineEndXpos=_wallLen[i]+endAnchorLen
+                    endif
+                else
+                    centerLineEndXpos=_wallLen[i]-ypos/tan((180-_wallRtz[i2]+_wallRtz[i])/2)
+                endif
+
+                if j>1 then
+                    startXpos=(j-1)*horbarUnitLen-centerLineStartLen-(L1+L1Plus)/2*tempNd/1000
+                else
+                    startXpos=centerLineStartXpos
+                endif
+
+                if j<horbarCount then
+                    endXpos=j*horbarUnitLen-centerLineStartLen+(L1+L1Plus)/2*tempNd/1000
+                else
+                    endXpos=centerLineEndXpos
+                endif
+
+                !始点x座標
+                horbarStartXpos=_wallNewPos[i][x]+startXpos*cos(_wallRtz[i])-ypos*sin(_wallRtz[i])
+
+                !終点x座標
+                horbarEndXpos=_wallNewPos[i][x]+endXpos*cos(_wallRtz[i])-ypos*sin(_wallRtz[i])
+
+                !始点y座標
+                horbarStartYpos=_wallNewPos[i][y]+startXpos*sin(_wallRtz[i])+ypos*cos(_wallRtz[i])
+
+                !終点y座標
+                horbarEndYpos=_wallNewPos[i][y]+endXpos*sin(_wallRtz[i])+ypos*cos(_wallRtz[i])
+
+                !最下段
+                if m=1 then
+                    for p=1 to hord_num
+                        horbarNum=horbarNum+1
+                        _horbarOd[horbarNum]=od_list[tempNd]
+                        _horbarMat[horbarNum]=SDmat[scode_list[tempNd]]
+                        _horbarPen[horbarNum]=SDpen[scode_list[tempNd]]
+                        _hor_tot_r[horbarNum]=od_list[tempNd]/2
+
+                        _horbarPoint[horbarNum]=2
+
+                        if j=1 then
+                            if i=1 and closeFlag=0 then
+                                if startAnchor=5 then
+                                    _horbarPoint[horbarNum]=_horbarPoint[horbarNum]+1
+                                    put horbarStartXpos+(L2+L2Plus)*tempNd/1000*cos(_wallRtz[i]+startAnchorAngle)
+                                    put horbarStartYpos+(L2+L2Plus)*tempNd/1000*sin(_wallRtz[i]+startAnchorAngle)
+                                    put horbarZpos+(p-1)*od_list[tempNd]
+                                endif
+                            else
+                                _horbarPoint[horbarNum]=_horbarPoint[horbarNum]+1
+                                put horbarStartXpos-(L1+L1Plus)/2*tempNd/1000*cos(_wallRtz[i1])
+                                put horbarStartYpos-(L1+L1Plus)/2*tempNd/1000*sin(_wallRtz[i1])
+                                put horbarZpos+(p-1)*od_list[tempNd]
+                            endif
+                        endif
+
+                        put horbarStartXpos
+                        put horbarStartYpos
+                        put horbarZpos+(p-1)*od_list[tempNd]
+
+                        put horbarEndXpos
+                        put horbarEndYpos
+                        put horbarZpos+(p-1)*od_list[tempNd]
+
+                        if j=horbarCount then 
+                            if i=wallPoint-1 and closeFlag=0 then
+                                if endAnchor=5 then
+                                    _horbarPoint[horbarNum]=_horbarPoint[horbarNum]+1
+                                    put horbarEndXpos+(L2+L2Plus)*tempNd/1000*cos(_wallRtz[i]+180-endAnchorAngle)
+                                    put horbarEndYpos+(L2+L2Plus)*tempNd/1000*sin(_wallRtz[i]+180-endAnchorAngle)
+                                    put horbarZpos+(p-1)*od_list[tempNd]
+                                endif
+                            else
+                                _horbarPoint[horbarNum]=_horbarPoint[horbarNum]+1
+                                put horbarEndXpos+(L1+L1Plus)/2*tempNd/1000*cos(_wallRtz[i2])
+                                put horbarEndYpos+(L1+L1Plus)/2*tempNd/1000*sin(_wallRtz[i2])
+                                put horbarZpos+(p-1)*od_list[tempNd]
+                            endif
+                        endif
+
+                        for q=1 to 3*_horbarPoint[horbarNum]
+                            _horbarPos[horbarNum][q]=get(1)
+                        next q
+                    next p
+                endif
+
+                !中間段
+                if m>1 and m<horbarLines then
+                    horbarNum=horbarNum+1
+                    _horbarOd[horbarNum]=od_list[tempNd]
+                    _horbarMat[horbarNum]=SDmat[scode_list[tempNd]]
+                    _horbarPen[horbarNum]=SDpen[scode_list[tempNd]]
+                    _hor_tot_r[horbarNum]=od_list[tempNd]/2
+
+                    _horbarPoint[horbarNum]=2
+
+                    if j=1 then
+                        if i=1 and closeFlag=0 then
+                            if startAnchor=5 then
+                                _horbarPoint[horbarNum]=_horbarPoint[horbarNum]+1
+                                put horbarStartXpos+(L2+L2Plus)*tempNd/1000*cos(_wallRtz[i]+startAnchorAngle)
+                                put horbarStartYpos+(L2+L2Plus)*tempNd/1000*sin(_wallRtz[i]+startAnchorAngle)
+                                put horbarZpos
+                            endif
+                        else
+                            _horbarPoint[horbarNum]=_horbarPoint[horbarNum]+1
+                            put horbarStartXpos-(L1+L1Plus)/2*tempNd/1000*cos(_wallRtz[i1])
+                            put horbarStartYpos-(L1+L1Plus)/2*tempNd/1000*sin(_wallRtz[i1])
+                            put horbarZpos
+                        endif
+                    endif
+
+                    put horbarStartXpos
+                    put horbarStartYpos
+                    put horbarZpos
+
+                    put horbarEndXpos
+                    put horbarEndYpos
+                    put horbarZpos
+
+                    if j=horbarCount then 
+                        if i=wallPoint-1 and closeFlag=0 then
+                            if endAnchor=5 then
+                                _horbarPoint[horbarNum]=_horbarPoint[horbarNum]+1
+                                put horbarEndXpos+(L2+L2Plus)*tempNd/1000*cos(_wallRtz[i]+180-endAnchorAngle)
+                                put horbarEndYpos+(L2+L2Plus)*tempNd/1000*sin(_wallRtz[i]+180-endAnchorAngle)
+                                put horbarZpos
+                            endif
+                        else
+                            _horbarPoint[horbarNum]=_horbarPoint[horbarNum]+1
+                            put horbarEndXpos+(L1+L1Plus)/2*tempNd/1000*cos(_wallRtz[i2])
+                            put horbarEndYpos+(L1+L1Plus)/2*tempNd/1000*sin(_wallRtz[i2])
+                            put horbarZpos
+                        endif
+                    endif
+
+                    for q=1 to 3*_horbarPoint[horbarNum]
+                        _horbarPos[horbarNum][q]=get(1)
+                    next q
+                endif
+
+                !最上段
+                if m=horbarLines then
+                    for p=1 to hort_num
+                        horbarNum=horbarNum+1
+                        _horbarOd[horbarNum]=od_list[tempNd]
+                        _horbarMat[horbarNum]=SDmat[scode_list[tempNd]]
+                        _horbarPen[horbarNum]=SDpen[scode_list[tempNd]]
+                        _hor_tot_r[horbarNum]=od_list[tempNd]/2
+
+                        _horbarPoint[horbarNum]=2
+
+                        if j=1 then
+                            if i=1 and closeFlag=0 then
+                                if startAnchor=5 then
+                                    _horbarPoint[horbarNum]=_horbarPoint[horbarNum]+1
+                                    put horbarStartXpos+(L2+L2Plus)*tempNd/1000*cos(_wallRtz[i]+startAnchorAngle)
+                                    put horbarStartYpos+(L2+L2Plus)*tempNd/1000*sin(_wallRtz[i]+startAnchorAngle)
+                                    put horbarZpos-(p-1)*od_list[tempNd]
+                                endif
+                            else
+                                _horbarPoint[horbarNum]=_horbarPoint[horbarNum]+1
+                                put horbarStartXpos-(L1+L1Plus)/2*tempNd/1000*cos(_wallRtz[i1])
+                                put horbarStartYpos-(L1+L1Plus)/2*tempNd/1000*sin(_wallRtz[i1])
+                                put horbarZpos-(p-1)*od_list[tempNd]
+                            endif
+                        endif
+
+                        put horbarStartXpos
+                        put horbarStartYpos
+                        put horbarZpos-(p-1)*od_list[tempNd]
+
+                        put horbarEndXpos
+                        put horbarEndYpos
+                        put horbarZpos-(p-1)*od_list[tempNd]
+
+                        if j=horbarCount then 
+                            if i=wallPoint-1 and closeFlag=0 then
+                                if endAnchor=5 then
+                                    _horbarPoint[horbarNum]=_horbarPoint[horbarNum]+1
+                                    put horbarEndXpos+(L2+L2Plus)*tempNd/1000*cos(_wallRtz[i]+180-endAnchorAngle)
+                                    put horbarEndYpos+(L2+L2Plus)*tempNd/1000*sin(_wallRtz[i]+180-endAnchorAngle)
+                                    put horbarZpos-(p-1)*od_list[tempNd]
+                                endif
+                            else
+                                _horbarPoint[horbarNum]=_horbarPoint[horbarNum]+1
+                                put horbarEndXpos+(L1+L1Plus)/2*tempNd/1000*cos(_wallRtz[i2])
+                                put horbarEndYpos+(L1+L1Plus)/2*tempNd/1000*sin(_wallRtz[i2])
+                                put horbarZpos+(p-1)*od_list[tempNd]
+                            endif
+                        endif
+
+                        for q=1 to 3*_horbarPoint[horbarNum]
+                            _horbarPos[horbarNum][q]=get(1)
+                        next q
+                    next p
+                endif
+            next n
+        next m
+    next j
+next i
+
+parameters \
+horbarOd=_horbarOd,
+horbarPen=_horbarPen,
+horbarMat=_horbarMat,
+horbarNum=horbarNum,
+horbarPoint=_horbarPoint,
+horbarPos=_horbarPos
+
+parameters \
+hor_tot_r=_hor_tot_r,
+hor_tot_pen=_horbarPen,
+hor_tot_mat=_horbarMat,
+hor_tot_num=horbarNum,
+hor_tot_spnum=_horbarPoint,
+hor_tot_coor=_horbarPos
+
+!lock "horbarOd","horbarPen","horbarMat","hor_tot_r","hor_tot_pen","hor_tot_mat"
+
+
+!=======================================天端キャップ筋
+capbarOd=od_list[verbarNd]
+capbarPen=SDpen[scode_list[verbarNd]]
+capbarMat=SDmat[scode_list[verbarNd]]
+
+capbarNum=0
+dim _capbarPoint[]
+dim _capbarPos[][]
+_capbarPoint[1]=0
+_capbarPos[1][1]=0
+_capbarPos[1][2]=0
+
+if pattern=2 and switchCapbar=1 then
+    for i=1 to wallPoint-1
+        for j=1 to _verbarLines[i]
+            xpos=_verbarXpos[i][j]+verbarMaxOd/2+capbarOd/2
+
+            y1pos=-wallThi/2+outsideCover+verbarMaxOd/2
+            y2pos=wallThi/2-insideCover-verbarMaxOd/2
+
+            z1pos=wallHei-topCover-capbarOd/2
+            z2pos=z1pos-elbowRad*capbarOd-capbarAnchorLen
+
+            capbarNum=capbarNum+1
+            _capbarPoint[capbarNum]=4
+
+            put _wallNewPos[i][x]+xpos*cos(_wallRtz[i])-y1pos*sin(_wallRtz[i])
+            put _wallNewPos[i][y]+xpos*sin(_wallRtz[i])+y1pos*cos(_wallRtz[i])
+            put z2pos
+
+            put _wallNewPos[i][x]+xpos*cos(_wallRtz[i])-y1pos*sin(_wallRtz[i])
+            put _wallNewPos[i][y]+xpos*sin(_wallRtz[i])+y1pos*cos(_wallRtz[i])
+            put z1pos
+
+            put _wallNewPos[i][x]+xpos*cos(_wallRtz[i])-y2pos*sin(_wallRtz[i])
+            put _wallNewPos[i][y]+xpos*sin(_wallRtz[i])+y2pos*cos(_wallRtz[i])
+            put z1pos
+
+            put _wallNewPos[i][x]+xpos*cos(_wallRtz[i])-y2pos*sin(_wallRtz[i])
+            put _wallNewPos[i][y]+xpos*sin(_wallRtz[i])+y2pos*cos(_wallRtz[i])
+            put z2pos
+
+            for q=1 to 3*_capbarPoint[capbarNum]
+                _capbarPos[capbarNum][q]=get(1)
+            next q
+        next j
+    next i
+endif
+
+parameters \
+capbarOd=capbarOd,
+capbarPen=capbarPen,
+capbarMat=capbarMat,
+capbarNum=capbarNum,
+capbarPoint=_capbarPoint,
+capbarPos=_capbarPos
+
+!lock "capbarOd","capbarPen","capbarMat"

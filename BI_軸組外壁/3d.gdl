@@ -1,0 +1,2339 @@
+!=============================================================================壁ホットスポット
+hotspot coo_start[1],coo_start[2],0
+hotspot coo_end[1],coo_end[2],0
+
+hotspot 0,coo_start[2],0,code,coo_start[1],1+128:code=code+1
+hotspot -1,coo_start[2],0,code,coo_start[1],3:code=code+1
+hotspot coo_start[1],coo_start[2],0,code,coo_start[1],2:code=code+1
+hotspot coo_start[1],0,0,code,coo_start[2],1+128:code=code+1
+hotspot coo_start[1],-1,0,code,coo_start[2],3:code=code+1
+hotspot coo_start[1],coo_start[2],0,code,coo_start[2],2:code=code+1
+
+hotspot 0,coo_end[2],0,code,coo_end[1],1+128:code=code+1
+hotspot -1,coo_end[2],0,code,coo_end[1],3:code=code+1
+hotspot coo_end[1],coo_end[2],0,code,coo_end[1],2:code=code+1
+hotspot coo_end[1],0,0,code,coo_end[2],1+128:code=code+1
+hotspot coo_end[1],-1,0,code,coo_end[2],3:code=code+1
+hotspot coo_end[1],coo_end[2],0,code,coo_end[2],2:code=code+1
+
+
+add coo_start[1],coo_start[2],0
+rotz angle
+if vertexTurn then
+    muly -1
+endif
+addy -move_y+0.001+wid_d+(0.001+sid_thi)-offset_line*(ref_line-1)/2
+
+hotspot 0,0,0,code,hei,1+128:code=code+1
+hotspot 0,0,-1,code,hei,3:code=code+1
+hotspot 0,0,hei,code,hei,2:code=code+1
+
+hotspot len,0,0,code,hei,1+128:code=code+1
+hotspot len,0,-1,code,hei,3:code=code+1
+hotspot len,0,hei,code,hei,2:code=code+1
+
+if display_wall then
+	hotspot 0,wid_jiku/2,0
+	hotspot 0,-wid_jiku/2,0
+	hotspot len,wid_jiku/2,0
+	hotspot len,-wid_jiku/2,0
+endif
+
+
+!==========================================================================カットポリゴン
+group "polygon"
+	material m_siding
+
+	if switch_polygon then
+		for i=1 to num_polygon
+			for j=1 to point_polygon[i]
+				put coo_polygon[2*j-1][i],(move_y-0.001-wid_d-sid_thi-0.001)-corner_wid,coo_polygon[2*j][i],0
+			next j
+			
+			for j=1 to point_polygon[i]
+				put coo_polygon[2*j-1][i],(move_y2+0.001+wid_d+0.001)+corner_wid,coo_polygon[2*j][i]
+			next j
+
+			ruledsegmented point_polygon[i],1+2+4+16+32+64,
+			get(nsp)
+		next i
+	endif
+endgroup
+
+
+!hotspot
+if switch_polygon then
+	for i=1 to num_polygon
+		for j=1 to point_polygon[i]
+			hotspot 0,0,coo_polygon[2*j][i],code,coo_polygon[2*j-1][i],1+128:code=code+1
+			hotspot coo_polygon[2*j-1][i],0,coo_polygon[2*j][i],code,coo_polygon[2*j-1][i],2:code=code+1
+			hotspot -1,0,coo_polygon[2*j][i],code,coo_polygon[2*j-1][i],3:code=code+1
+
+			hotspot coo_polygon[2*j-1][i],0,0,code,coo_polygon[2*j][i],1+128:code=code+1
+			hotspot coo_polygon[2*j-1][i],0,coo_polygon[2*j][i],code,coo_polygon[2*j][i],2:code=code+1
+			hotspot coo_polygon[2*j-1][i],0,-1,code,coo_polygon[2*j][i],3:code=code+1
+		next j
+	next i
+endif
+
+
+!===========================================================================開口
+group "win1"
+	addx absx
+		if switch_op then
+			for i=1 to win_num
+				add win_xz2[i][1]-wid2_jiku,-1,0
+					block win_wid2[i]+2*wid2_jiku,2,hei
+				del 1
+			next i
+		endif
+	del 1
+endgroup
+
+
+group "win2"
+	addx absx
+		if switch_op then
+			for i=1 to win_num
+				add win_xz2[i][1],-1,win_xz2[i][2]
+					block win_wid2[i],2,win_hei2[i]
+				del 1
+			next i
+
+			for i=1 to win_num
+				add win_xz2[i][1],-wid_jiku/2,win_xz2[i][2]-wid2_jiku
+					block win_wid2[i],wid_jiku,win_hei2[i]+2*wid2_jiku
+				del 1
+			next i
+		endif
+	del 1
+endgroup
+
+
+group "win3"
+	addx absx
+		if switch_op then
+			for i=1 to win_num
+				if win_type[i]=1 then
+					add win_xz2[i][1]+offset_win,-1,win_xz2[i][2]
+						block win_wid2[i]-2*offset_win,2,win_hei2[i]-offset_win2
+					del 1
+				endif
+				if win_type[i]=2 then
+					add win_xz2[i][1]+offset_win,-1,win_xz2[i][2]+offset_win3
+						block win_wid2[i]-2*offset_win,2,win_hei2[i]-offset_win2-offset_win3
+					del 1
+				endif
+			next i
+		endif
+	del 1
+endgroup
+
+
+group "win4"
+	addx absx
+		if switch_op then
+			for i=1 to win_num
+				if win_type[i]=1 then
+					add win_xz2[i][1]-wid_win_d,-1,win_xz2[i][2]
+						block win_wid2[i]+2*wid_win_d,2,win_hei2[i]+wid_win_d
+					del 1
+				endif
+				if win_type[i]=2 then
+					add win_xz2[i][1]-wid_win_d,-1,win_xz2[i][2]-wid_win_d
+						block win_wid2[i]+2*wid_win_d,2,win_hei2[i]+2*wid_win_d
+					del 1
+				endif
+			next i
+		endif
+	del 1
+endgroup
+
+
+if switch_op then
+	addx absx
+		for i=1 to win_num
+			if win_type[i]=1 then !扉
+				hotspot -offset_door1,0,win_xz[i][2],code,win_xz[i][1],1+128:code=code+1
+				hotspot -offset_door1-1,0,win_xz[i][2],code,win_xz[i][1],3:code=code+1
+				hotspot -offset_door1+win_xz[i][1],0,win_xz[i][2],code,win_xz[i][1],2:code=code+1
+				hotspot -offset_door1+win_xz[i][1],0,0,code,win_xz[i][2],1+128:code=code+1
+				hotspot -offset_door1+win_xz[i][1],0,-1,code,win_xz[i][2],3:code=code+1
+				hotspot -offset_door1+win_xz[i][1],0,win_xz[i][2],code,win_xz[i][2],2:code=code+1
+			
+				hotspot win_xz[i][1]+offset_door1,0,win_xz[i][2]+win_hei[i]/2,code,win_wid[i],1+128:code=code+1
+				hotspot win_xz[i][1]+offset_door1-1,0,win_xz[i][2]+win_hei[i]/2,code,win_wid[i],3:code=code+1
+				hotspot win_xz[i][1]+offset_door1+win_wid[i],0,win_xz[i][2]+win_hei[i]/2,code,win_wid[i],2:code=code+1
+			
+				hotspot win_xz[i][1]+win_wid[i]/2,0,win_xz[i][2]+offset_door2,code,win_hei[i],1+128:code=code+1
+				hotspot win_xz[i][1]+win_wid[i]/2,0,win_xz[i][2]+offset_door2-1,code,win_hei[i],3:code=code+1
+				hotspot win_xz[i][1]+win_wid[i]/2,0,win_xz[i][2]+offset_door2+win_hei[i],code,win_hei[i],2:code=code+1
+			else !窓
+				hotspot -offset_op1,0,win_xz[i][2]-offset_op3,code,win_xz[i][1],1+128:code=code+1
+				hotspot -offset_op1-1,0,win_xz[i][2]-offset_op3,code,win_xz[i][1],3:code=code+1
+				hotspot -offset_op1+win_xz[i][1],0,win_xz[i][2]-offset_op3,code,win_xz[i][1],2:code=code+1
+				hotspot -offset_op1+win_xz[i][1],0,-offset_op3,code,win_xz[i][2],1+128:code=code+1
+				hotspot -offset_op1+win_xz[i][1],0,-offset_op3-1,code,win_xz[i][2],3:code=code+1
+				hotspot -offset_op1+win_xz[i][1],0,-offset_op3+win_xz[i][2],code,win_xz[i][2],2:code=code+1
+			
+				hotspot win_xz[i][1]+offset_op1,0,win_xz[i][2]+win_hei[i]/2,code,win_wid[i],1+128:code=code+1
+				hotspot win_xz[i][1]+offset_op1-1,0,win_xz[i][2]+win_hei[i]/2,code,win_wid[i],3:code=code+1
+				hotspot win_xz[i][1]+offset_op1+win_wid[i],0,win_xz[i][2]+win_hei[i]/2,code,win_wid[i],2:code=code+1
+			
+				hotspot win_xz[i][1]+win_wid[i]/2,0,win_xz[i][2]+offset_op2,code,win_hei[i],1+128:code=code+1
+				hotspot win_xz[i][1]+win_wid[i]/2,0,win_xz[i][2]+offset_op2-1,code,win_hei[i],3:code=code+1
+				hotspot win_xz[i][1]+win_wid[i]/2,0,win_xz[i][2]+offset_op2+win_hei[i],code,win_hei[i],2:code=code+1
+			endif
+		next i
+	del 1
+endif
+
+
+!===========================================================================開口部シーリング
+group "opening_sealing"
+	if reverse then muly -1
+		addy -(move_y2+thi_gouhan+0.001+wid_d+0.001+sid_thi)
+			if win_num>0 then
+				for i=1 to win_num
+					material m_op_seal_1
+		
+					if switch_seal_op_side[i] Then
+						if win_type[i]=1 then
+							add win_xz2[i][1]+offset_win,0,win_xz2[i][2]
+								block seal_thi,seal_wid,win_hei2[i]-offset_win2
+							del 1
+						
+							add win_xz2[i][1]+win_wid2[i]-seal_thi-offset_win,0,win_xz2[i][2]
+								block seal_thi,seal_wid,win_hei2[i]-offset_win2
+							del 1
+						else
+							add win_xz2[i][1]+offset_win,0,win_xz2[i][2]+offset_win3
+								block seal_thi,seal_wid,win_hei2[i]-offset_win2-offset_win3
+							del 1
+						
+							add win_xz2[i][1]+win_wid2[i]-seal_thi-offset_win,0,win_xz2[i][2]+offset_win3
+								block seal_thi,seal_wid,win_hei2[i]-offset_win2-offset_win3
+							del 1
+						endif
+					endif
+		
+					if switch_seal_op_top[i] then
+						add win_xz2[i][1]+offset_win,0,win_xz2[i][2]+win_hei2[i]-seal_thi-offset_win2
+							block win_wid2[i]-2*offset_win,seal_wid,seal_thi
+						del 1
+					endif
+		
+					material m_op_seal_3
+		
+					if switch_seal_op_down[i] then
+						if win_type[i]=1 then
+							add win_xz2[i][1]+offset_win,0,win_xz2[i][2]
+						else
+							add win_xz2[i][1]+offset_win,0,win_xz2[i][2]+offset_win3
+						endif
+							block win_wid2[i]-2*offset_win,seal_wid,seal_thi
+						del 1
+					endif
+		
+					material m_op_seal_2
+		
+					if switch_seal_op_rat[i] then
+						if win_type[i]=1 then
+							add win_xz2[i][1]+offset_win,op_rat_offset,win_xz2[i][2]+op_rat_offset*op_rat/100
+						else
+							add win_xz2[i][1]+offset_win,op_rat_offset,win_xz2[i][2]+op_rat_offset*op_rat/100+offset_win3
+						endif
+							block win_wid2[i]-offset_win,seal_wid,seal_thi
+						del 1
+					endif
+				next i
+			endif
+		del 1
+	if reverse then del 1
+endgroup
+
+placegroup "opening_sealing"
+
+if reverse then muly -1
+	addy -(move_y2+thi_gouhan+0.001+wid_d+0.001+sid_thi)
+		if win_num>0 then
+			for i=1 to win_num
+				if switch_seal_op_rat[i] then
+					if win_type[i]=2 then addz offset_win3
+						hotspot win_xz2[i][1]+offset_win,0,win_xz2[i][2],code,op_rat_offset,1+128:code=code+1
+						hotspot win_xz2[i][1]+offset_win,op_rat_offset,win_xz2[i][2]+op_rat_offset*op_rat/100,code,op_rat_offset,2:code=code+1
+						hotspot win_xz2[i][1]+offset_win,-1,win_xz2[i][2]-op_rat/100,code,op_rat_offset,3:code=code+1
+		
+						hotspot win_xz2[i][1]+win_wid2[i]-offset_win,0,win_xz2[i][2],code,op_rat_offset,1+128:code=code+1
+						hotspot win_xz2[i][1]+win_wid2[i]-offset_win,op_rat_offset,win_xz2[i][2]+op_rat_offset*op_rat/100,code,op_rat_offset,2:code=code+1
+						hotspot win_xz2[i][1]+win_wid2[i]-offset_win,-1,win_xz2[i][2]-op_rat/100,code,op_rat_offset,3:code=code+1
+					if win_type[i]=2 then del 1
+				endif
+			next i
+		endif
+	del 1
+if reverse then del 1
+
+
+!=============================================================================開口補助線(内法寸法)
+group "sub_win"
+	if switch_op then
+		addx absx
+			for i=1 to win_num
+				loopx=int((win_wid[i]+0.02)/0.05)
+				loopz=int((win_hei[i]+0.02)/0.05)
+			
+				if loopx>0 and loopz>0 then
+					add win_xz[i][1],0,win_xz[i][2]+win_hei[i]
+						for j=1 to loopx
+							lin_ 0,0,0,0.03,0,0
+						addx 0.05
+						next j
+						del loopx
+					del 1
+				
+					add win_xz[i][1],0,win_xz[i][2]
+						for j=1 to loopx
+							lin_ 0,0,0,0.03,0,0
+						addx 0.05
+						next j
+						del loopx
+					del 1
+
+					add win_xz[i][1],0,win_xz[i][2]
+						for j=1 to loopz
+							lin_ 0,0,0,0,0,0.03
+						addz 0.05
+						next j
+						del loopz
+					del 1
+				
+					add win_xz[i][1]+win_wid[i],0,win_xz[i][2]
+						for j=1 to loopz
+							lin_ 0,0,0,0,0,0.03
+						addz 0.05
+						next j
+						del loopz
+					del 1
+
+					hotspot win_xz[i][1],0,win_xz[i][2]
+					hotspot win_xz[i][1]+win_wid[i],0,win_xz[i][2]
+					hotspot win_xz[i][1],0,win_xz[i][2]+win_hei[i]
+					hotspot win_xz[i][1]+win_wid[i],0,win_xz[i][2]+win_hei[i]
+				endif
+			next i
+		del 1
+	endif
+endgroup
+
+placegroup "sub_win"
+
+
+!==========================================================================梁開口
+group "beam_op1"
+	addx absx
+		if switch_beam then
+			for i=1 to beam_num
+				add beam_x[i],-1,hei-beam_hei[i]
+					block beam_wid[i],2,10
+				del 1
+			next i
+		endif
+	del 1
+endgroup
+
+
+if switch_beam then
+	addx absx
+		for i=1 to beam_num
+			hotspot 0,0,hei,code,beam_x[i],1+128:code=code+1
+			hotspot -1,0,hei,code,beam_x[i],3:code=code+1
+			hotspot beam_x[i],0,hei,code,beam_x[i],2:code=code+1
+		
+			hotspot beam_x[i],0,hei-beam_hei[i]/2,code,beam_wid[i],1+128:code=code+1
+			hotspot beam_x[i]-1,0,hei-beam_hei[i]/2,code,beam_wid[i],3:code=code+1
+			hotspot beam_x[i]+beam_wid[i],0,hei-beam_hei[i]/2,code,beam_wid[i],2:code=code+1
+		
+			hotspot beam_x[i]+beam_wid[i]/2,0,hei,code,beam_hei[i],1+128:code=code+1
+			hotspot beam_x[i]+beam_wid[i]/2,0,hei+1,code,beam_hei[i],3:code=code+1
+			hotspot beam_x[i]+beam_wid[i]/2,0,hei-beam_hei[i],code,beam_hei[i],2:code=code+1
+		next i
+	del 1
+endif
+
+
+!==========================================================================段差開口
+group "floor_op"
+	addx absx
+		if switch_floor then
+			for i=1 to floor_num
+				add floor_x[i],-1,0
+					block floor_wid[i],2,floor_hei[i]
+				del 1
+			next i
+		endif
+	del 1
+endgroup
+
+
+if switch_floor then
+	addx absx
+		for i=1 to floor_num
+			hotspot 0,0,0,code,floor_x[i],1+128:code=code+1
+			hotspot -1,0,0,code,floor_x[i],3:code=code+1
+			hotspot floor_x[i],0,0,code,floor_x[i],2:code=code+1
+
+			hotspot floor_x[i],0,floor_hei[i]/2,code,floor_wid[i],1+128:code=code+1
+			hotspot floor_x[i]-1,0,floor_hei[i]/2,code,floor_wid[i],3:code=code+1
+			hotspot floor_x[i]+floor_wid[i],0,floor_hei[i]/2,code,floor_wid[i],2:code=code+1
+
+			hotspot floor_x[i]+floor_wid[i]/2,0,0,code,floor_hei[i],1+128:code=code+1
+			hotspot floor_x[i]+floor_wid[i]/2,0,-1,code,floor_hei[i],3:code=code+1
+			hotspot floor_x[i]+floor_wid[i]/2,0,floor_hei[i],code,floor_hei[i],2:code=code+1
+		next i
+	del 1
+endif
+
+
+!==========================================================================上端傾斜
+group "sloping"
+	if roof_cut then
+		ruledsegmented 6,1+2+4+16+32,
+		0,-10,hei,0,
+		cut_xzL[1][1],-10,hei,0,
+		0,-10,hei-cut_xzL[1][2],0,
+		-10,-10,hei-cut_xzL[1][2],0,
+		-10,-10,hei,0,
+		0,-10,hei,0,
+		0,10,hei,
+		cut_xzL[1][1],10,hei,
+		0,10,hei-cut_xzL[1][2],
+		-10,10,hei-cut_xzL[1][2],
+		-10,10,hei,
+		0,10,hei
+		
+		ruledsegmented 6,1+2+4+16+32,
+		len,-10,hei,0,
+		len-cut_xzR[1][1],-10,hei,0,
+		len,-10,hei-cut_xzR[1][2],0,
+		len+10,-10,hei-cut_xzR[1][2],0,
+		len+10,-10,hei,0,
+		len,-10,hei,0,
+		len,10,hei,
+		len-cut_xzR[1][1],10,hei,
+		len,10,hei-cut_xzR[1][2],
+		len+10,10,hei-cut_xzR[1][2],
+		len+10,10,hei,
+		len,10,hei
+	endif
+endgroup
+
+
+if roof_cut then
+	hotspot 0,0,hei,code,cut_xzL[1][1],1+128:code=code+1
+	hotspot -1,0,hei,code,cut_xzL[1][1],3:code=code+1
+	hotspot cut_xzL[1][1],0,hei,code,cut_xzL[1][1],2:code=code+1
+	hotspot 0,0,hei,code,cut_xzL[1][2],1+128:code=code+1
+	hotspot 0,0,hei+1,code,cut_xzL[1][2],3:code=code+1
+	hotspot 0,0,hei-cut_xzL[1][2],code,cut_xzL[1][2],2:code=code+1
+	
+	hotspot len,0,hei,code,cut_xzR[1][1],1+128:code=code+1
+	hotspot len+1,0,hei,code,cut_xzR[1][1],3:code=code+1
+	hotspot len-cut_xzR[1][1],0,hei,code,cut_xzR[1][1],2:code=code+1
+	hotspot len,0,hei,code,cut_xzR[1][2],1+128:code=code+1
+	hotspot len,0,hei+1,code,cut_xzR[1][2],3:code=code+1
+	hotspot len,0,hei-cut_xzR[1][2],code,cut_xzR[1][2],2:code=code+1
+endif
+
+
+!===========================================================================軸組外壁
+group "base"
+	material m_jiku
+
+	add -wallStartOffset,-wid_jiku/2,-wid_jiku
+		block len+wallStartOffset+wallEndOffset,wid_jiku,wid_jiku
+	del 1
+endgroup
+
+if display_wall and switch_base then 
+	placegroup "base"
+endif
+
+
+group "hashira_all"
+	group "hashira"
+		material m_jiku
+	
+		for i=1 to h_num
+			if h_flag[i]=1 then
+				add h_coo[i]-wid_jiku/2,-wid_jiku/2,0
+					block wid_jiku,wid_jiku,hei
+				del 1
+			endif
+		next i
+	endgroup
+	
+	placegroup "hashira"
+
+	group "mabashira"
+		material m_jiku
+	
+		for i=1 to mb_num
+			if mb_flag[i]=1 then
+				add mb_coo[i]-wid2_jiku/2,-wid_jiku/2,0
+					block wid2_jiku,wid_jiku,hei
+				del 1
+			endif
+		next i
+	endgroup
+
+	placegroup "mabashira"
+endgroup
+
+hashira_all1= subgroup ("hashira_all","win1")
+hashira_all2= subgroup (hashira_all1,"beam_op1")
+hashira_all3= subgroup (hashira_all2,"floor_op")
+hashira_all4= subgroup{3} (hashira_all3,"sloping",m_jiku,m_jiku,m_jiku)
+hashira_all5= subgroup{3} (hashira_all4,"polygon",m_jiku,m_jiku,m_jiku)
+ 
+if display_wall then placegroup hashira_all5
+
+
+if display_wall then
+	if switch_change_coo and switch_change_spot then
+		for i=1 to h_num
+			hotspot 0,0,-0.2,code,h_coo[i],1+128:code=code+1
+			hotspot -1,0,-0.2,code,h_coo[i],3:code=code+1
+			hotspot h_coo[i],0,-0.2,code,h_coo[i],2:code=code+1
+		
+			hotspot 0,0,hei+0.2,code,h_coo[i],1+128:code=code+1
+			hotspot -1,0,hei+0.2,code,h_coo[i],3:code=code+1
+			hotspot h_coo[i],0,hei+0.2,code,h_coo[i],2:code=code+1
+		next i
+		
+		for i=1 to mb_num
+			hotspot 0,0,-0.2,code,mb_coo[i],1+128:code=code+1
+			hotspot -1,0,-0.2,code,mb_coo[i],3:code=code+1
+			hotspot mb_coo[i],0,-0.2,code,mb_coo[i],2:code=code+1
+			
+			hotspot 0,0,hei+0.2,code,mb_coo[i],1+128:code=code+1
+			hotspot -1,0,hei+0.2,code,mb_coo[i],3:code=code+1
+			hotspot mb_coo[i],0,hei+0.2,code,mb_coo[i],2:code=code+1
+		next i
+	endif
+endif
+
+
+!=============================================================================開口補強
+group "ref"
+	material m_jiku
+
+	addx absx
+		if switch_op then
+			for i=1 to win_num
+				add win_xz2[i][1]-win_ref_wid,-wid_jiku/2,0
+					block win_ref_wid,wid_jiku,hei
+				del 1
+				
+				add win_xz2[i][1]+win_wid2[i],-wid_jiku/2,0
+					block win_ref_wid,wid_jiku,hei
+				del 1
+				
+				if win_type[i]=2 then
+					add win_xz2[i][1],-wid_jiku/2,win_xz2[i][2]-win_ref_wid
+						block win_wid2[i],wid_jiku,win_ref_wid
+					del 1
+				endif
+				
+				if win_ref[i]=1 then
+					add win_xz2[i][1],-wid_jiku/2,win_xz2[i][2]+win_hei2[i]
+						block win_wid2[i],wid_jiku,win_ref_wid
+					del 1
+				endif
+			next i
+		endif
+	del 1
+endgroup
+
+ref1= subgroup{3} ("ref","sloping",m_jiku,m_jiku,m_jiku)
+
+if display_wall then
+	placegroup ref1
+endif
+
+
+!=============================================================================下地
+group "shitaji_floor"
+	material m_jiku
+
+	if switch_shitaji_floor then
+		addy -wid_jiku/2
+			block len,wid_jiku,wid_shitaji
+		del 1
+	endif
+endgroup
+
+shitaji_floor1=subgroup("shitaji_floor",hashira_all4)
+shitaji_floor2=subgroup(shitaji_floor1,"ref")
+shitaji_floor3=subgroup(shitaji_floor2,"win2")
+shitaji_floor4=subgroup(shitaji_floor3,"beam_op1")
+shitaji_floor5=subgroup(shitaji_floor4,"floor_op")
+shitaji_floor6=subgroup(shitaji_floor5,"polygon")
+
+group "shitaji_ref"
+	material m_jiku
+
+	if switch_shitaji_ref then
+		add 0,-wid_jiku/2,hei_shitaji_ref
+			block len,wid_jiku,wid_shitaji
+		del 1
+	endif
+endgroup
+
+shitaji_ref1=subgroup("shitaji_ref","hashira_all")
+shitaji_ref2=subgroup(shitaji_ref1,"ref")
+shitaji_ref3=subgroup(shitaji_ref2,"win1")
+shitaji_ref4=subgroup(shitaji_ref3,"beam_op1")
+shitaji_ref5=subgroup(shitaji_ref4,"floor_op")
+shitaji_ref6=subgroup(shitaji_ref5,"polygon")
+
+if display_wall then
+	if switch_shitaji_floor then
+		placegroup shitaji_floor6
+	endif
+	
+	if switch_shitaji_ref then
+		placegroup shitaji_ref6
+	endif
+endif
+
+
+!=============================================================================断熱材
+group "dannetsu"
+	material m_dannetsu
+
+	if pos_dannetsu=1 then
+		add -wallStartOffset+(1-switch_h_start)*wid_jiku,wid_jiku/2-thi_dannetsu,0
+	else
+		add -wallStartOffset+(1-switch_h_start)*wid_jiku,-wid_jiku/2,0
+	endif
+		block len+wallStartOffset+wallEndOffset-(1-switch_h_start)*wid_jiku-(1-switch_h_end)*wid_jiku,thi_dannetsu,hei
+	del 1
+endgroup
+
+dannetsu1= subgroup ("dannetsu","win2")
+dannetsu2= subgroup (dannetsu1,"beam_op1")
+dannetsu3= subgroup (dannetsu2,"floor_op")
+dannetsu4= subgroup (dannetsu3,hashira_all3)
+dannetsu5= subgroup (dannetsu4,"ref")
+dannetsu6= subgroup{3} (dannetsu5,"sloping",m_dannetsu,m_dannetsu,m_dannetsu)
+dannetsu7= subgroup (dannetsu6,shitaji_floor5)
+dannetsu8= subgroup (dannetsu7,shitaji_ref5)
+dannetsu9= subgroup{3} (dannetsu8,"polygon",m_dannetsu,m_dannetsu,m_dannetsu)
+ 
+if display_wall then
+	if switch_dannetsu then
+		if reverse then muly -1
+			placegroup dannetsu9
+		if reverse then del 1
+	endif
+endif
+
+
+!=============================================================================構造用合板(外側)
+group "gouhan"
+	material m_gouhan
+
+	if switch_gouhan then
+		loop_gouhan_x=ceil((len+offset_start_gh+offset_end_gh)/wid_gouhan)
+		loop_gouhan_z=ceil((hei+offset_up_gh-offset_down_gh)/hei_gouhan)	
+
+		add -offset_start_gh,-wid_jiku/2-thi_gouhan,offset_down_gh
+			for j=1 to loop_gouhan_z
+				for i=1 to loop_gouhan_x
+					block wid_gouhan-0.0001,thi_gouhan,hei_gouhan-0.0001
+				addx wid_gouhan
+				next i
+				del loop_gouhan_x
+			addz hei_gouhan
+			next j
+			del loop_gouhan_z
+		del 1
+	endif
+endgroup
+
+
+group "gouhan_waku"
+	material m_gouhan
+
+	if switch_gouhan then
+		add -offset_start_gh,-wid_jiku/2-thi_gouhan,offset_down_gh
+			block len+offset_start_gh+offset_end_gh,thi_gouhan,hei+offset_up_gh-offset_down_gh
+		del 1
+	endif
+endgroup
+
+gouhan1= isectgroup ("gouhan","gouhan_waku")
+gouhan2= subgroup (gouhan1,"win3")
+gouhan3= subgroup (gouhan2,"beam_op1")
+gouhan4= subgroup (gouhan3,"floor_op")
+gouhan5= subgroup{3} (gouhan4,"sloping",m_gouhan,m_gouhan,m_gouhan)
+gouhan6= subgroup{3} (gouhan5,"polygon",m_gouhan,m_gouhan,m_gouhan)
+
+if switch_gouhan and display_gouhan then
+	if reverse then muly -1
+		placegroup gouhan6
+
+		if display_gouhanspot then
+			hotspot len/(switch_gouhan+num_board+switch_siding+1),-wid_jiku/2-thi_gouhan,0,code,offset_down_gh,1+128:code=code+1
+			hotspot len/(switch_gouhan+num_board+switch_siding+1),-wid_jiku/2-thi_gouhan,-1,code,offset_down_gh,3:code=code+1
+			hotspot len/(switch_gouhan+num_board+switch_siding+1),-wid_jiku/2-thi_gouhan,offset_down_gh,code,offset_down_gh,2:code=code+1
+		
+			hotspot len/(switch_gouhan+num_board+switch_siding+1),-wid_jiku/2-thi_gouhan,hei,code,offset_up_gh,1+128:code=code+1
+			hotspot len/(switch_gouhan+num_board+switch_siding+1),-wid_jiku/2-thi_gouhan,hei-1,code,offset_up_gh,3:code=code+1
+			hotspot len/(switch_gouhan+num_board+switch_siding+1),-wid_jiku/2-thi_gouhan,hei+offset_up_gh,code,offset_up_gh,2:code=code+1
+		endif
+	if reverse then del 1
+endif
+
+
+!=============================================================================ボード
+group "board_front"
+	if switch_gouhan then addy -thi_gouhan
+		for n=1 to num_board
+			if type_board[n]=1 then material m_board1
+			if type_board[n]=2 then material m_board2
+			if type_board[n]=3 then material m_board3
+			if type_board[n]=4 then material m_board4
+			if type_board[n]=5 then material m_board5
+			if type_board[n]>5 then material m_board1
+
+			x_bo=ceil((offset_start[n]+offset_end[n]+len)/wid_bo)
+			y_bo=ceil((hei+offset_up[n]-offset_down[n])/hei_bo)
+
+			add -offset_start[n],-wid_jiku/2-thi_board[n],offset_down[n]
+				for i=1 to y_bo
+					for j=1 to x_bo
+						block wid_bo-0.0001,thi_board[n],hei_bo-0.0001
+					addx wid_bo
+					next j
+					del x_bo
+				addz hei_bo
+				next i
+				del y_bo
+			del 1
+		addy -thi_board[n]-0.0001
+		next n
+		del num_board
+	if switch_gouhan then del 1
+endgroup
+
+
+group "board_back"
+	for n=1 to num_board2
+		if type_board2[n]=1 then material m_board1
+		if type_board2[n]=2 then material m_board2
+		if type_board2[n]=3 then material m_board3
+		if type_board2[n]=4 then material m_board4
+		if type_board2[n]=5 then material m_board5
+		if type_board2[n]>5 then material m_board1
+	
+		x_bo=ceil((offset_start2[n]+offset_end2[n]+len)/wid_bo2)
+		y_bo=ceil((hei+offset_up2[n]-offset_down2[n])/hei_bo2)
+	
+		add -offset_start2[n],wid_jiku/2,offset_down2[n]
+			for i=1 to y_bo
+				for j=1 to x_bo
+					block wid_bo2-0.0001,thi_board2[n],hei_bo2-0.0001
+				addx wid_bo2
+				next j
+				del x_bo
+			addz hei_bo2
+			next i
+			del y_bo
+		del 1
+	addy thi_board2[n]+0.0001
+	next n
+	del num_board2
+endgroup
+
+
+group "frame_board"
+	material m_board1
+
+	if switch_gouhan then addy -thi_gouhan
+		for i=1 to num_board
+			add -offset_start[i],-wid_jiku/2-thi_board[i],offset_down[i]
+				block offset_start[i]+offset_end[i]+len,thi_board[i],hei+offset_up[i]-offset_down[i]
+			del 1
+		addy -thi_board[i]-0.0001
+		next i
+		del num_board
+	if switch_gouhan then del 1
+endgroup
+
+group "frame_board2"
+	material m_board1
+
+	for i=1 to num_board2
+		add -offset_start2[i],wid_jiku/2,offset_down2[i]
+			block offset_start2[i]+offset_end2[i]+len,thi_board2[i],hei+offset_up2[i]-offset_down2[i]
+		del 1
+	addy thi_board2[i]+0.0001
+	next i
+	del num_board2
+endgroup
+
+
+board_front1=isectgroup("board_front","frame_board")
+board_front2=subgroup{2}(board_front1,"win3",m_board1,m_board1,m_board1)
+board_front3=subgroup{2}(board_front2,"beam_op1",m_board1,m_board1,m_board1)
+board_front4=subgroup{2}(board_front3,"floor_op",m_board1,m_board1,m_board1)
+board_front5=subgroup{2}(board_front4,"sloping",m_board1,m_board1,m_board1)
+board_front6=subgroup{2}(board_front5,"polygon",m_board1,m_board1,m_board1)
+
+board_back1=isectgroup("board_back","frame_board2")
+board_back2=subgroup{2}(board_back1,"win3",m_board1,m_board1,m_board1)
+board_back3=subgroup{2}(board_back2,"beam_op1",m_board1,m_board1,m_board1)
+board_back4=subgroup{2}(board_back3,"floor_op",m_board1,m_board1,m_board1)
+board_back5=subgroup{2}(board_back4,"sloping",m_board1,m_board1,m_board1)
+board_back6=subgroup{2}(board_back5,"polygon",m_board1,m_board1,m_board1)
+
+
+if reverse then muly -1
+	if display_board and switch_board then
+		placegroup board_front6
+
+		if display_boardspot then
+			if switch_gouhan then yyy=thi_gouhan
+			if switch_gouhan=0 then yyy=0
+
+			for i=1 to num_board
+				hotspot len*(i+switch_gouhan)/(switch_gouhan+num_board+switch_siding+1),-wid_jiku/2-yyy-thi_board[i]/2,0,code,offset_down[i],1+128:code=code+1
+				hotspot len*(i+switch_gouhan)/(switch_gouhan+num_board+switch_siding+1),-wid_jiku/2-yyy-thi_board[i]/2,-1,code,offset_down[i],3:code=code+1
+				hotspot len*(i+switch_gouhan)/(switch_gouhan+num_board+switch_siding+1),-wid_jiku/2-yyy-thi_board[i]/2,offset_down[i],code,offset_down[i],2:code=code+1
+			
+				hotspot len*(i+switch_gouhan)/(switch_gouhan+num_board+switch_siding+1),-wid_jiku/2-yyy-thi_board[i]/2,hei,code,offset_up[i],1+128:code=code+1
+				hotspot len*(i+switch_gouhan)/(switch_gouhan+num_board+switch_siding+1),-wid_jiku/2-yyy-thi_board[i]/2,hei-1,code,offset_up[i],3:code=code+1
+				hotspot len*(i+switch_gouhan)/(switch_gouhan+num_board+switch_siding+1),-wid_jiku/2-yyy-thi_board[i]/2,hei+offset_up[i],code,offset_up[i],2:code=code+1
+			addy -thi_board[i]-0.0001
+			next i
+			del num_board
+		endif
+	endif
+
+	if display_board2 and switch_board2 then
+		placegroup board_back6
+
+		if display_boardspot then
+			for i=1 to num_board2
+				hotspot len*i/(num_board2+switch_panel+switch_siding_back+1),wid_jiku/2+thi_board2[i]/2,0,code,offset_down2[i],1+128:code=code+1
+				hotspot len*i/(num_board2+switch_panel+switch_siding_back+1),wid_jiku/2+thi_board2[i]/2,-1,code,offset_down2[i],3:code=code+1
+				hotspot len*i/(num_board2+switch_panel+switch_siding_back+1),wid_jiku/2+thi_board2[i]/2,offset_down2[i],code,offset_down2[i],2:code=code+1
+			
+				hotspot len*i/(num_board2+switch_panel+switch_siding_back+1),wid_jiku/2+thi_board2[i]/2,hei,code,offset_up2[i],1+128:code=code+1
+				hotspot len*i/(num_board2+switch_panel+switch_siding_back+1),wid_jiku/2+thi_board2[i]/2,hei-1,code,offset_up2[i],3:code=code+1
+				hotspot len*i/(num_board2+switch_panel+switch_siding_back+1),wid_jiku/2+thi_board2[i]/2,hei+offset_up2[i],code,offset_up2[i],2:code=code+1
+				addy thi_board2[i]+0.0001
+			next i
+			del num_board2
+		endif
+	endif
+if reverse then del 1
+
+
+!==========================================================================化粧板
+group "panel_front"
+	if type_panel=1 then material m_panel1
+	if type_panel=2 then material m_panel2
+	if type_panel=3 then material m_panel3
+	if type_panel=4 or type_panel=5 then material m_panel4
+	if type_panel=6 then material m_panel5
+
+	panel_y=wid_jiku/2
+
+	if switch_board2 then
+		for i=1 to num_board2
+			panel_y=panel_y+thi_board2[i]
+		next i
+	endif
+
+	x_pa=ceil((len+offset_start_p+offset_end_p)/wid_panel)
+	y_pa=ceil((hei+offset_up_p-offset_down_p)/hei_panel)
+
+	add -offset_start_p,panel_y,offset_down_p
+		for i=1 to x_pa
+			for j=1 to y_pa
+				block wid_panel-0.0001,thi_panel,hei_panel-0.0001
+			addz hei_panel
+			next j
+			del y_pa
+		addx wid_panel
+		next i
+		del x_pa
+	del 1
+endgroup
+
+
+panel_y=wid_jiku/2
+
+if switch_board2 then
+	for i=1 to num_board2
+		panel_y=panel_y+thi_board2[i]
+	next i
+endif
+
+
+group "panel_frame_front"
+	material m_panel1
+
+	add -offset_start_p,panel_y,offset_down_p
+		block len+offset_start_p+offset_end_p,thi_panel,hei-offset_down_p+offset_up_p
+	del 1
+endgroup
+
+panel_front1=isectgroup("panel_front","panel_frame_front")
+panel_front2=subgroup{2}(panel_front1,"win3",m_panel1,m_panel1,m_panel1)
+panel_front3=subgroup{2}(panel_front2,"beam_op1",m_panel1,m_panel1,m_panel1)
+panel_front4=subgroup{2}(panel_front3,"floor_op",m_panel1,m_panel1,m_panel1)
+panel_front5=subgroup{2}(panel_front4,"sloping",m_panel1,m_panel1,m_panel1)
+panel_front6=subgroup{2}(panel_front5,"polygon",m_panel1,m_panel1,m_panel1)
+
+if display_panel and switch_panel then
+	if reverse then muly -1
+		placegroup panel_front6
+
+		if display_panelspot then
+			hotspot len*(num_board2+switch_panel)/(num_board2+switch_panel+switch_siding_back+1),panel_y+thi_panel/2,0,code,offset_down_p,1+128:code=code+1
+			hotspot len*(num_board2+switch_panel)/(num_board2+switch_panel+switch_siding_back+1),panel_y+thi_panel/2,-1,code,offset_down_p,3:code=code+1
+			hotspot len*(num_board2+switch_panel)/(num_board2+switch_panel+switch_siding_back+1),panel_y+thi_panel/2,offset_down_p,code,offset_down_p,2:code=code+1
+
+			hotspot len*(num_board2+switch_panel)/(num_board2+switch_panel+switch_siding_back+1),panel_y+thi_panel/2,hei,code,offset_up_p,1+128:code=code+1
+			hotspot len*(num_board2+switch_panel)/(num_board2+switch_panel+switch_siding_back+1),panel_y+thi_panel/2,hei-1,code,offset_up_p,3:code=code+1
+			hotspot len*(num_board2+switch_panel)/(num_board2+switch_panel+switch_siding_back+1),panel_y+thi_panel/2,hei+offset_up_p,code,offset_up_p,2:code=code+1
+		endif
+	if reverse then del 1
+endif
+
+
+!==========================================================================見切り材
+group "molding"
+	material m_molding
+
+	if reverse then muly -1
+		if display_panel then
+			if switch_panel then
+				panel_y=wid_jiku/2
+			
+				if switch_board then
+					for i=1 to num_board
+						panel_y=panel_y+thi_board[i]
+					next i
+				endif
+
+				if switch_molding[1][1] then !左
+					tube 8,4,1+2+16+32,
+					0,thi_panel/2,0,
+					0.024,thi_panel/2,0,
+					0.024,thi_panel/2+0.001,0,
+					-0.001,thi_panel/2+0.001,0,
+					-0.001,-thi_panel/2-0.001,0,
+					0.024,-thi_panel/2-0.001,0,
+					0.024,-thi_panel/2,0,
+					0,-thi_panel/2,0,
+					-offset_start_p,panel_y+thi_panel/2,2*offset_down_p-(hei+offset_up_p),0,
+					-offset_start_p,panel_y+thi_panel/2,offset_down_p-0.001,0,
+					-offset_start_p,panel_y+thi_panel/2,hei+offset_up_p+0.001,0,
+					-offset_start_p,panel_y+thi_panel/2,2*(hei+offset_up_p)-offset_down_p,0
+				endif
+			
+				if switch_molding[1][2] then !右
+					tube 8,4,1+2+16+32,
+					0,thi_panel/2,0,
+					-0.024,thi_panel/2,0,
+					-0.024,thi_panel/2+0.001,0,
+					0.001,thi_panel/2+0.001,0,
+					0.001,-thi_panel/2-0.001,0,
+					-0.024,-thi_panel/2-0.001,0,
+					-0.024,-thi_panel/2,0,
+					0,-thi_panel/2,0,
+					len+offset_end_p,panel_y+thi_panel/2,2*offset_down_p-(hei+offset_up_p),0,
+					len+offset_end_p,panel_y+thi_panel/2,offset_down_p-0.001,0,
+					len+offset_end_p,panel_y+thi_panel/2,hei+offset_up_p+0.001,0,
+					len+offset_end_p,panel_y+thi_panel/2,2*(hei+offset_up_p)-offset_down_p,0
+				endif
+
+				if switch_molding[1][3] then !上
+					tube 8,4,1+2+16+32,
+					thi_panel/2,0,0,
+					thi_panel/2,-0.024,0,
+					thi_panel/2+0.001,-0.024,0,
+					thi_panel/2+0.001,0.001,0,
+					-thi_panel/2-0.001,0.001,0,
+					-thi_panel/2-0.001,-0.024,0,
+					-thi_panel/2,-0.024,0,
+					-thi_panel/2,0,0,
+					-2*offset_start_p-(len+offset_end_p),panel_y+thi_panel/2,hei+offset_up_p,0,
+					-offset_start_p-0.001,panel_y+thi_panel/2,hei+offset_up_p,0,
+					len+offset_end_p+0.001,panel_y+thi_panel/2,hei+offset_up_p,0,
+					2*(len+offset_end_p)+offset_start_p,panel_y+thi_panel/2,hei+offset_up_p,0
+				endif
+
+				if switch_molding[1][4] then !下
+					tube 8,4,1+2+16+32,
+					thi_panel/2,0,0,
+					thi_panel/2,0.024,0,
+					thi_panel/2+0.001,0.024,0,
+					thi_panel/2+0.001,-0.001,0,
+					-thi_panel/2-0.001,-0.001,0,
+					-thi_panel/2-0.001,0.024,0,
+					-thi_panel/2,0.024,0,
+					-thi_panel/2,0,0,
+					-2*offset_start_p-(len+offset_end_p),panel_y+thi_panel/2,offset_down_p,0,
+					-offset_start_p-0.001,panel_y+thi_panel/2,offset_down_p,0,
+					len+offset_end_p+0.001,panel_y+thi_panel/2,offset_down_p,0,
+					2*(len+offset_end_p)+offset_start_p,panel_y+thi_panel/2,offset_down_p,0
+				endif
+			endif
+		endif
+	if reverse then del 1
+endgroup
+
+molding1=subgroup{2}("molding","win3",m_molding,m_molding,m_molding)
+molding2=subgroup{2}(molding1,"beam_op1",m_molding,m_molding,m_molding)
+molding3=subgroup{2}(molding2,"floor_op",m_molding,m_molding,m_molding)
+molding4=subgroup{2}(molding3,"sloping",m_molding,m_molding,m_molding)
+molding5=subgroup{2}(molding4,"polygon",m_molding,m_molding,m_molding)
+
+placegroup molding5
+
+
+!==========================================================================防水シート
+group "sheet"
+	material m_sheet
+
+	if display_sheet then
+		add -offset_start_b,move_y-0.001,siding_down
+			block len+offset_start_b+offset_end_b,0.001,hei+siding_up-siding_down
+		del 1
+	endif
+endgroup
+
+sheet1= subgroup ("sheet","win3")
+sheet2= subgroup (sheet1,"beam_op1")
+sheet3= subgroup (sheet2,"floor_op")
+sheet4= subgroup{3} (sheet3,"sloping",m_sheet,m_sheet,m_sheet)
+sheet5= subgroup (sheet4,"polygon")
+ 
+if display_sheet then
+	if reverse then muly -1
+		placegroup sheet5
+	if reverse then del 1
+endif
+
+
+!==========================================================================防水シール
+group "sheetseal"
+	material m_sheetseal
+	
+	if display_sheet then
+		if switch_sheetseal then
+			pass_num=0
+
+			if roof_cut then
+				pass_num=pass_num+3
+
+				put -2*offset_start_b-cut_xzL[1][1]-0.001,move_y,hei+siding_up              ,0
+				put -offset_start_b                      ,move_y,hei+siding_up-cut_xzL[1][2],0
+				put cut_xzL[1][1]                        ,move_y,hei+siding_up              ,0
+			else
+				pass_num=pass_num+2
+
+				put -offset_start_b-1,move_y,hei+siding_up,0
+				put -offset_start_b  ,move_y,hei+siding_up,0
+			endif
+
+			if roof_cut then
+				pass_num=pass_num+3
+				
+				put len-cut_xzR[1][1]                     ,move_y,hei+siding_up              ,0
+				put len+offset_end_b                      ,move_y,hei+siding_up-cut_xzR[1][2],0
+				put len+2*offset_end_b+cut_xzR[1][1]+0.001,move_y,hei+siding_up              ,0
+			else
+				pass_num=pass_num+2
+				
+				put len+offset_end_b  ,move_y,hei+siding_up,0
+				put len+offset_end_b+1,move_y,hei+siding_up,0
+			endif
+
+			tube 5,pass_num,1+2+16+32+64,
+			-0.001,0,0,
+			-0.002,0,0,
+			-0.002,-sheetseal_wid,0,
+			-0.001,-sheetseal_wid,0,
+			-0.001,0,0,
+			get(pass_num*4)
+		endif
+	endif
+endgroup
+
+sheetseal_1 = subgroup ("sheetseal","win3")
+sheetseal_2 = subgroup (sheetseal_1,"beam_op1")
+sheetseal_3 = subgroup (sheetseal_2,"floor_op")
+sheetseal_4 = subgroup{3} (sheetseal_3,"polygon",m_sheetseal,m_sheetseal,m_sheetseal)
+
+if display_sheet and switch_sheetseal then
+	placegroup sheetseal_4
+endif
+
+
+!==========================================================================胴縁と開口補強
+group "doubuchi"
+	material m_doubuchi
+
+	if display_doubuchi then
+		if direction=1 then !縦
+
+			add -wid2_d/2,move_y-0.001-wid_d,siding_down
+				for i=1 to num_d
+					addx doubuchi_coo[i]
+						block wid2_d,wid_d,hei+siding_up-siding_down
+					del 1
+				next i
+			del 1
+		endif
+		
+		if direction=2 then !横
+			loopz=ceil((hei+siding_up-siding_down)/pitch_d)
+	
+			add -offset_start_d+wid2_d,move_y-0.001-wid_d,siding_down
+				for i=1 to loopz
+					block len+offset_start_d+offset_end_d-2*wid2_d,wid_d,wid2_d
+				addz pitch_d
+				next i
+				del loopz
+			del 1
+
+			add -offset_start_d,move_y-0.001-wid_d,siding_down
+				block wid2_d,wid_d,hei+siding_up-siding_down
+			del 1
+
+			add len+offset_end_d-wid2_d,move_y-0.001-wid_d,siding_down
+				block wid2_d,wid_d,hei+siding_up-siding_down
+			del 1
+		endif
+	endif
+endgroup
+
+doubuchi1= subgroup ("doubuchi","win4")
+doubuchi2= subgroup (doubuchi1,"beam_op1")
+doubuchi3= subgroup (doubuchi2,"floor_op")
+doubuchi4= subgroup{2} (doubuchi3,"sloping",m_doubuchi,m_doubuchi,m_doubuchi)
+doubuchi5= subgroup{2} (doubuchi4,"polygon",m_doubuchi,m_doubuchi,m_doubuchi)
+ 
+group "doubuchi_ref"
+	material m_doubuchi
+
+	if display_doubuchi and switch_op then
+		addx absx
+			for i=1 to win_num
+				if win_type[i]=2 then
+					add win_xz2[i][1]-wid_win_d,move_y-0.001-wid_d,win_xz2[i][2]-wid_win_d
+						block win_wid2[i]+2*wid_win_d,wid_d,wid_win_d
+					del 1
+				endif
+
+				add win_xz2[i][1]-wid_win_d,move_y-0.001-wid_d,win_xz2[i][2]+win_hei2[i]
+					block win_wid2[i]+2*wid_win_d,wid_d,wid_win_d
+				del 1
+			
+				if win_type[i]=2 then
+					add win_xz2[i][1]-wid_win_d,move_y-0.001-wid_d,win_xz2[i][2]
+						block wid_win_d,wid_d,win_hei2[i]
+					del 1
+		
+					add win_xz2[i][1]+win_wid2[i],move_y-0.001-wid_d,win_xz2[i][2]
+						block wid_win_d,wid_d,win_hei2[i]
+					del 1
+				else
+					add win_xz2[i][1]-wid_win_d,move_y-0.001-wid_d,0
+						block wid_win_d,wid_d,win_hei2[i]+win_xz2[i][2]
+					del 1
+		
+					add win_xz2[i][1]+win_wid2[i],move_y-0.001-wid_d,0
+						block wid_win_d,wid_d,win_hei2[i]+win_xz2[i][2]
+					del 1
+				endif
+			next i
+		del 1	
+	endif
+endgroup
+
+doubuchi_ref1= subgroup{3} ("doubuchi_ref","sloping",m_doubuchi,m_doubuchi,m_doubuchi)
+
+group "joiner"
+	material m_joiner
+
+	if switch_siding then
+		if direction=1 then !縦
+			add 0,move_y-0.001-wid_d,siding_down+0.01
+				for i=1 to joiner_all_num
+					addx joiner_all_pos[i]
+						extrude 13,0,0,hei+siding_up-siding_down-0.02,1+2+4+16,
+						-joiner_wid/2-0.01,0,0,
+						-joiner_wid/2+0.001,0,0,
+						-joiner_wid/2+0.001,-0.009,0,
+						joiner_wid/2-0.001,-0.009,0,
+						joiner_wid/2-0.001,0,0,
+						joiner_wid/2+0.01,0,0,
+						joiner_wid/2+0.01,-0.001,0,
+						joiner_wid/2,-0.001,0,
+						joiner_wid/2,-0.01,0,
+						-joiner_wid/2,-0.01,0,
+						-joiner_wid/2,-0.001,0,
+						-joiner_wid/2-0.01,-0.001,0,
+						-joiner_wid/2-0.01,0,0
+					del 1
+				next i
+			del 1
+		else
+			add -offset_start_d+wid2_d/2,move_y-0.001-wid_d,siding_down+0.01
+				extrude 13,0,0,hei+siding_up-siding_down-0.02,1+2+4+16,
+				-joiner_wid/2-0.01,0,0,
+				-joiner_wid/2+0.001,0,0,
+				-joiner_wid/2+0.001,-0.009,0,
+				joiner_wid/2-0.001,-0.009,0,
+				joiner_wid/2-0.001,0,0,
+				joiner_wid/2+0.01,0,0,
+				joiner_wid/2+0.01,-0.001,0,
+				joiner_wid/2,-0.001,0,
+				joiner_wid/2,-0.01,0,
+				-joiner_wid/2,-0.01,0,
+				-joiner_wid/2,-0.001,0,
+				-joiner_wid/2-0.01,-0.001,0,
+				-joiner_wid/2-0.01,0,0
+			del 1
+
+			add len+offset_end_d-wid2_d/2,move_y-0.001-wid_d,siding_down+0.01
+				extrude 13,0,0,hei+siding_up-siding_down-0.02,1+2+4+16,
+				-joiner_wid/2-0.01,0,0,
+				-joiner_wid/2+0.001,0,0,
+				-joiner_wid/2+0.001,-0.009,0,
+				joiner_wid/2-0.001,-0.009,0,
+				joiner_wid/2-0.001,0,0,
+				joiner_wid/2+0.01,0,0,
+				joiner_wid/2+0.01,-0.001,0,
+				joiner_wid/2,-0.001,0,
+				joiner_wid/2,-0.01,0,
+				-joiner_wid/2,-0.01,0,
+				-joiner_wid/2,-0.001,0,
+				-joiner_wid/2-0.01,-0.001,0,
+				-joiner_wid/2-0.01,0,0
+			del 1
+		endif
+	endif
+endgroup
+
+joiner1= subgroup ("joiner","win3")
+joiner2= subgroup (joiner1,"beam_op1")
+joiner3= subgroup (joiner2,"floor_op")
+joiner4= subgroup{2} (joiner3,"sloping",m_joiner,m_joiner,m_joiner)
+joiner5= subgroup{2} (joiner4,"polygon",m_joiner,m_joiner,m_joiner)
+
+if display_doubuchi then
+	if reverse then muly -1
+		placegroup doubuchi5
+		placegroup doubuchi_ref1
+	if reverse then del 1
+endif
+
+if switch_siding then
+	if reverse then muly -1
+		placegroup joiner5
+	if reverse then del 1
+endif
+
+
+!==========================================================================サイディング
+offset_start_d_temp=offset_start_d-wid2_d/2+joiner_wid/2
+offset_end_d_temp=offset_end_d-wid2_d/2+joiner_wid/2
+
+group "siding"
+	material m_siding
+	
+	add -offset_start_d_temp,move_y-0.001-wid_d-sid_thi-0.001,siding_down
+		block len+offset_start_d_temp+offset_end_d_temp,sid_thi,hei+siding_up-siding_down
+	del 1
+endgroup
+
+
+group "siding_joint"
+	material m_siding
+
+	if switch_siding then
+		if direction=1 then !横
+			add -joiner_wid/2,move_y-0.001-wid_d-sid_thi-0.001,siding_down
+				for i=1 to joiner_all_num
+					addx joiner_all_pos[i]
+						block joiner_wid,sid_thi,hei+siding_up-siding_down
+					del 1
+				next i
+			del 1
+
+			loopz=ceil((hei+siding_up-siding_down-sid_wid-allo_z_offset)/sid_wid)+1
+
+			add -offset_start_d+wid2_d/2,move_y-0.001-wid_d-sid_thi-0.001,siding_down+allo_z_offset-0.001
+				for i=1 to loopz
+					block len+offset_start_d+offset_end_d-wid2_d,sid_thi,0.001
+				addz sid_wid
+				next i
+				del loopz
+			del 1
+		endif
+		
+		if direction=2 then !縦
+			loopx=ceil((len+offset_start_d+offset_end_d-joiner_wid-wid2_d)/sid_wid)
+
+			add -offset_start_d+wid2_d/2,move_y-0.001-wid_d-sid_thi-0.001,siding_down
+				for i=1 to loopx
+					block 0.001,sid_thi,hei+siding_up-siding_down
+				addx sid_wid
+				next i
+				del loopx
+			del 1
+
+			loopz=ceil((hei+siding_up-siding_down)/sid_len)
+
+			add -offset_start_d,move_y-0.001-wid_d-sid_thi-0.001,siding_down
+				for i=1 to loopz
+					block len+offset_start_d+offset_end_d,sid_thi,0.01
+				addz sid_len
+				next i
+				del loopz
+			del 1
+		endif
+	endif
+endgroup
+
+
+group "seal"
+	material m_seal
+
+	if switch_siding then
+		if direction=1 then !横
+			add -joiner_wid/2,move_y-0.001-wid_d-sid_thi-0.001,siding_down
+				for i=1 to joiner_all_num
+					addx joiner_all_pos[i]
+						block joiner_wid,sid_thi-0.009,hei+siding_up-siding_down
+					del 1
+				next i
+			del 1
+		endif
+		
+		if direction=2 then !縦
+			add -offset_start_d_temp,move_y-0.001-wid_d-sid_thi-0.001,siding_down
+				block joiner_wid,sid_thi-0.009,hei+siding_up-siding_down
+			del 1
+
+			add len+offset_end_d_temp,move_y-0.001-wid_d-sid_thi-0.001,siding_down
+				block joiner_wid,sid_thi-0.009,hei+siding_up-siding_down
+			del 1
+		endif
+	endif
+endgroup
+
+
+group "siding_corner"
+	material m_corner
+
+	if corner_L=1 then !始点出隅
+		add -offset_start_d_temp,move_y-0.001-wid_d-0.001,siding_down
+			tube 4,5,1+2+16,
+			0,0,0,
+			sid_thi,0,0,
+			sid_thi,hei+siding_up-siding_down,0,
+			0,hei+siding_up-siding_down,0,
+			corner_wid,0,0,0,
+			0,0,0,0,
+			-corner_wid,0,0,0,
+			-corner_wid,corner_wid,0,0,
+			-corner_wid,2*corner_wid,0,0
+		del 1
+	endif
+
+	if corner_L=2 then !始点入隅
+		add -offset_start_d_temp,move_y-0.001-wid_d-0.001-sid_thi,siding_down
+			tube 4,5,1+2+16,
+			0,0,0,
+			-sid_thi,0,0,
+			-sid_thi,hei+siding_up-siding_down,0,
+			0,hei+siding_up-siding_down,0,
+			corner_wid,0,0,0,
+			0,0,0,0,
+			-corner_wid,0,0,0,
+			-corner_wid,-corner_wid,0,0,
+			-corner_wid,-2*corner_wid,0,0
+		del 1
+	endif
+
+	if corner_R=1 then !終点出隅
+		add len+offset_end_d_temp,move_y-0.001-wid_d-0.001,siding_down
+			tube 4,5,1+2+16,
+			0,0,0,
+			-sid_thi,0,0,
+			-sid_thi,hei+siding_up-siding_down,0,
+			0,hei+siding_up-siding_down,0,
+			-corner_wid,0,0,0,
+			0,0,0,0,
+			corner_wid,0,0,0,
+			corner_wid,corner_wid,0,0,
+			corner_wid,2*corner_wid,0,0
+		del 1
+	endif
+
+	if corner_R=2 then !終点入隅
+		add len+offset_end_d_temp,move_y-0.001-wid_d-0.001-sid_thi,siding_down
+			tube 4,5,1+2+16,
+			0,0,0,
+			sid_thi,0,0,
+			sid_thi,hei+siding_up-siding_down,0,
+			0,hei+siding_up-siding_down,0,
+			-corner_wid,0,0,0,
+			0,0,0,0,
+			corner_wid,0,0,0,
+			corner_wid,-corner_wid,0,0,
+			corner_wid,-2*corner_wid,0,0
+		del 1
+	endif
+endgroup
+
+
+group "coner_joint"
+	material m_corner
+
+	if direction=1 then 
+		loopz=ceil((hei+siding_up-siding_down-sid_wid-joiner_wid-allo_z_offset)/sid_wid)
+
+		add -offset_start_d_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001-sid_thi-corner_wid-sid_thi,siding_down-0.001+allo_z_offset
+			for i=1 to loopz
+			addz sid_wid
+				block corner_wid+sid_thi,corner_wid*2+sid_thi*2,0.001
+			next i
+			del loopz
+		del 1
+
+		add -offset_start_d_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001-sid_thi-corner_wid-sid_thi,hei+siding_up-0.001+allo_z_offset
+			block corner_wid+sid_thi,corner_wid*2+sid_thi*2,0.001
+		del 1
+
+		loopz=ceil((hei+siding_up-siding_down-sid_wid-allo_z_offset)/sid_wid)
+
+		add len+offset_end_d_temp,move_y-0.001-wid_d-0.001-sid_thi-corner_wid-sid_thi,siding_down-0.001+allo_z_offset
+			for i=1 to loopz
+			addz sid_wid
+				block corner_wid+sid_thi,corner_wid*2+sid_thi*2,0.001
+			next i
+			del loopz
+		del 1
+
+		add len+offset_end_d_temp,move_y-0.001-wid_d-0.001-sid_thi-corner_wid-sid_thi,hei+siding_up-0.001+allo_z_offset
+			block corner_wid+sid_thi,corner_wid*2+sid_thi*2,0.001
+		del 1
+	endif
+
+	if direction=2 then 
+		loopz=ceil((hei+siding_up-siding_down-allo_z_offset)/sid_len)
+
+		add -offset_start_d_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001-sid_thi-corner_wid-sid_thi,siding_down+allo_z_offset
+			for i=1 to loopz
+				block corner_wid+sid_thi,corner_wid*2+sid_thi*2,0.01
+			addz sid_len
+			next i
+			del loopz
+		del 1
+
+		loopz=ceil((hei+siding_up-siding_down-allo_z_offset)/sid_len)
+
+		add len+offset_end_d_temp,move_y-0.001-wid_d-0.001-sid_thi-corner_wid-sid_thi,siding_down+allo_z_offset
+			for i=1 to loopz
+				block corner_wid+sid_thi,corner_wid*2+sid_thi*2,0.01
+			addz sid_len
+			next i
+			del loopz
+		del 1
+	endif
+endgroup
+
+siding1= subgroup ("siding","siding_joint")
+siding2= subgroup (siding1,"win3")
+siding3= subgroup (siding2,"beam_op1")
+siding4= subgroup (siding3,"floor_op")
+siding5= subgroup{3} (siding4,"sloping",m_siding,m_siding,m_siding)
+siding6= subgroup{3} (siding5,"polygon",m_siding,m_siding,m_siding)
+
+siding_corner1= subgroup ("siding_corner","coner_joint")
+siding_corner2= subgroup (siding_corner1,"win3")
+siding_corner3= subgroup (siding_corner2,"beam_op1")
+siding_corner4= subgroup (siding_corner3,"floor_op")
+siding_corner5= subgroup{3} (siding_corner4,"sloping",m_corner,m_corner,m_corner)
+siding_corner6= subgroup{3} (siding_corner5,"polygon",m_corner,m_corner,m_corner)
+
+seal1= subgroup ("seal","win3")
+seal2= subgroup (seal1,"beam_op1")
+seal3= subgroup (seal2,"floor_op")
+seal4= subgroup{2} (seal3,"sloping",m_seal,m_seal,m_seal)
+seal5= subgroup{2} (seal4,"polygon",m_seal,m_seal,m_seal)
+
+if switch_siding then
+	if reverse then muly -1
+		placegroup siding6
+		placegroup siding_corner6
+		placegroup seal5
+
+	if switch_seal and joiner_all_num>2 then
+		for i=1 to joiner_num
+			hotspot 0,move_y-0.001-wid_d-sid_thi-0.001,hei+siding_up,code,joiner_coo[i],1+128:code=code+1
+			hotspot -1,move_y-0.001-wid_d-sid_thi-0.001,hei+siding_up,code,joiner_coo[i],3:code=code+1
+			hotspot joiner_coo[i],move_y-0.001-wid_d-sid_thi-0.001,hei+siding_up,code,joiner_coo[i],2:code=code+1
+		next i
+	else
+		hotspot -offset_start_d+wid2_d/2,move_y-0.001-wid_d-sid_thi-0.001,hei+siding_up,code,seal_start_pos,1+128:code=code+1
+		hotspot -offset_start_d+wid2_d/2+seal_start_pos,move_y-0.001-wid_d-sid_thi-0.001,hei+siding_up,code,seal_start_pos,2:code=code+1
+		hotspot -offset_start_d+wid2_d/2-1,move_y-0.001-wid_d-sid_thi-0.001,hei+siding_up,code,seal_start_pos,3:code=code+1
+	endif
+
+	if reverse then del 1
+endif
+
+if switch_siding and display_sidingspot then
+	if reverse then muly -1
+		hotspot len*(switch_gouhan+num_board+switch_siding)/(switch_gouhan+num_board+switch_siding+1),move_y-0.001-wid_d-sid_thi-0.001,0,code,siding_down,1+128:code=code+1
+		hotspot len*(switch_gouhan+num_board+switch_siding)/(switch_gouhan+num_board+switch_siding+1),move_y-0.001-wid_d-sid_thi-0.001,-1,code,siding_down,3:code=code+1
+		hotspot len*(switch_gouhan+num_board+switch_siding)/(switch_gouhan+num_board+switch_siding+1),move_y-0.001-wid_d-sid_thi-0.001,siding_down,code,siding_down,2:code=code+1
+
+		hotspot len*(switch_gouhan+num_board+switch_siding)/(switch_gouhan+num_board+switch_siding+1),move_y-0.001-wid_d-sid_thi-0.001,hei,code,siding_up,1+128:code=code+1
+		hotspot len*(switch_gouhan+num_board+switch_siding)/(switch_gouhan+num_board+switch_siding+1),move_y-0.001-wid_d-sid_thi-0.001,hei-1,code,siding_up,3:code=code+1
+		hotspot len*(switch_gouhan+num_board+switch_siding)/(switch_gouhan+num_board+switch_siding+1),move_y-0.001-wid_d-sid_thi-0.001,hei+siding_up,code,siding_up,2:code=code+1
+	if reverse then del 1
+endif
+
+
+!=======================================天端シール
+group "siding_top_seal"
+	material m_top_seal
+
+	if switch_mendo then
+		pass_num=0
+
+		if corner_L=1 or corner_L=2 then
+			if corner_L=1 then
+				if roof_cut then
+					pass_num=pass_num+4
+
+					put -offset_start_d_temp-corner_wid,move_y-0.001-wid_d-0.001+corner_wid+1,hei+siding_up-cut_xzL[1][2],0
+					put -offset_start_d_temp-corner_wid,move_y-0.001-wid_d-0.001+corner_wid,hei+siding_up-cut_xzL[1][2],0
+					put -offset_start_d_temp-corner_wid,move_y-0.001-wid_d-0.001,hei+siding_up-cut_xzL[1][2],0
+					put cut_xzL[1][1],move_y-0.001-wid_d-0.001,hei+siding_up,0
+				else
+					pass_num=pass_num+3
+
+					put -offset_start_d_temp-corner_wid,move_y-0.001-wid_d-0.001+corner_wid+1,hei+siding_up,0
+					put -offset_start_d_temp-corner_wid,move_y-0.001-wid_d-0.001+corner_wid,hei+siding_up,0
+					put -offset_start_d_temp-corner_wid,move_y-0.001-wid_d-0.001,hei+siding_up,0
+				endif
+			else
+				if roof_cut then
+					pass_num=pass_num+4
+
+					put -offset_start_d_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001-sid_thi-corner_wid-1,hei+siding_up-cut_xzL[1][2],0
+					put -offset_start_d_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001-sid_thi-corner_wid,hei+siding_up-cut_xzL[1][2],0
+					put -offset_start_d_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001,hei+siding_up-cut_xzL[1][2],0
+					put cut_xzL[1][1],move_y-0.001-wid_d-0.001,hei+siding_up,0
+				else
+					pass_num=pass_num+3
+
+					put -offset_start_d_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001-sid_thi-corner_wid-1,hei+siding_up,0
+					put -offset_start_d_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001-sid_thi-corner_wid,hei+siding_up,0
+					put -offset_start_d_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001,hei+siding_up,0
+				endif
+			endif
+		else
+			if roof_cut then
+				pass_num=pass_num+3
+
+				put -2*offset_start_d_temp-cut_xzL[1][1]-0.001,move_y-0.001-wid_d-0.001,hei+siding_up,0
+				put -offset_start_d_temp,move_y-0.001-wid_d-0.001,hei+siding_up-cut_xzL[1][2],0
+				put cut_xzL[1][1],move_y-0.001-wid_d-0.001,hei+siding_up,0
+			else
+				pass_num=pass_num+2
+
+				put -offset_start_d_temp-1,move_y-0.001-wid_d-0.001,hei+siding_up,0
+				put -offset_start_d_temp,move_y-0.001-wid_d-0.001,hei+siding_up,0
+			endif
+		endif
+
+		if corner_R=1 or corner_R=2 then
+			if corner_R=1 then
+				if roof_cut then
+					pass_num=pass_num+4
+
+					put len-cut_xzR[1][1],move_y-0.001-wid_d-0.001,hei+siding_up,0
+					put len+offset_end_d_temp+corner_wid,move_y-0.001-wid_d-0.001,hei+siding_up-cut_xzR[1][2],0
+					put len+offset_end_d_temp+corner_wid,move_y-0.001-wid_d-0.001+corner_wid,hei+siding_up-cut_xzR[1][2],0
+					put len+offset_end_d_temp+corner_wid,move_y-0.001-wid_d-0.001+corner_wid+1,hei+siding_up-cut_xzR[1][2],0
+				else
+					pass_num=pass_num+3
+
+					put len+offset_end_d_temp+corner_wid,move_y-0.001-wid_d-0.001,hei+siding_up,0
+					put len+offset_end_d_temp+corner_wid,move_y-0.001-wid_d-0.001+corner_wid,hei+siding_up,0
+					put len+offset_end_d_temp+corner_wid,move_y-0.001-wid_d-0.001+corner_wid+1,hei+siding_up,0
+				endif
+			else
+				if roof_cut then
+					pass_num=pass_num+4
+
+					put len-cut_xzR[1][1],move_y-0.001-wid_d-0.001,hei+siding_up,0
+					put len+offset_end_d_temp+corner_wid+sid_thi,move_y-0.001-wid_d-0.001,hei+siding_up-cut_xzR[1][2],0
+					put len+offset_end_d_temp+corner_wid+sid_thi,move_y-0.001-wid_d-0.001-corner_wid-sid_thi,hei+siding_up-cut_xzR[1][2],0
+					put len+offset_end_d_temp+corner_wid+sid_thi,move_y-0.001-wid_d-0.001-corner_wid-sid_thi-1,hei+siding_up-cut_xzR[1][2],0
+				else
+					pass_num=pass_num+3
+
+					put len+offset_end_d_temp+corner_wid+sid_thi,move_y-0.001-wid_d-0.001,hei+siding_up,0
+					put len+offset_end_d_temp+corner_wid+sid_thi,move_y-0.001-wid_d-0.001-corner_wid-sid_thi,hei+siding_up,0
+					put len+offset_end_d_temp+corner_wid+sid_thi,move_y-0.001-wid_d-0.001-corner_wid-sid_thi-1,hei+siding_up,0
+				endif
+			endif
+		else
+			if roof_cut then
+				pass_num=pass_num+3
+				
+				put len-cut_xzR[1][1],move_y-0.001-wid_d-0.001,hei+siding_up,0
+				put len+offset_end_d_temp,move_y-0.001-wid_d-0.001,hei+siding_up-cut_xzR[1][2],0
+				put len+2*offset_end_d_temp+cut_xzR[1][1]+0.001,move_y-0.001-wid_d-0.001,hei+siding_up,0
+			else
+				pass_num=pass_num+2
+				
+				put len+offset_end_d_temp,move_y-0.001-wid_d-0.001,hei+siding_up,0
+				put len+offset_end_d_temp+1,move_y-0.001-wid_d-0.001,hei+siding_up,0
+			endif
+		endif
+
+		tube 5,pass_num,1+2+16+32+64,
+		-sid_thi,0,0,
+		-sid_thi-0.001,0,0,
+		-sid_thi-0.001,-top_seal_wid,0,
+		-sid_thi,-top_seal_wid,0,
+		-sid_thi,0,0,
+		get(pass_num*4)
+	endif
+endgroup
+
+
+group "siding_top_op"
+	material m_drainer
+
+	if switch_siding and switch_drainer and switch_op then
+		for i=1 to win_num
+			if win_xz[i][2]+win_hei[i]>hei-0.03 then
+				add win_xz2[i][1]+offset_win,move_y-0.001-wid_d-0.02-corner_wid,hei+siding_up-top_seal_wid
+					block win_wid2[i]-2*offset_win,0.02+2*corner_wid,top_seal_wid+mendo_hei
+				del 1
+			endif
+		next i
+	endif
+
+	if switch_polygon then
+		for i=1 to num_polygon
+			for j=1 to point_polygon[i]
+				put coo_polygon[2*j-1][i],(move_y-0.001-wid_d-sid_thi-0.001)-corner_wid,coo_polygon[2*j][i],0
+			next j
+			
+			for j=1 to point_polygon[i]
+				put coo_polygon[2*j-1][i],(move_y2+0.001+wid_d+0.001)+corner_wid,coo_polygon[2*j][i]
+			next j
+
+			ruledsegmented point_polygon[i],1+2+4+16+32+64,
+			get(nsp)
+		next i
+	endif
+endgroup
+
+
+!=======================================天端見切り
+group "siding_top_mendo"
+	material m_mendo
+
+	if switch_mendo then
+		pass_num=0
+
+		if corner_L=1 or corner_L=2 then
+			if corner_L=1 then
+				if roof_cut then
+					pass_num=pass_num+4
+
+					put -offset_start_d_temp-corner_wid,move_y-0.001-wid_d-0.001+corner_wid+1,hei+siding_up-cut_xzL[1][2],0
+					put -offset_start_d_temp-corner_wid,move_y-0.001-wid_d-0.001+corner_wid,hei+siding_up-cut_xzL[1][2],0
+					put -offset_start_d_temp-corner_wid,move_y-0.001-wid_d-0.001,hei+siding_up-cut_xzL[1][2],0
+					put cut_xzL[1][1],move_y-0.001-wid_d-0.001,hei+siding_up,0
+				else
+					pass_num=pass_num+3
+
+					put -offset_start_d_temp-corner_wid,move_y-0.001-wid_d-0.001+corner_wid+1,hei+siding_up,0
+					put -offset_start_d_temp-corner_wid,move_y-0.001-wid_d-0.001+corner_wid,hei+siding_up,0
+					put -offset_start_d_temp-corner_wid,move_y-0.001-wid_d-0.001,hei+siding_up,0
+				endif
+			else
+				if roof_cut then
+					pass_num=pass_num+4
+
+					put -offset_start_d_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001-sid_thi-corner_wid-1,hei+siding_up-cut_xzL[1][2],0
+					put -offset_start_d_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001-sid_thi-corner_wid,hei+siding_up-cut_xzL[1][2],0
+					put -offset_start_d_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001,hei+siding_up-cut_xzL[1][2],0
+					put cut_xzL[1][1],move_y-0.001-wid_d-0.001,hei+siding_up,0
+				else
+					pass_num=pass_num+3
+
+					put -offset_start_d_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001-sid_thi-corner_wid-1,hei+siding_up,0
+					put -offset_start_d_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001-sid_thi-corner_wid,hei+siding_up,0
+					put -offset_start_d_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001,hei+siding_up,0
+				endif
+			endif
+		else
+			if roof_cut then
+				pass_num=pass_num+3
+
+				put -2*offset_start_d_temp-cut_xzL[1][1]-0.001,move_y-0.001-wid_d-0.001,hei+siding_up,0
+				put -offset_start_d_temp,move_y-0.001-wid_d-0.001,hei+siding_up-cut_xzL[1][2],0
+				put cut_xzL[1][1],move_y-0.001-wid_d-0.001,hei+siding_up,0
+			else
+				pass_num=pass_num+2
+
+				put -offset_start_d_temp-1,move_y-0.001-wid_d-0.001,hei+siding_up,0
+				put -offset_start_d_temp,move_y-0.001-wid_d-0.001,hei+siding_up,0
+			endif
+		endif
+
+		if corner_R=1 or corner_R=2 then
+			if corner_R=1 then
+				if roof_cut then
+					pass_num=pass_num+4
+
+					put len-cut_xzR[1][1],move_y-0.001-wid_d-0.001,hei+siding_up,0
+					put len+offset_end_d_temp+corner_wid,move_y-0.001-wid_d-0.001,hei+siding_up-cut_xzR[1][2],0
+					put len+offset_end_d_temp+corner_wid,move_y-0.001-wid_d-0.001+corner_wid,hei+siding_up-cut_xzR[1][2],0
+					put len+offset_end_d_temp+corner_wid,move_y-0.001-wid_d-0.001+corner_wid+1,hei+siding_up-cut_xzR[1][2],0
+				else
+					pass_num=pass_num+3
+
+					put len+offset_end_d_temp+corner_wid,move_y-0.001-wid_d-0.001,hei+siding_up,0
+					put len+offset_end_d_temp+corner_wid,move_y-0.001-wid_d-0.001+corner_wid,hei+siding_up,0
+					put len+offset_end_d_temp+corner_wid,move_y-0.001-wid_d-0.001+corner_wid+1,hei+siding_up,0
+				endif
+			else
+				if roof_cut then
+					pass_num=pass_num+4
+
+					put len-cut_xzR[1][1],move_y-0.001-wid_d-0.001,hei+siding_up,0
+					put len+offset_end_d_temp+corner_wid+sid_thi,move_y-0.001-wid_d-0.001,hei+siding_up-cut_xzR[1][2],0
+					put len+offset_end_d_temp+corner_wid+sid_thi,move_y-0.001-wid_d-0.001-corner_wid-sid_thi,hei+siding_up-cut_xzR[1][2],0
+					put len+offset_end_d_temp+corner_wid+sid_thi,move_y-0.001-wid_d-0.001-corner_wid-sid_thi-1,hei+siding_up-cut_xzR[1][2],0
+				else
+					pass_num=pass_num+3
+
+					put len+offset_end_d_temp+corner_wid+sid_thi,move_y-0.001-wid_d-0.001,hei+siding_up,0
+					put len+offset_end_d_temp+corner_wid+sid_thi,move_y-0.001-wid_d-0.001-corner_wid-sid_thi,hei+siding_up,0
+					put len+offset_end_d_temp+corner_wid+sid_thi,move_y-0.001-wid_d-0.001-corner_wid-sid_thi-1,hei+siding_up,0
+				endif
+			endif
+		else
+			if roof_cut then
+				pass_num=pass_num+3
+				
+				put len-cut_xzR[1][1],move_y-0.001-wid_d-0.001,hei+siding_up,0
+				put len+offset_end_d_temp,move_y-0.001-wid_d-0.001,hei+siding_up-cut_xzR[1][2],0
+				put len+2*offset_end_d_temp+cut_xzR[1][1]+0.001,move_y-0.001-wid_d-0.001,hei+siding_up,0
+			else
+				pass_num=pass_num+2
+				
+				put len+offset_end_d_temp,move_y-0.001-wid_d-0.001,hei+siding_up,0
+				put len+offset_end_d_temp+1,move_y-0.001-wid_d-0.001,hei+siding_up,0
+			endif
+		endif
+
+		tube 20,pass_num,1+2+16+32+64,
+		0,0,0,
+		-sid_thi-mendo_wid/5-0.001,0,0,
+		-sid_thi-mendo_wid/5-0.001,mendo_hei-0.001,0,
+		-sid_thi-mendo_wid+0.001,mendo_hei-0.001,0,
+		-sid_thi-mendo_wid*3/5,mendo_hei-0.001,0,
+		-sid_thi-mendo_wid*2/5,mendo_hei/3,0,
+		-sid_thi-mendo_wid*2/5,0,0,
+		-sid_thi-mendo_wid*3/5,0,0,
+		-sid_thi-mendo_wid*4/5,mendo_hei/3,0,
+		-sid_thi-mendo_wid*4/5,mendo_hei/3+0.001,0,
+		-sid_thi-mendo_wid*3/5,0.001,0,
+		-sid_thi-mendo_wid*2/5-0.001,0.001,0,
+		-sid_thi-mendo_wid*2/5-0.001,mendo_hei/3,0,
+		-sid_thi-mendo_wid*3/5,mendo_hei-0.002,0,
+		-sid_thi-mendo_wid,mendo_hei-0.002,0,
+		-sid_thi-mendo_wid,mendo_hei,0,
+		-sid_thi-mendo_wid/5,mendo_hei,0,
+		-sid_thi-mendo_wid/5,0.001,0,
+		0,0.001,0,
+		0,0,0,
+		get(pass_num*4)
+	endif
+endgroup
+
+siding_top_seal_1=subgroup("siding_top_seal","siding_top_op")
+siding_top_mendo_1=subgroup("siding_top_mendo","siding_top_op")
+
+if switch_mendo then
+	placegroup siding_top_seal_1
+	placegroup siding_top_mendo_1
+endif
+
+
+!=======================================下端水切り
+offset_start_m_temp=offset_start_m-wid2_d/2+joiner_wid/2
+offset_end_m_temp=offset_end_m-wid2_d/2+joiner_wid/2
+
+group "down_drainer"
+	material m_drainer
+
+	if switch_siding and switch_drainer then
+		pass_num=0
+
+		if corner_L=1 or corner_L=2 then
+			pass_num=pass_num+3
+
+			if corner_L=1 then
+				put -offset_start_m_temp-corner_wid,move_y-0.001-wid_d-0.001+corner_wid+1,siding_down,0
+				put -offset_start_m_temp-corner_wid,move_y-0.001-wid_d-0.001+corner_wid,siding_down,0
+				put -offset_start_m_temp-corner_wid,move_y-0.001-wid_d-0.001,siding_down,0
+			else
+				put -offset_start_m_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001-sid_thi-corner_wid-1,siding_down,0
+				put -offset_start_m_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001-sid_thi-corner_wid,siding_down,0
+				put -offset_start_m_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001,siding_down,0
+			endif
+		else
+			pass_num=pass_num+2
+			put -offset_start_m_temp-1,move_y-0.001-wid_d-0.001,siding_down,0
+			put -offset_start_m_temp,move_y-0.001-wid_d-0.001,siding_down,0
+		endif
+
+		if corner_R=1 or corner_R=2 then
+			pass_num=pass_num+3
+
+			if corner_R=1 then
+				put len+offset_end_m_temp+corner_wid,move_y-0.001-wid_d-0.001,siding_down,0
+				put len+offset_end_m_temp+corner_wid,move_y-0.001-wid_d-0.001+corner_wid,siding_down,0
+				put len+offset_end_m_temp+corner_wid,move_y-0.001-wid_d-0.001+corner_wid+1,siding_down,0
+			else
+				put len+offset_end_m_temp+corner_wid+sid_thi,move_y-0.001-wid_d-0.001,siding_down,0
+				put len+offset_end_m_temp+corner_wid+sid_thi,move_y-0.001-wid_d-0.001-corner_wid-sid_thi,siding_down,0
+				put len+offset_end_m_temp+corner_wid+sid_thi,move_y-0.001-wid_d-0.001-corner_wid-sid_thi-1,siding_down,0
+			endif
+		else
+			pass_num=pass_num+2
+			put len+offset_end_m_temp,move_y-0.001-wid_d-0.001,siding_down,0
+			put len+offset_end_m_temp+1,move_y-0.001-wid_d-0.001,siding_down,0
+		endif
+
+		tube 9,pass_num,1+2+16+32+64,
+		0,0.03,0,
+		0,-drainer_hei/3,0,
+		-sid_thi-drainer_wid,-drainer_hei,0,
+		-sid_thi-drainer_wid,-drainer_hei-drainer_low,0,
+		-sid_thi-drainer_wid+0.001,-drainer_hei-drainer_low,0,
+		-sid_thi-drainer_wid+0.001,-drainer_hei,0,
+		0.001,-drainer_hei/3,0,
+		0.001,0.03,0,
+		0,0.03,0,
+		get(pass_num*4)
+	endif
+endgroup
+
+
+group "down_drainer_op"
+	material m_drainer
+
+	if switch_siding and switch_drainer and switch_op then
+		for i=1 to win_num
+			if win_xz[i][2]<0.03 then
+				add win_xz2[i][1]+offset_win,move_y-0.001-wid_d-0.02-corner_wid,-drainer_low-drainer_hei
+					block win_wid2[i]-2*offset_win,0.02+2*corner_wid,drainer_low+drainer_hei+0.03
+				del 1
+			endif
+		next i
+	endif
+
+	if switch_polygon then
+		for i=1 to num_polygon
+			for j=1 to point_polygon[i]
+				put coo_polygon[2*j-1][i],(move_y-0.001-wid_d-sid_thi-0.001)-corner_wid,coo_polygon[2*j][i],0
+			next j
+			
+			for j=1 to point_polygon[i]
+				put coo_polygon[2*j-1][i],(move_y2+0.001+wid_d+0.001)+corner_wid,coo_polygon[2*j][i]
+			next j
+
+			ruledsegmented point_polygon[i],1+2+4+16+32+64,
+			get(nsp)
+		next i
+	endif
+endgroup
+
+down_drainer_1=subgroup("down_drainer","down_drainer_op")
+
+if switch_siding and switch_drainer then
+	placegroup down_drainer_1
+
+	if corner_L=0 then
+		hotspot 0,move_y-0.001-wid_d-0.02,-drainer_low-drainer_hei,code,offset_start_m,1+128:code=code+1
+		hotspot 1,move_y-0.001-wid_d-0.02,-drainer_low-drainer_hei,code,offset_start_m,3:code=code+1
+		hotspot -offset_start_m,move_y-0.001-wid_d-0.02,-drainer_low-drainer_hei,code,offset_start_m,2:code=code+1
+	endif
+
+	if corner_R=0 then
+		hotspot len,move_y-0.001-wid_d-0.02,-drainer_low-drainer_hei,code,offset_end_m,1+128:code=code+1
+		hotspot len-1,move_y-0.001-wid_d-0.02,-drainer_low-drainer_hei,code,offset_end_m,3:code=code+1
+		hotspot len+offset_end_m,move_y-0.001-wid_d-0.02,-drainer_low-drainer_hei,code,offset_end_m,2:code=code+1
+	endif
+endif
+
+
+!=======================================外巾木
+group "baseboard"
+	if baseboard_num then
+		!巾木
+		thi_offset=0
+
+		for i=1 to baseboard_num
+			material baseboard_m[i]
+
+			pass_num=0
+	
+			if corner_L=1 or corner_L=2 then
+				pass_num=pass_num+3
+
+				if corner_L=1 then
+					put -offset_start_m_temp-corner_wid,move_y-0.001-wid_d-0.001+corner_wid+1,siding_down,0
+					put -offset_start_m_temp-corner_wid,move_y-0.001-wid_d-0.001+corner_wid,siding_down,0
+					put -offset_start_m_temp-corner_wid,move_y-0.001-wid_d-0.001,siding_down,0
+				else
+					put -offset_start_m_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001-sid_thi-corner_wid-1,siding_down,0
+					put -offset_start_m_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001-sid_thi-corner_wid,siding_down,0
+					put -offset_start_m_temp-corner_wid-sid_thi,move_y-0.001-wid_d-0.001,siding_down,0
+				endif
+			else
+				pass_num=pass_num+2
+				put -offset_start_m_temp-1,move_y-0.001-wid_d-0.001,siding_down,0
+				put -offset_start_m_temp,move_y-0.001-wid_d-0.001,siding_down,0
+			endif
+	
+			if corner_R=1 or corner_R=2 then
+				pass_num=pass_num+3
+
+				if corner_R=1 then
+					put len+offset_end_m_temp+corner_wid,move_y-0.001-wid_d-0.001,siding_down,0
+					put len+offset_end_m_temp+corner_wid,move_y-0.001-wid_d-0.001+corner_wid,siding_down,0
+					put len+offset_end_m_temp+corner_wid,move_y-0.001-wid_d-0.001+corner_wid+1,siding_down,0
+				else
+					put len+offset_end_m_temp+corner_wid+sid_thi,move_y-0.001-wid_d-0.001,siding_down,0
+					put len+offset_end_m_temp+corner_wid+sid_thi,move_y-0.001-wid_d-0.001-corner_wid-sid_thi,siding_down,0
+					put len+offset_end_m_temp+corner_wid+sid_thi,move_y-0.001-wid_d-0.001-corner_wid-sid_thi-1,siding_down,0
+				endif
+			else
+				pass_num=pass_num+2
+				put len+offset_end_m_temp,move_y-0.001-wid_d-0.001,siding_down,0
+				put len+offset_end_m_temp+1,move_y-0.001-wid_d-0.001,siding_down,0
+			endif
+			
+			addz -baseboard_offset
+				tube 4,pass_num,1+2+16+32+64,
+				-thi_offset,0,0,
+				-thi_offset-baseboard_thi[i],0,0,
+				-thi_offset-baseboard_thi[i],-baseboard_hei,0,
+				-thi_offset,-baseboard_hei,0,
+				get(pass_num*4)
+			del 1
+
+			thi_offset=thi_offset+baseboard_thi[i]
+		next i
+	endif
+endgroup
+
+
+group "baseboard_op"
+	material m_drainer
+
+	if switch_siding and switch_drainer and switch_op then
+		for i=1 to win_num
+			if win_xz[i][2]<=0 then
+				add win_xz2[i][1]+offset_win,move_y-0.001-wid_d-0.02-corner_wid,-baseboard_offset-baseboard_hei
+					block win_wid2[i]-2*offset_win,0.02+2*corner_wid,baseboard_hei
+				del 1
+			endif
+		next i
+	endif
+
+	if switch_polygon then
+		for i=1 to num_polygon
+			for j=1 to point_polygon[i]
+				put coo_polygon[2*j-1][i],(move_y-0.001-wid_d-sid_thi-0.001)-corner_wid,coo_polygon[2*j][i],0
+			next j
+			
+			for j=1 to point_polygon[i]
+				put coo_polygon[2*j-1][i],(move_y2+0.001+wid_d+0.001)+corner_wid,coo_polygon[2*j][i]
+			next j
+
+			ruledsegmented point_polygon[i],1+2+4+16+32+64,
+			get(nsp)
+		next i
+	endif
+endgroup
+
+baseboard_1=subgroup("baseboard","baseboard_op")
+!placegroup "baseboard_op"
+
+if switch_baseboard then
+	placegroup baseboard_1
+endif
+
+
+!==========================================================================内側サイデイング(バルコニーのパラペット利用)
+!=======================================防水シート
+group "sheet_back"
+	material m_sheet
+
+	if switch_siding_back then
+		add -offset_start_b2,move_y2,siding_down2
+			block len+offset_start_b2+offset_end_b2,0.001,hei+siding_up-siding_down2
+		del 1
+	endif
+endgroup
+
+placegroup "sheet_back"
+
+sheet_back1= subgroup ("sheet_back","win3")
+sheet_back2= subgroup (sheet_back1,"beam_op1")
+sheet_back3= subgroup (sheet_back2,"floor_op")
+sheet_back4= subgroup{3} (sheet_back3,"sloping",m_sheet,m_sheet,m_sheet)
+
+if switch_siding_back then
+	if reverse then muly -1
+		placegroup sheet_back4
+	if reverse then del 1
+endif
+
+
+!=======================================胴縁
+group "doubuchi_back"
+	material m_doubuchi
+
+	if switch_siding_back then
+		if direction=1 then !縦
+			loopx=ceil((len+offset_start_d2+offset_end_d2-2*wid2_d)/pitch_d)
+
+			add -offset_start_d2,move_y2+0.001,siding_down2
+				for i=1 to loopx
+					block wid2_d,wid_d,hei+siding_up-siding_down2
+				addx pitch_d
+				next i
+				del loopx
+			del 1
+
+			add len+offset_end_d2-wid2_d,move_y2+0.001,siding_down2
+				block wid2_d,wid_d,hei+siding_up-siding_down2
+			del 1
+		endif
+		
+		if direction=2 then !横
+			loopz=ceil((hei+siding_up-siding_down2-pitch_d-wid2_d)/pitch_d)
+	
+			add -offset_start_d2,move_y2+0.001,siding_down2
+				for i=1 to loopz
+				addz pitch_d
+					block len+offset_start_d2+offset_end_d2,wid_d,wid2_d
+				next i
+				del loopz
+			del 1
+		endif
+	endif
+endgroup
+
+doubuchi_back1= subgroup ("doubuchi_back","win4")
+doubuchi_back2= subgroup (doubuchi_back1,"beam_op1")
+doubuchi_back3= subgroup (doubuchi_back2,"floor_op")
+doubuchi_back4= subgroup{3} (doubuchi_back3,"sloping",m_doubuchi,m_doubuchi,m_doubuchi)
+
+
+!=======================================ハットジョイナー
+group "joiner_back"
+	material m_joiner
+
+	if switch_siding_back then
+		if direction=1 then !縦
+			loopx=ceil((len+offset_start_d2+offset_end_d2-2*wid2_d)/sid_len)
+
+			add -offset_start_d2+wid2_d/2,move_y2+0.001+wid_d,siding_down2+0.01
+				for i=1 to loopx
+					extrude 13,0,0,hei+siding_up-siding_down2-0.02,1+2+4+16,
+					-joiner_wid/2-0.01,0,0,
+					-joiner_wid/2+0.001,0,0,
+					-joiner_wid/2+0.001,0.009,0,
+					joiner_wid/2-0.001,0.009,0,
+					joiner_wid/2-0.001,0,0,
+					joiner_wid/2+0.01,0,0,
+					joiner_wid/2+0.01,0.001,0,
+					joiner_wid/2,0.001,0,
+					joiner_wid/2,0.01,0,
+					-joiner_wid/2,0.01,0,
+					-joiner_wid/2,0.001,0,
+					-joiner_wid/2-0.01,0.001,0,
+					-joiner_wid/2-0.01,0,0
+				addx sid_len
+				next i
+				del loopx
+			del 1
+
+			add len+offset_end_d2-wid2_d/2,move_y2+0.001+wid_d,siding_down2+0.01
+				extrude 13,0,0,hei+siding_up-siding_down2-0.02,1+2+4+16,
+				-joiner_wid/2-0.01,0,0,
+				-joiner_wid/2+0.001,0,0,
+				-joiner_wid/2+0.001,0.009,0,
+				joiner_wid/2-0.001,0.009,0,
+				joiner_wid/2-0.001,0,0,
+				joiner_wid/2+0.01,0,0,
+				joiner_wid/2+0.01,0.001,0,
+				joiner_wid/2,0.001,0,
+				joiner_wid/2,0.01,0,
+				-joiner_wid/2,0.01,0,
+				-joiner_wid/2,0.001,0,
+				-joiner_wid/2-0.01,0.001,0,
+				-joiner_wid/2-0.01,0,0
+			del 1
+		endif
+	endif
+endgroup
+
+joiner_back1= subgroup ("joiner_back","win4")
+joiner_back2= subgroup (joiner_back1,"beam_op1")
+joiner_back3= subgroup (joiner_back2,"floor_op")
+joiner_back4= subgroup{3} (joiner_back3,"sloping",m_joiner,m_joiner,m_joiner)
+
+
+!=======================================サイディング
+group "siding_back"
+	material m_siding2
+	
+	add -offset_start_d2+wid2_d/2+joiner_wid/2,move_y2+0.001+wid_d+0.001,siding_down2
+		block len+offset_start_d2+offset_end_d2-wid2_d-joiner_wid,sid_thi,hei+siding_up-siding_down2
+	del 1
+endgroup
+
+
+group "siding_joint_back"
+	material m_siding2
+
+	if switch_siding_back then
+		if direction=1 then !横
+			loopx=ceil((len+offset_start_d2+offset_end_d2-joiner_wid-wid2_d)/sid_len)
+	
+			add -offset_start_d2-joiner_wid/2+wid2_d/2,move_y2+0.001+wid_d+0.001,siding_down2
+				for i=1 to loopx
+					block joiner_wid,sid_thi,hei+siding_up-siding_down2
+				addx sid_len
+				next i
+				del loopx
+			del 1
+
+			add len+offset_end_d2-wid2_d/2-joiner_wid/2,move_y2+0.001+wid_d+0.001,siding_down2
+				block joiner_wid,sid_thi,hei+siding_up-siding_down2
+			del 1
+
+			loopz=ceil((hei+siding_up-siding_down2-sid_wid)/sid_wid)
+
+			add -offset_start_d2+wid2_d/2,move_y2+0.001+wid_d+0.001,siding_down2-0.001
+				for i=1 to loopz
+				addz sid_wid
+					block len+offset_start_d2+offset_end_d2-wid2_d,sid_thi,0.001
+				next i
+				del loopz
+			del 1
+
+			add -offset_start_d2+wid2_d/2,move_y2+0.001+wid_d+0.001,hei+siding_up-0.001
+				block len+offset_start_d2+offset_end_d2-wid2_d,sid_thi,0.001
+			del 1
+		endif
+	endif
+endgroup
+
+siding_back1= subgroup ("siding_back","siding_joint_back")
+siding_back2= subgroup (siding_back1,"win3")
+siding_back3= subgroup (siding_back2,"beam_op1")
+siding_back4= subgroup (siding_back3,"floor_op")
+siding_back5= subgroup{2} (siding_back4,"sloping",m_siding2,m_siding2,m_siding2)
+
+
+!=======================================シール
+group "seal_back"
+	material m_seal
+
+	if switch_siding_back then
+		if direction=1 then !横
+			loopx=ceil((len+offset_start_d2+offset_end_d2-2*wid2_d)/sid_len)
+	
+			add -offset_start_d2-joiner_wid/2+wid2_d/2,move_y2+0.001+wid_d+0.01,siding_down2
+				for i=1 to loopx
+					block joiner_wid,sid_thi-0.009,hei+siding_up-siding_down2
+				addx sid_len
+				next i
+				del loopx
+			del 1
+
+			add len+offset_end_d2-wid2_d/2-joiner_wid/2,move_y2+0.001+wid_d+0.01,siding_down2
+				block joiner_wid,sid_thi-0.009,hei+siding_up-siding_down2
+			del 1
+		endif
+	endif
+endgroup
+
+seal_back1= subgroup ("seal_back","win3")
+seal_back2= subgroup (seal_back1,"beam_op1")
+seal_back3= subgroup (seal_back2,"floor_op")
+seal_back4= subgroup{2} (seal_back3,"sloping",m_seal,m_seal,m_seal)
+
+
+!=======================================コーナー
+group "siding_corner_back"
+	material m_corner2
+
+	if corner_L2=2 then !始点入隅
+		add -offset_start_d2+wid2_d/2-joiner_wid/2,move_y2+0.001+wid_d+0.001+sid_thi,siding_down2
+			tube 4,5,1+2+16,
+			0,0,0,
+			sid_thi,0,0,
+			sid_thi,hei+siding_up-siding_down2,0,
+			0,hei+siding_up-siding_down2,0,
+			corner_wid2,0,0,0,
+			0,0,0,0,
+			-corner_wid2,0,0,0,
+			-corner_wid2,corner_wid2,0,0,
+			-corner_wid2,2*corner_wid2,0,0
+		del 1
+	endif
+
+	if corner_L2=1 then !始点出隅
+		add -offset_start_d2+wid2_d/2-joiner_wid/2,move_y2+0.001+wid_d+0.001,siding_down2
+			tube 4,5,1+2+16,
+			0,0,0,
+			-sid_thi,0,0,
+			-sid_thi,hei+siding_up-siding_down2,0,
+			0,hei+siding_up-siding_down2,0,
+			corner_wid2,0,0,0,
+			0,0,0,0,
+			-corner_wid2,0,0,0,
+			-corner_wid2,-corner_wid2,0,0,
+			-corner_wid2,-2*corner_wid2,0,0
+		del 1
+	endif
+
+	if corner_R2=2 then !終点入隅
+		add len+offset_end_d2-wid2_d/2+joiner_wid/2,move_y2+0.001+wid_d+0.001+sid_thi,siding_down2
+			tube 4,5,1+2+16,
+			0,0,0,
+			-sid_thi,0,0,
+			-sid_thi,hei+siding_up-siding_down2,0,
+			0,hei+siding_up-siding_down2,0,
+			-corner_wid,0,0,0,
+			0,0,0,0,
+			corner_wid2,0,0,0,
+			corner_wid2,corner_wid2,0,0,
+			corner_wid2,2*corner_wid2,0,0
+		del 1
+	endif
+
+	if corner_R2=1 then !終点出隅
+		add len+offset_end_d2-wid2_d/2+joiner_wid/2,move_y2+0.001+wid_d+0.001,siding_down2
+			tube 4,5,1+2+16,
+			0,0,0,
+			sid_thi,0,0,
+			sid_thi,hei+siding_up-siding_down2,0,
+			0,hei+siding_up-siding_down2,0,
+			-corner_wid2,0,0,0,
+			0,0,0,0,
+			corner_wid2,0,0,0,
+			corner_wid2,-corner_wid2,0,0,
+			corner_wid2,-2*corner_wid2,0,0
+		del 1
+	endif
+endgroup
+
+
+group "coner_joint_back"
+	material m_corner2
+
+	if direction=1 then 
+		loopz=ceil((hei+siding_up-siding_down2-sid_wid-joiner_wid)/sid_wid)
+
+		add -offset_start_d2+wid2_d/2-joiner_wid/2-corner_wid2-sid_thi,move_y2+0.001+wid_d+0.001+sid_thi-corner_wid2-sid_thi,siding_down2-0.001
+			for i=1 to loopz
+			addz sid_wid
+				block corner_wid2+sid_thi,corner_wid2*2+sid_thi*2,0.001
+			next i
+			del loopz
+		del 1
+
+		add -offset_start_d2+wid2_d/2-joiner_wid/2-corner_wid2-sid_thi,move_y2+0.001+wid_d+0.001+sid_thi-corner_wid2-sid_thi,hei+siding_up-0.001
+			block corner_wid2+sid_thi,corner_wid2*2+sid_thi*2,0.001
+		del 1
+
+		loopz=ceil((hei+siding_up-siding_down2-sid_wid)/sid_wid)
+
+		add len+offset_end_d2-wid2_d/2+joiner_wid/2,move_y2+0.001+wid_d+0.001+sid_thi-corner_wid2-sid_thi,siding_down2-0.001
+			for i=1 to loopz
+			addz sid_wid
+				block corner_wid2+sid_thi,corner_wid2*2+sid_thi*2,0.001
+			next i
+			del loopz
+		del 1
+
+		add len+offset_end_d2-wid2_d/2+joiner_wid/2,move_y2+0.001+wid_d+0.001+sid_thi-corner_wid-sid_thi,hei+siding_up-0.001
+			block corner_wid2+sid_thi,corner_wid2*2+sid_thi*2,0.001
+		del 1
+	endif
+endgroup
+
+siding_corner_back1= subgroup ("siding_corner_back","coner_joint_back")
+siding_corner_back2= subgroup (siding_corner_back1,"win3")
+siding_corner_back3= subgroup (siding_corner_back2,"beam_op1")
+siding_corner_back4= subgroup (siding_corner_back3,"floor_op")
+siding_corner_back5= subgroup{3} (siding_corner_back4,"sloping",m_corner2,m_corner2,m_corner2)
+
+if switch_siding_back then
+	if reverse then muly -1
+		placegroup doubuchi_back4
+		placegroup joiner_back4
+		placegroup seal_back4
+		placegroup siding_back5
+		placegroup siding_corner_back5
+
+	if display_sidingspot then
+		hotspot len*(num_board2+switch_panel+switch_siding_back)/(num_board2+switch_panel+switch_siding_back+1),move_y2+0.002+wid_d+sid_thi,0,code,siding_down2,1+128:code=code+1
+		hotspot len*(num_board2+switch_panel+switch_siding_back)/(num_board2+switch_panel+switch_siding_back+1),move_y2+0.002+wid_d+sid_thi,-1,code,siding_down2,3:code=code+1
+		hotspot len*(num_board2+switch_panel+switch_siding_back)/(num_board2+switch_panel+switch_siding_back+1),move_y2+0.002+wid_d+sid_thi,siding_down2,code,siding_down2,2:code=code+1
+	
+		hotspot len*(num_board2+switch_panel+switch_siding_back)/(num_board2+switch_panel+switch_siding_back+1),move_y2+0.002+wid_d+sid_thi,hei,code,siding_up,1+128:code=code+1
+		hotspot len*(num_board2+switch_panel+switch_siding_back)/(num_board2+switch_panel+switch_siding_back+1),move_y2+0.002+wid_d+sid_thi,hei-1,code,siding_up,3:code=code+1
+		hotspot len*(num_board2+switch_panel+switch_siding_back)/(num_board2+switch_panel+switch_siding_back+1),move_y2+0.002+wid_d+sid_thiS,hei+siding_up,code,siding_up,2:code=code+1
+	endif
+
+	if reverse then del 1
+endif
+
+
+if vertexTurn then del 1
+del 3

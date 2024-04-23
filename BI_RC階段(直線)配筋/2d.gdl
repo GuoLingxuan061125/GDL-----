@@ -1,0 +1,11 @@
+project2{3} 3,270,2,1+2+4+8+16,parameters step_nosing=0,step_rat=0,disSD=0,disCL=0,disPOINT=0
+
+hotspot2 0,0
+hotspot2 0,stairWid
+hotspot2 stairNum*stairTread,0
+hotspot2 stairNum*stairTread,stairWid
+
+if switchLanding then
+    hotspot2 stairNum*stairTread+landingDep,0 
+    hotspot2 stairNum*stairTread+landingDep,stairWid
+endif

@@ -1,0 +1,408 @@
+project2 3,270,2
+hotspot2 0,0
+
+!hotspot offset_horizontal_Y
+hotspot2 0,-offset_horizontal_x,unID,offset_horizontal_Y,1+128 : unID=unID+1
+hotspot2 offset_horizontal_Y,-offset_horizontal_x,unID,offset_horizontal_Y,2 : unID=unID+1
+hotspot2 -1,-offset_horizontal_x,unID,offset_horizontal_Y,3 : unID=unID+1
+
+!hotspot offset_horizontal_x
+hotspot2 offset_horizontal_Y,0,unID,offset_horizontal_x,1+128 : unID=unID+1
+hotspot2 offset_horizontal_Y,-offset_horizontal_x,unID,offset_horizontal_x,2 : unID=unID+1
+hotspot2 offset_horizontal_Y,1,unID,offset_horizontal_x,3 : unID=unID+1
+
+!hotspot bolt_position_x
+if bolt_indication=1 then
+	hotspot2 offset_horizontal_Y,-offset_horizontal_x,unID,bolt_position_x,1+128 : unID=unID+1
+	hotspot2 offset_horizontal_Y,-offset_horizontal_x-bolt_position_x,unID,bolt_position_x,2 : unID=unID+1
+	hotspot2 offset_horizontal_Y,-offset_horizontal_x+1,unID,bolt_position_x,3 : unID=unID+1
+endif
+
+if product_name=1 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 0,-offset_horizontal_x-0.6/td
+
+    hotspot2 22.5/td,-offset_horizontal_x
+    hotspot2 22.5/td,-offset_horizontal_x-0.6/td
+
+    hotspot2 -22.5/td,-offset_horizontal_x
+    hotspot2 -22.5/td,-offset_horizontal_x-0.6/td
+endif
+
+if product_name=2 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 -15/td,-offset_horizontal_x
+    hotspot2 15/td,-offset_horizontal_x
+    hotspot2 -15/td,-offset_horizontal_x-30/td
+    hotspot2 15/td,-offset_horizontal_x-30/td
+endif
+
+if product_name=3 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 -15/td,-offset_horizontal_x
+    hotspot2 15/td,-offset_horizontal_x
+    hotspot2 -15/td,-offset_horizontal_x-30/td
+    hotspot2 15/td,-offset_horizontal_x-30/td
+endif
+
+if product_name=4 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 15/td,-offset_horizontal_x
+    hotspot2 -15/td,-offset_horizontal_x
+    hotspot2 -15/td, -offset_horizontal_x-40/td
+    hotspot2 15/td,-offset_horizontal_x-40/td
+    hotspot2 -13/td, -offset_horizontal_x-42/td
+    hotspot2 13/td, -offset_horizontal_x-42/td
+endif
+
+
+if product_name=5 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 25/td,-offset_horizontal_x
+    hotspot2 -25/td,-offset_horizontal_x
+    hotspot2 25/td,-offset_horizontal_x-73.2/td
+    hotspot2 -25/td,-offset_horizontal_x-73.2/td
+endif
+
+if product_name=6 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 20/td,-offset_horizontal_x
+    hotspot2 -20/td,-offset_horizontal_x
+    hotspot2 20/td,-offset_horizontal_x-6/td
+    hotspot2 -20/td,-offset_horizontal_x-6/td
+endif
+
+if product_name=7 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 20/td,-offset_horizontal_x
+    hotspot2 -20/td,-offset_horizontal_x
+    hotspot2 20/td,-offset_horizontal_x-16.6/td
+    hotspot2 -20/td,-offset_horizontal_x-16.6/td
+endif
+
+
+if product_name=8 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 -45/td, -offset_horizontal_x
+    hotspot2 45/td,-offset_horizontal_x
+    hotspot2 -45/td, -offset_horizontal_x-20/td
+    hotspot2 45/td,-offset_horizontal_x-20/td
+    hotspot2 -40/td, -offset_horizontal_x-26/td
+    hotspot2 40/td,-offset_horizontal_x-26/td
+endif
+
+if product_name=9 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 -15/td, -offset_horizontal_x
+    hotspot2 15/td,-offset_horizontal_x
+    hotspot2 -15/td, -offset_horizontal_x-20/td
+    hotspot2 15/td,-offset_horizontal_x-20/td
+    hotspot2 -13/td, -offset_horizontal_x-23/td
+    hotspot2 13/td,-offset_horizontal_x-23/td
+endif
+
+if product_name=10 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 0,-offset_horizontal_x-0.6/td
+    hotspot2 30/td,-offset_horizontal_x
+    hotspot2 30/td,-offset_horizontal_x-0.6/td
+    hotspot2 -30/td,-offset_horizontal_x
+    hotspot2 -30/td,-offset_horizontal_x-0.6/td
+endif
+
+if product_name=11 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 0,-offset_horizontal_x-0.6/td
+    hotspot2 35/td,-offset_horizontal_x
+    hotspot2 35/td,-offset_horizontal_x-0.6/td
+    hotspot2 -35/td,-offset_horizontal_x
+    hotspot2 -35/td,-offset_horizontal_x-0.6/td
+endif
+
+if product_name=12 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 15/td,-offset_horizontal_x
+    hotspot2 15/td,-offset_horizontal_x-1.6/td
+    hotspot2 -15/td,-offset_horizontal_x
+    hotspot2 -15/td,-offset_horizontal_x-1.6/td
+    hotspot2 -8/td, -offset_horizontal_x-10.7/td
+    hotspot2 -14/td, -offset_horizontal_x-24.3/td
+    hotspot2 -15/td, -offset_horizontal_x-35.2/td
+    hotspot2 -11.1/td, -offset_horizontal_x-40/td
+    hotspot2 11.1/td,-offset_horizontal_x -40/td
+    hotspot2 15/td, -offset_horizontal_x-35.2/td
+    hotspot2 14/td,-offset_horizontal_x -24.3/td
+    hotspot2 8/td, -offset_horizontal_x-10.7/td
+endif
+
+if product_name=13 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 15/td,-offset_horizontal_x
+    hotspot2 15/td,-offset_horizontal_x-1.6/td
+    hotspot2 -15/td,-offset_horizontal_x
+    hotspot2 -15/td,-offset_horizontal_x-1.6/td
+    hotspot2 -8/td, -offset_horizontal_x-10.7/td
+    hotspot2 -14/td, -offset_horizontal_x-24.3/td
+    hotspot2 -15/td, -offset_horizontal_x-35.2/td
+    hotspot2 -11.1/td, -offset_horizontal_x-40/td
+    hotspot2 11.1/td, -offset_horizontal_x-40/td
+    hotspot2 15/td, -offset_horizontal_x-35.2/td
+    hotspot2 14/td, -offset_horizontal_x-24.3/td
+    hotspot2 8/td, -offset_horizontal_x-10.7/td
+endif
+
+
+if product_name=14 or product_name=15  then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 15/td,-offset_horizontal_x
+    hotspot2 15/td,-offset_horizontal_x-2.3/td
+    hotspot2 -15/td,-offset_horizontal_x
+    hotspot2 -15/td,-offset_horizontal_x-2.3/td
+    hotspot2 -11.1/td, -offset_horizontal_x-50/td
+    hotspot2 11.1/td, -offset_horizontal_x-50/td
+    hotspot2 15/td, -offset_horizontal_x-46.5/td
+    hotspot2 -15/td, -offset_horizontal_x-46.5/td
+endif
+
+if product_name=16 or product_name=17  then
+    hotspot2 offset_horizontal_Y        ,-offset_horizontal_x
+    hotspot2 offset_horizontal_Y+22.5/td,-offset_horizontal_x
+    hotspot2 offset_horizontal_Y+22.5/td,-offset_horizontal_x-3.2/td
+    hotspot2 offset_horizontal_Y-22.5/td,-offset_horizontal_x
+    hotspot2 offset_horizontal_Y-22.5/td,-offset_horizontal_x-3.2/td
+    hotspot2 offset_horizontal_Y-20/td  ,-offset_horizontal_x-65/td
+    hotspot2 offset_horizontal_Y+20/td  ,-offset_horizontal_x-65/td
+    hotspot2 offset_horizontal_Y+22.5/td,-offset_horizontal_x-62.7/td
+    hotspot2 offset_horizontal_Y-22.5/td,-offset_horizontal_x-62.7/td
+endif
+
+
+if product_name=18  then
+    hotspot2 offset_horizontal_Y         ,-offset_horizontal_x
+    hotspot2 offset_horizontal_Y+27.5/td ,-offset_horizontal_x
+    hotspot2 offset_horizontal_Y+27.5/td ,-offset_horizontal_x-3.2/td
+    hotspot2 offset_horizontal_Y-27.5/td ,-offset_horizontal_x
+    hotspot2 offset_horizontal_Y-27.5/td ,-offset_horizontal_x-3.2/td
+    hotspot2 offset_horizontal_Y-25/td   ,-offset_horizontal_x-65/td
+    hotspot2 offset_horizontal_Y+25/td   ,-offset_horizontal_x-65/td
+    hotspot2 offset_horizontal_Y+27.5/td ,-offset_horizontal_x-63/td
+    hotspot2 offset_horizontal_Y-27.5/td ,-offset_horizontal_x-63/td
+endif
+
+if product_name=19  then
+    !hotspot2 offset_horizontal_Y+20/td,-offset_horizontal_x
+    !hotspot2 offset_horizontal_Y-20/td,-offset_horizontal_x
+    !hotspot2 offset_horizontal_Y+20/td,-offset_horizontal_x-3.2/td
+    !hotspot2 offset_horizontal_Y-20/td,-offset_horizontal_x-3.2/td
+endif
+
+if product_name=20 then
+    !hotspot2 offset_horizontal_Y+20.8/td,-offset_horizontal_x
+    !hotspot2 offset_horizontal_Y-20.8/td,-offset_horizontal_x
+    !hotspot2 offset_horizontal_Y+20.8/td,-offset_horizontal_x-4/td
+    !hotspot2 offset_horizontal_Y-20.8/td,-offset_horizontal_x-4/td
+endif
+
+if product_name=21 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 20.8/td,-offset_horizontal_x
+    hotspot2 -20.8/td,-offset_horizontal_x
+    hotspot2 20.8/td,-offset_horizontal_x-4/td
+    hotspot2 -20.8/td,-offset_horizontal_x-4/td
+endif
+
+if product_name=22 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 20.8/td,-offset_horizontal_x
+    hotspot2 -20.8/td,-offset_horizontal_x
+    hotspot2 20.8/td,-offset_horizontal_x-4/td
+    hotspot2 -20.8/td,-offset_horizontal_x-4/td
+endif
+
+if product_name=25 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 15/td,-offset_horizontal_x
+    hotspot2 -15/td,-offset_horizontal_x
+    hotspot2 15/td,-offset_horizontal_x-1.6/td
+    hotspot2 -15/td,-offset_horizontal_x-1.6/td
+    hotspot2 15/td,-offset_horizontal_x-42.3/td
+    hotspot2 -15/td,-offset_horizontal_x-42.3/td
+    hotspot2 -12.1/td,-offset_horizontal_x-45/td
+    hotspot2 12.1/td,-offset_horizontal_x-45/td
+endif
+
+if product_name=26 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 16/td,-offset_horizontal_x
+    hotspot2 -16/td,-offset_horizontal_x
+    hotspot2 16/td,-offset_horizontal_x-4/td
+    hotspot2 -16/td,-offset_horizontal_x-4/td
+endif
+
+if product_name=27 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 16/td,-offset_horizontal_x
+    hotspot2 -16/td,-offset_horizontal_x
+    hotspot2 16/td,-offset_horizontal_x-5/td
+    hotspot2 -16/td,-offset_horizontal_x-5/td
+endif
+
+if product_name=29 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 15/td,-offset_horizontal_x
+    hotspot2 -15/td,-offset_horizontal_x
+    hotspot2 15/td,-offset_horizontal_x-3.2/td
+    hotspot2 -15/td,-offset_horizontal_x-3.2/td
+    hotspot2 15/td,-offset_horizontal_x-55/td
+    hotspot2 -15/td,-offset_horizontal_x-55/td
+    hotspot2 10/td,-offset_horizontal_x-60/td
+    hotspot2 -10/td,-offset_horizontal_x-60/td
+endif
+
+if product_name=33 then
+    hotspot2 0,0.5*S_A
+endif
+
+if product_name=46 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 120/td,-offset_horizontal_x
+    hotspot2 -120/td,-offset_horizontal_x
+    hotspot2 120/td,-offset_horizontal_x-0.7/td
+    hotspot2 -120/td,-offset_horizontal_x-0.7/td
+endif
+
+if product_name=47 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 150/td,-offset_horizontal_x
+    hotspot2 -150/td,-offset_horizontal_x
+    hotspot2 150/td,-offset_horizontal_x-1.6/td
+    hotspot2 -150/td,-offset_horizontal_x-1.6/td
+endif
+
+if product_name=48 OR product_name=50 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 120/td,-offset_horizontal_x
+    hotspot2 -120/td,-offset_horizontal_x
+    hotspot2 120/td,-offset_horizontal_x-0.6/td
+    hotspot2 -120/td,-offset_horizontal_x-0.6/td
+endif
+
+
+!==========================52,"N-フリーダム筋交いプレート"=====================
+if product_name=52 then
+    if hardware_position=1 or hardware_position=3 then !左側
+        hotspot2 +offset_horizontal_Y,-offset_horizontal_x
+    endif 
+
+    if hardware_position=2 or hardware_position=4 then !右側
+        hotspot2 -offset_horizontal_Y,-offset_horizontal_x
+    endif 
+endif
+
+
+!==========================53,"ハイパーガゼットII"=====================
+if product_name=53 then
+    if hardware_position=1 or hardware_position=3 then !左側
+        hotspot2 +offset_horizontal_Y,-offset_horizontal_x
+    endif 
+
+    if hardware_position=2 or hardware_position=4 then !右側
+        hotspot2 -offset_horizontal_Y,-offset_horizontal_x
+    endif 
+endif
+
+if product_name=54 then
+    hotspot2 0,-offset_horizontal_x
+    hotspot2 10/td,-offset_horizontal_x
+    hotspot2 -10/td,-offset_horizontal_x
+    hotspot2 10/td,-offset_horizontal_x-2.3/td
+    hotspot2 -10/td,-offset_horizontal_x-2.3/td
+endif
+
+if product_name=601 then
+    if hardware_position=1 then
+        hotspot2 0,offset_horizontal_x
+        hotspot2 25/td,offset_horizontal_x
+        hotspot2 0.6/td,offset_horizontal_x+25/td
+        hotspot2 0,offset_horizontal_x+25/td
+        hotspot2 0.6/td,offset_horizontal_x+0.6/td
+        hotspot2 25/td,offset_horizontal_x+0.6/td
+    else
+        hotspot2 0,-offset_horizontal_x
+        hotspot2 25/td,-offset_horizontal_x
+        hotspot2 0.6/td,-offset_horizontal_x-25/td
+        hotspot2 0,-offset_horizontal_x-25/td
+        hotspot2 0.6/td,-offset_horizontal_x-0.6/td
+        hotspot2 25/td,-offset_horizontal_x-0.6/td
+    endif
+endif
+
+if product_name=602 then
+    if hardware_position=1 then
+        hotspot2 0,-offset_horizontal_x
+        hotspot2 25/td,-offset_horizontal_x
+        hotspot2 0.6/td,-offset_horizontal_x-25/td
+        hotspot2 0,-offset_horizontal_x-25/td
+        hotspot2 0.6/td,-offset_horizontal_x-0.6/td
+        hotspot2 25/td,-offset_horizontal_x-0.6/td
+    else
+        hotspot2 0,offset_horizontal_x
+        hotspot2 25/td,offset_horizontal_x
+        hotspot2 0.6/td,offset_horizontal_x+25/td
+        hotspot2 0,offset_horizontal_x+25/td
+        hotspot2 0.6/td,offset_horizontal_x+0.6/td
+        hotspot2 25/td,offset_horizontal_x+0.6/td
+    endif
+endif
+
+if product_name=61 or product_name=62 or product_name=63 or product_name=64 or product_name=65 then 
+    hotspot2 0.6+offset_horizontal_x,offset_horizontal_x
+    hotspot2 offset_horizontal_x,0.6+offset_horizontal_x
+endif 
+
+if product_name=61 & 0 then
+    hotspot2 637.8/td,offset_horizontal_x
+    hotspot2 684.7/td,offset_horizontal_x
+    hotspot2 offset_horizontal_x,637.8/td
+    hotspot2 offset_horizontal_x,684.7/td
+endif
+
+if product_name=62 & 0 then
+    hotspot2 637.8/td,offset_horizontal_x
+    hotspot2 703.7/td,offset_horizontal_x
+    hotspot2 offset_horizontal_x,637.8/td
+    hotspot2 offset_horizontal_x,703.7/td
+endif
+
+if product_name=63 & 0 then
+    !hotspot2 637.8/td,offset_horizontal_x
+    !hotspot2 684.7/td,offset_horizontal_x
+    !hotspot2 offset_horizontal_x,637.8/td
+    !hotspot2 offset_horizontal_x,684.7/td
+    hotspot2 0.6+offset_horizontal_x,offset_horizontal_x
+    hotspot2 offset_horizontal_x,0.6+offset_horizontal_x
+endif
+
+if product_name=64 & 0 then
+    hotspot2 639.3/td,offset_horizontal_x
+    hotspot2 674.5/td,offset_horizontal_x
+    hotspot2 offset_horizontal_x,639.3/td
+    hotspot2 offset_horizontal_x,674.5/td
+endif
+
+if product_name=65 & 0 then
+    hotspot2 0,offset_horizontal_x
+    !hotspot2 639.3/td,offset_horizontal_x
+    !hotspot2 674.5/td,offset_horizontal_x
+    !hotspot2 offset_horizontal_x,639.3/td
+    !hotspot2 offset_horizontal_x,674.5/td
+endif
+
+
+
+!if bolt_name=1 then 
+!    HOTSPOT2 16/td,0 ,unID, bolt_orientation, 4+128 :unID=unID+1
+!    HOTSPOT2 16/td*COS(bolt_orientation), 16/td*SIN(bolt_orientation), unID, bolt_orientation, 5    :unID=unID+1
+!    HOTSPOT2 0,0 , unID, bolt_orientation, 6    :unID=unID+1
+!endif 
+

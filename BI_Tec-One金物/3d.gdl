@@ -1,0 +1,1421 @@
+hotspot 0,0,0
+
+driftPinCount=0
+dim driftPinPos[][]
+
+
+!土台-柱(コーナー)===================================================================================================
+if usePlace=1 then
+    !土台
+        material bodyMat
+
+        if hardwareDir=1 then
+            add -woodSize/2-0.1,-woodSize/2,-woodSize
+                block woodSize+0.1,woodSize,woodSize
+            del 1
+        endif
+
+        if hardwareDir=2 then
+            add -woodSize/2,-woodSize/2,-woodSize
+                block woodSize+0.1,woodSize,woodSize
+            del 1
+        endif
+
+        if hardwareDir=3 then
+            add -woodSize/2,-woodSize/2,-woodSize
+                block woodSize,woodSize+0.1,woodSize
+            del 1
+        endif
+
+        if hardwareDir=4 then
+            add -woodSize/2,-woodSize/2-0.1,-woodSize
+                block woodSize,woodSize+0.1,woodSize
+            del 1
+        endif
+
+    !柱
+        material bodyMat
+
+        add -woodSize/2,-woodSize/2,0
+            block woodSize,woodSize,2*woodSize
+        del 1
+
+    !金物
+        !アンカーボルト直結金具
+            if hardwareDir=1 or hardwareDir=2 then rotz 0
+            if hardwareDir=3 or hardwareDir=4 then rotz 90
+            addz -woodSize
+                gosub 100+woodWid
+            del 2
+
+        !アゴ掛金具
+            if hardwareDir=1 then rotz 180
+            if hardwareDir=2 then rotz 0
+            if hardwareDir=3 then rotz 90
+            if hardwareDir=4 then rotz -90
+            addx woodSize/2
+                gosub 301
+            del 2
+
+    !中ボルト
+        addz -0.0255
+        if hardwareDir=1 then rotz 0
+        if hardwareDir=2 then rotz 180
+        if hardwareDir=3 then rotz -90
+        if hardwareDir=4 then rotz 90
+            gosub 1001
+        del 2
+endif
+
+
+!土台-柱(十字交差)===================================================================================================
+if usePlace=2 then
+    !土台
+        material bodyMat
+
+        if hardwareDir=5 then !x方向
+            add -woodSize/2-0.1,-woodSize/2,-woodSize
+                block woodSize+2*0.1,woodSize,woodSize
+            del 1
+        endif
+
+        if hardwareDir=6 then !y方向
+            add -woodSize/2,-woodSize/2-0.1,-woodSize
+                block woodSize,woodSize+2*0.1,woodSize
+            del 1
+        endif
+
+    !柱
+        material bodyMat
+
+        add -woodSize/2,-woodSize/2,0
+            block woodSize,woodSize,2*woodSize
+        del 1
+
+    !金物
+        !ホールダウンパイプ
+            if hardwareDir=5 then rotz 0
+            if hardwareDir=6 then rotz 90
+                gosub 2000+hardware2Type
+            del 1
+
+        !アゴ掛金具
+            addz woodSize
+                if hardwareDir=5 then rotz 0
+                if hardwareDir=6 then rotz 90
+                add woodSize/2,0,-woodSize
+                    gosub 301
+                del 2
+
+                if hardwareDir=5 then rotz 180
+                if hardwareDir=6 then rotz -90
+                add woodSize/2,0,-woodSize
+                    gosub 301
+                del 2
+            del 1
+
+    !中ボルト
+        addz -0.0255-0.025
+        if hardwareDir=5 then rotz 0
+        if hardwareDir=6 then rotz 90
+            gosub 1002
+        del 2
+endif
+
+
+!柱-梁===================================================================================================
+if usePlace=3 then
+    !柱
+        material bodyMat
+
+        columnHei=max(beamHei[1],beamHei[2],beamHei[3],beamHei[4])
+
+        add -woodSize/2,-woodSize/2,-columnHei
+            block woodSize,woodSize,columnHei
+        del 1
+
+    !梁
+        material bodyMat
+
+        if beamSwitch[1] then
+            add -woodSize/2-0.1,-woodSize/2,-beamHei[1]
+                block 0.1,woodSize,beamHei[1]
+            del 1
+        endif
+
+        if beamSwitch[2] then
+            add woodSize/2,-woodSize/2,-beamHei[2]
+               block 0.1,woodSize,beamHei[2]
+            del 1
+        endif
+
+        if beamSwitch[3] then
+            add -woodSize/2,woodSize/2,-beamHei[3]
+                block woodSize,0.1,beamHei[3]
+            del 1
+        endif
+
+        if beamSwitch[4] then
+            add -woodSize/2,-woodSize/2-0.1,-beamHei[4]
+                block woodSize,0.1,beamHei[4]
+            del 1
+        endif
+
+    !金物
+        !左
+            leftBeamCode=0
+            if beamSwitch[1] then
+                leftBeamCode=hardwareBeamCode[beamHei[1]*1000]
+                subBeamCode=leftBeamCode
+                shiftFlag=0
+
+                addx -woodSize/2
+                rotz 180
+                    gosub 300+subBeamCode
+                del 2
+            endif
+
+        !右
+            rightBeamCode=0
+            if beamSwitch[2] then
+                rightBeamCode=hardwareBeamCode[beamHei[2]*1000]
+                subBeamCode=rightBeamCode
+                shiftFlag=0
+
+                addx woodSize/2
+                    gosub 300+subBeamCode
+                del 1
+            endif
+
+        !上
+            upBeamCode=0
+            if beamSwitch[3] then
+                upBeamCode=hardwareBeamCode[beamHei[3]*1000]
+                subBeamCode=upBeamCode
+                if leftBeamCode or rightBeamCode then
+                    shiftFlag=1
+                else
+                    shiftFlag=0
+                endif
+            
+                addy woodSize/2
+                rotz 90
+                    gosub 300+subBeamCode
+                del 2
+            endif
+
+        !下
+            downBeamCode=0
+            if beamSwitch[4] then
+                downBeamCode=hardwareBeamCode[beamHei[4]*1000]
+                subBeamCode=downBeamCode
+                if leftBeamCode or rightBeamCode then
+                    shiftFlag=1
+                else
+                    shiftFlag=0
+                endif
+
+                addy -woodSize/2
+                rotz -90
+                    gosub 300+subBeamCode
+                del 2
+            endif
+
+        !ホールダウンパイプ
+            if upBeamCode or downBeamCode then
+                turnFlag=1
+
+                if leftBeamCode or rightBeamCode then
+                    shiftFlag=1
+                else
+                    shiftFlag=0
+                endif
+            else
+                turnFlag=0
+                shiftFlag=0
+            endif
+
+            if switchHoldDownPipe then
+                if shiftFlag then addz 0.026
+                if turnFlag then rotz 90
+                    gosub 2000+hardware2Type
+                if turnFlag then del 1
+                if shiftFlag then del 1
+            endif
+
+    !中ボルト
+        for i=1 to max(leftBeamCode,rightBeamCode)
+            if i<=leftBeamCode then
+                leftBoltEdge=1
+            else
+                leftBoltEdge=0
+            endif
+
+            if i<=rightBeamCode then
+                rightBeamEdge=1
+            else
+                rightBeamEdge=0
+            endif
+
+            addz -0.0505-(i-1)*0.07
+            if rightBeamEdge and leftBoltEdge=0 then rotz 180
+                gosub 1000+leftBoltEdge+rightBeamEdge
+            del top
+        next i
+
+        for i=1 to max(upBeamCode,downBeamCode)
+            if i<=upBeamCode then
+                upBoltEdge=1
+            else
+                upBoltEdge=0
+            endif
+
+            if i<=downBeamCode then
+                downBoltEdge=1
+            else
+                downBoltEdge=0
+            endif
+
+            addz -0.0505-(i-1)*0.07+shiftFlag*0.026
+            rotz -90
+            if downBoltEdge and upBoltEdge=0 then rotz 180
+                gosub 1000+upBoltEdge+downBoltEdge
+            del top
+        next i
+endif
+
+
+!柱-柱 継ぎ===================================================================================================
+if usePlace=4 then
+    !柱
+        material bodyMat
+
+        add -woodSize/2,-woodSize/2,-2*woodSize
+            block woodSize,woodSize,2*woodSize
+        del 1
+
+        add -woodSize/2,-woodSize/2,0
+            block woodSize,woodSize,2*woodSize
+        del 1
+    
+    !金物
+        gosub 2000+hardware2Type
+endif
+
+
+!土台継手===================================================================================================
+if usePlace=5 then
+    !土台
+        material bodyMat
+
+        if hardwareDir=5 then rotz 0
+        if hardwareDir=6 then rotz 90
+            add -woodSize,-woodSize/2,-woodSize
+                block woodSize,woodSize,woodSize
+            del 1
+
+            add 0,-woodSize/2,-woodSize
+                block woodSize,woodSize,woodSize
+            del 1
+        del 1
+    
+    !金物
+
+endif
+
+end
+
+
+
+!sub===================================================================================================
+!100=土台
+!2000=柱
+!300=梁
+!500=土台継手
+!1000=中ボルト
+
+!hareware_foundation_H105
+101:
+    !金物
+        material hardwareMat
+
+        cylind 0.105,0.0295
+
+        addz 0.1005-0.0205-0.018
+            cylind 0.211,0.0108
+        del 1
+
+    !ドリフトピン
+        material driftPinMat
+
+        addz 0.1005-0.0205-0.018+0.211-0.018-0.05
+        roty 90
+        addz -driftPinL/2
+            cylind driftPinL,driftPinRad
+        del 3
+
+        addz 0.1005-0.0205-0.018+0.211-0.018
+        rotx 90
+        addz -driftPinL/2
+            cylind driftPinL,driftPinRad
+        del 3
+return
+
+!hareware_foundation_H120
+102:
+    !金物
+        material hardwareMat
+
+        cylind 0.120,0.0295
+
+        addz 0.1155-0.0205-0.018
+            cylind 0.261,0.0108
+        del 1
+
+    !ドリフトピン
+        material driftPinMat
+
+        addz 0.1155-0.0205-0.018+0.261-0.018-0.05-0.05
+        rotx 90
+        addz -driftPinL/2
+            cylind driftPinL,driftPinRad
+        del 3
+
+        addz 0.1155-0.0205-0.018+0.261-0.018-0.05
+        roty 90
+        addz -driftPinL/2
+            cylind driftPinL,driftPinRad
+        del 3
+
+        addz 0.1155-0.0205-0.018+0.261-0.018
+        rotx 90
+        addz -driftPinL/2
+            cylind driftPinL,driftPinRad
+        del 3
+return
+
+!hareware_column_HLP-10
+2101:
+    addz -0.050-0.018
+    !金物
+        material hardwareMat
+
+        roty -90
+        addz -0.011
+            cutpolya 4,1,0,
+            0.018,0,900,
+            0.0065,360,4000,
+            0.138,0,900,
+            0.0065,360,4000,
+            0,0,0.022
+        del 2
+            cylind 0.156,0.011
+        cutend
+
+    !ドリフトピン
+        material driftPinMat
+        
+        addz 0.138
+        roty 90
+        addz -driftPinL/2
+            cylind driftPinL,driftPinRad
+        del 3
+
+        if usePlace=4 then
+            addz 0.018
+            roty 90
+            addz -driftPinL/2
+                cylind driftPinL,driftPinRad
+            del 3
+        endif
+    del 1
+return
+
+!hareware_column_HDP-10
+2102:
+    addz -0.050-0.018
+    !金物
+        material hardwareMat
+
+        roty -90
+        addz -0.011
+            cutpolya 4,1,0,
+            0.018,0,900,
+            0.0065,360,4000,
+            0.138,0,900,
+            0.0065,360,4000,
+            0,0,0.022
+        del 2
+            cylind 0.156,0.011
+        cutend
+
+    !ドリフトピン
+        material driftPinMat
+
+        addz 0.138
+        roty 90
+        addz -driftPinL/2
+            cylind driftPinL,driftPinRad
+        del 3
+
+        if usePlace=4 then
+            addz 0.018
+            roty 90
+            addz -driftPinL/2
+                cylind driftPinL,driftPinRad
+            del 3
+        endif
+    del 1
+return
+
+!hareware_column_HDP-10(+)
+2103:
+    addz -0.050-0.018
+    !金物
+        material hardwareMat
+
+        rotx 90
+        addz -0.011
+            cutpolya 2,1,0,
+            0,0.138,900,
+            0.0065,360,4000,
+            0,0,0.022
+        del 2
+            roty -90
+            addz -0.011
+                cutpolya 2,1,0,
+                0.018,0,900,
+                0.0065,360,4000,
+                0,0,0.022
+            del 2
+                cylind 0.156,0.011
+            cutend
+        cutend
+
+    !ドリフトピン
+        material driftPinMat
+        
+        addz 0.138
+        rotx 90
+        addz -driftPinL/2
+            cylind driftPinL,driftPinRad
+        del 3
+
+        if usePlace=4 then
+            addz 0.018
+            roty 90
+            addz -driftPinL/2
+                cylind driftPinL,driftPinRad
+            del 3
+        endif
+    del 1
+return
+
+!hareware_column_HDP-15
+2104:
+    addz -0.050-0.03-0.018
+    !金物
+        material hardwareMat
+
+        rotx 90
+        addz -0.011
+            cutpolya 2,1,0,
+            0,0.198,900,
+            0.0065,360,4000,
+            0,0,0.022
+        del 2
+            roty -90
+            addz -0.011
+                cutpolya 6,1,0,
+                0.018,0,900,
+                0.0065,360,4000,
+                0.048,0,900,
+                0.0065,360,4000,
+                0.148,0,900,
+                0.0065,360,4000,
+                0,0,0.022
+            del 2
+                cylind 0.216,0.011
+            cutend
+        cutend
+
+    !ドリフトピン
+        material driftPinMat
+
+        addz 0.148
+        roty 90
+        addz -driftPinL/2
+            cylind driftPinL,driftPinRad
+        del 3
+
+        addz 0.198
+        rotx 90
+        addz -driftPinL/2
+            cylind driftPinL,driftPinRad
+        del 3
+    del 1
+return
+
+!hareware_column_HDP-20
+2105:
+    addz -0.050-0.03-0.018
+    !金物
+        material hardwareMat
+
+        rotx 90
+        addz -0.011
+            cutpolya 2,1,0,
+            0,0.248,900,
+            0.0065,360,4000,
+            0,0,0.022
+        del 2
+            roty -90
+            addz -0.011
+                cutpolya 6,1,0,
+                0.018,0,900,
+                0.0065,360,4000,
+                0.048,0,900,
+                0.0065,360,4000,
+                0.198,0,900,
+                0.0065,360,4000,
+                0,0,0.022
+            del 2
+                cylind 0.266,0.011
+            cutend
+        cutend
+
+    !ドリフトピン
+        material driftPinMat
+
+        addz 0.198
+        roty 90
+        addz -driftPinL/2
+            cylind driftPinL,driftPinRad
+        del 3
+
+        addz 0.248
+        rotx 90
+        addz -driftPinL/2
+            cylind driftPinL,driftPinRad
+        del 3
+    del 1
+return
+
+!hareware_column_HDP-CC
+2106:
+    addz -0.075-0.07-0.018
+    !金物
+        material hardwareMat
+
+        rotx 90
+        addz -0.011
+            cutpolya 6,1,0,
+            0,0.043,900,
+            0.0065,360,4000,
+            0,0.113,900,
+            0.0065,360,4000,
+            0,0.263,900,
+            0.0065,360,4000,
+            0,0,0.022
+        del 2
+            roty -90
+            addz -0.011
+                cutpolya 6,1,0,
+                0.018,0,900,
+                0.0065,360,4000,
+                0.088,0,900,
+                0.0065,360,4000,
+                0.313,0,900,
+                0.0065,360,4000,
+                0,0,0.022
+            del 2
+                cylind 0.331,0.011
+            cutend
+        cutend
+
+    !ドリフトピン
+        material driftPinMat
+
+        for n=1 to 3
+            if n=1 then addz 0.018
+            if n=2 then addz 0.088
+            if n=3 then addz 0.313
+            roty 90
+            addz -driftPinL/2
+                cylind driftPinL,driftPinRad
+            del 3
+        next n
+
+        for n=1 to 3
+            if n=1 then addz 0.043
+            if n=2 then addz 0.113
+            if n=3 then addz 0.263
+            rotx 90
+            addz -driftPinL/2
+                cylind driftPinL,driftPinRad
+            del 3
+        next n
+    del 1
+return
+
+!hareware_column_HMP-140
+2107:
+    addz -0.050-0.025-0.045-0.025-0.045-0.018
+    !金物
+        material hardwareMat
+
+        roty -90
+        addz -0.011
+            cutpolya 10,1,0,
+            0.018,0,900,
+            0.0065,360,4000,
+            0.063,0,900,
+            0.0065,360,4000,
+            0.088,0,900,
+            0.0065,360,4000,
+            0.133,0,900,
+            0.0065,360,4000,
+            0.158,0,900,
+            0.0065,360,4000,
+            0,0,0.022
+        del 2
+            cylind 0.176,0.011
+        cutend
+
+    !ドリフトピン
+        material driftPinMat
+
+        addz 0.018
+        roty 90
+        addz -driftPinL/2
+            cylind driftPinL,driftPinRad
+        del 3
+    del 1
+return
+
+!hareware_column_HMP-260
+2108:
+    addz -0.050-0.025-0.045-0.025-0.045-0.018
+    !金物
+        material hardwareMat
+
+        roty -90
+        addz -0.011
+            cutpolya 12,1,0,
+            0.018,0,900,
+            0.0065,360,4000,
+            0.063,0,900,
+            0.0065,360,4000,
+            0.088,0,900,
+            0.0065,360,4000,
+            0.133,0,900,
+            0.0065,360,4000,
+            0.158,0,900,
+            0.0065,360,4000,
+            0.278,0,900,
+            0.0065,360,4000,
+            0,0,0.022
+        del 2
+            cylind 0.296,0.011
+        cutend
+
+    !ドリフトピン
+        material driftPinMat
+
+        for n=1 to 2
+            if n=1 then addz 0.018
+            if n=2 then addz 0.278
+            roty 90
+            addz -driftPinL/2
+                cylind driftPinL,driftPinRad
+            del 3
+        next n
+    del 1
+return
+
+!hareware_column_GP-95
+2201:
+    addz -0.050-0.018
+    !金物
+        material hardwareMat
+
+        roty -90
+        addz -0.011
+            cutpolya 4,1,0,
+            0.018,0,900,
+            0.0065,360,4000,
+            0.113,0,900,
+            0.0065,360,4000,
+            0,0,0.022
+        del 2
+            cylind 0.131,0.0135
+        cutend
+
+    !ドリフトピン
+        material driftPinMat
+
+        addz 0.113
+        roty 90
+        addz -driftPinL/2
+            cylind driftPinL,driftPinRad
+        del 3
+    del 1
+return
+
+!hareware_column_GP-95(+)
+2202:
+    addz -0.050-0.018
+    !金物
+        material hardwareMat
+
+        rotx 90
+        addz -0.011
+            cutpolya 2,1,0,
+            0,0.113,900,
+            0.0065,360,4000,
+            0,0,0.022
+        del 2
+            roty -90
+            addz -0.011
+                cutpolya 2,1,0,
+                0.018,0,900,
+                0.0065,360,4000,
+                0,0,0.022
+            del 2
+                cylind 0.131,0.0135
+            cutend
+        cutend
+
+    !ドリフトピン
+        material driftPinMat
+
+        addz 0.113
+        rotx 90
+        addz -driftPinL/2
+            cylind driftPinL,driftPinRad
+        del 3
+    del 1
+return
+
+!hareware_column_GP-140
+2203:
+    addz -0.050-0.045-0.018
+    !金物
+        material hardwareMat
+
+        roty -90
+        addz -0.011
+            cutpolya 6,1,0,
+            0.018,0,900,
+            0.0065,360,4000,
+            0.063,0,900,
+            0.0065,360,4000,
+            0.158,0,900,
+            0.0065,360,4000,
+            0,0,0.022
+        del 2
+            cylind 0.176,0.0135
+        cutend
+
+    !ドリフトピン
+        material driftPinMat
+
+        addz 0.158
+        roty 90
+        addz -driftPinL/2
+            cylind driftPinL,driftPinRad
+        del 3
+    del 1
+return
+
+!hareware_column_GP-190
+2204:
+    addz -0.050-0.018
+    !金物
+        material hardwareMat
+
+        roty -90
+        addz -0.011
+            cutpolya 6,1,0,
+            0.018,0,900,
+            0.0065,360,4000,
+            0.113,0,900,
+            0.0065,360,4000,
+            0.208,0,900,
+            0.0065,360,4000,
+            0,0,0.022
+        del 2
+            cylind 0.226,0.0135
+        cutend
+
+    !ドリフトピン
+        material driftPinMat
+
+        for n=1 to 2
+            if n=1 then addz 0.113
+            if n=2 then addz 0.208
+            roty 90
+            addz -driftPinL/2
+                cylind driftPinL,driftPinRad
+            del 3
+        next n
+    del 1
+return
+
+!hareware_column_GP-235
+2205:
+    addz -0.050-0.045-0.018
+    !金物
+        material hardwareMat
+
+        roty -90
+        addz -0.011
+            cutpolya 8,1,0,
+            0.018,0,900,
+            0.0065,360,4000,
+            0.063,0,900,
+            0.0065,360,4000,
+            0.158,0,900,
+            0.0065,360,4000,
+            0.253,0,900,
+            0.0065,360,4000,
+            0,0,0.022
+        del 2
+            cylind 0.271,0.0135
+        cutend
+
+    !ドリフトピン
+        material driftPinMat
+
+        for n=1 to 2
+            if n=1 then addz 0.158
+            if n=2 then addz 0.253
+            roty 90
+            addz -driftPinL/2
+                cylind driftPinL,driftPinRad
+            del 3
+        next n
+    del 1
+return
+
+!hareware_beam_H105to150
+301:
+    !寸法===================
+        hardwareX=0.1
+        hardwareZ=0.0985
+        hardwareWid=0.04
+        hardwareGap=0.03
+        hardwareThi=0.002
+        cornerRad=0.0067
+        holeRad1=0.0065
+        holeRad2=0.0064
+
+        driftPinCount=2
+        driftPinPos[1][1]=0.075 : driftPinPos[1][2]=0.034
+        driftPinPos[2][1]=0.075 : driftPinPos[2][2]=0.034+0.0355
+
+    !金物===================
+        material hardwareMat
+
+        addz -hardwareZ-0.0055
+        !corner
+            addz 0.008
+                extrude 7,0,0,hardwareZ-(hardwareWid-2*cornerRad)/2-0.008,1+2+4+16+32,
+                0          ,-hardwareWid/2+cornerRad  ,1   ,
+                cornerRad  ,-hardwareWid/2+cornerRad  ,901 ,
+                0          ,90                        ,4001,
+                cornerRad  ,-hardwareWid/2+hardwareThi,1   ,
+                cornerRad  ,-hardwareWid/2+cornerRad  ,901 ,
+                0          ,-90                       ,4001,
+                0          ,-hardwareWid/2+cornerRad  ,-1
+
+                extrude 7,0,0,hardwareZ-(hardwareWid-2*cornerRad)/2-0.008,1+2+4+16+32,
+                hardwareThi,hardwareWid/2-cornerRad   ,1   ,
+                cornerRad  ,hardwareWid/2-cornerRad   ,901 ,
+                0          ,-90                       ,4001,
+                cornerRad  ,hardwareWid/2             ,1   ,
+                cornerRad  ,hardwareWid/2-cornerRad   ,901 ,
+                0          ,90                        ,4001,
+                hardwareThi,hardwareWid/2-cornerRad   ,-1
+            del 1
+
+        !back
+            add hardwareThi,0,0.008
+            roty -90
+                extrude 13,0,0,hardwareThi,1+2+4+16+32,
+                0                                                        ,-hardwareWid/2+cornerRad,1   ,
+                hardwareZ-(hardwareWid-2*cornerRad)/2-0.008,-hardwareWid/2+cornerRad              ,1   ,
+                hardwareZ-(hardwareWid-2*cornerRad)/2-0.008,-hardwareWid/2+cornerRad              ,1   ,
+                hardwareZ-(hardwareWid-2*cornerRad)/2-0.008,0                                     ,901 ,
+                hardwareZ-(hardwareWid-2*cornerRad)/2-0.008,180                                   ,4001,
+                0                                                        ,hardwareWid/2-cornerRad ,1   ,
+                0                                                        ,hardwareWid/2-cornerRad ,-1  ,
+                0.0205                                             ,0                       ,901 ,
+                holeRad2                                             ,360                     ,4001,
+                0.0205+0.025                                       ,0                       ,901 ,
+                holeRad2                                             ,360                     ,4001,
+                0.0205+2*0.025                                     ,0                       ,901 ,
+                holeRad2                                             ,360                     ,4001
+            del 2
+
+        !side
+            for n=1 to 2
+                addy -hardwareWid/2+hardwareThi
+                rotx 90
+                    extrude 15,0,0,hardwareThi,1+2+4+16+32,
+                    cornerRad         ,0.008                                              ,1   ,
+                    0.02              ,0.008                                              ,1   ,
+                    0.02              ,0                                                  ,1   ,
+                    hardwareX         ,0                                                  ,1   ,
+                    hardwareX         ,hardwareZ-0.015                                    ,1   ,
+                    0.075+holeRad1,hardwareZ-0.015                                    ,1   ,
+                    0.075+holeRad1,hardwareZ-0.029                                    ,1   ,
+                    0.075             ,hardwareZ-0.029                                    ,901 ,
+                    0                 ,-180                                               ,4001,
+                    0.075-holeRad1,hardwareZ-0.015                                    ,1   ,
+                    0.01              ,hardwareZ-0.015                                    ,1   ,
+                    cornerRad         ,hardwareZ-(hardwareWid-2*cornerRad)/2              ,1   ,
+                    cornerRad         ,0.008                                              ,-1  ,
+                    0.075             ,0.034                                              ,901 ,
+                    holeRad1      ,360                                                ,4001
+                del 2
+            addy hardwareWid-hardwareThi
+            next n
+            del 2
+        del 1
+
+    !ドリフトピン===================
+        material driftPinMat
+
+        addz -hardwareZ-0.0055
+            for n=1 to driftPinCount
+                add driftPinPos[n][1],0,driftPinPos[n][2]
+                rotx 90
+                addz -driftPinL/2
+                    cylind driftPinL,driftPinRad
+                del 3
+            next n
+        del 1
+return
+
+
+!hareware_beam_H180to210
+302:
+    !寸法===================
+        hardwareX=0.1
+        hardwareZ=0.135
+        hardwareWid=0.04
+        hardwareGap=0.03
+        hardwareThi=0.002
+        cornerRad=0.0067
+        holeRad1=0.0065
+        holeRad2=0.0064
+
+        driftPinCount=3
+        driftPinPos[1][1]=0.075 : driftPinPos[1][2]=0.014+0.0215
+        driftPinPos[2][1]=0.0885 : driftPinPos[2][2]=0.014+0.0215+0.019+0.026
+        driftPinPos[3][1]=0.075 : driftPinPos[3][2]=hardwareZ-0.014
+
+    !金物===================
+        material hardwareMat
+
+        addz -hardwareZ-0.0305+shiftFlag*0.026
+        !corner
+            extrude 7,0,0,hardwareZ,1+2+4+16+32,
+            0          ,-hardwareWid/2+cornerRad  ,1   ,
+            cornerRad  ,-hardwareWid/2+cornerRad  ,901 ,
+            0          ,90                        ,4001,
+            cornerRad  ,-hardwareWid/2+hardwareThi,1   ,
+            cornerRad  ,-hardwareWid/2+cornerRad  ,901 ,
+            0          ,-90                       ,4001,
+            0          ,-hardwareWid/2+cornerRad  ,-1
+
+            extrude 7,0,0,hardwareZ,1+2+4+16+32,
+            hardwareThi,hardwareWid/2-cornerRad   ,1   ,
+            cornerRad  ,hardwareWid/2-cornerRad   ,901 ,
+            0          ,-90                       ,4001,
+            cornerRad  ,hardwareWid/2             ,1   ,
+            cornerRad  ,hardwareWid/2-cornerRad   ,901 ,
+            0          ,90                        ,4001,
+            hardwareThi,hardwareWid/2-cornerRad   ,-1
+
+        !back
+            addx hardwareThi
+            roty -90
+                extrude 9,0,0,hardwareThi,1+2+4+16+32,
+                0                      ,-hardwareWid/2+cornerRad,1   ,
+                hardwareZ,-hardwareWid/2+cornerRad              ,1   ,
+                hardwareZ,hardwareWid/2-cornerRad               ,1   ,
+                0                      ,hardwareWid/2-cornerRad ,1   ,
+                0                      ,-hardwareWid/2+cornerRad,-1  ,
+                0.045                  ,0                       ,901 ,
+                holeRad2           ,360                     ,4001,
+                0.045+0.07             ,0                       ,901 ,
+                holeRad2           ,360                     ,4001
+            del 2
+
+        !side
+            for n=1 to 2
+                addy -hardwareWid/2+hardwareThi
+                rotx 90
+                    extrude 23,0,0,hardwareThi,1+2+4+16+32,
+                    cornerRad         ,0                                         ,1   ,
+                    0.075-holeRad1,0                                         ,1   ,
+                    0.075-holeRad1,0.014                                     ,1   ,
+                    0.075             ,0.014                                     ,901 ,
+                    0                 ,-180                                      ,4001,
+                    0.075+holeRad1,0                                         ,1   ,
+                    hardwareX         ,0                                         ,1   ,
+                    hardwareX         ,hardwareZ                                 ,1   ,
+                    0.075+holeRad1,hardwareZ                                 ,1   ,
+                    0.075+holeRad1,hardwareZ-0.014                           ,1   ,
+                    0.075             ,hardwareZ-0.014                           ,901 ,
+                    0                 ,-180                                      ,4001,
+                    0.075-holeRad1,hardwareZ                                 ,1   ,
+                    cornerRad         ,hardwareZ                                 ,1   ,
+                    cornerRad         ,0                                         ,-1  ,
+                    0.075             ,0.014+0.0215                              ,901 ,
+                    holeRad1      ,360                                       ,4001,
+                    0.075             ,hardwareZ-0.014-0.0215                    ,901 ,
+                    holeRad1      ,360                                       ,4001,
+                    0.0885            ,0.014+0.0215+0.019                        ,901 ,
+                    holeRad1      ,360                                       ,4001,
+                    0.0885            ,hardwareZ-0.014-0.0215-0.019              ,901 ,
+                    holeRad1      ,360                                       ,4001
+                del 2
+            addy hardwareWid-hardwareThi
+            next n
+            del 2
+        del 1
+
+    !ドリフトピン===================
+        material driftPinMat
+
+        addz -hardwareZ-0.0305
+            for n=1 to driftPinCount
+                if n=1 or n=3 then
+                    add driftPinPos[n][1],0,driftPinPos[n][2]+shiftFlag*0.0045
+                else
+                    add driftPinPos[n][1],0,driftPinPos[n][2]
+                endif
+                rotx 90
+                addz -driftPinL/2
+                    cylind driftPinL,driftPinRad
+                del 3
+            next n
+        del 1
+return
+
+!hareware_beam_H240to300
+303:
+    !寸法===================
+        hardwareX=0.1
+        hardwareZ=0.205
+        hardwareWid=0.04
+        hardwareGap=0.03
+        hardwareThi=0.002
+        cornerRad=0.0067
+        holeRad1=0.0065
+        holeRad2=0.0064
+
+        driftPinCount=3
+        driftPinPos[1][1]=0.075 : driftPinPos[1][2]=0.019+0.0265
+        driftPinPos[2][1]=0.075 : driftPinPos[2][2]=0.019+0.0265+0.044+0.026
+        driftPinPos[3][1]=0.075 : driftPinPos[3][2]=hardwareZ-0.019
+
+    !金物===================
+        material hardwareMat
+
+        addz -hardwareZ-0.0305+shiftFlag*0.026
+        !corner
+            extrude 7,0,0,hardwareZ,1+2+4+16+32,
+            0          ,-hardwareWid/2+cornerRad  ,1   ,
+            cornerRad  ,-hardwareWid/2+cornerRad  ,901 ,
+            0          ,90                        ,4001,
+            cornerRad  ,-hardwareWid/2+hardwareThi,1   ,
+            cornerRad  ,-hardwareWid/2+cornerRad  ,901 ,
+            0          ,-90                       ,4001,
+            0          ,-hardwareWid/2+cornerRad  ,-1
+
+            extrude 7,0,0,hardwareZ,1+2+4+16+32,
+            hardwareThi,hardwareWid/2-cornerRad   ,1   ,
+            cornerRad  ,hardwareWid/2-cornerRad   ,901 ,
+            0          ,-90                       ,4001,
+            cornerRad  ,hardwareWid/2             ,1   ,
+            cornerRad  ,hardwareWid/2-cornerRad   ,901 ,
+            0          ,90                        ,4001,
+            hardwareThi,hardwareWid/2-cornerRad   ,-1
+
+        !back
+            addx hardwareThi
+            roty -90
+                extrude 11,0,0,hardwareThi,1+2+4+16+32,
+                0                      ,-hardwareWid/2+cornerRad,1   ,
+                hardwareZ,-hardwareWid/2+cornerRad              ,1   ,
+                hardwareZ,hardwareWid/2-cornerRad               ,1   ,
+                0                      ,hardwareWid/2-cornerRad ,1   ,
+                0                      ,-hardwareWid/2+cornerRad,-1  ,
+                0.045                  ,0                       ,901 ,
+                holeRad2           ,360                     ,4001,
+                0.045+0.07             ,0                       ,901 ,
+                holeRad2           ,360                     ,4001,
+                0.045+0.07+0.07        ,0                       ,901 ,
+                holeRad2           ,360                     ,4001
+            del 2
+
+        !side
+            for n=1 to 2
+                addy -hardwareWid/2+hardwareThi
+                rotx 90
+                    extrude 23,0,0,hardwareThi,1+2+4+16+32,
+                    cornerRad         ,0                             ,1   ,
+                    0.075-holeRad1,0                             ,1   ,
+                    0.075-holeRad1,0.019                         ,1   ,
+                    0.075             ,0.019                         ,901 ,
+                    0                 ,-180                          ,4001,
+                    0.075+holeRad1,0                             ,1   ,
+                    hardwareX         ,0                             ,1   ,
+                    hardwareX         ,hardwareZ                     ,1   ,
+                    0.075+holeRad1,hardwareZ                     ,1   ,
+                    0.075+holeRad1,hardwareZ-0.019               ,1   ,
+                    0.075             ,hardwareZ-0.019               ,901 ,
+                    0                 ,-180                          ,4001,
+                    0.075-holeRad1,hardwareZ                     ,1   ,
+                    cornerRad         ,hardwareZ                     ,1   ,
+                    cornerRad         ,0                             ,-1  ,
+                    0.075             ,0.019+0.0265                  ,901 ,
+                    holeRad1      ,360                           ,4001,
+                    0.075             ,0.019+0.0265+0.044            ,901 ,
+                    holeRad1      ,360                           ,4001,
+                    0.075             ,0.019+0.0265+0.044+0.026      ,901 ,
+                    holeRad1      ,360                           ,4001,
+                    0.075             ,0.019+0.0265+0.044+0.026+0.044,901 ,
+                    holeRad1      ,360                           ,4001
+                del 2
+            addy hardwareWid-hardwareThi
+            next n
+            del 2
+        del 1
+
+    !ドリフトピン===================
+        material driftPinMat
+
+        addz -hardwareZ-0.0305
+            for n=1 to driftPinCount
+                add driftPinPos[n][1],0,driftPinPos[n][2]
+                rotx 90
+                addz -driftPinL/2
+                    cylind driftPinL,driftPinRad
+                del 3
+            next n
+        del 1
+return
+
+!hareware_beam_H330to420
+304:
+    !寸法===================
+        hardwareX=0.1
+        hardwareZ=0.275
+        hardwareWid=0.04
+        hardwareGap=0.03
+        hardwareThi=0.002
+        cornerRad=0.0067
+        holeRad1=0.0065
+        holeRad2=0.0064
+
+        if hardware3Type=2 then
+            driftPinCount=3
+        else
+            driftPinCount=4
+        endif
+        driftPinPos[1][1]=0.075 : driftPinPos[1][2]=hardwareZ-0.019
+        driftPinPos[2][1]=0.075 : driftPinPos[2][2]=0.019+0.0265+0.044+0.026+0.044+0.026
+        driftPinPos[3][1]=0.075 : driftPinPos[3][2]=0.019+0.0265+0.044+0.026
+        driftPinPos[4][1]=0.075 : driftPinPos[4][2]=0.019+0.0265
+
+    !金物===================
+        material hardwareMat
+
+        addz -hardwareZ-0.0305+shiftFlag*0.026
+        !corner
+            extrude 7,0,0,hardwareZ,1+2+4+16+32,
+            0          ,-hardwareWid/2+cornerRad  ,1   ,
+            cornerRad  ,-hardwareWid/2+cornerRad  ,901 ,
+            0          ,90                        ,4001,
+            cornerRad  ,-hardwareWid/2+hardwareThi,1   ,
+            cornerRad  ,-hardwareWid/2+cornerRad  ,901 ,
+            0          ,-90                       ,4001,
+            0          ,-hardwareWid/2+cornerRad  ,-1
+
+            extrude 7,0,0,hardwareZ,1+2+4+16+32,
+            hardwareThi,hardwareWid/2-cornerRad   ,1   ,
+            cornerRad  ,hardwareWid/2-cornerRad   ,901 ,
+            0          ,-90                       ,4001,
+            cornerRad  ,hardwareWid/2             ,1   ,
+            cornerRad  ,hardwareWid/2-cornerRad   ,901 ,
+            0          ,90                        ,4001,
+            hardwareThi,hardwareWid/2-cornerRad   ,-1
+
+        !back
+            addx hardwareThi
+            roty -90
+                extrude 13,0,0,hardwareThi,1+2+4+16+32,
+                0                      ,-hardwareWid/2+cornerRad,1   ,
+                hardwareZ,-hardwareWid/2+cornerRad              ,1   ,
+                hardwareZ,hardwareWid/2-cornerRad               ,1   ,
+                0                      ,hardwareWid/2-cornerRad ,1   ,
+                0                      ,-hardwareWid/2+cornerRad,-1  ,
+                0.045                  ,0                       ,901 ,
+                holeRad2           ,360                     ,4001,
+                0.045+0.07             ,0                       ,901 ,
+                holeRad2           ,360                     ,4001,
+                0.045+0.07+0.07        ,0                       ,901 ,
+                holeRad2           ,360                     ,4001,
+                0.045+0.07+0.07+0.07   ,0                       ,901 ,
+                holeRad2           ,360                     ,4001
+            del 2
+
+        !side
+            for n=1 to 2
+                addy -hardwareWid/2+hardwareThi
+                rotx 90
+                    extrude 27,0,0,hardwareThi,1+2+4+16+32,
+                    cornerRad         ,0                                   ,1   ,
+                    0.075-holeRad1,0                                   ,1   ,
+                    0.075-holeRad1,0.019                               ,1   ,
+                    0.075             ,0.019                               ,901 ,
+                    0                 ,-180                                ,4001,
+                    0.075+holeRad1,0                                   ,1   ,
+                    hardwareX         ,0                                   ,1   ,
+                    hardwareX         ,hardwareZ                           ,1   ,
+                    0.075+holeRad1,hardwareZ                           ,1   ,
+                    0.075+holeRad1,hardwareZ-0.019                     ,1   ,
+                    0.075             ,hardwareZ-0.019                     ,901 ,
+                    0                 ,-180                                ,4001,
+                    0.075-holeRad1,hardwareZ                           ,1   ,
+                    cornerRad         ,hardwareZ                           ,1   ,
+                    cornerRad         ,0                                   ,-1  ,
+                    0.075             ,0.019+0.0265                        ,901 ,
+                    holeRad1      ,360                                 ,4001,
+                    0.075             ,0.019+0.0265+0.044                  ,901 ,
+                    holeRad1      ,360                                 ,4001,
+                    0.075             ,0.019+0.0265+0.044+0.026            ,901 ,
+                    holeRad1      ,360                                 ,4001,
+                    0.075             ,0.019+0.0265+0.044+0.026+0.044      ,901 ,
+                    holeRad1      ,360                                 ,4001,
+                    0.075             ,0.019+0.0265+0.044+0.026+0.044+0.026,901 ,
+                    holeRad1      ,360                                 ,4001,
+                    0.075             ,hardwareZ-0.019-0.0265              ,901 ,
+                    holeRad1      ,360                                 ,4001
+                del 2
+            addy hardwareWid-hardwareThi
+            next n
+            del 2
+        del 1
+
+    !ドリフトピン===================
+        material driftPinMat
+
+        addz -hardwareZ-0.0305
+            for n=1 to driftPinCount
+                add driftPinPos[n][1],0,driftPinPos[n][2]
+                rotx 90
+                addz -driftPinL/2
+                    cylind driftPinL,driftPinRad
+                del 3
+            next n
+        del 1
+return
+
+!hareware_foundation_connect_GJ-10
+501:
+    !金物
+
+    !ドリフトピン
+
+return
+
+!hareware_foundation_connect_GJ-10Ⅱ
+502:
+    !金物
+
+    !ドリフトピン
+    
+return
+
+
+!bolt_MZ
+1001:
+    !寸法===================
+        hardwareThi=0.002
+        boltL=woodSize+0.02
+        boltRad=0.006
+        edge1Rad=0.019/2
+        edge1Thi=0.01
+        edge2Rad=0.035/2
+        edge2Thi=0.0045
+
+    !ボルト===================
+        material boltMat
+
+        roty 90
+            addz -woodSize/2-edge1Thi-hardwareThi
+                extrude 6,0,0,edge1Thi,1+2+4+8+16,
+                edge1Rad*cos(0)  ,edge1Rad*sin(0)  ,0,
+                edge1Rad*cos(60) ,edge1Rad*sin(60) ,0,
+                edge1Rad*cos(120),edge1Rad*sin(120),0,
+                edge1Rad*cos(180),edge1Rad*sin(180),0,
+                edge1Rad*cos(240),edge1Rad*sin(240),0,
+                edge1Rad*cos(300),edge1Rad*sin(300),0
+            del 1
+
+            addz -boltL+woodSize/2
+                cylind boltL,boltRad
+            del 1
+
+            addz woodSize/2
+                cylind edge2Thi,edge2Rad
+            del 1
+        del 1
+return
+
+!bolt_MB
+1002:
+    !寸法===================
+        hardwareThi=0.002
+        boltL=woodSize+0.02
+        boltRad=0.006
+        edge1Rad=0.019/2
+        edge1Thi=0.01
+        edge2Rad=0.019/2
+        edge2Thi=0.01
+    
+    !ボルト===================
+        material boltMat
+
+        roty 90
+            addz -woodSize/2-edge1Thi-hardwareThi
+                extrude 6,0,0,edge1Thi,1+2+4+8+16,
+                edge1Rad*cos(0)  ,edge1Rad*sin(0)  ,0,
+                edge1Rad*cos(60) ,edge1Rad*sin(60) ,0,
+                edge1Rad*cos(120),edge1Rad*sin(120),0,
+                edge1Rad*cos(180),edge1Rad*sin(180),0,
+                edge1Rad*cos(240),edge1Rad*sin(240),0,
+                edge1Rad*cos(300),edge1Rad*sin(300),0
+            del 1
+
+            addz -boltL+woodSize/2+hardwareThi
+                cylind boltL,boltRad
+            del 1
+
+            addz woodSize/2+hardwareThi
+                extrude 6,0,0,edge2Thi,1+2+4+8+16,
+                edge2Rad*cos(0)  ,edge2Rad*sin(0)  ,0,
+                edge2Rad*cos(60) ,edge2Rad*sin(60) ,0,
+                edge2Rad*cos(120),edge2Rad*sin(120),0,
+                edge2Rad*cos(180),edge2Rad*sin(180),0,
+                edge2Rad*cos(240),edge2Rad*sin(240),0,
+                edge2Rad*cos(300),edge2Rad*sin(300),0
+            del 1
+        del 1
+return

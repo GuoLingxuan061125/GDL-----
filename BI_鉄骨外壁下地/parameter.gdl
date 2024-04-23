@@ -1,0 +1,1279 @@
+gosub "variables"
+gosub "set steel data"
+
+   !dim _steelPos[][]
+
+   !for i=1 to vardim1 (steelPos)
+   !for j=1 to vardim2 (steelPos)
+   !    _steelPos[i][j]=steelPos[i][j]
+   !next j
+   !next i
+
+   !parameters steelPos=_steelPos
+
+gosub "count"
+
+end
+
+"variables":
+
+    gosub "channel"
+
+    dim array1D[]
+    dim array2D[][]
+
+    values{2} "arrangeMethod" 1,"左・下揃え",2,"右・上揃え",3,"中央揃え",4,"等間隔"
+    values "widoFrameExlen" range[0,)
+    !values "widoData" range[0,)
+    values "endSpace" range[0,)
+    values "pitch" range[0,)
+    values "slopeOffset" range[0,)
+
+    !initialize  steelEdit
+        for i=1 to vardim1 (steelPos)
+        for j=1 to 4
+            if abs (steelEdit[i][j])>esp then 
+                parameters steelEdit[i][j]=steelEdit[i][j]
+            else
+                parameters steelEdit[i][j]=0
+            endif
+        next j
+        next i
+
+    parameters \
+    steelSizeTXT[1][1]=colSizeTXT,
+    steelSizeTXT[1][2]=furSizeTXT,
+    steelSizeTXT[1][3]=widoSizeTXT,
+    steelSizeTXT[1][4]=agSizeTXT
+
+    dim array1D[]
+    _row=steelIndex[1][1]
+
+    array1D=fixColumnHei
+    gosub "resize1Dlist"
+    parameters fixColumnHei=array1D
+
+    !reset slopeOffset when crossing
+        if slopeOffset[1][1]>frameRange[1][1]-slopeOffset[2][1] then 
+            parameters slopeOffset[1][1]=slopeOffset[2][1]-esp
+        endif
+
+        if topSlope[1][1]=0 then 
+            parameters \
+            slopeOffset[1][1]=0,
+            slopeOffset[1][3]=0
+        endif
+
+        if topSlope[1][2]=0 then 
+            parameters \
+            slopeOffset[2][1]=0,
+            slopeOffset[2][3]=0
+        endif
+
+return
+
+"set steel data":
+
+    !steel size
+
+        num1=0 : txt1="" : num2=0 : txt2="" : num3=0 : txt3="" : num4=0
+        n = SPLIT (steelSizeTXT[1][1], "%n%s%n%s%n%s%n", num1,txt1,num2,txt2,num3,txt3,num4)
+        parameters colSize[1][1]=num1/td, colSize[1][2]=num2/td, colSize[1][3]=num3/td, colSize[1][4]=num4/td
+
+        num1=0 : txt1="" : num2=0 : txt2="" : num3=0 : txt3="" : num4=0
+        n = SPLIT (steelSizeTXT[1][2], "%n%s%n%s%n%s%n", num1,txt1,num2,txt2,num3,txt3,num4)
+        parameters furringSize[1][1]=num1/td, furringSize[1][2]=num2/td, furringSize[1][3]=num3/td, furringSize[1][4]=num4/td
+
+        num1=0 : txt1="" : num2=0 : txt2="" : num3=0 : txt3="" : num4=0
+        n = SPLIT (steelSizeTXT[1][3], "%n%s%n%s%n%s%n", num1,txt1,num2,txt2,num3,txt3,num4)
+        parameters widoSize[1][1]=num1/td, widoSize[1][2]=num2/td, widoSize[1][3]=num3/td, widoSize[1][4]=num4/td
+
+        num1=0 : txt1="" : num2=0 : txt2="" : num3=0 : txt3="" : num4=0
+        n = SPLIT (steelSizeTXT[1][4], "%n%s%n%s%n%s%n", num1,txt1,num2,txt2,num3,txt3,num4)
+        parameters agSize[1][1]=num1/td, agSize[1][2]=num2/td, agSize[1][3]=num3/td, agSize[1][4]=num4/td
+
+    !all kinds of steel pos list
+
+        dim steelPos[][]
+
+        for i=1 to vardim1 (tempPos)
+        for j=1 to vardim2 (tempPos)
+            parameters steelPos[i][j]=0
+        next j
+        next i
+            !parameters steelPos=steelPos
+
+        dim tempPos[][]
+
+        for i=1 to vardim1 (steelPos)
+        for j=1 to vardim2 (steelPos)
+            parameters tempPos[i][j]=0
+        next j
+        next i
+           !parameters tempPos=tempPos
+
+    if update then
+
+        iSteel=0
+        
+        !column
+            orix=0
+            _pitch=frameRange[1][1]
+
+            if pitch[1][1]>esp and pitch[1][1]<frameRange[1][1] then 
+            
+                nColumn= ceil (frameRange[1][1]/pitch[1][1])+1
+
+                if arrangeMethod[1][1]=1 then !左・下揃え
+                    _pitch=pitch[1][1]
+                    if startPos[1][1]>esp then 
+                        orix=-_pitch+startPos[1][1]
+                    else
+                        orix=0
+                    endif
+                endif
+
+                if arrangeMethod[1][1]=2 then !右・上揃え
+                    _pitch=pitch[1][1]
+                    orix=frameRange[1][1]-_pitch*(nColumn-1)
+                endif
+
+                if arrangeMethod[1][1]=3 then !中央揃え
+                    _pitch=pitch[1][1]
+                    _space=frameRange[1][1]-_pitch*(nColumn-1)
+
+                    if _space<=_pitch then 
+                        orix=(frameRange[1][1]-_pitch*(nColumn-1))/2
+                    else
+                        orix=-(frameRange[1][1]-_pitch*(nColumn-2))/2
+                    endif
+
+                endif
+
+                if arrangeMethod[1][1]=4 then !等間隔
+                    _pitch=frameRange[1][1]/(nColumn-1)
+                    orix=0
+                endif
+
+                nColumn= ceil (frameRange[1][1]/_pitch)+1
+            else
+                nColumn= 2
+            endif
+
+            for iColumn=1 to nColumn
+
+                if iColumn<nColumn then  !from start side
+
+                    iSteel=iSteel+1
+                    jCol=-3
+
+                    jCol=jCol+3
+                    steelPos[iSteel][jCol+x]= sgn (iSteel-1)*orix+(iColumn-1)*_pitch
+                    steelPos[iSteel][jCol+y]=0
+                    steelPos[iSteel][jCol+z]=0
+                    jCol=jCol+3
+                    steelPos[iSteel][jCol+x]= sgn (iSteel-1)*orix+(iColumn-1)*_pitch
+                    steelPos[iSteel][jCol+y]=0
+                    steelPos[iSteel][jCol+z]=frameRange[1][2]+fixColumnHei[iColumn]
+
+                else    !end side
+
+                    iSteel=iSteel+1
+                    jCol=-3
+
+                    jCol=jCol+3
+                    steelPos[iSteel][jCol+x]=0+frameRange[1][1]
+                    steelPos[iSteel][jCol+y]=0
+                    steelPos[iSteel][jCol+z]=0
+                    jCol=jCol+3
+                    steelPos[iSteel][jCol+x]=0+frameRange[1][1]
+                    steelPos[iSteel][jCol+y]=0
+                    steelPos[iSteel][jCol+z]=frameRange[1][2]+fixColumnHei[iColumn]
+
+                endif
+                        
+            next iColumn 
+
+            parameters steelIndex[1][1]=iSteel
+
+        !furring
+
+            oriz=furringSize[1][3]/2
+            _pitch=(frameRange[1][2]-furringSize[1][3])
+
+            if pitch[1][2]>esp and pitch[1][2]<(frameRange[1][2]-furringSize[1][3]) then 
+
+                nFurring= ceil ((frameRange[1][2]-furringSize[1][3])/ pitch[1][2])+1
+
+                if arrangeMethod[1][2]=1 then 
+                    _pitch=pitch[1][2]
+                    oriz=furringSize[1][3]/2
+                endif
+
+                if arrangeMethod[1][2]=2 then 
+                    _pitch=pitch[1][2]
+                    oriz=(frameRange[1][2]-furringSize[1][3])-_pitch*(nFurring-1)+furringSize[1][3]/2
+                endif
+
+                if arrangeMethod[1][2]=3 then 
+
+                    _pitch=pitch[1][2]
+                    _space=(frameRange[1][2]-furringSize[1][3])-_pitch*(nFurring-1)
+
+                    if _space<=_pitch then 
+                        oriz=((frameRange[1][2]-furringSize[1][3])-_pitch*(nFurring-1))/2+furringSize[1][3]/2
+                    else
+                        oriz=-((frameRange[1][2]-furringSize[1][3])-_pitch*(nFurring-2))/2+furringSize[1][3]/2
+                    endif
+                endif
+
+                if arrangeMethod[1][2]=4 then 
+                    _pitch=(frameRange[1][2]-furringSize[1][3])/(nFurring-1)
+                    oriz=furringSize[1][3]/2
+                endif
+
+                nFurring= ceil ((frameRange[1][2]-furringSize[1][3])/_pitch)+1
+
+            else
+                nFurring= 2
+            endif
+
+            for iFurring=1 to nFurring
+
+                if iFurring<nFurring then 
+
+                    if (arrangeMethod[1][2]=2 or arrangeMethod[1][2]=3) and iFurring=1 then
+                        _sgn=0
+                        fixOriz=furringSize[1][3]/2
+                    else
+                        _sgn=1
+                        fixOriz=0
+                    endif
+
+                    iSteel=iSteel+1
+                    jCol=-3
+
+                    jCol=jCol+3
+                    steelPos[iSteel][jCol+x]=0 
+                    steelPos[iSteel][jCol+y]=0
+                    steelPos[iSteel][jCol+z]= _sgn*oriz+fixOriz+(iFurring-1)*_pitch
+                    jCol=jCol+3
+                    steelPos[iSteel][jCol+x]=frameRange[1][1]
+                    steelPos[iSteel][jCol+y]=0
+                    steelPos[iSteel][jCol+z]= _sgn*oriz+fixOriz+(iFurring-1)*_pitch
+
+                else !end side
+
+                    iSteel=iSteel+1
+                    jCol=-3
+
+                    jCol=jCol+3
+                    steelPos[iSteel][jCol+x]=0
+                    steelPos[iSteel][jCol+y]=0
+                    steelPos[iSteel][jCol+z]=0+frameRange[1][2]-furringSize[1][3]/2
+                    jCol=jCol+3
+                    steelPos[iSteel][jCol+x]=0+frameRange[1][1]
+                    steelPos[iSteel][jCol+y]=0
+                    steelPos[iSteel][jCol+z]=0+frameRange[1][2]-furringSize[1][3]/2
+
+                endif
+
+            next iFurring             
+
+            parameters steelIndex[1][2]=iSteel
+
+        !expand widopos list
+
+            dim array2D[][]
+            array2D=widoData
+            _row=nWido 
+            _col=5
+            gosub "resize2Dlist by size"
+            parameters widoData=array2D     
+
+            dim array2D[][]
+            array2D=widoFrameExlen
+            _row=nWido 
+            _col=2
+            gosub "resize2Dlist by size"
+            parameters widoFrameExlen=array2D  
+
+        !wido frame
+            dim widoHasTB[]
+            for iwido=1 to nwido
+
+                hasBot=2
+                hasTop=1
+                !check wido TB frame
+                    for iFurring=1+steelIndex[1][1] to nFurring+steelIndex[1][1]
+
+                        if hasBot then 
+                            !bot 
+                            if  widoData[iwido][z]<steelPos[iFurring][z]+(furringSize[1][3]+endSpace) \
+                            and widoData[iwido][z]>steelPos[iFurring][z]-(furringSize[1][3]+endSpace) then
+                                hasBot=0
+                                offBot=furringSize[1][3]/2
+                                if widoData[iwido][z]<steelPos[1+steelIndex[1][1]][z]+furringSize[1][3]/2+endSpace then offBot=-furringSize[1][3]/2-endSpace
+                            else
+                                hasBot=2
+                                offBot=widoSize[1][3]/2
+                            endif
+                        endif
+
+                        if hasTop then 
+                            !top 
+                            if  widoData[iwido][z]+widoData[iwido][H]<steelPos[iFurring][z]+(furringSize[1][3]+endSpace) \
+                            and widoData[iwido][z]+widoData[iwido][H]>steelPos[iFurring][z]-(furringSize[1][3]+endSpace) then
+                                hasTop=0
+                                offTop=-furringSize[1][3]/2
+                            else
+                                hasTop=1
+                                offTop=-widoSize[1][3]/2
+                            endif         
+                        endif        
+
+                    next iFurring
+
+                !exlen hotspot control
+                    parameters widoHasTB[iwido]= (hasTop+hasBot)
+
+                iSteel=iSteel+1
+                jCol=-3          
+
+                if hasTop then 
+
+                    jCol=jCol+3
+                    steelPos[iSteel][jCol+x]=widoData[iwido][x]-widoFrameExlen[iwido][1]
+                    steelPos[iSteel][jCol+y]=0
+                    steelPos[iSteel][jCol+z]=widoData[iwido][z]+widoData[iwido][H]
+                    jCol=jCol+3
+                    steelPos[iSteel][jCol+x]=widoData[iwido][x]+widoData[iwido][B]+widoFrameExlen[iwido][2]
+                    steelPos[iSteel][jCol+y]=0
+                    steelPos[iSteel][jCol+z]=widoData[iwido][z]+widoData[iwido][H]
+
+                endif
+
+                if hasBot then 
+
+                    jCol=jCol+3
+                    steelPos[iSteel][jCol+x]=widoData[iwido][x]-widoFrameExlen[iwido][1]
+                    steelPos[iSteel][jCol+y]=0
+                    steelPos[iSteel][jCol+z]=widoData[iwido][z]
+                    jCol=jCol+3
+                    steelPos[iSteel][jCol+x]=widoData[iwido][x]+widoData[iwido][B]+widoFrameExlen[iwido][2]
+                    steelPos[iSteel][jCol+y]=0
+                    steelPos[iSteel][jCol+z]=widoData[iwido][z]
+
+                endif
+
+                !left and right
+
+                    jCol=jCol+3
+                    steelPos[iSteel][jCol+x]=widoData[iwido][x]
+                    steelPos[iSteel][jCol+y]=0
+                    steelPos[iSteel][jCol+z]=widoData[iwido][z]+offBot+endSpace
+                    jCol=jCol+3
+                    steelPos[iSteel][jCol+x]=widoData[iwido][x]
+                    steelPos[iSteel][jCol+y]=0
+                    steelPos[iSteel][jCol+z]=widoData[iwido][z]+widoData[iwido][H]+offTop-endSpace
+
+                    jCol=jCol+3
+                    steelPos[iSteel][jCol+x]=widoData[iwido][x]+widoData[iwido][B]
+                    steelPos[iSteel][jCol+y]=0
+                    steelPos[iSteel][jCol+z]=widoData[iwido][z]+widoData[iwido][H]+offTop-endSpace
+                    jCol=jCol+3
+                    steelPos[iSteel][jCol+x]=widoData[iwido][x]+widoData[iwido][B]
+                    steelPos[iSteel][jCol+y]=0
+                    steelPos[iSteel][jCol+z]=widoData[iwido][z]+offBot+endSpace
+
+
+            next iwido
+            
+            parameters steelIndex[1][3]=iSteel
+
+        !split furring route
+            !each route insert 2 pt per mid column 
+
+            newcolNum=nFurring+2*max(nColumn-2,0)
+
+            for iFurring=1 to nFurring !check each row
+
+                irow=iFurring+steelIndex[1][1]
+                jcol=-3
+
+            for iColumn=1 to nColumn !march each col
+
+                if iColumn=1 then 
+                    jcol=jcol+3
+                    steelPos[irow][jcol+x]= steelPos[iColumn][x]+colSize[1][1]/2+endSpace
+                    steelPos[irow][jcol+y]= steelPos[irow][jcol+y]
+                    steelPos[irow][jcol+z]= steelPos[irow][jcol+z]
+                endif 
+
+                if iColumn>1 and iColumn<nColumn then 
+                    jcol=jcol+3
+                    steelPos[irow][jcol+x]= steelPos[iColumn][x]-colSize[1][1]/2-endSpace
+                    steelPos[irow][jcol+y]= steelPos[irow][jcol-3+y]
+                    steelPos[irow][jcol+z]= steelPos[irow][jcol-3+z]
+                    jcol=jcol+3
+                    steelPos[irow][jcol+x]= steelPos[iColumn][x]+colSize[1][1]/2+endSpace
+                    steelPos[irow][jcol+y]= steelPos[irow][jcol-3+y]
+                    steelPos[irow][jcol+z]= steelPos[irow][jcol-3+z]
+                endif
+
+                if iColumn=nColumn then 
+                    jcol=jcol+3
+                    steelPos[irow][jcol+x]= steelPos[nColumn][x]-colSize[1][1]/2-endSpace
+                    steelPos[irow][jcol+y]= steelPos[irow][jcol-3+y]
+                    steelPos[irow][jcol+z]= steelPos[irow][jcol-3+z]
+                endif 
+
+            next iColumn
+            next iFurring 
+
+            !each route insert 2 pt per wido
+
+                for i=1 to vardim1 (steelPos)
+                for j=1 to vardim2 (steelPos)
+                    tempPos[i][j]=steelPos[i][j]
+                next j
+                next i
+                
+                nCol= vardim2 (steelPos)
+
+                !check furring route 1 to n and pairs in col
+                for iFurring=1 to nFurring
+
+                    irow=iFurring+steelIndex[1][1]
+                    jcol=-3
+                    tempCol=-3
+
+                for jFurring=0 to nCol-1 step 6
+
+                    !current point set
+                    jcol=jcol+3
+                        p1x=steelPos[irow][jFurring+x]
+                        p1y=steelPos[irow][jFurring+y]
+                        p1z=steelPos[irow][jFurring+z]
+                    jcol=jcol+3
+                        p2x=steelPos[irow][jFurring+3+x]
+                        p2y=steelPos[irow][jFurring+3+y]
+                        p2z=steelPos[irow][jFurring+3+z]
+
+                    !check if in the range of wido
+                    isCut=0
+                    dim widoIndex[]
+
+                    for iwido=1 to nwido 
+
+                        if (p1z>widoData[iwido][z]+widoSize[1][3]/2 and p1z<widoData[iwido][z]+widoData[iwido][H]-widoSize[1][3]/2) then inRange_Z=1 else inRange_Z=0
+                        if p1x<=widoData[iwido][x]-widoSize[1][3]/2-endSpace and p2x>=widoData[iwido][x]+widoData[iwido][B]+widoSize[1][3]/2+endSpace then inRange_X=1 else inRange_X=0
+                        
+                        if iFurring=1 then if (p1z>widoData[iwido][z]-widoSize[1][3]/2-endSpace and p1z<widoData[iwido][z]+widoSize[1][3]/2+endSpace) then inRange_Z=1
+                        
+                        if inRange_Z and inRange_X then 
+                            isCut=isCut+1
+                            widoIndex[isCut]=iwido                                      
+                        endif
+
+                    next iwido 
+
+                    !sort wido index depend on x
+
+                        nwidoMatched=vardim1 (widoIndex)
+
+                        dim widox[]
+                        for i=1 to nwidoMatched
+                            widox[i]=widoData[widoIndex[i]][x]
+                        next i
+
+                        if nwidoMatched>=2 then
+                            for j=1 to nwidoMatched-1
+                            for i=1 to nwidoMatched-j
+
+                                if widox[i]>widox[i+1] then 
+                                    tempx=widox[i+1]
+                                    widox[i+1]=widox[i]
+                                    widox[i]=tempx
+
+                                    tempID=widoIndex[i+1]
+                                    widoIndex[i+1]=widoIndex[i]
+                                    widoIndex[i]=tempID                                   
+                                endif
+
+                            next i
+                            next j
+
+                        endif
+
+                    if isCut then 
+                        tempCol=tempCol+3
+                            tempPos[irow][tempCol+x]=p1x
+                            tempPos[irow][tempCol+y]=p1y
+                            tempPos[irow][tempCol+z]=p1z
+
+                        !wido frame
+                        for i=1 to nwidoMatched
+                            tempCol=tempCol+3
+                                tempPos[irow][tempCol+x]=widoData[widoIndex[i]][x]-widoSize[1][3]/2-endSpace
+                                tempPos[irow][tempCol+y]=p1y
+                                tempPos[irow][tempCol+z]=p1z
+
+                            tempCol=tempCol+3
+                                tempPos[irow][tempCol+x]=widoData[widoIndex[i]][x]+widoData[widoIndex[i]][B]+widoSize[1][3]/2+endSpace
+                                tempPos[irow][tempCol+y]=p2y
+                                tempPos[irow][tempCol+z]=p2z
+                        next i    
+
+                        tempCol=tempCol+3
+                            tempPos[irow][tempCol+x]=p2x
+                            tempPos[irow][tempCol+y]=p2y
+                            tempPos[irow][tempCol+z]=p2z
+                    else
+                        tempCol=tempCol+3
+                            tempPos[irow][tempCol+x]=p1x
+                            tempPos[irow][tempCol+y]=p1y
+                            tempPos[irow][tempCol+z]=p1z
+                        tempCol=tempCol+3
+                            tempPos[irow][tempCol+x]=p2x
+                            tempPos[irow][tempCol+y]=p2y
+                            tempPos[irow][tempCol+z]=p2z
+                    endif
+
+                next jFurring
+                next iFurring     
+
+
+        !calculate fixColumnHei
+        if topSlope[1][1] or topSlope[1][2] then 
+
+            if topSlope[1][1] then 
+            for iColumn=1 to steelIndex[1][1]    
+
+                _distance=steelPos[iColumn][x]-slopeOffset[1][1]
+
+                if _distance<esp then isInSlopeRange=1 else isInSlopeRange=0
+                if isInSlopeRange then 
+                    parameters fixColumnHei[iColumn]=-slopeOffset[1][3]*abs(_distance)/(slopeOffset[1][1]+esp)
+                endif
+
+            next iColumn
+            endif
+
+            if topSlope[1][2] then 
+            for iColumn=1 to steelIndex[1][1]
+
+                _distance=steelPos[iColumn][x]-(frameRange[1][1]-slopeOffset[2][1])
+
+                if _distance>esp then isInSlopeRange=1 else isInSlopeRange=0
+                if isInSlopeRange then 
+                    parameters fixColumnHei[iColumn]=-slopeOffset[2][3]*abs(_distance)/(slopeOffset[2][1]+esp)
+                endif
+
+            next iColumn
+            endif
+
+            !reset to zero
+            for iColumn=1 to steelIndex[1][1]  
+
+                left_distance=steelPos[iColumn][x]-slopeOffset[1][1]
+                right_distance=steelPos[iColumn][x]-(frameRange[1][1]-slopeOffset[2][1])
+
+                if left_distance>esp and right_distance<esp then parameters fixColumnHei[iColumn]=0
+
+            next iColumn
+
+        else
+
+            !initialize list    
+            for i=1 to steelIndex[1][1]
+                parameters fixColumnHei[i]=0
+            next i
+
+        endif
+
+        !delete furring
+        
+        !if topSlope[1][1]+topSlope[1][2] then         
+        if 0 then 
+            for iFurring=1+steelIndex[1][1] to steelIndex[1][2]
+            for iColumn=1 to steelIndex[1][1]-1
+
+            maxColumnHei= max (tempPos[iColumn][z+3],tempPos[iColumn+1][z+3])-furringSize[1][3]/2
+            minColumnHei= min (tempPos[iColumn][z+3],tempPos[iColumn+1][z+3])-furringSize[1][3]/2          
+
+            minColumnPosx= tempPos[iColumn][x]
+            maxColumnPosx= tempPos[iColumn+1][x]
+
+            _dz=tempPos[iColumn][z+3]-tempPos[iColumn+1][z+3]
+
+            !if (frameRange[1][1]-topSlope[1][2]*slopeOffset[2][1])-maxColumnPosx<eps then _dz=tempPos[iColumn][z+3]-(frameRange[1][2]-furringSize[1][3])
+
+            for jcol=0 to vardim2 (tempPos) step 6
+            !reset furring out of range
+            if tempPos[iFurring][x+jcol]-minColumnPosx>0 and tempPos[iFurring][x+3+jcol]-maxColumnPosx<0 then _isInXrange=1 else _isInXrange=0
+
+            if _isInXrange then 
+
+                if tempPos[iFurring][z+jcol]-maxColumnHei>0 then _isOverhead=1 else _isOverhead=0
+
+                if _isOverhead then 
+                    
+                    tempPos[iFurring][x+jcol]=0
+                    tempPos[iFurring][y+jcol]=0
+                    tempPos[iFurring][z+jcol]=0
+                    tempPos[iFurring][x+3+jcol]=0
+                    tempPos[iFurring][y+3+jcol]=0
+                    tempPos[iFurring][z+3+jcol]=0
+
+                endif
+
+                !resize furring between minColumnHei and maxColumnHei
+
+                if tempPos[iFurring][z+jcol]-maxColumnHei<0 and tempPos[iFurring][z+jcol]-minColumnHei>=0 then
+
+                    if _dz<0 then 
+
+                        _rangez=abs(tempPos[iFurring][z+jcol]-minColumnHei)
+
+                        if slopeOffset[1][1]>minColumnPosx and slopeOffset[1][1]<maxColumnPosx then 
+                            _rangex=slopeOffset[1][1]-tempPos[iFurring][x+jcol]
+                        else
+                            _rangex=abs(tempPos[iFurring][x+3+jcol]-tempPos[iFurring][x+jcol])
+                        endif
+
+                        tempPos[iFurring][x+jcol]=tempPos[iFurring][x+jcol]-_rangex*_rangez/_dz+furringSize[1][3]/2
+
+                    endif
+
+                    if _dz>0 then 
+
+                        _rangez=abs(tempPos[iFurring][z+jcol]-minColumnHei)
+
+                        if abs(frameRange[1][1]-slopeOffset[2][1])>minColumnPosx and abs(frameRange[1][1]-slopeOffset[2][1])<maxColumnPosx then 
+                            _rangex=tempPos[iFurring][x+3+jcol]-abs(frameRange[1][1]-slopeOffset[2][1])
+                        else
+                            _rangex=abs(tempPos[iFurring][x+3+jcol]-tempPos[iFurring][x+jcol])+furringSize[1][3]/2
+                        endif
+
+                        tempPos[iFurring][x+3+jcol]=tempPos[iFurring][x+3+jcol]-_rangex*_rangez/_dz-furringSize[1][3]/2 
+
+                    endif
+
+                endif
+
+            endif
+
+            next jcol
+
+            next iColumn
+            next iFurring
+        endif
+
+        !top furring
+        _newLastRow=steelIndex[1][2]
+        jcol=0
+        for iColumn=1 to steelIndex[1][1]-1
+
+            jcol=jcol+6*(iColumn-1)
+
+            minColumnPosx= tempPos[iColumn][x]
+            maxColumnPosx= tempPos[iColumn+1][x]
+
+            left_distance =slopeOffset[1][1]
+            right_distance=frameRange[1][1]-slopeOffset[2][1]
+
+            if minColumnPosx<left_distance and left_distance<maxColumnPosx then  _overwriteRight=1 else _overwriteRight=0
+            if minColumnPosx<right_distance and right_distance<maxColumnPosx then _overwriteLeft=1 else _overwriteLeft=0
+
+            if _overwriteRight then 
+
+                tempPos[_newLastRow][x+jcol]=tempPos[iColumn][x]+(colSize[1][1]/2+endSpace)
+                tempPos[_newLastRow][y+jcol]=tempPos[iColumn][y]
+                tempPos[_newLastRow][z+jcol]=tempPos[iColumn][z+3]-furringSize[1][3]/2
+
+                tempPos[_newLastRow][x+3+jcol]=left_distance
+                tempPos[_newLastRow][y+3+jcol]=tempPos[iColumn][y]
+                tempPos[_newLastRow][z+3+jcol]=frameRange[1][2]-furringSize[1][3]/2
+
+                jcol=jcol+6
+                tempPos[_newLastRow][x+jcol]=left_distance
+                tempPos[_newLastRow][y+jcol]=tempPos[iColumn][y]
+                tempPos[_newLastRow][z+jcol]=frameRange[1][2]-furringSize[1][3]/2
+
+                tempPos[_newLastRow][x+3+jcol]=tempPos[iColumn+1][x]-(colSize[1][1]/2+endSpace)
+                tempPos[_newLastRow][y+3+jcol]=tempPos[iColumn+1][y]
+                tempPos[_newLastRow][z+3+jcol]=frameRange[1][2]-furringSize[1][3]/2
+
+            else
+
+                tempPos[_newLastRow][x+jcol]=tempPos[iColumn][x]+(colSize[1][1]/2+endSpace)
+                tempPos[_newLastRow][y+jcol]=tempPos[iColumn][y]
+                tempPos[_newLastRow][z+jcol]=tempPos[iColumn][z+3]-furringSize[1][3]/2
+
+                tempPos[_newLastRow][x+3+jcol]=tempPos[iColumn+1][x]-(colSize[1][1]/2+endSpace)
+                tempPos[_newLastRow][y+3+jcol]=tempPos[iColumn+1][y]
+                tempPos[_newLastRow][z+3+jcol]=tempPos[iColumn+1][z+3]-furringSize[1][3]/2
+
+            endif
+
+            if _overwriteLeft then 
+
+                if _overwriteRight then 
+                    tempPos[_newLastRow][x+jcol]=left_distance
+                    tempPos[_newLastRow][y+jcol]=tempPos[iColumn][y]
+                    tempPos[_newLastRow][z+jcol]=frameRange[1][2]-furringSize[1][3]/2
+                else
+                    tempPos[_newLastRow][x+jcol]=tempPos[iColumn][x]+(colSize[1][1]/2+endSpace)
+                    tempPos[_newLastRow][y+jcol]=tempPos[iColumn][y]
+                    tempPos[_newLastRow][z+jcol]=frameRange[1][2]-furringSize[1][3]/2
+                endif
+                    tempPos[_newLastRow][x+3+jcol]=right_distance
+                    tempPos[_newLastRow][y+3+jcol]=tempPos[iColumn][y]
+                    tempPos[_newLastRow][z+3+jcol]=frameRange[1][2]-furringSize[1][3]/2
+
+                    jcol=jcol+6
+
+                    tempPos[_newLastRow][x+jcol]=right_distance
+                    tempPos[_newLastRow][y+jcol]=tempPos[iColumn][y]
+                    tempPos[_newLastRow][z+jcol]=frameRange[1][2]-furringSize[1][3]/2
+                    
+                    tempPos[_newLastRow][x+3+jcol]=tempPos[iColumn+1][x]+(colSize[1][1]/2+endSpace)
+                    tempPos[_newLastRow][y+3+jcol]=tempPos[iColumn+1][y]
+                    tempPos[_newLastRow][z+3+jcol]=tempPos[iColumn+1][z+3]-furringSize[1][3]/2
+
+            endif
+
+        next iColumn
+
+        !endif !delete furring when roof cutted
+
+                dim array2D[][]
+                    array2D=tempPos
+                    _row=iSteel 
+                    _col=vardim2 (tempPos)
+                    gosub "resize2Dlist by size"
+
+		!parameters tempPos=array2D        
+		!parameters steelPos=array2D
+
+        dim steelPos[][]
+        steelPos=array2D
+        gosub "split list" !output route by parts 
+        
+    endif !update
+
+return
+
+"split list":
+
+    dim array2D[][]
+    _row=steelIndex[1][1]
+    _col=6
+
+    array2D=colRoute
+    gosub "resize2Dlist"
+    parameters colRoute=array2D
+
+    dim array2D[][]
+    _row=steelIndex[1][2]-steelIndex[1][1]
+    _col=6
+
+    array2D=furRoute
+    gosub "resize2Dlist"
+    parameters furRoute=array2D
+
+    dim array2D[][]
+    _row=steelIndex[1][3]-steelIndex[1][2]
+    _col=6
+
+    array2D=widoRoute
+    gosub "resize2Dlist"
+    parameters widoRoute=array2D
+
+    dim _colRoute[][]
+    _colRoute[1][1]=0 : _colRoute[1][2]=0
+
+    icolRoute=0
+    irow=0
+    for iroute=1 to steelIndex[1][1]
+        irow=irow+1
+
+        exsitFlag=1
+        if iroute=1 and switchStart=0 then exsitFlag=0
+        if iroute=steelIndex[1][1] and switchEnd=0 then exsitFlag=0
+
+
+        for jcol=0 to vardim2 (steelPos) step 6
+            !隣接の頂点が重なっていない場合
+            if abs (steelPos[irow][x+jcol]-steelPos[irow][x+jcol+3])>esp \
+            or abs (steelPos[irow][y+jcol]-steelPos[irow][y+jcol+3])>esp \
+            or abs (steelPos[irow][z+jcol]-steelPos[irow][z+jcol+3])>esp then
+                if exsitFlag=1 then
+                    icolRoute=icolRoute+1
+
+                    _colRoute[icolRoute][x]=steelPos[irow][x+jcol]
+                    _colRoute[icolRoute][y]=steelPos[irow][y+jcol]
+                    _colRoute[icolRoute][z]=steelPos[irow][z+jcol]
+                    _colRoute[icolRoute][x+3]=steelPos[irow][x+jcol+3]
+                    _colRoute[icolRoute][y+3]=steelPos[irow][y+jcol+3]
+                    _colRoute[icolRoute][z+3]=steelPos[irow][z+jcol+3]
+                endif
+            endif
+        next jcol
+    next iroute
+
+    colRoute=_colRoute
+    parameters colRoute=_colRoute
+
+    ifurRoute=0
+    savedRoute=0
+
+    dim _furRoute[][]
+
+    for iroute=1 to steelIndex[1][2]-steelIndex[1][1]
+    irow=irow+1
+    for jcol=0 to vardim2 (steelPos) step 6
+
+        if abs (steelPos[irow][x+jcol]-steelPos[irow][x+jcol+3]) \
+        +  abs (steelPos[irow][y+jcol]-steelPos[irow][y+jcol+3]) \
+        +  abs (steelPos[irow][z+jcol]-steelPos[irow][z+jcol+3])>esp then isLegalPosition=1 else isLegalPosition=0
+
+        !tempPos[_newLastRow][x]
+        !tempPos[_newLastRow][y]
+        !tempPos[_newLastRow][z]
+        !tempPos[_newLastRow][x+3]
+        !tempPos[_newLastRow][y+3]
+        !tempPos[_newLastRow][z+3]
+
+        !tempIndex=vardim2(tempPos)-6
+        !tempPos[_newLastRow][tempIndex+x]
+        !tempPos[_newLastRow][tempIndex+y]
+        !tempPos[_newLastRow][tempIndex+z]
+        !tempPos[_newLastRow][tempIndex+x+3]
+        !tempPos[_newLastRow][tempIndex+y+3]
+        !tempPos[_newLastRow][tempIndex+z+3]
+
+        !steelPos[irow][x+jcol]
+        !steelPos[irow][y+jcol]
+        !steelPos[irow][z+jcol]
+
+        !calculate cross point
+
+        if isLegalPosition then 
+
+            isOverWriteLeft=0
+            isOverWriteRight=0      
+            isOutOfRange=0   
+
+            _nloop=vardim2 (tempPos)
+
+            checkRange=0.05
+
+            if _newLastRow<>irow then 
+
+                for jcheck=jcol to _nloop step 6
+
+                    _isLeftInRange=0
+                    _isRightInRange=0
+
+                    !tempPos[_newLastRow][x+jcheck]
+                    !tempPos[_newLastRow][y+jcheck]
+                    !tempPos[_newLastRow][z+jcheck]
+                    !tempPos[_newLastRow][x+jcheck+3]
+                    !tempPos[_newLastRow][y+jcheck+3]
+                    !tempPos[_newLastRow][z+jcheck+3]
+
+                    !steelPos[irow][x+jcol]
+                    !steelPos[irow][y+jcol]
+                    !steelPos[irow][z+jcol]
+                    !steelPos[irow][x+jcol+3]
+                    !steelPos[irow][y+jcol+3]
+                    !steelPos[irow][z+jcol+3]
+
+                    !if  abs (steelPos[irow][x+jcol]-tempPos[_newLastRow][x+jcheck])     <eps \
+                    !and abs (tempPos[_newLastRow][x+jcheck+3]-steelPos[irow][x+jcol+3]) <eps \
+                    !and abs (steelPos[irow][z+jcol]  -tempPos[_newLastRow][z+jcheck])   <eps \
+                    !and abs (steelPos[irow][z+jcol+3]-tempPos[_newLastRow][z+jcheck+3]) <eps then _isSelf=1
+
+                    slopex1=tempPos[_newLastRow][x+jcheck]
+                    slopez1=tempPos[_newLastRow][z+jcheck]
+                    slopex2=tempPos[_newLastRow][x+jcheck+3]
+                    slopez2=tempPos[_newLastRow][z+jcheck+3]                    
+
+                    if abs (steelPos[irow][x+jcol]-slopex1)    <checkRange then _isLeftInRange =1
+                    if abs (slopex2-steelPos[irow][x+jcol+3])  <checkRange then _isRightInRange=1
+
+                    if _isLeftInRange and _isRightInRange then 
+
+                        _diffLeft =(steelPos[irow][z+jcol]  -slopez1)
+                        _diffRight=(steelPos[irow][z+jcol+3]-slopez2)
+
+                        if  _diffLeft >-eps \
+                        and _diffRight>-eps \
+                        then 
+                            isOutOfRange=1
+                            jcheck=_nloop+1
+                        endif
+
+                    endif
+
+                    !check intersection 
+                    if abs (slopex2-slopex1)>eps then 
+
+                        isChangeLeft=0
+                        isChangeRight=0                            
+                        if slopez2-slopez1>0 then isChangeLeft=1
+                        if slopez2-slopez1<0 then isChangeRight=1
+
+                        if isChangeLeft or isChangeRight then 
+
+                            krate=(slopez2-slopez1)/(slopex2-slopex1)
+                            brate=slopez2-krate*slopex2
+                            
+                            crossx=(steelPos[irow][z+jcol]-brate)/krate
+                            crossz= steelPos[irow][z+jcol]
+
+                        endif
+
+                        if  crossx-slopex1>0 \
+                        and crossx-slopex2<0 \
+                        and crossx-steelPos[irow][x+jcol]>0 \
+                        and crossx-steelPos[irow][x+jcol+3]<0 \
+
+                        then hasIsecPoint=1 else hasIsecPoint=0
+                         
+                        if hasIsecPoint then 
+                            if isChangeLeft then 
+                                newx=(steelPos[irow][z+jcol]-brate)/krate
+                                steelPos[irow][x+jcol]=newx
+                            endif
+
+                            if isChangeRight then 
+                                newx=(steelPos[irow][z+jcol+3]-brate)/krate
+                                steelPos[irow][x+jcol+3]=newx
+                            endif
+                        endif
+
+                    endif
+
+                next jcheck
+
+            endif
+
+            if _newLastRow=irow then 
+
+                if  (steelPos[irow][x+jcol+3]-right_distance) > eps \
+                and abs (steelPos[irow][z+jcol+3]-steelPos[irow][z+jcol])<eps \
+                then isOutOfRange=1  
+
+                if isOutOfRange=0 then 
+
+                    for jcheck=jcol+6 to _nloop step 6
+
+                        if  abs (steelPos[irow][x+jcol]-tempPos[_newLastRow][x+jcheck])     <eps \
+                        and abs (tempPos[_newLastRow][x+jcheck+3]-steelPos[irow][x+jcol+3]) <eps \
+                        and abs (steelPos[irow][z+jcol]-tempPos[_newLastRow][z+jcheck])     <eps \
+                        and abs (tempPos[_newLastRow][z+jcheck+3]-steelPos[irow][z+jcol+3]) <eps \
+                        then isOutOfRange=1
+                            
+                    next jcheck
+
+                endif
+
+            endif
+
+            if isOutOfRange=0 then 
+
+                ifurRoute=ifurRoute+1
+                parameters \
+                furRoute[ifurRoute][x]  =steelPos[irow][x+jcol],
+                furRoute[ifurRoute][y]  =steelPos[irow][y+jcol],
+                furRoute[ifurRoute][z]  =steelPos[irow][z+jcol],
+                furRoute[ifurRoute][x+3]=steelPos[irow][x+jcol+3],
+                furRoute[ifurRoute][y+3]=steelPos[irow][y+jcol+3],
+                furRoute[ifurRoute][z+3]=steelPos[irow][z+jcol+3]
+                
+            endif
+
+            !else
+
+            !ifurRoute=ifurRoute+1
+            !parameters \
+            !furRoute[ifurRoute][x]=0,
+            !furRoute[ifurRoute][y]=0,
+            !furRoute[ifurRoute][z]=0,
+            !furRoute[ifurRoute][x+3]=0,
+            !furRoute[ifurRoute][y+3]=0,
+            !furRoute[ifurRoute][z+3]=0
+
+        endif
+
+    next jcol
+
+        for jclear=1 to vardim2 (steelPos)
+            parameters steelPos[irow][jclear]=0
+        next jclear
+
+        if 1 then 
+
+            jsave=0
+            for isave=savedRoute+1 to ifurRoute
+
+                parameters \
+                steelPos[irow][x+jsave]  =furRoute[isave][x],
+                steelPos[irow][y+jsave]  =furRoute[isave][y],
+                steelPos[irow][z+jsave]  =furRoute[isave][z],
+                steelPos[irow][x+jsave+3]=furRoute[isave][x+3],
+                steelPos[irow][y+jsave+3]=furRoute[isave][y+3],
+                steelPos[irow][z+jsave+3]=furRoute[isave][z+3]
+
+                jsave=jsave+6
+
+            next isave
+
+        endif
+
+        savedRoute=ifurRoute
+
+    next iroute
+
+    iwidoRoute=0
+    for iroute=1 to steelIndex[1][3]-steelIndex[1][2]
+    irow=irow+1    
+    for jcol=0 to vardim2 (tempPos) step 6
+
+        if abs (tempPos[irow][x+jcol]-tempPos[irow][x+jcol+3])>esp \
+        or abs (tempPos[irow][y+jcol]-tempPos[irow][y+jcol+3])>esp \
+        or abs (tempPos[irow][z+jcol]-tempPos[irow][z+jcol+3])>esp then 
+        iwidoRoute=iwidoRoute+1 
+
+            parameters \
+            steelPos[irow][x+jcol]  =tempPos[irow][x+jcol],
+            steelPos[irow][y+jcol]  =tempPos[irow][y+jcol],
+            steelPos[irow][z+jcol]  =tempPos[irow][z+jcol],
+            steelPos[irow][x+jcol+3]=tempPos[irow][x+jcol+3],
+            steelPos[irow][y+jcol+3]=tempPos[irow][y+jcol+3],
+            steelPos[irow][z+jcol+3]=tempPos[irow][z+jcol+3]
+
+            parameters \
+            widoRoute[iwidoRoute][x]  =tempPos[irow][x+jcol],
+            widoRoute[iwidoRoute][y]  =tempPos[irow][y+jcol],
+            widoRoute[iwidoRoute][z]  =tempPos[irow][z+jcol],
+            widoRoute[iwidoRoute][x+3]=tempPos[irow][x+jcol+3],
+            widoRoute[iwidoRoute][y+3]=tempPos[irow][y+jcol+3],
+            widoRoute[iwidoRoute][z+3]=tempPos[irow][z+jcol+3]
+
+        endif
+
+    next jcol
+    next iroute
+
+		parameters count_colRoute = icolRoute
+		parameters count_furRoute = ifurRoute
+		parameters count_widoRoute= iwidoRoute
+
+return
+
+"count":
+
+    !cross section
+
+        _iRow=0
+        volumn=0
+
+        for iSteel=1 to vardim1 (steelPos)
+
+            !column
+            if iSteel<=steelIndex[1][1] then
+                area=colSize[1][1]*colSize[1][2]-(colSize[1][1]-colSize[1][3])*(colSize[1][2]-colSize[1][3])
+                if iSteel=1 and switchStart=0 then area=0
+                if iSteel=steelIndex[1][1] and switchEnd=0 then area=0
+            endif
+
+            !furring
+            if steelIndex[1][1]<iSteel and iSteel<=steelIndex[1][2] then 
+                area=furringSize[1][2]*furringSize[1][3]-(furringSize[1][2]-furringSize[1][1])*(furringSize[1][3]-furringSize[1][1])-furringSize[1][1]*(furringSize[1][2]-2*furringSize[1][4])
+            endif
+
+            !wido
+            if steelIndex[1][2]<iSteel then 
+                area=widoSize[1][2]*widoSize[1][3]-(widoSize[1][2]-widoSize[1][1])*(widoSize[1][3]-widoSize[1][1])-widoSize[1][1]*(widoSize[1][2]-2*widoSize[1][4])
+            endif
+
+            if steelEdit[iSteel][1]=0 then !hide=0
+
+                for jCol=1   to vardim2 (steelPos)/3/2
+
+                        _spx=steelPos[iSteel][6*jCol-5]
+                        _spy=steelPos[iSteel][6*jCol-4]
+                        _spz=steelPos[iSteel][6*jCol-3]
+
+                        _epx=steelPos[iSteel][6*jCol-2]
+                        _epy=steelPos[iSteel][6*jCol-1]
+                        _epz=steelPos[iSteel][6*jCol-0]
+
+                        _vecx=_epx-_spx
+                        _vecy=_epy-_spy
+                        _vecz=_epz-_spz
+
+                        _iRow=iSteel
+
+                        if abs(_vecx+_vecy+_vecz)>esp then 
+
+                            rotAxisY=0
+                            rotAxisZ=0
+                            vecLen=0
+
+                            gosub "CL rotation"
+
+                            volumn=volumn+vecLen*area
+
+                        endif
+
+                next jCol
+
+            endif
+
+        next iSteel
+
+        parameters countSteelWgt=volumn*steelDensity/td
+
+return
+
+!================================functions==================================
+
+
+
+    "resize2Dlist by size":
+
+        dim list2D[][]
+
+                for j=1 to _col
+                for i=1 to _row
+                    
+                    if 1>vardim1(array2D) then 
+                        list2D[i][j]=0
+                    else
+                        list2D[i][j]=array2D[i][j]
+                    endif
+                
+                next i
+                next j
+                
+        array2D=list2D
+
+    return
+
+    "CL rotation":
+      
+        Veca_x_Vecb=(_vecx)*1
+        lenva_x_lenvb=sqr((_vecx)^2+(_vecy)^2)*1
+        
+        if abs((_epx+_epy)-(_spx+_spy))>esp then
+
+            if sgn(_vecy)=0 and sgn(_vecx)>=0 then rotAxisZ=0
+            if sgn(_vecy)=0 and sgn(_vecx)<0  then rotAxisZ=180
+
+            if sgn(_vecy)<>0 then
+
+                if sgn(_vecy)<0  then alpha=360
+                if sgn(_vecy)>0  then alpha=0 
+
+                rotAxisZ=sgn(_vecy)*acs(Veca_x_Vecb/lenva_x_lenvb)+alpha
+
+            endif
+
+                XYplaneVecLen=sqr((_vecx)^2+(_vecy)^2)
+
+        endif
+
+        if abs(_spz-_epz)>esp then 
+
+            Veca_x_Vecb=_vecx*_vecx+_vecy*_vecy
+            lenva_x_lenvb=max(sqr(_vecx^2+_vecy^2+_vecz^2)*sqr(_vecx^2+_vecy^2),esp)
+            
+            if abs((_epx+_epy)-(_spx+_spy))>-esp then
+
+                if sgn(_vecz)=0 and sgn(_vecx+_vecy)>=0 then rotAxisY=0
+                if sgn(_vecz)=0 and sgn(_vecx+_vecy)<0  then rotAxisY=180
+
+                if sgn(_vecz)<>0 then
+
+                    if sgn(_vecz)<0  then alpha=-180
+                    if sgn(_vecz)>0  then alpha=180 
+
+                    rotAxisY=sgn(_vecz)*acs(Veca_x_Vecb/lenva_x_lenvb)+alpha
+
+                endif
+
+                    vecLen=sqr(_vecx^2+_vecy^2+_vecz^2)
+
+            endif
+
+        else
+
+                rotAxisY=0
+                vecLen=XYplaneVecLen
+
+        endif
+
+    return
+
+    "resize1Dlist":
+
+    dim list1D[]
+
+            for i=1 to _row
+                
+                if 1>vardim1(array1D) then 
+                    list1D[i]=0
+                else
+                    list1D[i]=array1D[i]
+                endif
+            
+            next i
+            
+    array1D=list1D
+
+    return
+
+    "resize2Dlist":
+
+        dim list2D[][]
+
+                for j=1 to _col
+                for i=1 to _row
+                    
+                    if 1>vardim1(array2D) then 
+                        list2D[i][j]=0
+                    else
+                        list2D[i][j]=array2D[i][j]
+                    endif
+                
+                next i
+                next j
+                
+        array2D=list2D
+
+    return
+
+    "channel":
+
+    updateYear=0
+    updateMonth=0
+    updateDay=0
+
+    updateDate=""
+
+    ch=open ("DateTime", "", "%Y/%m/%d")
+    n=input (ch, "", "", updateDate)
+    close (ch)
+
+    g=split (updateDate, "%n/%n/%n", updateYear, txt1, updateMonth, txt2, updateDay)
+
+    updatenum=updateYear*10000+updateMonth*100+updateDay
+
+		parameters updateDate=updateDate
+
+    return

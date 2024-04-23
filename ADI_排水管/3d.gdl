@@ -1,0 +1,215 @@
+resol arcResol
+
+!========================================パイプ
+!hotspot
+    for i=1 to h_pipeNum
+        for j=1 to _h_pipeTNum[i]
+            hotspot _h_pipeTPos[i][2*(j-1)+x],_h_pipeTPos[i][2*(j-1)+y],h_pipeLevel[i]
+        next j
+
+        for j=1 to _h_pipeBrNum[i]
+            for n=1 to _h_pipeBrTNum[i][j]
+                index=(h_pipeBrVNum+1)*2*(j-1)+2*(n-1)
+                hotspot _h_pipeBrTPos[i][index+x],_h_pipeBrTPos[i][index+y],h_pipeLevel[i]
+            next n
+        next j
+
+        hotspot _h_pipePos[i][1],_h_pipePos[i][2],0             ,code,h_pipeLevel[i],1+128 : code=code+1
+        hotspot _h_pipePos[i][1],_h_pipePos[i][2],h_pipeLevel[i],code,h_pipeLevel[i],2     : code=code+1
+        hotspot _h_pipePos[i][1],_h_pipePos[i][2],-1            ,code,h_pipeLevel[i],3     : code=code+1
+    next i
+
+
+!中心線
+    group "h_pipe_centerLine"
+        for i=1 to h_pipeNum
+            pen h_pipePen[i]
+
+            if _h_pipeElbowVNum[i]=2 then
+                put _h_pipeElbowPos[i][1],_h_pipeElbowPos[i][2],h_pipeLevel[i]
+                put _h_pipeElbowPos[i][3],_h_pipeElbowPos[i][4],h_pipeLevel[i]
+
+                lin_ get(6)
+            endif
+
+            if _h_pipeElbowVNum[i]>=3 then
+                for j=1 to _h_pipeElbowVNum[i]
+                    !x,y,s
+                        put _h_pipeElbowPos[i][2*(j-1)+x],_h_pipeElbowPos[i][2*(j-1)+y],_h_pipeElbowFlag[i][j]
+                next j
+
+                addz h_pipeLevel[i]
+                    extrude _h_pipeElbowVNum[i],0,0,0,16,
+                    get(3*_h_pipeElbowVNum[i])
+                del 1
+            endif
+
+            !分岐パイプ(エルボなし)
+                for j=1 to _h_pipeBrNum[i]
+                    if _h_pipeBrTNum[i][j]>=2 then
+                        index=(h_pipeBrVNum+1)*2*(j-1)
+
+                        for n=1 to _h_pipeBrTNum[i][j]-1
+                            lin_ _h_pipeBrTPos[i][index+2*(n-1)+x],_h_pipeBrTPos[i][index+2*(n-1)+y],h_pipeLevel[i],
+                                 _h_pipeBrTPos[i][index+2*n+x],_h_pipeBrTPos[i][index+2*n+y],h_pipeLevel[i]
+                        next n
+                    endif
+                next j
+        next i
+    endgroup
+
+    if h_pipeDisCL then
+        placegroup "h_pipe_centerLine"
+    endif
+
+
+!パイプ本体
+    group "h_pipe_body"
+        if h_pipeDisBody then
+            for i=1 to h_pipeNum
+                if _h_pipeTNum[i]>=2 then
+                    dim _vertices[][]
+                
+                    for j=1 to _h_pipeTNum[i]
+                        _vertices[j][x]=_h_pipeTPos[i][2*(j-1)+x]
+                        _vertices[j][y]=_h_pipeTPos[i][2*(j-1)+y]
+                        _vertices[j][z]=h_pipeLevel[i]
+                    next j
+                
+                    call "API_Pipe" parameters \
+                    showCL=0,
+                    detail=arcResol,
+                    elbowRad=elbowRad,
+                    nVertex=_h_pipeTNum[i],
+                    vertices=_vertices,
+                    pipeRad=h_pipeDia/2,
+                    matPipe=h_pipeMat[i]
+                endif
+            next i
+
+            !分岐パイプ
+            for i=1 to h_pipeNum
+                material h_pipeMat[i]
+
+                for j=1 to h_pipeBrNum[i]
+                    if _h_pipeBrTNum[i][j]>=2 then
+                        !dim _vertices[][]
+                        !
+                        !index=(h_pipeBrVNum+1)*2*(j-1)
+                        !
+                        !for n=1 to _h_pipeBrTNum[i][j]
+                        !    _vertices[n][x]=_h_pipeBrTPos[i][index+2*(n-1)+x]
+                        !    _vertices[n][y]=_h_pipeBrTPos[i][index+2*(n-1)+y]
+                        !    _vertices[n][z]=h_pipeLevel[i]
+                        !next n
+                        !
+                        !call "API_Pipe" parameters \
+                        !showCL=0,
+                        !detail=arcResol,
+                        !elbowRad=elbowRad,
+                        !nVertex=_h_pipeBrTNum[i][j],
+                        !vertices=_vertices,
+                        !pipeRad=h_pipeDia/2,
+                        !matPipe=h_pipeMat[i]
+
+                        tube_r=h_pipeDia/2
+                        SDresol=arcResol
+                        gosub "tube断面"
+
+                        index=(h_pipeBrVNum+1)*2*(j-1)
+                        
+                        put 2*_h_pipeBrTPos[i][index+1]-_h_pipeBrTPos[i][index+3],2*_h_pipeBrTPos[i][index+2]-_h_pipeBrTPos[i][index+4],h_pipeLevel[i],0
+                        for n=1 to _h_pipeBrTNum[i][j]
+                            put _h_pipeBrTPos[i][index+2*(n-1)+x],_h_pipeBrTPos[i][index+2*(n-1)+y],h_pipeLevel[i],0
+                        next n
+                        put 2*_h_pipeBrTPos[i][index+2*(_h_pipeBrTNum[i][j]-1)+x]-_h_pipeBrTPos[i][index+2*(_h_pipeBrTNum[i][j]-2)+x],\
+                            2*_h_pipeBrTPos[i][index+2*(_h_pipeBrTNum[i][j]-1)+y]-_h_pipeBrTPos[i][index+2*(_h_pipeBrTNum[i][j]-2)+y],h_pipeLevel[i],0
+                        
+                        tube SDresol+1,_h_pipeBrTNum[i][j]+2,1+2+4+8+16+32,
+                        get((SDresol+1)*3),
+                        get(4*(_h_pipeBrTNum[i][j]+2))
+                    endif
+                next j
+            next i
+        endif
+    endgroup
+
+    if h_pipeDisBody then
+        placegroup "h_pipe_body"
+    endif
+
+
+!中心線(切断)
+    group "h_pipe_centerLine_cut"
+        for i=1 to h_pipeNum
+            for j=1 to h_pipeNum
+                if h_pipeLevel[j]-h_pipeLevel[i]>eps then
+                    if _h_pipeTNum[j]>=2 then
+                        put 2*_h_pipeTPos[j][1]-_h_pipeTPos[j][3],2*_h_pipeTPos[j][2]-_h_pipeTPos[j][4],h_pipeLevel[i],0
+                        for n=1 to _h_pipeTNum[j]
+                            put _h_pipeTPos[j][2*(n-1)+x],_h_pipeTPos[j][2*(n-1)+y],h_pipeLevel[i],0
+                        next n
+                        put 2*_h_pipeTPos[j][2*(_h_pipeTNum[j]-1)+x]-_h_pipeTPos[j][2*(_h_pipeTNum[j]-2)+x],\
+                            2*_h_pipeTPos[j][2*(_h_pipeTNum[j]-1)+y]-_h_pipeTPos[j][2*(_h_pipeTNum[j]-2)+y],h_pipeLevel[i],0
+
+                        tube 5,_h_pipeTNum[j]+2,1+2+4+8+16+32,
+                        -cutGap,-0.0001,0,
+                        cutGap,-0.0001,0,
+                        cutGap,0.0001,0,
+                        -cutGap,0.0001,0,
+                        -cutGap,-0.0001,0,
+                        get(4*(_h_pipeTNum[j]+2))
+                    endif
+
+                    !分岐パイプ
+                        for n=1 to _h_pipeBrNum[j]
+                            if _h_pipeBrTNum[j][n]>=2 then
+                                index=(h_pipeBrVNum+1)*2*(n-1)
+
+                                put 2*_h_pipeBrTPos[j][index+1]-_h_pipeBrTPos[j][index+3],2*_h_pipeBrTPos[j][index+2]-_h_pipeBrTPos[j][index+4],h_pipeLevel[i],0
+                                for m=1 to _h_pipeBrTNum[j][n]
+                                    put _h_pipeBrTPos[j][index+2*(m-1)+x],_h_pipeBrTPos[j][index+2*(m-1)+y],h_pipeLevel[i],0
+                                next m
+                                put 2*_h_pipeBrTPos[j][index+2*(_h_pipeBrTNum[j][n]-1)+x]-_h_pipeBrTPos[j][index+2*(_h_pipeBrTNum[j][n]-2)+x],\
+                                    2*_h_pipeBrTPos[j][index+2*(_h_pipeBrTNum[j][n]-1)+y]-_h_pipeBrTPos[j][index+2*(_h_pipeBrTNum[j][n]-2)+y],h_pipeLevel[i],0
+
+                                tube 5,_h_pipeBrTNum[j][n]+2,1+2+4+8+16+32,
+                                -cutGap,-0.0001,0,
+                                cutGap,-0.0001,0,
+                                cutGap,0.0001,0,
+                                -cutGap,0.0001,0,
+                                -cutGap,-0.0001,0,
+                                get(4*(_h_pipeBrTNum[j][n]+2))
+                            endif
+                        next n
+                endif
+            next j
+        next i
+    endgroup
+
+    h_pipe_centerLine_cut1=subgroup("h_pipe_centerLine","h_pipe_centerLine_cut")
+    !placegroup "h_pipe_centerLine"
+    !placegroup "h_pipe_centerLine_cut"
+
+    if h_pipeDisCutCL then
+        placegroup h_pipe_centerLine_cut1
+    endif
+
+    
+
+
+end
+
+
+
+
+
+
+"tube断面":
+    for q=1 to SDresol
+        put tube_r*cos((1-q)*360/SDresol),tube_r*sin((1-q)*360/SDresol),0
+    next q
+    put tube_r,0,0
+return
+
+

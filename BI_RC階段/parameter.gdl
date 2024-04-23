@@ -1,0 +1,628 @@
+!==============================================================================集計
+!=======================================総階数
+if switch_gl then
+	parameters step_num_all=(floor_num-1)*step_num_totle+gl_num
+else
+	parameters step_num_all=(floor_num-1)*step_num_totle
+endif
+
+lock "step_num_all"
+
+!=======================================下部階段仕上幅
+wid_fin_step_down=step_wid1
+if switch_hr1 and hr_hide<>2 then wid_fin_step_down=wid_fin_step_down-hr_wid
+if switch_hr2 and hr2_type=1 then wid_fin_step_down=wid_fin_step_down-hr2_wid
+if step_ditch then wid_fin_step_down=wid_fin_step_down-ditch_wid
+
+if switch_fin then
+	parameters wid_fin_step_down=wid_fin_step_down
+else
+	parameters wid_fin_step_down=0
+endif
+
+lock "wid_fin_step_down"
+
+!=======================================上部階段仕上幅
+wid_fin_step_up=step_wid2
+if switch_hr1 and hr_hide<>3 then wid_fin_step_up=wid_fin_step_up-hr_wid
+if switch_hr2 and hr2_type=1 then wid_fin_step_up=wid_fin_step_up-hr2_wid
+if step_ditch then wid_fin_step_up=wid_fin_step_up-ditch_wid
+
+if switch_fin then
+	parameters wid_fin_step_up=wid_fin_step_up
+else
+	parameters wid_fin_step_up=0
+endif
+
+lock "wid_fin_step_up"
+
+!=======================================踏面仕上面積
+if switch_fin and step_fin_type=1 then
+	parameters area_step_tread=((floor_num-1)*step_num_down*wid_fin_step_down+((floor_num-1)*step_num_up+switch_gl*gl_num)*wid_fin_step_up)*step_tread/cos(step_rat_angle)
+else
+	parameters area_step_tread=0
+endif
+
+lock "area_step_tread"
+
+!=======================================蹴上仕上面積
+if switch_fin and step_fin_type=1 then
+	parameters area_step_riser=((floor_num-1)*step_num_down*wid_fin_step_down+((floor_num-1)*step_num_up+switch_gl*gl_num)*wid_fin_step_up)*sqr((step_riser-step_rat)^2+step_nosing^2)
+else
+	parameters area_step_riser=0
+endif
+
+lock "area_step_riser"
+
+!=======================================ノンスリップ仕上長さ
+if switch_fin and step_fin_type=1 then
+	parameters len_step_nosing=((floor_num-1)*step_num_down*wid_fin_step_down+((floor_num-1)*step_num_up+switch_gl*gl_num)*wid_fin_step_up)
+else
+	parameters len_step_nosing=0
+endif
+
+lock "len_step_nosing"
+
+!=======================================ノンスリップ仕上面積
+if switch_fin and step_fin_type=1 then
+	parameters area_step_nosing=len_step_nosing*step_nosing/cos(step_rat_angle)
+else
+	parameters area_step_nosing=0
+endif
+
+lock "area_step_nosing"
+
+!=======================================仕上げモルタル面積
+if switch_fin and step_fin_type=2 then
+	parameters area_step_mortar=((floor_num-1)*step_num_down*wid_fin_step_down+((floor_num-1)*step_num_up+switch_gl*gl_num)*wid_fin_step_up)*sqr((step_riser-step_rat)^2+(step_tread+step_nosing)/cos(step_rat_angle))
+else
+	parameters area_step_mortar=0
+endif
+
+lock "area_step_mortar"
+
+!=======================================中間踊り場仕上面積
+landing_dep_2=landing_dep
+if switch_hr1 then landing_dep_2=landing_dep_2-hr_wid
+if landing_ditch then landing_dep_2=landing_dep_2-ditch_wid
+
+area_one_landing=(step_nosing+landing_1-step_tread)*wid_fin_step_down+landing_2*wid_fin_step_up+landing_dep_2*(wid_fin_step_down+wid_fin_step_up+handrail_wid)
+if switch_hr2 and hr2_type=1 then area_one_landing=area_one_landing-hr_wid*(handrail_wid+2*hr_wid)
+
+if switch_fin then
+	parameters area_landing=area_one_landing*(floor_num-1)
+else
+	parameters area_landing=0
+endif
+
+lock "area_landing"
+
+!=======================================フロア踊り場仕上面積
+floor_dep_2=floor_dep
+if switch_hr1 and hr_hide<>1 then floor_dep_2=floor_dep_2-hr_wid
+if floor_ditch then floor_dep_2=floor_dep_2-ditch_wid
+
+if switch_floor then !フロア踊り場あり
+	area_one_floor=(-min(standard_x,0)+floor_1-step_tread)*wid_fin_step_down+(standard_x-min(standard_x,0)+floor_1+step_nosing)*wid_fin_step_up+floor_dep_2*(wid_fin_step_down+wid_fin_step_up+handrail_wid)
+	if switch_hr2 and hr2_type=1 then area_one_floor=area_one_floor-hr_wid*(handrail_wid+2*hr2_wid)
+	
+	area_floor=area_one_floor*z_1-(-min(standard_x,0)+floor_1)*wid_fin_step_down
+	if switch_hr2 then area_floor=area_floor-hr2_wid*wid_fin_step_down
+else !フロア踊り場なし
+	area_one_floor=(-min(standard_x,0)+floor_1)*wid_fin_step_down+(standard_x-min(standard_x,0)+floor_1+step_nosing)*wid_fin_step_up
+	area_floor=area_one_floor*z_1-(-min(standard_x,0)+floor_1)*wid_fin_step_down
+endif 
+
+if switch_fin then
+	parameters area_floor=area_floor
+else
+	parameters area_floor=0
+endif
+
+lock "area_floor"
+
+!=======================================溝長さ
+len_ditch=0 !踊り場溝
+len_ditch2=0 !階段溝
+
+if switch_gl then
+	if step_ditch then !階段側
+		if switch_floor then
+			for i=1 to floor_num-1	
+				len_ditch2=len_ditch2+(floor_dep+floor_1-min(standard_x,0)-x_floor)+(step_num_down*(sqr(step_riser^2+step_nosing^2)+step_nosing+step_tread)-step_tread)+(landing_1+landing_dep-x_landing)
+				len_ditch2=len_ditch2+(landing_dep+landing_2-x_landing)+(step_num_up*(sqr(step_riser^2+step_nosing^2)+step_nosing+step_tread)-step_tread)+(standard_x-min(standard_x,0)+floor_1+floor_dep-x_floor)
+			next i
+			len_ditch2=len_ditch2+(floor_dep-x_floor)
+			len_ditch2=len_ditch2+(floor_dep+floor_1+standard_x-min(standard_x,0)-x_floor)+(gl_num*(sqr(step_riser^2+step_nosing^2)+step_nosing+step_tread)-step_tread)
+		else
+			for i=1 to floor_num-1	
+				len_ditch2=len_ditch2+(floor_1-min(standard_x,0))+(step_num_down*(sqr(step_riser^2+step_nosing^2)+step_nosing+step_tread)-step_tread)+(landing_1+landing_dep-x_landing)
+				len_ditch2=len_ditch2+(landing_dep+landing_2-x_landing)+(step_num_up*(sqr(step_riser^2+step_nosing^2)+step_nosing+step_tread)-step_tread)+(standard_x-min(standard_x,0)+floor_1)
+			next i
+			len_ditch2=len_ditch2+(floor_1+standard_x-min(standard_x,0))+(gl_num*(sqr(step_riser^2+step_nosing^2)+step_nosing+step_tread)-step_tread)
+		endif
+	endif
+
+	if landing_ditch then !中間踊り場
+		for i=1 to floor_num-1
+			len_ditch=len_ditch+(step_wid_tot-y_down-y_up)
+		next i
+	endif
+
+	if switch_floor and floor_ditch then !フロア踊り場
+		for i=1 to floor_num
+			len_ditch=len_ditch+(step_wid_tot-y_down-y_up)
+		next i
+	endif
+else
+	if step_ditch then
+		if switch_floor then
+			if floor_num>2 then
+				for i=1 to floor_num-2
+					len_ditch2=len_ditch2+(floor_dep+floor_1-min(standard_x,0)-x_floor)+(step_num_down*(sqr(step_riser^2+step_nosing^2)+step_nosing+step_tread)-step_tread)+(landing_1+landing_dep-x_landing)
+				next i
+			endif
+			for i=1 to floor_num-1
+				len_ditch2=len_ditch2+(landing_dep+landing_2-x_landing)+(step_num_up*(sqr(step_riser^2+step_nosing^2)+step_nosing+step_tread)-step_tread)+(standard_x-min(standard_x,0)+floor_1+floor_dep-x_floor)
+			next i
+			len_ditch2=len_ditch2+(floor_dep-x_floor)
+			len_ditch2=len_ditch2+(step_num_down*(sqr(step_riser^2+step_nosing^2)+step_nosing+step_tread)-step_tread)+(landing_1+landing_dep-x_landing)
+		else
+			if floor_num>2 then
+				for i=1 to floor_num-2
+					len_ditch2=len_ditch2+(floor_1-min(standard_x,0))+(step_num_down*(sqr(step_riser^2+step_nosing^2)+step_nosing+step_tread)-step_tread)+(landing_1+landing_dep-x_landing)
+				next i
+			endif
+			for i=1 to floor_num-1
+				len_ditch2=len_ditch2+(landing_dep+landing_2-x_landing)+(step_num_up*(sqr(step_riser^2+step_nosing^2)+step_nosing+step_tread)-step_tread)+(standard_x-min(standard_x,0)+floor_1)
+			next i
+			len_ditch2=len_ditch2+(step_num_down*(sqr(step_riser^2+step_nosing^2)+step_nosing+step_tread)-step_tread)+(landing_1+landing_dep-x_landing)
+		endif
+	endif
+
+	if landing_ditch then !中間踊り場
+		for i=1 to floor_num-1
+			len_ditch=len_ditch+(step_wid_tot-y_down-y_up)
+		next i
+	endif
+
+	if switch_floor and floor_ditch then !フロア踊り場
+		for i=1 to floor_num-1
+			len_ditch=len_ditch+(step_wid_tot-y_down-y_up)
+		next i
+	endif
+endif
+
+parameters len_ditch=len_ditch
+parameters len_ditch2=len_ditch2
+
+lock "len_ditch","len_ditch2"
+
+!=======================================溝仕上面積
+if switch_fin then
+	parameters area_ditch=len_ditch*(ditch_wid+2*ditch_dep+fin_ditch_hei)+step_num_all*(step_tread+step_nosing)*step_riser/2
+	parameters area_ditch2=len_ditch2*(ditch_wid+2*ditch_dep+fin_ditch_hei)+step_num_all*(step_tread+step_nosing)*step_riser/2
+else
+	parameters area_ditch=0
+	parameters area_ditch2=0
+endif
+
+lock "area_ditch","area_ditch2"
+
+!=======================================外側立上り天端仕上長さ
+len_hr1_top=0
+area_hr1_top=0
+
+if switch_fin and switch_hr1 then
+	for i=1 to floor_num-1 !中間踊り場立上り
+		len_hr1_top=len_hr1_top+step_wid_tot
+		area_hr1_top=area_hr1_top+(step_wid_tot)*hr_wid2
+	next i
+	
+	if switch_floor then
+		if hr_hide<>1 then !フロア踊り場立上り
+			for i=1 to floor_num-1
+				len_hr1_top=len_hr1_top+step_wid_tot
+				area_hr1_top=area_hr1_top+(step_wid_tot)*hr_wid2
+			next i
+		else
+			for i=1 to floor_num-1
+				len_hr1_top=len_hr1_top+hr_hide_start+hr_hide_end
+				area_hr1_top=area_hr1_top+(hr_hide_start+hr_hide_end)*hr_wid2
+			next i
+		endif
+	endif
+	
+	if hr_hide<>2 then !中間踊り場下部立上り
+		if switch_floor then
+			for i=1 to floor_num-1
+				len_hr1_top=len_hr1_top+(floor_dep+floor_1-min(standard_x,0)-step_tread-x_floor)+step_num_down*sqr(step_tread^2+step_riser^2)+(landing_1+landing_dep-x_landing)
+				area_hr1_top=area_hr1_top+((floor_dep+floor_1-min(standard_x,0)-step_tread-x_floor)+step_num_down*sqr(step_tread^2+step_riser^2)+(landing_1+landing_dep-x_landing))*hr_wid
+			next i
+		else
+			for i=1 to floor_num-1
+				len_hr1_top=len_hr1_top+(floor_1-min(standard_x,0)-step_tread)+step_num_down*sqr(step_tread^2+step_riser^2)+(landing_1+landing_dep-x_landing)
+				area_hr1_top=area_hr1_top+((floor_1-min(standard_x,0)-step_tread)+step_num_down*sqr(step_tread^2+step_riser^2)+(landing_1+landing_dep-x_landing))*hr_wid
+			next i
+		endif
+	else
+		if switch_floor then
+			if hr_hide_start<=floor_dep then
+				for i=1 to floor_num-1
+					len_hr1_top=len_hr1_top+hr_hide_start
+					area_hr1_top=area_hr1_top+hr_hide_start*hr_wid
+				next i
+			else
+				for i=1 to floor_num-1
+					len_hr1_top=len_hr1_top+floor_dep+(hr_hide_start-floor_dep)/cos(step_angle)
+					area_hr1_top=area_hr1_top+(floor_dep+(hr_hide_start-floor_dep)/cos(step_angle))*hr_wid
+				next i
+			endif
+		else
+			for i=1 to floor_num-1
+				len_hr1_top=len_hr1_top+hr_hide_start/cos(step_angle)
+				area_hr1_top=area_hr1_top+(hr_hide_start/cos(step_angle))*hr_wid
+			next i
+		endif
+
+		if hr_hide_end<=landing_dep then
+			for i=1 to floor_num-1
+				len_hr1_top=len_hr1_top+hr_hide_end
+				area_hr1_top=area_hr1_top+hr_hide_end*hr_wid
+			next i
+		else
+			for i=1 to floor_num-1
+				len_hr1_top=len_hr1_top+landing_dep+(hr_hide_end-landing_dep)/cos(step_angle)
+				area_hr1_top=area_hr1_top+(landing_dep+(hr_hide_end-landing_dep)/cos(step_angle))*hr_wid
+			next i
+		endif
+	endif
+	
+	if hr_hide<>3 then !中間踊り場上部立上り
+		if switch_floor then
+			for i=1 to floor_num-1
+				len_hr1_top=len_hr1_top+(landing_dep+landing_2-step_tread-x_landing)+step_num_up*sqr(step_tread^2+step_riser^2)+(standard_x-min(standard_x,0)+floor_1+floor_dep-x_floor)
+				area_hr1_top=area_hr1_top+((landing_dep+landing_2-step_tread-x_landing)+step_num_up*sqr(step_tread^2+step_riser^2)+(standard_x-min(standard_x,0)+floor_1+floor_dep-x_floor))*hr_wid
+			next i
+		else
+			for i=1 to floor_num-1
+				len_hr1_top=len_hr1_top+(landing_dep+landing_2-step_tread-x_landing)+step_num_up*sqr(step_tread^2+step_riser^2)+(standard_x-min(standard_x,0)+floor_1)
+				area_hr1_top=area_hr1_top+((landing_dep+landing_2-step_tread-x_landing)+step_num_up*sqr(step_tread^2+step_riser^2)+(standard_x-min(standard_x,0)+floor_1))*hr_wid
+			next i
+		endif
+	else
+		if switch_floor then
+			if hr_hide_start<=floor_dep then
+				for i=1 to floor_num-1
+					len_hr1_top=len_hr1_top+hr_hide_start
+					area_hr1_top=area_hr1_top+hr_hide_start*hr_wid
+				next i
+			else
+				for i=1 to floor_num-1
+					len_hr1_top=len_hr1_top+floor_dep+(hr_hide_start-floor_dep)/cos(step_angle)
+					area_hr1_top=area_hr1_top+(floor_dep+(hr_hide_start-floor_dep)/cos(step_angle))*hr_wid
+				next i
+			endif
+		else
+			for i=1 to floor_num-1
+				len_hr1_top=len_hr1_top+hr_hide_start/cos(step_angle)
+				area_hr1_top=area_hr1_top+(hr_hide_start/cos(step_angle))*hr_wid
+			next i
+		endif
+
+		if hr_hide_end<=landing_dep then
+			for i=1 to floor_num-1
+				len_hr1_top=len_hr1_top+hr_hide_end
+				area_hr1_top=area_hr1_top+hr_hide_end*hr_wid
+			next i
+		else
+			for i=1 to floor_num-1
+				len_hr1_top=len_hr1_top+landing_dep+(hr_hide_end-landing_dep)/cos(step_angle)
+				area_hr1_top=area_hr1_top+(landing_dep+(hr_hide_end-landing_dep)/cos(step_angle))*hr_wid
+			next i
+		endif
+	endif
+	
+	if switch_gl then
+		if switch_floor then
+			if hr_hide<>1 then
+				len_hr1_top=len_hr1_top+step_wid_tot
+				area_hr1_top=area_hr1_top+(step_wid_tot)*hr_wid2
+			else
+				len_hr1_top=len_hr1_top+hr_hide_start+hr_hide_end
+				area_hr1_top=area_hr1_top+(hr_hide_start+hr_hide_end)*hr_wid2
+			endif
+		
+			len_hr1_top=len_hr1_top+(floor_dep+floor_1-min(0,standard_x)-step_tread)+(floor_dep+floor_1+standard_x-min(0,standard_x))+(gl_num*step_tread)/cos(step_angle)
+			area_hr1_top=area_hr1_top+((floor_dep+floor_1-min(0,standard_x)-step_tread)+(floor_dep+floor_1+standard_x-min(0,standard_x))+(gl_num*step_tread)/cos(step_angle))*hr_wid
+		else
+			len_hr1_top=len_hr1_top+(floor_1-min(0,standard_x)-step_tread)+(floor_1+standard_x-min(0,standard_x))+(gl_num*step_tread)/cos(step_angle)
+			area_hr1_top=area_hr1_top+((floor_1-min(0,standard_x)-step_tread)+(floor_1+standard_x-min(0,standard_x))+(gl_num*step_tread)/cos(step_angle))*hr_wid
+		endif
+	endif
+endif
+
+
+parameters len_hr1_top=len_hr1_top
+parameters area_hr1_top=area_hr1_top
+
+lock "len_hr1_top","area_hr1_top"
+
+
+!=======================================内側立上り天端仕上長さ
+len_hr2_top=0
+area_hr2_top=0
+
+if hr2_type=2 then !壁
+	len_hr2_top=len_hr2_top+(landing_2-step_tread)+step_num_up*sqr(step_tread^2+step_riser^2)+(standard_x-min(standard_x,0)+floor_1)
+
+	if switch_floor then
+		len_hr2_top=len_hr2_top+step_wid1+handrail_wid
+	endif
+endif
+
+if hr2_type=1 then !手すり
+	len_hr2_top=len_hr2_top+(floor_num-1)*(step_num_down*step_tread)/cos(step_angle) !下部階段
+	len_hr2_top=len_hr2_top+(floor_num-1)*(step_num_up*step_tread)/cos(step_angle) !上部階段
+	len_hr2_top=len_hr2_top+(floor_num-1)*(landing_1+landing_2+handrail_wid+2*hr2_wid) !中間踊り場
+	len_hr2_top=len_hr2_top+(floor_num-2)*(2*floor_1+abs(standard_x)+handrail_wid+2*hr2_wid) !フロア踊り場
+
+	if switch_floor then
+		len_hr2_top=len_hr2_top+(hr2_wid+handrail_wid+step_wid1) !最上階フロア踊り場
+	endif
+
+	if switch_gl then
+		len_hr2_top=len_hr2_top+(2*floor_1+abs(standard_x)+handrail_wid+2*hr2_wid)
+		len_hr2_top=len_hr2_top+(gl_num*step_tread)/cos(step_angle)
+	endif
+endif
+
+if switch_fin and switch_hr2 then
+	parameters len_hr2_top=len_hr2_top
+	parameters area_hr2_top=len_hr2_top*hr2_wid
+else
+	parameters len_hr2_top=0
+	parameters area_hr2_top=0
+endif
+
+lock "len_hr2_top","area_hr2_top"
+
+
+!=======================================床裏仕上面積
+area_step_down=0
+
+if switch_fin then
+	area_step_down=area_step_down+(floor_num-1)*step_wid1*(step_num_down*step_tread)/cos(step_angle) !下部階段
+	area_step_down=area_step_down+(floor_num-1)*step_wid2*(step_num_up*step_tread)/cos(step_angle) !上部階段
+	area_step_down=area_step_down+(floor_num-1)*(step_wid1*(landing_1+landing_2)+landing_dep*(step_wid_tot)) !中間踊り場
+
+	if switch_floor then
+		area_step_down=area_step_down+(floor_num-2)*((step_wid1+step_wid2)/2*(2*floor_1+abs(standard_x))+floor_dep*(step_wid_tot)) !フロア踊り場
+		area_step_down=area_step_down+((step_wid1+step_wid2)/2*(floor_1+abs(standard_x))+floor_dep*(step_wid_tot)) !最上階フロア踊り場
+	else
+		area_step_down=area_step_down+(floor_num-2)*((step_wid1+step_wid2)/2*(2*floor_1+abs(standard_x))) !フロア踊り場
+		area_step_down=area_step_down+((step_wid1+step_wid2)/2*(floor_1+abs(standard_x))) !最上階フロア踊り場
+	endif
+
+	if switch_gl then
+		if switch_floor then
+			area_step_down=area_step_down+((step_wid1+step_wid2)/2*(2*floor_1+abs(standard_x))+floor_dep*(step_wid_tot))
+		else
+			area_step_down=area_step_down+((step_wid1+step_wid2)/2*(2*floor_1+abs(standard_x)))
+		endif
+		
+		area_step_down=area_step_down+step_wid2*(gl_num*step_tread)/cos(step_angle)
+	endif
+endif
+
+parameters area_step_down=area_step_down
+lock "area_step_down"
+
+
+!==============================================================================ボーダー長さ・面積
+len_boarder=0
+
+if switch_hr1 and switch_boarder then
+	if switch_gl then
+		len_boarder=len_boarder+(gl_num*sqr(step_tread^2+step_riser^2))+(standard_x-(min(standard_x,0)-floor_1-floor_dep))+\
+					(step_wid_tot)+(-step_tread-(min(standard_x,0)-floor_1-floor_dep))
+
+		if switch_floor=0 then
+			len_boarder=len_boarder-2*floor_dep-(step_wid_tot)
+		endif
+	endif
+	
+	for j=1 to floor_num-1
+		len_boarder=len_boarder+(step_num_down*sqr(step_tread^2+step_riser^2))+(landing_1+landing_dep)+(step_wid_tot)+(landing_dep+landing_2-step_tread)+\
+					(step_num_up*sqr(step_tread^2+step_riser^2))+(standard_x-(min(standard_x,0)-floor_1-floor_dep))+(step_wid_tot)+(-step_tread-(min(standard_x,0)-floor_1-floor_dep))
+
+		if switch_floor=0 then
+			len_boarder=len_boarder-2*floor_dep-(step_wid_tot)
+		endif
+	next j
+
+	len_boarder=len_boarder-(floor_1-step_tread-min(standard_x,0))
+endif
+
+area_boarder=len_boarder*boarder_hei
+
+parameters len_boarder=len_boarder
+parameters area_boarder=area_boarder
+
+lock "len_boarder","area_boarder"
+
+
+!==============================================================================立上り外側仕上面積
+area_hr_outside=0
+!==========================================内側立上り
+if switch_hr2 then
+	if hr2_type=1 then
+		area_hr_outside=area_hr_outside+(floor_num-2)*(floor_thi+hr2_hei)*(2*floor_1+abs(standard_x)-step_tread)
+		area_hr_outside=area_hr_outside+(floor_num-1)*(landing_thi+hr2_hei)*(landing_1+handrail_wid+landing_2-step_tread)
+		area_hr_outside=area_hr_outside+(floor_num-1)*(hr2_hei+step_riser+step_thi/cos(step_angle))*(step_num_down*step_tread)
+		area_hr_outside=area_hr_outside+(floor_num-1)*(hr2_hei+step_riser+step_thi/cos(step_angle))*(step_num_up*step_tread)
+	
+		if switch_gl then
+			area_hr_outside=area_hr_outside+(floor_thi+hr2_hei)*(2*floor_1+abs(standard_x)-step_tread)
+			area_hr_outside=area_hr_outside+(hr2_hei+step_riser+step_thi/cos(step_angle))*(gl_num*step_tread)
+		endif
+	endif
+endif
+
+
+!==========================================外側立上り
+if switch_hr1 then
+	if switch_floor then
+		area_hr_outside=area_hr_outside+(floor_thi+floor_hr_hei)*(standard_x-min(0,standard_x)+floor_1+2*floor_dep+step_wid_tot)
+		area_hr_outside=area_hr_outside+(floor_num-2)*(floor_thi+floor_hr_hei)*(2*floor_1+abs(standard_x)-step_tread+2*floor_dep+step_wid_tot)
+	else
+		area_hr_outside=area_hr_outside+(floor_thi+floor_hr_hei)*(standard_x-min(0,standard_x)+floor_1)
+		area_hr_outside=area_hr_outside+(floor_num-2)*(floor_thi+floor_hr_hei)*(2*floor_1+abs(standard_x)-step_tread)	
+	endif
+
+	area_hr_outside=area_hr_outside+(floor_num-1)*(landing_thi+landing_hr_hei)*(landing_1+landing_dep+step_wid_tot+landing_dep+landing_2-step_tread)
+	area_hr_outside=area_hr_outside+(floor_num-1)*(hr_hei+step_riser+step_thi/cos(step_angle))*(step_num_down*step_tread)
+	area_hr_outside=area_hr_outside+(floor_num-1)*(hr_hei+step_riser+step_thi/cos(step_angle))*(step_num_up*step_tread)
+
+	if switch_gl then
+		if switch_floor then
+			area_hr_outside=area_hr_outside+(floor_thi+floor_hr_hei)*(2*floor_1+abs(standard_x)-step_tread+2*floor_dep+step_wid_tot)
+			area_hr_outside=area_hr_outside+(hr_hei+step_riser+step_thi/cos(step_angle))*(gl_num*step_tread)
+		else
+			area_hr_outside=area_hr_outside+(floor_thi+floor_hr_hei)*(2*floor_1+abs(standard_x)-step_tread)
+			area_hr_outside=area_hr_outside+(hr_hei+step_riser+step_thi/cos(step_angle))*(gl_num*step_tread)
+		endif
+	endif
+
+	if switch_floor and hr_hide=1 then !フロア踊り場
+		area_hr_outside=area_hr_outside-(floor_num-1)*(floor_thi+floor_hr_hei)*(step_wid_tot-hr_hide_start-hr_hide_end)
+	endif
+
+	if hr_hide=2 then !中間踊り場下部階段
+		if switch_floor then
+			area_hr_outside=area_hr_outside-(floor_num-1)*(hr_hei+step_riser+step_thi/cos(step_angle))*((step_num_down-1)*step_tread+landing_1+landing_dep-min(0,standard_x)+floor_1+floor_dep-hr_hide_start-hr_hide_end)
+		else
+			area_hr_outside=area_hr_outside-(floor_num-1)*(hr_hei+step_riser+step_thi/cos(step_angle))*((step_num_down-1)*step_tread+landing_1+landing_dep-min(0,standard_x)+floor_1-hr_hide_start-hr_hide_end)
+		endif
+	endif
+
+	if hr_hide=3 then !中間踊り場上部階段
+		if switch_floor then
+			area_hr_outside=area_hr_outside-(floor_num-1)*(hr_hei+step_riser+step_thi/cos(step_angle))*((step_num_down-1)*step_tread+landing_1+landing_dep-min(0,standard_x)+floor_1+floor_dep-hr_hide_start-hr_hide_end)
+		else
+			area_hr_outside=area_hr_outside-(floor_num-1)*(hr_hei+step_riser+step_thi/cos(step_angle))*((step_num_down-1)*step_tread+landing_1+landing_dep-min(0,standard_x)+floor_1-hr_hide_start-hr_hide_end)
+		endif
+	endif
+
+	if switch_boarder then
+		area_hr_outside=area_hr_outside-area_boarder
+	endif
+
+	if switch_floor then
+		area_hr_outside=area_hr_outside+(floor_thi+floor_hr_hei)*(step_wid1+handrail_wid*switch_hr2*(2-hr2_type))
+	endif
+endif
+
+parameters area_hr_outside=area_hr_outside
+lock "area_hr_outside"
+
+
+!==============================================================================立上り内側仕上面積(黄色)
+area_hr_inside=0
+!==========================================内側立上り
+if switch_hr2 then
+	if hr2_type=1 then !手すり
+		area_hr_inside=area_hr_inside+(floor_num-2)*hr2_hei*(2*floor_1+abs(standard_x)-step_tread+4*hr2_wid)
+		area_hr_inside=area_hr_inside+(floor_num-1)*hr2_hei*(landing_1+handrail_wid+landing_2-step_tread+4*hr2_wid)
+		area_hr_inside=area_hr_inside+(floor_num-1)*(hr2_hei+step_thi/cos(step_angle))*(step_num_down*step_tread)
+		area_hr_inside=area_hr_inside+(floor_num-1)*(hr2_hei+step_thi/cos(step_angle))*(step_num_up*step_tread)
+	
+		if switch_gl then
+			area_hr_inside=area_hr_inside+hr2_hei*(2*floor_1+abs(standard_x)-step_tread+4*hr2_wid)
+			area_hr_inside=area_hr_inside+(hr2_hei+step_thi/cos(step_angle))*(gl_num*step_tread)
+		endif
+	endif
+
+	if hr2_type=2 then !壁
+		area_hr_inside=area_hr_inside+((floor_num-1)*floor_hei+hr2_hei-(step_riser+step_thi/cos(step_angle)))*(2*handrail_wid+2*(floor_1-min(0,standard_x)+(step_num_down)*step_tread+landing_1))
+		area_hr_inside=area_hr_inside-handrail_wid*(step_num_up*step_riser)-2*(landing_2*(step_num_up*step_riser))-2*(step_num_up*step_tread)*(step_num_up*step_riser)/2
+
+		if switch_gl then
+			area_hr_inside=area_hr_inside+(gl_num*step_riser)*(2*handrail_wid+2*(floor_1-min(0,standard_x)+(step_num_down)*step_tread+landing_1))
+		endif
+	endif
+endif
+
+
+!==========================================外側立上り
+if switch_hr1 then
+	if switch_floor then
+		area_hr_inside=area_hr_inside+floor_hr_hei*(standard_x-min(0,standard_x)+floor_1+floor_dep+step_wid_tot+floor_dep-2*hr_wid-2*hr_wid2)
+		area_hr_inside=area_hr_inside+(floor_num-2)*floor_hr_hei*(2*floor_1+abs(standard_x)-step_tread+2*floor_dep+step_wid_tot-2*hr_wid-2*hr_wid2)
+	else
+		area_hr_inside=area_hr_inside+floor_hr_hei*(standard_x-min(0,standard_x)+floor_1)
+		area_hr_inside=area_hr_inside+(floor_num-2)*floor_hr_hei*(2*floor_1+abs(standard_x)-step_tread)
+	endif
+	
+	area_hr_inside=area_hr_inside+(floor_num-1)*landing_hr_hei*(landing_1+landing_dep+step_wid_tot+landing_dep+landing_2-step_tread-2*hr_wid-2*hr_wid2)
+	area_hr_inside=area_hr_inside+(floor_num-1)*(hr_hei+step_thi/cos(step_angle))*(step_num_down*step_tread)
+	area_hr_inside=area_hr_inside+(floor_num-1)*(hr_hei+step_thi/cos(step_angle))*(step_num_up*step_tread)
+
+	if switch_gl then
+		if switch_floor then
+			area_hr_inside=area_hr_inside+floor_hr_hei*(2*floor_1+abs(standard_x)-step_tread+2*floor_dep+step_wid_tot-2*hr_wid-2*hr_wid2)
+			area_hr_inside=area_hr_inside+(hr_hei+step_thi/cos(step_angle))*(gl_num*step_tread)
+		else
+			area_hr_inside=area_hr_inside+floor_hr_hei*(2*floor_1+abs(standard_x)-step_tread)
+			area_hr_inside=area_hr_inside+(hr_hei+step_thi/cos(step_angle))*(gl_num*step_tread)
+		endif
+	endif
+
+	if hr_hide=1 then !フロア踊り場
+		area_hr_inside=area_hr_inside-(floor_num-1)*floor_hr_hei*(step_wid_tot-hr_hide_start-hr_hide_end)
+	endif
+
+	if hr_hide=2 then !中間踊り場下部階段
+		if switch_floor then
+			area_hr_inside=area_hr_inside-(floor_num-1)*(hr_hei+step_thi/cos(step_angle))*((step_num_down-1)*step_tread+landing_1+landing_dep-min(0,standard_x)+floor_1+floor_dep-hr_hide_start-hr_hide_end)
+		else
+			area_hr_inside=area_hr_inside-(floor_num-1)*(hr_hei+step_thi/cos(step_angle))*((step_num_down-1)*step_tread+landing_1+landing_dep-min(0,standard_x)+floor_1-hr_hide_start-hr_hide_end)
+		endif
+	endif
+
+	if hr_hide=3 then !中間踊り場上部階段
+		if switch_floor then
+			area_hr_inside=area_hr_inside-(floor_num-1)*(hr_hei+step_thi/cos(step_angle))*((step_num_down-1)*step_tread+landing_1+landing_dep-min(0,standard_x)+floor_1+floor_dep-hr_hide_start-hr_hide_end)
+		else
+			area_hr_inside=area_hr_inside-(floor_num-1)*(hr_hei+step_thi/cos(step_angle))*((step_num_down-1)*step_tread+landing_1+landing_dep-min(0,standard_x)+floor_1-hr_hide_start-hr_hide_end)
+		endif
+	endif
+
+	area_hr_inside=area_hr_inside+floor_hr_hei*(step_wid1+handrail_wid+hr2_wid*switch_hr2*(2-hr2_type))
+endif
+
+parameters area_hr_inside=area_hr_inside
+lock "area_hr_inside"
+
+
+!=========================================コンクリート数量
+concrete_vol=0
+
+!階段
+	for i=1 to floor_num-1
+		for j=1 to step_num_down
+			
+		next j
+
+		for j=1 to step_num_down
+
+		next j
+	next i
+
+!踊り場
+	
+
+!廊下
+
+
+!立上り

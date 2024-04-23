@@ -1,0 +1,73 @@
+code=1
+x=1
+y=2
+z=3
+eps=1e-5
+
+!================================================================大引き設定
+dim _sleeperWid[]
+_sleeperWid[1]=0.09
+_sleeperWid[2]=0.105
+
+dim _supportingHeiMin[],_supportingHeiMax[]
+_supportingHeiMin[1]=0.115 : _supportingHeiMax[1]=0.142
+_supportingHeiMin[2]=0.141 : _supportingHeiMax[2]=0.194
+_supportingHeiMin[3]=0.192 : _supportingHeiMax[3]=0.267
+_supportingHeiMin[4]=0.247 : _supportingHeiMax[4]=0.382
+_supportingHeiMin[5]=0.312 : _supportingHeiMax[5]=0.447
+_supportingHeiMin[6]=0.377 : _supportingHeiMax[6]=0.532
+_supportingHeiMin[7]=0.462 : _supportingHeiMax[7]=0.617
+
+values{2} "sleeperSize" 1,"90角",2,"105角"
+values{2} "hardwareType" 1,"タイプ1",2,"タイプ2"
+values{2} "supportingType" 1,"YTB-1114L",2,"YTB-1320L",3,"YTB-1827L",4,"YTB-2438L",5,"YTB-3045L",6,"YTB-3753L",7,"YTB-4562L"
+values "supportingHei" range[_supportingHeiMin[supportingType],_supportingHeiMax[supportingType]]
+values "supportingPitch" 0.91
+
+!長さ
+sleeperLen=sqr((sleeperPos[2][x]-sleeperPos[1][x])^2+(sleeperPos[2][y]-sleeperPos[1][y])^2)
+
+
+!回転角
+sleeperRtz=0
+
+if sleeperPos[2][y]>sleeperPos[1][y]+eps then
+    sleeperRtz=acs((sleeperPos[2][x]-sleeperPos[1][x])/sleeperLen)
+endif
+
+if sleeperPos[2][y]<=sleeperPos[1][y]+eps and sleeperPos[2][y]>=sleeperPos[1][y]-eps then
+    if sleeperPos[2][x]>=sleeperPos[1][x] then
+        sleeperRtz=0
+    else
+        sleeperRtz=180
+    endif
+endif
+
+if sleeperPos[2][y]<sleeperPos[1][y]-eps then
+    sleeperRtz=360-acs((sleeperPos[2][x]-sleeperPos[1][x])/sleeperLen)
+endif
+
+
+!================================================================鋼製束
+!鋼製束数
+supportingNum=ceil(sleeperLen/supportingPitch)
+
+!鋼製束位置
+dim _supportingPos[]
+_supportingPos[1]=0
+
+if supportingNum=1 then 
+    _supportingPos[1]=sleeperLen/2
+endif
+
+if supportingNum>1 then
+    supportingFactPitch=sleeperLen/supportingNum
+
+    for i=1 to supportingNum
+        _supportingPos[i]=(i-0.5)*supportingFactPitch
+    next i
+endif
+
+parameters \
+supportingNum=supportingNum,
+supportingPos=_supportingPos

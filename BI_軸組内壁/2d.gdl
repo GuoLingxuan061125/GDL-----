@@ -1,0 +1,973 @@
+absx=len-sqr(coo_end[1]^2+coo_end[2]^2)
+
+define style "jiku_detail" textfont,0.3*100/GLOB_SCALE,5,0
+define style "len_detail" textfont,0.25*100/GLOB_SCALE,5,0
+define style "board_detail" textfont,0.5*100/GLOB_SCALE,5,0
+define style "board_detail2" textfont,0.5*100/GLOB_SCALE,4,0
+
+hotspot2 coo_start[1],coo_start[2]
+hotspot2 coo_end[1],coo_end[2]
+
+hotspot2 0,coo_start[2],code,coo_start[1],1+128:code=code+1
+hotspot2 -1,coo_start[2],code,coo_start[1],3:code=code+1
+hotspot2 coo_start[1],coo_start[2],code,coo_start[1],2:code=code+1
+hotspot2 coo_start[1],0,code,coo_start[2],1+128:code=code+1
+hotspot2 coo_start[1],-1,code,coo_start[2],3:code=code+1
+hotspot2 coo_start[1],coo_start[2],code,coo_start[2],2:code=code+1
+
+hotspot2 0,coo_end[2],code,coo_end[1],1+128:code=code+1
+hotspot2 -1,coo_end[2],code,coo_end[1],3:code=code+1
+hotspot2 coo_end[1],coo_end[2],code,coo_end[1],2:code=code+1
+hotspot2 coo_end[1],0,code,coo_end[2],1+128:code=code+1
+hotspot2 coo_end[1],-1,code,coo_end[2],3:code=code+1
+hotspot2 coo_end[1],coo_end[2],code,coo_end[2],2:code=code+1
+
+add2 coo_start[1],coo_start[2]
+rot2 angle
+
+hotspot2 0,wid_jiku/2
+hotspot2 0,-wid_jiku/2
+hotspot2 len,wid_jiku/2
+hotspot2 len,-wid_jiku/2
+
+rect2 0,-wid_jiku/2,len,wid_jiku/2
+
+
+!==========================================================立桟ー2D表示
+if switch_jiku then !縦さん自由調整
+	for i=1 to num_jiku
+		hotspot2 0,0,code,coo_jiku[i],1+128:code=code+1
+		hotspot2 -1,0,code,coo_jiku[i],3:code=code+1
+		hotspot2 coo_jiku[i],0,code,coo_jiku[i],2:code=code+1
+	next i
+endif
+
+
+if switch_jiku2d then
+    !柱
+    for i=1 to num_column
+		if i=1 then
+			if start_type<=4 then
+				column_offset=-0.12+wid_jiku/2+wid2_jiku/2
+			else
+				column_offset=0.12-wid_jiku/2-wid2_jiku/2
+			endif
+		else
+			column_offset=0.12-wid_jiku/2-wid2_jiku/2
+		endif
+
+        add2 _column_coo[i],-wid_jiku/2
+            rect2 -wid_jiku/2,0,wid_jiku/2,wid_jiku
+            line2 -wid_jiku/2,0,wid_jiku/2,wid_jiku
+            line2 -wid_jiku/2,wid_jiku,wid_jiku/2,0
+        del 1
+
+		if switch_detail then
+			line2 _column_coo[i],0,_column_coo[i]+column_offset,0.03+wid_jiku/2
+			circle2 _column_coo[i]+column_offset,0.09+wid_jiku/2,0.06
+			style "jiku_detail"
+			text2 _column_coo[i]+column_offset,0.11+wid_jiku/2,"C"+str(i,1,0)
+			style "len_detail"
+			text2 _column_coo[i]+column_offset,0.07+wid_jiku/2,str("%.0",column_len[i]*1000)
+		endif
+    next i
+
+    !小柱
+    for i=1 to num_sjiku
+		if i=1 then
+			if start_type=3 or start_type=4 then
+				if start_type=3 then
+					sjiku_offset=0
+				endif
+				if start_type=4 then
+					sjiku_offset=wid_jiku-wid_side
+				endif
+			else
+				if end_type=3 then
+					sjiku_offset=0
+				endif
+				if end_type=4 then
+					sjiku_offset=wid_jiku-wid_side
+				endif
+			endif
+		else
+			if end_type=3 then
+				sjiku_offset=0
+			endif
+			if end_type=4 then
+				sjiku_offset=wid_jiku-wid_side
+			endif
+		endif
+
+		add2 _sjiku_coo[i],-wid_jiku/2+sjiku_offset
+			rect2 -wid2_jiku/2,0,wid2_jiku/2,wid_side
+			line2 -wid2_jiku/2,0,wid2_jiku/2,wid_side
+			line2 -wid2_jiku/2,wid_side,wid2_jiku/2,0
+		del 1
+
+		if switch_detail then
+			line2 _sjiku_coo[i],-wid_jiku/2+wid_side/2+sjiku_offset,_sjiku_coo[i],0.03+wid_jiku/2
+			circle2 _sjiku_coo[i],0.09+wid_jiku/2,0.06
+			style "jiku_detail"
+			text2 _sjiku_coo[i],0.11+wid_jiku/2,"SC"+str(i,1,0)
+			style "len_detail"
+			text2 _sjiku_coo[i],0.07+wid_jiku/2,str("%.0",sjiku_len[i]*1000)
+		endif
+    next i
+
+    !間柱
+	for i=1 to num_jiku2
+		add2 _coo_jiku2[i],-wid_jiku/2
+            rect2 -wid2_jiku/2,0,wid2_jiku/2,wid_jiku
+            line2 -wid2_jiku/2,0,wid2_jiku/2,wid_jiku
+            line2 -wid2_jiku/2,wid_jiku,wid2_jiku/2,0
+		del 1
+
+		if switch_detail then
+			if i<=start_jiku then
+				if start_type=6 then 
+					if n=1 then sign_offset=-0.12+wid2_jiku
+					if n=2 then sign_offset=0
+					if n=3 then sign_offset=0.12-wid2_jiku
+				else
+					sign_offset=0
+				endif
+			endif
+
+			if i>start_jiku and i<=start_jiku+num_jiku then
+				sign_offset=0
+			endif
+
+			if i>start_jiku+num_jiku then
+				if end_type=6 then
+					if i=num_jiku2-2 then sign_offset=-0.12+wid2_jiku
+					if i=num_jiku2-1 then sign_offset=0
+					if i=num_jiku2 then sign_offset=0.12-wid2_jiku
+				else
+					sign_offset=0
+				endif
+			endif
+
+			line2 _coo_jiku2[i],0,_coo_jiku2[i]+sign_offset,0.03+wid_jiku/2
+			circle2 _coo_jiku2[i]+sign_offset,0.09+wid_jiku/2,0.06
+			style "jiku_detail"
+			text2 _coo_jiku2[i]+sign_offset,0.11+wid_jiku/2,"S"+str(i,1,0)
+			style "len_detail"
+			text2 _coo_jiku2[i]+sign_offset,0.07+wid_jiku/2,str("%.0",jiku_len[i]*1000)
+		endif
+	next i
+endif
+
+
+!==========================================================開口ー2D表示
+if switch_ref_win and switch_op then
+	add2 absx,0
+        for i=1 to win_num
+            hotspot2 win_xz2[i][1],0
+            hotspot2 win_xz2[i][1]+win_wid2[i],0
+
+            line2 win_xz2[i][1],0,win_xz2[i][1]+win_wid2[i],0
+            line2 win_xz2[i][1],-wid_jiku/2,win_xz2[i][1],wid_jiku/2
+            line2 win_xz2[i][1]+win_wid2[i],-wid_jiku/2,win_xz2[i][1]+win_wid2[i],wid_jiku/2
+
+            add2 win_xz2[i][1],0
+            rect2 -wid2_jiku,-wid_jiku/2,0,wid_jiku/2
+            del 1
+
+            add2 win_xz2[i][1]+win_wid2[i],0
+            rect2 0,-wid_jiku/2,wid2_jiku,wid_jiku/2
+            del 1
+
+            hotspot2 0,0,code,win_xz[i][1],1+128:code=code+1
+            hotspot2 0-1,0,code,win_xz[i][1],3:code=code+1
+            hotspot2 0+win_xz[i][1],0,code,win_xz[i][1],2:code=code+1
+
+            hotspot2 0+win_xz[i][1],0,code,win_wid[i],1+128:code=code+1
+            hotspot2 0+win_xz[i][1]-1,0,code,win_wid[i],3:code=code+1
+            hotspot2 0+win_xz[i][1]+win_wid[i],0,code,win_wid[i],2:code=code+1
+
+            if switch_ref_detail then
+                line2 win_xz2[i][1]-wid2_jiku/2,0,win_xz2[i][1]-wid2_jiku/2-0.03-wid_jiku/2,-0.03-wid_jiku/2
+                line2 win_xz2[i][1]+win_wid2[i]+wid2_jiku/2,0,win_xz2[i][1]+win_wid2[i]+wid2_jiku/2+0.03+wid_jiku/2,-0.03-wid_jiku/2
+                circle2 win_xz2[i][1]-wid2_jiku/2-0.03-wid_jiku/2,-0.09-wid_jiku/2,0.06
+                circle2 win_xz2[i][1]+win_wid2[i]+wid2_jiku/2+0.03+wid_jiku/2,-0.09-wid_jiku/2,0.06
+                style "jiku_detail"
+                text2 win_xz2[i][1]-wid2_jiku/2-0.03-wid_jiku/2,-0.07-wid_jiku/2,"KS"+str(2*i-1,1,0)
+                text2 win_xz2[i][1]+win_wid2[i]+wid2_jiku/2+0.03+wid_jiku/2,-0.07-wid_jiku/2,"KS"+str(2*i,1,0)
+                style "len_detail"
+                text2 win_xz2[i][1]-wid2_jiku/2-0.03-wid_jiku/2,-0.11-wid_jiku/2,str("%.0",ref_len[2*i-1]*1000)
+                text2 win_xz2[i][1]+win_wid2[i]+wid2_jiku/2+0.03+wid_jiku/2,-0.11-wid_jiku/2,str("%.0",ref_len[2*i]*1000)
+            endif
+        next i
+	del 1
+endif
+
+if switch_board_detail and switch_op then
+	add2 absx,0
+        for i=1 to win_num
+            line2 win_xz2[i][1],0,win_xz2[i][1],-0.12
+            line2 win_xz2[i][1]+win_wid2[i],0,win_xz2[i][1]+win_wid2[i],-0.12
+            line2 win_xz2[i][1],-0.1,win_xz2[i][1]+win_wid2[i],-0.1
+
+            hotspot2 win_xz2[i][1],-0.1
+            hotspot2 win_xz2[i][1]+win_wid2[i],-0.1
+
+            line2 win_xz2[i][1],-0.1,win_xz2[i][1]+0.04,-0.12
+            line2 win_xz2[i][1],-0.1,win_xz2[i][1]+0.04,-0.08
+            line2 win_xz2[i][1]+win_wid2[i],-0.1,win_xz2[i][1]+win_wid2[i]-0.04,-0.12
+            line2 win_xz2[i][1]+win_wid2[i],-0.1,win_xz2[i][1]+win_wid2[i]-0.04,-0.08
+
+            style "jiku_detail"
+            if win_type[i]=1 then
+                add2 win_xz2[i][1]+win_wid2[i]/2,-0.15
+                text2 0,0,"扉     W="+str("%.0",win_wid2[i]*1000)+"     H="+str("%.0",win_hei2[i]*1000)
+                del 1
+            else
+                add2 win_xz2[i][1]+win_wid2[i]/2,-0.15
+                text2 0,0,"窓     W="+str("%.0",win_wid2[i]*1000)+"     H="+str("%.0",win_hei2[i]*1000)
+                del 1
+            endif
+        next i
+	del 1
+endif
+
+
+!==========================================================梁開口ー2D表示
+if switch_ref_beam and switch_beam then
+	add2 absx,0
+        for i=1 to beam_num
+            hotspot2 beam_x[i],0
+            hotspot2 beam_x[i]+beam_wid[i],0
+
+            line2 beam_x[i],-wid_jiku/2,beam_x[i]+beam_wid[i],wid_jiku/2
+            line2 beam_x[i],wid_jiku/2,beam_x[i]+beam_wid[i],-wid_jiku/2
+            line2 beam_x[i],-wid_jiku/2,beam_x[i],wid_jiku/2
+            line2 beam_x[i]+beam_wid[i],wid_jiku/2,beam_x[i]+beam_wid[i],-wid_jiku/2
+
+            if beam_ref[i][2]=1 then
+                add2 beam_x[i]+beam_wid[i],0
+                rect2 0,-wid_jiku/2,wid2_jiku,wid_jiku/2
+                del 1
+            endif
+
+            if beam_ref[i][1]=1 then
+                add2 beam_x[i],0
+                rect2 -wid2_jiku,-wid_jiku/2,0,wid_jiku/2
+                del 1
+            endif
+
+            if switch_ref_detail then
+                bnn=0
+
+                if beam_ref[i][1]=1 then
+                    line2 beam_x[i]-wid2_jiku/2,0,beam_x[i]-wid2_jiku/2,-0.03-wid_jiku/2
+                    circle2 beam_x[i]-wid2_jiku/2,-0.09-wid_jiku/2,0.06
+                endif
+                if beam_ref[i][2]=1 then
+                    line2 beam_x[i]+beam_wid[i]+wid2_jiku/2,0,beam_x[i]+beam_wid[i]+wid2_jiku/2,-0.03-wid_jiku/2
+                    circle2 beam_x[i]+beam_wid[i]+wid2_jiku/2,-0.09-wid_jiku/2,0.06
+                endif
+                    style "jiku_detail"
+                if beam_ref[i][1]=1 then
+                    bnn=bnn+1
+                    text2 beam_x[i]-wid2_jiku/2,-0.07-wid_jiku/2,"BS"+str(bnn,1,0)
+                endif
+                if beam_ref[i][2]=1 then
+                    bnn=bnn+1
+                    text2 beam_x[i]+beam_wid[i]+wid2_jiku/2,-0.07-wid_jiku/2,"BS"+str(bnn,1,0)
+                endif
+                    style "len_detail"
+                if beam_ref[i][1]=1 then
+                    text2 beam_x[i]-wid2_jiku/2,-0.11-wid_jiku/2,str("%.0",beam_len[bnn]*1000)
+                endif
+                if beam_ref[i][2]=1 then
+                    text2 beam_x[i]+beam_wid[i]+wid2_jiku/2,-0.11-wid_jiku/2,str("%.0",beam_len[bnn]*1000)
+                endif
+            endif
+        next i
+	del 1
+endif
+
+
+!==========================================================遮音材ー2D表示
+if switch_sound2d and switch_sound then
+	fill fill_sound
+	
+	poly2 5,2,
+	0,wid_jiku/2,0,-wid_jiku/2,len,-wid_jiku/2,len,wid_jiku/2,0,wid_jiku/2
+endif
+
+
+!==========================================================ボードー2D表示
+if display_board2D then
+	if reverse then mul2 1,-1
+        if switch_board then
+            for i=1 to num_board 
+                add2 -offset_start[i],-wid_jiku/2-thi_board[i]
+                rect2 0,0,len+offset_start[i]+offset_end[i],thi_board[i]
+                hotspot2 0,0
+                hotspot2 len+offset_start[i]+offset_end[i],0
+                del 1
+                add2 0,-thi_board[i]
+            next i
+            del num_board 
+        endif
+        
+        if switch_board2 then
+            for i=1 to num_board2
+                add2 -offset_start2[i],wid_jiku/2+thi_board2[i]
+                rect2 0,0,len+offset_start2[i]+offset_end2[i],-thi_board2[i]
+                hotspot2 0,0
+                hotspot2 len+offset_start2[i]+offset_end2[i],0
+                del 1
+                add2 0,thi_board2[i]
+            next i
+            del num_board2
+        endif
+
+        if display_boardspot2D then
+            if switch_board then
+                for i=1 to num_board
+                    hotspot2 0,-wid_jiku/2-thi_board[i]/2,code,offset_start[i],1+128:code=code+1
+                    hotspot2 1,-wid_jiku/2-thi_board[i]/2,code,offset_start[i],3:code=code+1
+                    hotspot2 -offset_start[i],-wid_jiku/2-thi_board[i]/2,code,offset_start[i],2:code=code+1
+        
+                    hotspot2 len,-wid_jiku/2-thi_board[i]/2,code,offset_end[i],1+128:code=code+1
+                    hotspot2 len-1,-wid_jiku/2-thi_board[i]/2,code,offset_end[i],3:code=code+1
+                    hotspot2 len+offset_end[i],-wid_jiku/2-thi_board[i]/2,code,offset_end[i],2:code=code+1
+        
+                    add2 0,-thi_board[i]
+                next i
+                del num_board
+            endif
+
+            if switch_board2 then
+                for i=1 to num_board2
+                    hotspot2 0,wid_jiku/2+thi_board2[i]/2,code,offset_start2[i],1+128:code=code+1
+                    hotspot2 1,wid_jiku/2+thi_board2[i]/2,code,offset_start2[i],3:code=code+1
+                    hotspot2 -offset_start2[i],wid_jiku/2+thi_board2[i]/2,code,offset_start2[i],2:code=code+1
+        
+                    hotspot2 len,wid_jiku/2+thi_board2[i]/2,code,offset_end2[i],1+128:code=code+1
+                    hotspot2 len-1,wid_jiku/2+thi_board2[i]/2,code,offset_end2[i],3:code=code+1
+                    hotspot2 len+offset_end2[i],wid_jiku/2+thi_board2[i]/2,code,offset_end2[i],2:code=code+1
+        
+                    add2 0,thi_board[i]
+                next i
+                del num_board2
+            endif
+        endif
+	if reverse then del 1
+endif
+
+
+!==========================================================化粧板ー2D表示
+if display_panel2D then
+	if reverse then mul2 1,-1
+        if switch_panel then
+            panel_y=-wid_jiku/2
+        
+            if switch_board then
+                for i=1 to num_board
+                    panel_y=panel_y-thi_board[i]
+                next i
+            endif
+
+            add2 -offset_start_p,panel_y-thi_panel
+                rect2 0,0,len+offset_start_p+offset_end_p,thi_panel
+                hotspot2 0,0
+                hotspot2 len+offset_start_p+offset_end_p,0
+            del 1
+        endif
+
+        if switch_panel2 then
+            panel_y2=wid_jiku/2
+        
+            if switch_board2 then
+                for i=1 to num_board2
+                    panel_y2=panel_y2+thi_board2[i]
+                next i
+            endif
+        
+            add2 -offset_start_p2,panel_y2
+                rect2 0,0,len+offset_start_p2+offset_end_p2,thi_panel2
+                hotspot2 0,thi_panel2
+                hotspot2 len+offset_start_p2+offset_end_p2,thi_panel2
+            del 1
+        endif
+
+        if display_panelspot2D then
+            if switch_panel then
+                hotspot2 0,panel_y-thi_panel/2,code,offset_start_p,1+128:code=code+1
+                hotspot2 1,panel_y-thi_panel/2,code,offset_start_p,3:code=code+1
+                hotspot2 -offset_start_p,panel_y-thi_panel/2,code,offset_start_p,2:code=code+1
+
+                hotspot2 len,panel_y-thi_panel/2,code,offset_end_p,1+128:code=code+1
+                hotspot2 len-1,panel_y-thi_panel/2,code,offset_end_p,3:code=code+1
+                hotspot2 len+offset_end_p,panel_y-thi_panel/2,code,offset_end_p,2:code=code+1
+            endif
+
+            if switch_panel2 then
+                hotspot2 0,panel_y2+thi_panel2/2,code,offset_start_p2,1+128:code=code+1
+                hotspot2 1,panel_y2+thi_panel2/2,code,offset_start_p2,3:code=code+1
+                hotspot2 -offset_start_p2,panel_y2+thi_panel2/2,code,offset_start_p2,2:code=code+1
+
+                hotspot2 len,panel_y2+thi_panel2/2,code,offset_end_p2,1+128:code=code+1
+                hotspot2 len-1,panel_y2+thi_panel2/2,code,offset_end_p2,3:code=code+1
+                hotspot2 len+offset_end_p2,panel_y2+thi_panel2/2,code,offset_end_p2,2:code=code+1
+            endif
+        endif
+	if reverse then del 1
+endif
+
+
+!==========================================================ボードと化粧板ー詳細表示
+if switch_board_detail then
+	!================================表
+	if switch_board or switch_panel then
+		if reverse then mul2 1,-1
+            hotspot2 len/2,spot[1][2],code,spot[1][1],1+128:code=code+1
+            hotspot2 len/2-1,spot[1][2],code,spot[1][1],3:code=code+1
+            hotspot2 len/2+spot[1][1],spot[1][2],code,spot[1][1],2:code=code+1
+            
+            hotspot2 len/2+spot[1][1],0,code,spot[1][2],1+128:code=code+1
+            hotspot2 len/2+spot[1][1],-1,code,spot[1][2],3:code=code+1
+            hotspot2 len/2+spot[1][1],spot[1][2],code,spot[1][2],2:code=code+1
+        
+            hotspot2 len/2+spot[1][1],spot[1][2],code,len_bar[1],1+128:code=code+1
+            hotspot2 len/2+spot[1][1]-1,spot[1][2],code,len_bar[1],3:code=code+1
+            hotspot2 len/2+spot[1][1]+len_bar[1],spot[1][2],code,len_bar[1],2:code=code+1
+
+            line2 len/2,-wid_jiku/2-0.005,len/2+spot[1][1],spot[1][2]
+        
+            for i=1 to num_board+switch_panel
+                add2 spot[1][1]/(num_board+switch_panel),(spot[1][2]-(-wid_jiku/2-0.005))/(num_board+switch_panel)
+                line2 len/2,-wid_jiku/2-0.005,len/2+len_bar[1],-wid_jiku/2-0.005
+            next i
+            del num_board+switch_panel
+		if reverse then del 1
+
+		style "board_detail"
+		if reverse=0 then
+			if switch_pillar=0 then
+				text2 len/2+spot[1][1]+0.2,spot[1][2]-0.1,txt_fire1+" (表)"
+			else
+				text2 len/2+spot[1][1]+0.2,spot[1][2]-0.1,txt_fire1+" (表)"+" (柱型)"
+			endif
+
+			if switch_board then
+				for i=1 to num_board
+					add2 spot[1][1]/(num_board+switch_panel),(spot[1][2]-(-wid_jiku/2-0.005))/(num_board+switch_panel)
+					style "board_detail2"
+					text2 len/2+len_bar[1]+0.05,-wid_jiku/2-0.005,txt_type_board1[i]+"  t"+str(thi_board[i]*1000,2,1)
+				next i
+				del num_board
+			endif
+
+			if switch_panel then
+				style "board_detail2"
+				text2 len/2+spot[1][1]+len_bar[1]+0.05,spot[1][2],txt_type_panel1+"  t"+str(thi_panel*1000,3,2)
+			endif
+		else
+			if switch_pillar=0 then
+				text2 len/2+spot[1][1]+0.2,-spot[1][2]+0.1,txt_fire1+" (表)"
+			else
+				text2 len/2+spot[1][1]+0.2,-spot[1][2]+0.1,txt_fire1+" (表)"+" (柱型)"
+			endif
+
+			if switch_board then
+				for i=1 to num_board
+					add2 spot[1][1]/(num_board+switch_panel),-(spot[1][2]-(-wid_jiku/2-0.005))/(num_board+switch_panel)
+					style "board_detail2"
+					text2 len/2+len_bar[1]+0.05,wid_jiku/2+0.005,txt_type_board1[i]+"  t"+str(thi_board[i]*1000,2,1)
+				next i
+				del num_board
+			endif
+
+			if switch_panel then
+				style "board_detail2"
+				text2 len/2+spot[1][1]+len_bar[1]+0.05,-spot[1][2],txt_type_panel1+"  t"+str(thi_panel*1000,3,2)
+			endif
+		endif
+	endif
+
+	!================================裏
+	if switch_board2 or switch_panel2 then
+		if reverse then mul2 1,-1
+            hotspot2 len/2,spot[2][2],code,spot[2][1],1+128:code=code+1
+            hotspot2 len/2-1,spot[2][2],code,spot[2][1],3:code=code+1
+            hotspot2 len/2+spot[2][1],spot[2][2],code,spot[2][1],2:code=code+1
+            
+            hotspot2 len/2+spot[2][1],0,code,spot[2][2],1+128:code=code+1
+            hotspot2 len/2+spot[2][1],-1,code,spot[2][2],3:code=code+1
+            hotspot2 len/2+spot[2][1],spot[2][2],code,spot[2][2],2:code=code+1
+
+            hotspot2 len/2+spot[2][1],spot[2][2],code,len_bar[2],1+128:code=code+1
+            hotspot2 len/2+spot[2][1]-1,spot[2][2],code,len_bar[2],3:code=code+1
+            hotspot2 len/2+spot[2][1]+len_bar[2],spot[2][2],code,len_bar[2],2:code=code+1
+
+            line2 len/2,wid_jiku/2+0.005,len/2+spot[2][1],spot[2][2]
+        
+            for i=1 to num_board2+switch_panel2
+                add2 spot[2][1]/(num_board2+switch_panel2),(spot[2][2]-(wid_jiku/2+0.005))/(num_board2+switch_panel2)
+                line2 len/2,wid_jiku/2+0.005,len/2+len_bar[2],wid_jiku/2+0.005
+            next i
+            del num_board2+switch_panel2
+		if reverse then del 1
+
+		style "board_detail"
+		if reverse=0 then
+			if switch_pillar=0 then
+				text2 len/2+spot[2][1]+0.2,spot[2][2]+0.1,txt_fire2+" (裏)"
+			else
+				text2 len/2+spot[2][1]+0.2,spot[2][2]+0.1,txt_fire2+" (裏)"+" (柱型)"
+			endif
+
+			if switch_board2 then
+				for i=1 to num_board2
+					add2 spot[2][1]/(num_board2+switch_panel2),(spot[2][2]-(wid_jiku/2+0.005))/(num_board2+switch_panel2)
+					style "board_detail2"
+					text2 len/2+len_bar[2]+0.05,wid_jiku/2+0.005,txt_type_board2[i]+"  t"+str(thi_board2[i]*1000,2,1)
+				next i
+				del num_board2
+			endif
+
+			if switch_panel2 then
+				style "board_detail2"
+				text2 len/2+spot[2][1]+len_bar[2]+0.05,spot[2][2],txt_type_panel2+"  t"+str(thi_panel2*1000,3,2)
+			endif
+		else
+			if switch_pillar=0 then
+				text2 len/2+spot[2][1]+0.2,-spot[2][2]-0.1,txt_fire2+" (裏)"
+			else
+				text2 len/2+spot[2][1]+0.2,-spot[2][2]-0.1,txt_fire2+" (裏)"+" (柱型)"
+			endif
+
+			if switch_board2 then
+				for i=1 to num_board2
+					add2 spot[2][1]/(num_board2+switch_panel2),-(spot[2][2]-(wid_jiku/2+0.005))/(num_board2+switch_panel2)
+					style "board_detail2"
+					text2 len/2+len_bar[2]+0.05,-wid_jiku/2-0.005,txt_type_board2[i]+"  t"+str(thi_board2[i]*1000,2,1)
+				next i
+				del num_board2
+			endif
+
+			if switch_panel2 then
+				style "board_detail2"
+				text2 len/2+spot[2][1]+len_bar[2]+0.05,-spot[2][2],txt_type_panel2+"  t"+str(thi_panel2*1000,3,2)
+			endif
+		endif
+	endif
+
+	!================================シール詳細表示
+	fill seal_fill
+
+	if switch_board then
+		seal_y=-wid_jiku/2
+	
+		for i=1 to num_board
+			seal_y=seal_y-thi_board[i]
+		next i
+
+		if reverse=0 then 
+			dir_y=seal_y-0.3
+		else
+			dir_y=-seal_y+0.3
+		endif
+
+		if reverse=0 then 
+			dir_yb=seal_y-0.15
+		else
+			dir_yb=-seal_y+0.15
+		endif
+
+		pen blank_pen
+
+		if switch_seal[1][1] or switch_soundseal[1][1] then
+			add2 -offset_start[num_seal],dir_y
+				style "board_detail"
+				text2 0,0,"L"
+			del 1
+		endif
+
+		if switch_seal[1][2] or switch_soundseal[1][2] then
+			add2 len+offset_end[num_seal],dir_y
+				style "board_detail"
+				text2 0,0,"R"
+			del 1
+		endif
+
+		if switch_seal[1][3] or switch_soundseal[1][3] then
+			add2 len/3,dir_y
+				style "board_detail"
+				text2 0,0,"U"
+			del 1
+		endif
+
+		if switch_seal[1][4] or switch_soundseal[1][4] then
+			add2 len*2/3,dir_y
+				style "board_detail"
+				text2 0,0,"D"
+			del 1
+		endif
+
+		if switch_seal[1][1] and switch_soundseal[1][1]=0 then
+			pen fire_pen
+
+			add2 -offset_start[num_seal],dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_soundseal[1][1] and switch_seal[1][1]=0 then
+			pen sound_pen
+
+			add2 -offset_start[num_seal],dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[1][1] and switch_soundseal[1][1] then
+			pen fire_pen
+
+			add2 -offset_start[num_seal],dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0,0.1,0,0
+			del 1
+
+			pen sound_pen
+
+			add2 -offset_start[num_seal],dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,0.05,-0.1,0,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,0.05,0.1,0,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[1][2] and switch_soundseal[1][2]=0 then
+			pen fire_pen
+
+			add2 len+offset_end[num_seal],dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_soundseal[1][2] and switch_seal[1][2]=0 then
+			pen sound_pen
+
+			add2 len+offset_end[num_seal],dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[1][2] and switch_soundseal[1][2] then
+			pen fire_pen
+
+			add2 len+offset_end[num_seal],dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0,0.1,0,0
+			del 1
+
+			pen sound_pen
+
+			add2 len+offset_end[num_seal],dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,0.05,-0.1,0,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,0.05,0.1,0,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[1][3] and switch_soundseal[1][3]=0 then
+			pen fire_pen
+
+			add2 len/3,dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_soundseal[1][3] and switch_seal[1][3]=0 then
+			pen sound_pen
+
+			add2 len/3,dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[1][3] and switch_soundseal[1][3] then
+			pen fire_pen
+
+			add2 len/3,dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0,0.1,0,0
+			del 1
+
+			pen sound_pen
+
+			add2 len/3,dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,0.05,-0.1,0,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,0.05,0.1,0,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[1][4] and switch_soundseal[1][4]=0 then
+			pen fire_pen
+
+			add2 len*2/3,dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_soundseal[1][4] and switch_seal[1][4]=0 then
+			pen sound_pen
+
+			add2 len*2/3,dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[1][4] and switch_soundseal[1][4] then
+			pen fire_pen
+
+			add2 len*2/3,dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0,0.1,0,0
+			del 1
+
+			pen sound_pen
+
+			add2 len*2/3,dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,0.05,-0.1,0,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,0.05,0.1,0,0.1,0,0
+			del 1
+		endif
+	endif
+
+	if switch_board2 then
+		seal_y2=wid_jiku/2
+	
+		for i=1 to num_board2
+			seal_y2=seal_y2+thi_board2[i]
+		next i
+
+		if reverse=0 then 
+			dir_y2=seal_y2+0.3
+		else
+			dir_y2=-seal_y2-0.3
+		endif
+
+		if reverse=0 then 
+			dir_yb2=seal_y2+0.15
+		else
+			dir_yb2=-seal_y2-0.15
+		endif
+
+		pen blank_pen
+
+		if switch_seal[2][1] or switch_soundseal[2][1] then
+			add2 -offset_start2[num_seal2],dir_y2
+				style "board_detail"
+				text2 0,0,"L"
+			del 1
+		endif
+
+		if switch_seal[2][2] or switch_soundseal[2][2] then
+			add2 len+offset_end2[num_seal2],dir_y2
+				style "board_detail"
+				text2 0,0,"R"
+			del 1
+		endif
+
+		if switch_seal[2][3] or switch_soundseal[2][3] then
+			add2 len/3,dir_y2
+				style "board_detail"
+				text2 0,0,"U"
+			del 1
+		endif
+
+		if switch_seal[2][4] or switch_soundseal[2][4] then
+			add2 len*2/3,dir_y2
+				style "board_detail"
+				text2 0,0,"D"
+			del 1
+		endif
+
+		if switch_seal[2][1] and switch_soundseal[2][1]=0 then
+			pen fire_pen
+
+			add2 -offset_start2[num_seal2],dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_soundseal[2][1] and switch_seal[2][1]=0 then
+			pen sound_pen
+
+			add2 -offset_start2[num_seal2],dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[2][1] and switch_soundseal[2][1] then
+			pen fire_pen
+
+			add2 -offset_start2[num_seal2],dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0,0.1,0,0
+			del 1
+
+			pen sound_pen
+
+			add2 -offset_start2[num_seal2],dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,0.05,-0.1,0,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,0.05,0.1,0,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[2][2] and switch_soundseal[2][2]=0 then
+			pen fire_pen
+
+			add2 len+offset_end2[num_seal2],dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_soundseal[2][2] and switch_seal[2][2]=0 then
+			pen sound_pen
+
+			add2 len+offset_end2[num_seal2],dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[2][2] and switch_soundseal[2][2] then
+			pen fire_pen
+
+			add2 len+offset_end2[num_seal2],dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0,0.1,0,0
+			del 1
+
+			pen sound_pen
+
+			add2 len+offset_end2[num_seal2],dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,0.05,-0.1,0,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,0.05,0.1,0,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[2][3] and switch_soundseal[2][3]=0 then
+			pen fire_pen
+
+			add2 len/3,dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_soundseal[2][3] and switch_seal[2][3]=0 then
+			pen sound_pen
+
+			add2 len/3,dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[2][3] and switch_soundseal[2][3] then
+			pen fire_pen
+
+			add2 len/3,dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0,0.1,0,0
+			del 1
+
+			pen sound_pen
+
+			add2 len/3,dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,0.05,-0.1,0,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,0.05,0.1,0,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[2][4] and switch_soundseal[2][4]=0 then
+			pen fire_pen
+
+			add2 len*2/3,dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_soundseal[2][4] and switch_seal[2][4]=0 then
+			pen sound_pen
+
+			add2 len*2/3,dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[2][4] and switch_soundseal[2][4] then
+			pen fire_pen
+
+			add2 len*2/3,dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0,0.1,0,0
+			del 1
+
+			pen sound_pen
+
+			add2 len*2/3,dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,0.05,-0.1,0,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,0.05,0.1,0,0.1,0,0
+			del 1
+		endif
+	endif
+endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+del 2

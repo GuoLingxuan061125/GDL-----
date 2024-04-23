@@ -1,0 +1,176 @@
+project2{3} 3,270,1,1+2+4+8+16+32,parameters disSD=0,disPOINT=0,disCL=dis_detail_2d
+
+define style "moji" textfont,3*100/glob_scale,5,1
+
+!========================================================================スラブ
+style "moji"
+
+for i=1 to 4
+	hotspot2 slab_pos[i][1],slab_pos[i][2]
+	hotline2 slab_pos[i][1],slab_pos[i][2],slab_pos[i+1][1],slab_pos[i+1][2],code
+
+	if dis_slab_num then
+		add2 slab_pos[i][1],slab_pos[i][2]
+		rot2 slab_rtz[i]
+		add2 slab_len[i]/2,beam_offset[i]+0.2
+		rot2 -slab_rtz[i]
+			text2 0,0,i
+		del 4
+	endif
+next i
+
+for i=2 to 4
+	hotspot2 0,slab_pos[i][2],code,slab_pos[i][1],1+128:code=code+1
+	hotspot2 slab_pos[i][1],slab_pos[i][2],code,slab_pos[i][1],2:code=code+1
+	hotspot2 -1,slab_pos[i][2],code,slab_pos[i][1],3:code=code+1
+	
+	hotspot2 slab_pos[i][1],0,code,slab_pos[i][2],1+128:code=code+1
+	hotspot2 slab_pos[i][1],slab_pos[i][2],code,slab_pos[i][2],2:code=code+1
+	hotspot2 slab_pos[i][1],-1,code,slab_pos[i][2],3:code=code+1
+next i
+
+
+!========================================================================柱
+!for i=1 to 4
+!	add2 slab_pos[i][1],slab_pos[i][2]
+!		!左下角
+!		hotspot2 0,-column_offset[i][2],code,column_offset[i][1],1+128:code=code+1
+!		hotspot2 -column_offset[i][1],-column_offset[i][2],code,column_offset[i][1],2:code=code+1
+!		hotspot2 1,-column_offset[i][2],code,column_offset[i][1],3:code=code+1
+!		
+!		hotspot2 -column_offset[i][1],0,code,column_offset[i][2],1+128:code=code+1
+!		hotspot2 -column_offset[i][1],-column_offset[i][2],code,column_offset[i][2],2:code=code+1
+!		hotspot2 -column_offset[i][1],1,code,column_offset[i][2],3:code=code+1
+!
+!		!右下角
+!		hotspot2 0,-column_offset[i][2],code,column_offset[i][1],1+128:code=code+1
+!		hotspot2 column_offset[i][1],-column_offset[i][2],code,column_offset[i][1],2:code=code+1
+!		hotspot2 -1,-column_offset[i][2],code,column_offset[i][1],3:code=code+1
+!		
+!		hotspot2 column_offset[i][1],0,code,column_offset[i][2],1+128:code=code+1
+!		hotspot2 column_offset[i][1],-column_offset[i][2],code,column_offset[i][2],2:code=code+1
+!		hotspot2 column_offset[i][1],1,code,column_offset[i][2],3:code=code+1
+!
+!		!右上角
+!		hotspot2 0,column_offset[i][2],code,column_offset[i][1],1+128:code=code+1
+!		hotspot2 column_offset[i][1],column_offset[i][2],code,column_offset[i][1],2:code=code+1
+!		hotspot2 -1,column_offset[i][2],code,column_offset[i][1],3:code=code+1
+!		
+!		hotspot2 column_offset[i][1],0,code,column_offset[i][2],1+128:code=code+1
+!		hotspot2 column_offset[i][1],column_offset[i][2],code,column_offset[i][2],2:code=code+1
+!		hotspot2 column_offset[i][1],-1,code,column_offset[i][2],3:code=code+1
+!
+!		!左上角
+!		hotspot2 0,column_offset[i][2],code,column_offset[i][1],1+128:code=code+1
+!		hotspot2 -column_offset[i][1],column_offset[i][2],code,column_offset[i][1],2:code=code+1
+!		hotspot2 1,column_offset[i][2],code,column_offset[i][1],3:code=code+1
+!		
+!		hotspot2 -column_offset[i][1],0,code,column_offset[i][2],1+128:code=code+1
+!		hotspot2 -column_offset[i][1],column_offset[i][2],code,column_offset[i][2],2:code=code+1
+!		hotspot2 -column_offset[i][1],-1,code,column_offset[i][2],3:code=code+1
+!	del 1
+!next i
+
+
+!========================================================================梁
+for i=1 to 4
+	add2 slab_pos[i][1],slab_pos[i][2]
+	rot2 slab_rtz[i]
+		hotspot2 slab_len[i]/2,0,code,beam_offset[i],1+128:code=code+1
+		hotspot2 slab_len[i]/2,beam_offset[i],code,beam_offset[i],2:code=code+1
+		hotspot2 slab_len[i]/2,-1,code,beam_offset[i],3:code=code+1
+	del 2
+next i
+
+!梁逃げ寸法
+for i=1 to 4
+	add2 slab_pos[i][1],slab_pos[i][2]
+	rot2 slab_rtz[i]
+		hotspot2 slab_len[i]/2,-beam_offset[i],code,beam_anc_offset[i],1+128:code=code+1
+		hotspot2 slab_len[i]/2,-beam_offset[i]+beam_anc_offset[i],code,beam_anc_offset[i],2:code=code+1
+		hotspot2 slab_len[i]/2,-beam_offset[i]-1,code,beam_anc_offset[i],3:code=code+1
+	del 2
+next i
+
+
+!======================================================================開口ホットスポットとサブライン
+if op_num>0 then
+	for i=1 to op_num
+		hotspot2 0,op_pos[i][2],code,op_pos[i][1],1+128:code=code+1
+		hotspot2 op_pos[i][1],op_pos[i][2],code,op_pos[i][1],2:code=code+1
+		hotspot2 -1,op_pos[i][2],code,op_pos[i][1],3:code=code+1
+	
+		hotspot2 op_pos[i][1],0,code,op_pos[i][2],1+128:code=code+1
+		hotspot2 op_pos[i][1],op_pos[i][2],code,op_pos[i][2],2:code=code+1
+		hotspot2 op_pos[i][1],-1,code,op_pos[i][2],3:code=code+1
+
+		hotspot2 op_pos[i][1],op_pos[i][2]+op_wid[i]/2,code,op_len[i],1+128:code=code+1
+		hotspot2 op_pos[i][1]+op_len[i],op_pos[i][2]+op_wid[i]/2,code,op_len[i],2:code=code+1
+		hotspot2 op_pos[i][1]-1,op_pos[i][2]+op_wid[i]/2,code,op_len[i],3:code=code+1
+
+		if op_shape[i]=1 then
+			hotspot2 op_pos[i][1]+op_len[i]/2,op_pos[i][2],code,op_wid[i],1+128:code=code+1
+			hotspot2 op_pos[i][1]+op_len[i]/2,op_pos[i][2]+op_wid[i],code,op_wid[i],2:code=code+1
+			hotspot2 op_pos[i][1]+op_len[i]/2,op_pos[i][2]-1,code,op_wid[i],3:code=code+1
+
+			hotspot2 op_pos[i][1]+op_len[i],op_pos[i][2]
+			hotspot2 op_pos[i][1]+op_len[i],op_pos[i][2]+op_wid[i]
+			hotspot2 op_pos[i][1],op_pos[i][2]+op_wid[i]
+	
+			rect2 op_pos[i][1],op_pos[i][2],op_pos[i][1]+op_len[i],op_pos[i][2]+op_wid[i]
+		else
+			hotspot2 op_pos[i][1]+op_len[i]/2,op_pos[i][2]+op_wid[i]
+		endif
+	next i
+endif
+
+
+set line_type all_line_type
+
+
+!======================================================================段差ホットスポットとサブライン
+for i=1 to step_num
+	hotspot2 0,step_pos[i][2],code,step_pos[i][1],1+128:code=code+1
+	hotspot2 step_pos[i][1],step_pos[i][2],code,step_pos[i][1],2:code=code+1
+	hotspot2 -1,step_pos[i][2],code,step_pos[i][1],3:code=code+1
+
+	hotspot2 step_pos[i][1],0,code,step_pos[i][2],1+128:code=code+1
+	hotspot2 step_pos[i][1],step_pos[i][2],code,step_pos[i][2],2:code=code+1
+	hotspot2 step_pos[i][1],-1,code,step_pos[i][2],3:code=code+1
+
+	hotspot2 step_pos[i][1],step_pos[i][2]+step_wid[i]/2,code,step_len[i],1+128:code=code+1
+	hotspot2 step_pos[i][1]+step_len[i],step_pos[i][2]+step_wid[i]/2,code,step_len[i],2:code=code+1
+	hotspot2 step_pos[i][1]-1,step_pos[i][2]+step_wid[i]/2,code,step_len[i],3:code=code+1
+
+	hotspot2 step_pos[i][1]+step_len[i]/2,step_pos[i][2],code,step_wid[i],1+128:code=code+1
+	hotspot2 step_pos[i][1]+step_len[i]/2,step_pos[i][2]+step_wid[i],code,step_wid[i],2:code=code+1
+	hotspot2 step_pos[i][1]+step_len[i]/2,step_pos[i][2]-1,code,step_wid[i],3:code=code+1
+
+	hotspot2 step_pos[i][1]+step_len[i],step_pos[i][2]
+	hotspot2 step_pos[i][1]+step_len[i],step_pos[i][2]+step_wid[i]
+	hotspot2 step_pos[i][1],step_pos[i][2]+step_wid[i]
+next i
+
+
+!========================================================================矢印
+if mbar_dir=1 then
+	line2 (minx+maxx)/2,arr_start,(minx+maxx)/2,arr_end
+	line2 (minx+maxx)/2,arr_start,(minx+maxx)/2-0.1,arr_start+0.1
+	line2 (minx+maxx)/2,arr_start,(minx+maxx)/2+0.1,arr_start+0.1
+	line2 (minx+maxx)/2,arr_end,(minx+maxx)/2-0.1,arr_end-0.1
+	line2 (minx+maxx)/2,arr_end,(minx+maxx)/2+0.1,arr_end-0.1
+else
+	line2 arr_start,(miny+maxy)/2,arr_end,(miny+maxy)/2
+	line2 arr_start,(miny+maxy)/2,arr_start+0.1,(miny+maxy)/2+0.1
+	line2 arr_start,(miny+maxy)/2,arr_start+0.1,(miny+maxy)/2-0.1
+	line2 arr_end,(miny+maxy)/2,arr_end-0.1,(miny+maxy)/2+0.1
+	line2 arr_end,(miny+maxy)/2,arr_end-0.1,(miny+maxy)/2-0.1
+endif
+
+
+
+
+
+
+
+

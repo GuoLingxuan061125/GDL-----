@@ -1,0 +1,273 @@
+!==============================================================================配筋設定
+values{2} "conFc" 18,"18 N/㎟",21,"21 N/㎟",24,"24 N/㎟",27,"27 N/㎟",30,"30 N/㎟",33,"33 N/㎟",36,"36 N/㎟",39,"39 N/㎟",42,"42 N/㎟",45,"45 N/㎟",\
+				  48,"48 N/㎟",51,"51 N/㎟",54,"54 N/㎟",57,"57 N/㎟",60,"60 N/㎟"
+
+if conFc=18 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345"
+if conFc=21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390"
+if conFc>21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390",4,"SD490"
+
+parameters l2=l2_list[sdType][conFc]
+parameters l2h=l2h_list[sdType][conFc]
+
+values "SDresol" range[3,]
+
+
+!==============================================================================立上り縦筋
+values{2} "fver_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+values "fver_pitch" range[0.05,]
+
+fver_r=dr_list[fver_steel]
+fver_nd=nd_list[fver_steel]
+fver_mat=SDmat[scode_list[fver_steel]]
+fver_pen=SDpen[scode_list[fver_steel]]
+
+parameters fver_r=fver_r,
+    fver_nd=fver_nd,
+    fver_mat=fver_mat,
+    fver_pen=fver_pen
+
+fver_num=0
+dim _fver_point[]
+dim _fver_pos[][]
+
+!上下
+fver_x_num=max(int((base_x-2*(fver_side_cover+fver_r))/fver_pitch),0)+1
+
+dim _fver_x_pos[]
+for i=1 to fver_x_num
+    _fver_x_pos[i]=-base_x/2+(base_x-(fver_x_num-1)*fver_pitch)/2+(i-1)*fver_pitch
+next i
+
+dim _fver_y_pos[]
+_fver_y_pos[1]=-base_y/2+fver_side_cover+fver_r
+_fver_y_pos[2]=base_y/2-fver_side_cover-fver_r
+
+for i=1 to 2
+    for j=1 to fver_x_num
+        fver_num=fver_num+1
+        _fver_point[fver_num]=3
+
+        put _fver_x_pos[j]
+        put _fver_y_pos[i]
+        put base_z+roof_z1+roof_z2-fver_top_cover
+
+        put _fver_x_pos[j]
+        put _fver_y_pos[i]
+        put fver_down_cover+fver_r
+
+        put _fver_x_pos[j]
+        put _fver_y_pos[i]+(2*i-3)*L2h*fver_nd
+        put fver_down_cover+fver_r
+
+        for n=1 to 3*_fver_point[fver_num]
+            _fver_pos[fver_num][n]=get(1)
+        next n
+    next j
+next i
+
+!左右
+fver_y_num=max(int((base_y-2*(fver_side_cover+fver_r))/fver_pitch),0)+1
+
+_fver_x_pos[1]=-base_x/2+fver_side_cover+fver_r
+_fver_x_pos[2]=base_x/2-fver_side_cover-fver_r
+
+for i=1 to fver_y_num
+    _fver_y_pos[i]=-base_y/2+(base_y-(fver_y_num-1)*fver_pitch)/2+(i-1)*fver_pitch
+next i
+
+for i=1 to 2
+    for j=1 to fver_y_num
+        fver_num=fver_num+1
+        _fver_point[fver_num]=3
+
+        put _fver_x_pos[i]
+        put _fver_y_pos[j]
+        put base_z+roof_z1+roof_z2-fver_top_cover
+
+        put _fver_x_pos[i]
+        put _fver_y_pos[j]
+        put fver_down_cover+fver_r
+
+        put _fver_x_pos[i]+(2*i-3)*L2h*fver_nd
+        put _fver_y_pos[j]
+        put fver_down_cover+fver_r
+
+        for n=1 to 3*_fver_point[fver_num]
+            _fver_pos[fver_num][n]=get(1)
+        next n
+    next j
+next i
+
+parameters fver_num=fver_num,
+    fver_point=_fver_point,
+    fver_pos=_fver_pos
+
+
+!==============================================================================立上り帯筋
+values{2} "hoop_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+values "hoop_pitch" range[0.05,]
+
+hoop_r=dr_list[hoop_steel]
+hoop_nd=nd_list[hoop_steel]
+hoop_mat=SDmat[scode_list[hoop_steel]]
+hoop_pen=SDpen[scode_list[hoop_steel]]
+
+parameters hoop_r=hoop_r,
+    hoop_nd=hoop_nd,
+    hoop_mat=hoop_mat,
+    hoop_pen=hoop_pen
+
+hoop_num=0
+dim _hoop_point[]
+dim _hoop_pos[][]
+
+hoop_z_num=int((base_z+roof_z1+roof_z2-fver_down_cover-5*fver_r)/hoop_pitch)+1
+
+dim _hoop_z_pos[]
+for i=1 to hoop_z_num
+    _hoop_z_pos[i]=fver_down_cover+5*fver_r+(i-1)*hoop_pitch
+next i
+
+for i=1 to hoop_z_num
+    hoop_num=hoop_num+1
+    _hoop_point[hoop_num]=5
+
+    put -base_x/2+(fver_side_cover-hoop_r)
+    put -base_y/2+(fver_side_cover-hoop_r)
+    put _hoop_z_pos[i]
+
+    put base_x/2-(fver_side_cover-hoop_r)
+    put -base_y/2+(fver_side_cover-hoop_r)
+    put _hoop_z_pos[i]
+
+    put base_x/2-(fver_side_cover-hoop_r)
+    put base_y/2-(fver_side_cover-hoop_r)
+    put _hoop_z_pos[i]
+
+    put -base_x/2+(fver_side_cover-hoop_r)
+    put base_y/2-(fver_side_cover-hoop_r)
+    put _hoop_z_pos[i]
+
+    put -base_x/2+(fver_side_cover-hoop_r)
+    put -base_y/2+(fver_side_cover-hoop_r)
+    put _hoop_z_pos[i]
+
+    for n=1 to 3*_hoop_point[hoop_num]
+        _hoop_pos[hoop_num][n]=get(1)
+    next n
+next i
+
+parameters hoop_num=hoop_num,
+    hoop_point=_hoop_point,
+    hoop_pos=_hoop_pos
+
+
+!==============================================================================天端配筋
+values{2} "roof_pattern" 1,"シングル",2,"ダブル"
+values{2} "roof_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+values "roof_pitch" range[0.05,]
+
+roof_r=dr_list[roof_steel]
+roof_nd=nd_list[roof_steel]
+roof_mat=SDmat[scode_list[roof_steel]]
+roof_pen=SDpen[scode_list[roof_steel]]
+
+parameters roof_r=roof_r,
+    roof_nd=roof_nd,
+    roof_mat=roof_mat,
+    roof_pen=roof_pen
+
+roof_num=0
+dim _roof_point[]
+dim _roof_pos[][]
+
+!x方向並び
+roof_x_num=int((roof_x-2*(roof_side_cover+roof_r))/roof_pitch)+1
+
+dim _roof_x_pos[]
+for i=1 to roof_x_num
+    _roof_x_pos[i]=-roof_x/2+(roof_x-(roof_x_num-1)*roof_pitch)/2+(i-1)*roof_pitch
+next i
+
+dim _roof_z_pos[]
+_roof_z_pos[1]=base_z+roof_z1-roof_top_cover-roof_r
+_roof_z_pos[2]=base_z+roof_top_cover+roof_r
+
+for i=1 to roof_pattern
+    for j=1 to roof_x_num
+        roof_num=roof_num+1
+        _roof_point[roof_num]=2
+
+        put _roof_x_pos[j]
+        put -roof_y/2+roof_side_cover
+        put _roof_z_pos[i]
+
+        put _roof_x_pos[j]
+        put roof_y/2-roof_side_cover
+        put _roof_z_pos[i]
+
+        for n=1 to 3*_roof_point[roof_num]
+            _roof_pos[roof_num][n]=get(1)
+        next n
+    next j
+next i
+
+!y方向並び
+roof_y_num=int((roof_y-2*(roof_side_cover+roof_r))/roof_pitch)+1
+
+dim _roof_y_pos[]
+for i=1 to roof_x_num
+    _roof_y_pos[i]=-roof_y/2+(roof_y-(roof_y_num-1)*roof_pitch)/2+(i-1)*roof_pitch
+next i
+
+_roof_z_pos[1]=base_z+roof_z1-roof_top_cover-3*roof_r
+_roof_z_pos[2]=base_z+roof_top_cover+3*roof_r
+
+for i=1 to roof_pattern
+    for j=1 to roof_y_num
+        roof_num=roof_num+1
+        _roof_point[roof_num]=2
+
+        put -roof_x/2+roof_side_cover
+        put _roof_y_pos[j]
+        put _roof_z_pos[i]
+
+        put roof_x/2-roof_side_cover
+        put _roof_y_pos[j]
+        put _roof_z_pos[i]
+
+        for n=1 to 3*_roof_point[roof_num]
+            _roof_pos[roof_num][n]=get(1)
+        next n
+    next j
+next i
+
+
+!型枠面積
+area_board=0
+
+if dis_form then
+    area_board=area_board+2*base_x*(base_z-offset_cemb)
+    area_board=area_board+2*(base_y+2*form_thi)*(base_z-offset_cemb)
+    if roof_y/2-base_y/2>0 then
+        area_board=area_board+2*(base_x+2*form_thi)*(roof_y/2-base_y/2)
+    endif
+    if roof_x/2-base_x/2>0 then
+        area_board=area_board+2*(roof_x/2-base_x/2)*(roof_y+2*form_thi)
+    endif
+    area_board=area_board+2*roof_x*roof_z1
+    area_board=area_board+2*(roof_y+2*form_thi)*roof_z1
+endif
+
+parameters area_board=area_board
+lock "area_board"
+
+
+
+
+
+
+
+parameters roof_num=roof_num,
+    roof_point=_roof_point,
+    roof_pos=_roof_pos

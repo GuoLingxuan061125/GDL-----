@@ -1,0 +1,354 @@
+!==============================================================================階段
+values{2} "step_dir" 1,"逆時計回り",2,"時計回り"
+values "floor_num" range[2,]
+
+parameters step_rat_angle=atn(step_rat/(step_tread+step_nosing))
+parameters step_angle=atn(step_riser/step_tread)
+values "step_num_totle" range[3,]
+
+values{2} "switch_mode" 1,"蹴上により階層高自動計算",2,"階層高により蹴上自動計算"
+
+if switch_mode=1 then
+	parameters floor_hei=step_num_totle*step_riser
+	lock "floor_hei"
+else
+	parameters step_riser=floor_hei/step_num_totle
+	lock "step_riser"
+endif
+
+values "step_wid1" range[0,]
+values "step_wid2" range[0,]
+values "step_tread" range[0,]
+values "step_riser" range[0,]
+values "step_nosing" range[0,]
+values "step_rat" range[0,]
+
+
+
+!==============================================================================踊り場
+values "step_num_down" range[2,step_num_totle-1]
+
+parameters step_num_up=step_num_totle-step_num_down
+lock "step_num_up"
+
+values "landing_1" range[step_tread,]
+values "landing_2" range[0,]
+values "handrail_wid" range[0,]
+values "landing_dep" range(0,]
+values "landing_thi" range(0,]
+values "landing_rat" range[0,landing_thi/landing_dep*100]
+if standard_x>=step_tread then
+	values "floor_1" range[0,]
+else
+	values "floor_1" range[step_tread-max(standard_x,0),]
+endif
+values "floor_dep" range(0,]
+values "floor_thi" range(0,]
+values "floor_rat" range[0,floor_thi/floor_dep*100]
+
+if switch_floor=0 then
+	hideparameter "floor_dep","floor_rat","floor_ditch","floor_rd"
+endif
+
+
+!==============================================================================1階下がり
+values "gl_num" range[1,]
+
+if switch_gl=0 then
+	hideparameter "gl_num"
+endif
+
+
+!==============================================================================立上り
+values{2} "hr2_type" 1,"手すり",2,"壁"
+if switch_floor then
+	values{2} "hr_hide" 0,"なし",1,"フロア踊り場側",2,"中間踊り場下部階段側",3,"中間踊り場上部階段側"
+else
+	values{2} "hr_hide" 0,"なし",2,"中間踊り場下部階段側",3,"中間踊り場上部階段側"
+endif
+
+if hr_hide=1 then
+	values "hr_hide_start" range[0,totWid-2*hr_wid-hr_hide_end)
+	values "hr_hide_end" range[0,totWid-2*hr_wid-hr_hide_start)
+endif
+if hr_hide=2 or hr_hide=3 then
+	if switch_floor then
+		values "hr_hide_start" range[0,floor_dep+floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-2*hr_wid-hr_hide_end]
+		values "hr_hide_end" range[0,floor_dep+floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-2*hr_wid-hr_hide_start]
+	else
+		values "hr_hide_start" range[0,floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid-hr_hide_end]
+		values "hr_hide_end" range[0,floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid-hr_hide_start]
+	endif
+endif
+
+if switch_hr2=0 then hideparameter "hr2_type"
+
+if switch_hr2 and hr2_type=2 then values "handrail_wid" range(0,]
+
+values "hr_hei" range(0,]
+values "hr2_hei" range(0,]
+
+
+!==============================================================================集計
+downY1=0
+if switch_hr1 then
+	if hr_hide=2 then
+		if hr_hide_start>0 or hr_hide_end>0 then downY1=downY1+hr_wid
+	else
+		downY1=downY1+hr_wid
+	endif
+endif
+
+downY2=step_wid1
+if switch_hr2 and hr2_type=1 then downY2=downY2-hr2_wid
+
+upY1=step_wid1+handrail_wid
+if switch_hr2 and hr2_type=1 then upY1=upY1+hr2_wid
+
+upY2=totWid
+if switch_hr1 then
+	if hr_hide=3 then
+		if hr_hide_start>0 or hr_hide_end>0 then upY2=upY2-hr_wid
+	else
+		upY2=upY2-hr_wid
+	endif
+endif
+
+!======================================階段蹴上型枠面積
+stepRiserArea=((floor_num-1)*step_num_down)*abs(downY2-downY1)*(step_riser/cos(step_b))+((floor_num-1)*step_num_up+switch_gl*gl_num)*abs(upY2-upY1)*(step_riser/cos(step_b))
+if disStepFrame=0 then stepRiserArea=0
+parameters stepRiserArea=stepRiserArea
+
+!======================================階段踏面型枠面積
+stepTreadArea=((floor_num-1)*(step_num_down-1))*abs(downY2-downY1)*((step_tread+step_nosing)/cos(step_c))+((floor_num-1)*(step_num_up-1)+switch_gl*(gl_num-1))*abs(upY2-upY1)*((step_tread+step_nosing)/cos(step_c))
+if disStepFrame=0 then stepTreadArea=0
+parameters stepTreadArea=stepTreadArea
+
+!======================================立上り側面型枠面積
+handrailSideArea=0
+!立上り外側仕上面積
+!内側立上り
+if switch_hr2 then
+	if hr2_type=1 then
+		handrailSideArea=handrailSideArea+(floor_num-2)*(floor_thi+hr2_hei)*(2*floor_1+abs(standard_x)-step_tread)
+		handrailSideArea=handrailSideArea+(floor_num-1)*(landing_thi+hr2_hei)*(landing_1+handrail_wid+landing_2-step_tread)
+		handrailSideArea=handrailSideArea+(floor_num-1)*(hr2_hei+step_riser+step_thi/cos(step_angle))*(step_num_down*step_tread)
+		handrailSideArea=handrailSideArea+(floor_num-1)*(hr2_hei+step_riser+step_thi/cos(step_angle))*(step_num_up*step_tread)
+	
+		if switch_gl then
+			handrailSideArea=handrailSideArea+(floor_thi+hr2_hei)*(2*floor_1+abs(standard_x)-step_tread)
+			handrailSideArea=handrailSideArea+(hr2_hei+step_riser+step_thi/cos(step_angle))*(gl_num*step_tread)
+		endif
+	endif
+endif
+
+!外側立上り
+if switch_hr1 then
+	if switch_floor then
+		handrailSideArea=handrailSideArea+(floor_thi+floor_hr_hei)*(standard_x-min(0,standard_x)+floor_1+2*floor_dep+totWid)
+		handrailSideArea=handrailSideArea+(floor_num-2)*(floor_thi+floor_hr_hei)*(2*floor_1+abs(standard_x)-step_tread+2*floor_dep+totWid)
+	else
+		handrailSideArea=handrailSideArea+(floor_thi+floor_hr_hei)*(standard_x-min(0,standard_x)+floor_1)
+		handrailSideArea=handrailSideArea+(floor_num-2)*(floor_thi+floor_hr_hei)*(2*floor_1+abs(standard_x)-step_tread)	
+	endif
+
+	handrailSideArea=handrailSideArea+(floor_num-1)*(landing_thi+landing_hr_hei)*(landing_1+landing_dep+totWid+landing_dep+landing_2-step_tread)
+	handrailSideArea=handrailSideArea+(floor_num-1)*(hr_hei+step_riser+step_thi/cos(step_angle))*(step_num_down*step_tread)
+	handrailSideArea=handrailSideArea+(floor_num-1)*(hr_hei+step_riser+step_thi/cos(step_angle))*(step_num_up*step_tread)
+
+	if switch_gl then
+		if switch_floor then
+			handrailSideArea=handrailSideArea+(floor_thi+floor_hr_hei)*(2*floor_1+abs(standard_x)-step_tread+2*floor_dep+totWid)
+			handrailSideArea=handrailSideArea+(hr_hei+step_riser+step_thi/cos(step_angle))*(gl_num*step_tread)
+		else
+			handrailSideArea=handrailSideArea+(floor_thi+floor_hr_hei)*(2*floor_1+abs(standard_x)-step_tread)
+			handrailSideArea=handrailSideArea+(hr_hei+step_riser+step_thi/cos(step_angle))*(gl_num*step_tread)
+		endif
+	endif
+
+	if hr_hide=2 then !中間踊り場下部階段
+		if switch_floor then
+			handrailSideArea=handrailSideArea-(floor_num-1)*(hr_hei+step_riser+step_thi/cos(step_angle))*((step_num_down-1)*step_tread+landing_1+landing_dep-min(0,standard_x)+floor_1+floor_dep-hr_hide_start-hr_hide_end)
+		else
+			handrailSideArea=handrailSideArea-(floor_num-1)*(hr_hei+step_riser+step_thi/cos(step_angle))*((step_num_down-1)*step_tread+landing_1+landing_dep-min(0,standard_x)+floor_1-hr_hide_start-hr_hide_end)
+		endif
+	endif
+
+	if hr_hide=3 then !中間踊り場上部階段
+		if switch_floor then
+			handrailSideArea=handrailSideArea-(floor_num-1)*(hr_hei+step_riser+step_thi/cos(step_angle))*((step_num_down-1)*step_tread+landing_1+landing_dep-min(0,standard_x)+floor_1+floor_dep-hr_hide_start-hr_hide_end)
+		else
+			handrailSideArea=handrailSideArea-(floor_num-1)*(hr_hei+step_riser+step_thi/cos(step_angle))*((step_num_down-1)*step_tread+landing_1+landing_dep-min(0,standard_x)+floor_1-hr_hide_start-hr_hide_end)
+		endif
+	endif
+endif
+
+if switch_hr1_top and switch_floor then
+	handrailSideArea=handrailSideArea+(floor_thi+floor_hr_hei)*(step_wid1+handrail_wid*switch_hr2*(2-hr2_type))
+endif
+
+!立上り内側仕上面積
+!内側立上り
+if switch_hr2 then
+	if hr2_type=1 then !手すり
+		handrailSideArea=handrailSideArea+(floor_num-2)*hr2_hei*(2*floor_1+abs(standard_x)-step_tread+4*hr2_wid)
+		handrailSideArea=handrailSideArea+(floor_num-1)*hr2_hei*(landing_1+handrail_wid+landing_2-step_tread+4*hr2_wid)
+		handrailSideArea=handrailSideArea+(floor_num-1)*(hr2_hei+step_thi/cos(step_angle))*(step_num_down*step_tread)
+		handrailSideArea=handrailSideArea+(floor_num-1)*(hr2_hei+step_thi/cos(step_angle))*(step_num_up*step_tread)
+	
+		if switch_gl then
+			handrailSideArea=handrailSideArea+hr2_hei*(2*floor_1+abs(standard_x)-step_tread+4*hr2_wid)
+			handrailSideArea=handrailSideArea+(hr2_hei+step_thi/cos(step_angle))*(gl_num*step_tread)
+		endif
+	endif
+
+	if hr2_type=2 then !壁
+		handrailSideArea=handrailSideArea+((floor_num-1)*floor_hei+hr2_hei-(step_riser+step_thi/cos(step_angle)))*(2*handrail_wid+2*(floor_1-min(0,standard_x)+(step_num_down)*step_tread+landing_1))
+		handrailSideArea=handrailSideArea-handrail_wid*(step_num_up*step_riser)-2*(landing_2*(step_num_up*step_riser))-2*(step_num_up*step_tread)*(step_num_up*step_riser)/2
+
+		if switch_gl then
+			handrailSideArea=handrailSideArea+(gl_num*step_riser)*(2*handrail_wid+2*(floor_1-min(0,standard_x)+(step_num_down)*step_tread+landing_1))
+		endif
+	endif
+endif
+
+!外側立上り
+if switch_hr1 then
+	if switch_floor then
+		handrailSideArea=handrailSideArea+floor_hr_hei*(standard_x-min(0,standard_x)+floor_1+floor_dep+totWid+floor_dep-2*hr_wid-2*hr_wid2)
+		handrailSideArea=handrailSideArea+(floor_num-2)*floor_hr_hei*(2*floor_1+abs(standard_x)-step_tread+2*floor_dep+totWid-2*hr_wid-2*hr_wid2)
+	else
+		handrailSideArea=handrailSideArea+floor_hr_hei*(standard_x-min(0,standard_x)+floor_1)
+		handrailSideArea=handrailSideArea+(floor_num-2)*floor_hr_hei*(2*floor_1+abs(standard_x)-step_tread)
+	endif
+
+	handrailSideArea=handrailSideArea+(floor_num-1)*landing_hr_hei*(landing_1+landing_dep+totWid+landing_dep+landing_2-step_tread-2*hr_wid-2*hr_wid2)
+	handrailSideArea=handrailSideArea+(floor_num-1)*(hr_hei+step_thi/cos(step_angle))*(step_num_down*step_tread)
+	handrailSideArea=handrailSideArea+(floor_num-1)*(hr_hei+step_thi/cos(step_angle))*(step_num_up*step_tread)
+
+	if switch_gl then
+		if switch_floor then
+			handrailSideArea=handrailSideArea+floor_hr_hei*(2*floor_1+abs(standard_x)-step_tread+2*floor_dep+totWid-2*hr_wid-2*hr_wid2)
+			handrailSideArea=handrailSideArea+(hr_hei+step_thi/cos(step_angle))*(gl_num*step_tread)
+		else
+			handrailSideArea=handrailSideArea+floor_hr_hei*(2*floor_1+abs(standard_x)-step_tread)
+			handrailSideArea=handrailSideArea+(hr_hei+step_thi/cos(step_angle))*(gl_num*step_tread)
+		endif
+	endif
+
+	if hr_hide=2 then !中間踊り場下部階段
+		if switch_floor then
+			handrailSideArea=handrailSideArea-(floor_num-1)*(hr_hei+step_thi/cos(step_angle))*((step_num_down-1)*step_tread+landing_1+landing_dep-min(0,standard_x)+floor_1+floor_dep-hr_hide_start-hr_hide_end)
+		else
+			handrailSideArea=handrailSideArea-(floor_num-1)*(hr_hei+step_thi/cos(step_angle))*((step_num_down-1)*step_tread+landing_1+landing_dep-min(0,standard_x)+floor_1-hr_hide_start-hr_hide_end)
+		endif
+	endif
+
+	if hr_hide=3 then !中間踊り場上部階段
+		if switch_floor then
+			handrailSideArea=handrailSideArea-(floor_num-1)*(hr_hei+step_thi/cos(step_angle))*((step_num_down-1)*step_tread+landing_1+landing_dep-min(0,standard_x)+floor_1+floor_dep-hr_hide_start-hr_hide_end)
+		else
+			handrailSideArea=handrailSideArea-(floor_num-1)*(hr_hei+step_thi/cos(step_angle))*((step_num_down-1)*step_tread+landing_1+landing_dep-min(0,standard_x)+floor_1-hr_hide_start-hr_hide_end)
+		endif
+	endif
+endif
+
+if switch_hr1_top then
+	handrailSideArea=handrailSideArea+floor_hr_hei*(step_wid1+handrail_wid+hr2_wid*switch_hr2*(2-hr2_type))
+endif
+
+if disHandrailFrame=0 then handrailSideArea=0
+parameters handrailSideArea=handrailSideArea
+
+!======================================立上り天端型枠面積
+handrailTopArea=0
+
+if switch_hr1 then
+	for i=1 to floor_num-1
+		if i=1 and switch_gl=0 then
+			handrailTopArea=handrailTopArea+sqr((step_num_down*step_tread+(landing_hr_hei-hr_hei)/tan(step_angle))^2+(step_num_down*step_riser+landing_hr_hei-hr_hei)^2)*hr_wid
+		else
+			handrailTopArea=handrailTopArea+sqr((step_num_down*step_tread+(landing_hr_hei-floor_hr_hei)/tan(step_angle))^2+(step_num_down*step_riser+landing_hr_hei-floor_hr_hei)^2)*hr_wid
+		endif
+
+		handrailTopArea=handrailTopArea+sqr((-step_num_up*step_tread-(floor_hr_hei-landing_hr_hei)/tan(step_angle))^2+(step_num_up*step_riser+floor_hr_hei-landing_hr_hei)^2)*hr_wid
+	next i
+
+	if switch_gl then
+		handrailTopArea=handrailTopArea+sqr((gl_num*step_tread+(floor_hr_hei-hr_hei)/tan(step_angle))^2+(-gl_num*step_riser+hr_hei-floor_hr_hei)^2)*hr_wid
+	endif
+
+	handrailTopArea=handrailTopArea+hr_hei*hr_wid
+endif
+
+if switch_hr2 then
+	if hr2_type=1 then
+		for i=1 to floor_num-1
+			temporary_x=max(min(standard_x,0)-floor_1-hr2_wid,-step_tread)
+			handrailTopArea=handrailTopArea+sqr(((step_num_down-1)*step_tread-temporary_x)^2+((step_num_down-1)*step_riser-tan(step_angle)*temporary_x)^2)*hr2_wid
+
+			temporary_x1=min(standard_x+step_num_up*step_tread,(step_num_down-1)*step_tread+landing_1+hr2_wid)
+			temporary_x2=max(standard_x-(floor_hr_hei-hr2_hei)/tan(step_angle),min(standard_x,0)-floor_1)
+			handrailTopArea=handrailTopArea+sqr((temporary_x2-temporary_x1)^2+((standard_x-temporary_x2)*tan(step_angle)+step_num_up*step_riser)^2)*hr2_wid
+		next i
+
+		if switch_gl then
+			handrailTopArea=handrailTopArea+sqr((gl_num*step_tread)^2+(gl_num*step_riser)^2)*hr2_wid
+		endif
+
+		handrailTopArea=handrailTopArea+hr2_hei*hr2_wid
+	else
+		temporary_x1=min(standard_x+step_num_up*step_tread,(step_num_down-1)*step_tread+landing_1)
+		temporary_x2=max(standard_x-(floor_hr_hei-hr2_hei)/tan(step_angle),min(standard_x,0)-floor_1)
+
+		handrailTopArea=handrailTopArea+sqr((temporary_x2-temporary_x1)^2+((temporary_x2-temporary_x1)*tan(step_angle))^2)*hr2_wid
+	endif
+endif
+
+if disHandrailFrame=0 then handrailTopArea=0
+parameters handrailTopArea=handrailTopArea
+
+!======================================裏面型枠面積
+stepBackArea=0
+landingBackArea=0
+
+stepBackArea=stepBackArea+(floor_num-1)*step_wid1*(step_num_down*step_tread)/cos(step_angle) !下部階段
+stepBackArea=stepBackArea+(floor_num-1)*step_wid2*(step_num_up*step_tread)/cos(step_angle) !上部階段
+landingBackArea=landingBackArea+(floor_num-1)*(step_wid1*landing_1+step_wid2*landing_2+landing_dep*(totWid)) !中間踊り場
+if switch_floor then
+	landingBackArea=landingBackArea+(floor_num-2)*((step_wid1+step_wid2)/2*(2*floor_1+abs(standard_x))+floor_dep*(totWid)) !フロア踊り場
+	landingBackArea=landingBackArea+(step_wid2*(floor_1+abs(standard_x))+floor_dep*(totWid)) !最上階フロア踊り場
+else
+	landingBackArea=landingBackArea+(floor_num-2)*((step_wid1+step_wid2)/2*(2*floor_1+abs(standard_x))) !フロア踊り場
+	landingBackArea=landingBackArea+(step_wid2*(floor_1+abs(standard_x))) !最上階フロア踊り場
+endif
+
+if switch_gl then
+	stepBackArea=stepBackArea+step_wid2*(gl_num*step_tread)/cos(step_angle) !1階下がり階段
+
+	if switch_floor then
+		landingBackArea=landingBackArea+((step_wid1+step_wid2)/2*(2*floor_1+abs(standard_x))+floor_dep*(totWid)) !フロア踊り場
+	else
+		landingBackArea=landingBackArea+((step_wid1+step_wid2)/2*(2*floor_1+abs(standard_x))) !フロア踊り場
+	endif
+endif
+
+if disStepBackFrame=0 then stepBackArea=0
+if disLandingBackFrame=0 then landingBackArea=0
+parameters stepBackArea=stepBackArea,landingBackArea=landingBackArea
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

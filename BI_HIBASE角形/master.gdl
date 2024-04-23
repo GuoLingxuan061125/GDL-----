@@ -1,0 +1,2577 @@
+call "BI_function_hotkey" parameters all , returned_parameters GATE
+if GATE=0 then end
+
+unid=1
+
+baseplate_thi=H
+parameters baseplate_thi=baseplate_thi
+
+
+if interface_fl=1 then
+    hideparameter all
+endif
+
+if interface_f2=1 then
+    lock all "interface_fl","interface_f2","dis_anchor3D","dis_nut3D",
+    "dis_plate3D","dis_frame3D","dis_anchor2D","dis_nut2D","dis_plate2D",
+    "dis_frame2D","m_frame","fixAnchorPosz","poszChanged","RR","showEdgeOnly",
+    "labelPos","showABSize","textSize"
+
+    hideparameter "interface_f2"
+endif
+
+VALUES{2} "type" 1,"E(エコ)タイプ",2,"Gタイプ"
+
+IF type = 1 then
+    VALUES{2} "rr" 150, "150",175, "175", 200, "200",250, "250", 300, "300",350, "350", 400, "400",450, "450", 
+        500, "500",550, "550"
+
+    IF rr= 150 THEN
+        values "mn" 4
+        values "md" 24
+        listCode=1
+        C=0.29
+        C1=0.21
+        T2=0.025
+    ENDIF
+
+    IF rr= 175 THEN
+        values "mn" 4
+        values "md" 24
+        listCode=2
+        C=0.31
+        C1=0.23
+        T2=0.025
+    ENDIF
+
+    IF rr= 200 THEN
+        values "mn" 4
+        VALUES "md" 24,30,36
+        IF md = 24 THEN
+            listCode=3
+            C=0.34
+            C1=0.26
+            T2=0.025
+        ENDIF
+        IF md = 30 THEN
+            listCode=4
+            C=0.36
+            C1=0.27
+            T2=0.032
+        ENDIF 
+        IF md = 36 THEN
+            listCode=5
+            C=0.36
+            C1=0.27
+            T2=0.040
+        ENDIF
+    ENDIF
+
+    IF rr= 250 THEN
+        VALUES "mn" 4,8
+        IF mn = 4 THEN
+            VALUES "md" 24,30,36
+            IF md = 24 THEN
+                listCode=6
+                C=0.39
+                C1=0.31
+                T2=0.025
+            ENDIF
+            IF md = 30 THEN
+                listCode=7
+                C=0.41
+                C1=0.32
+                T2=0.032
+            ENDIF 
+            IF md = 36 THEN
+                listCode=8
+                C=0.41
+                C1=0.32
+                T2=0.040
+            ENDIF
+        ELSE
+            values "md" 30
+            listCode=9
+            C=0.45
+            C1=0.36
+            C2=0.19
+            T2=0.040
+        ENDIF
+    ENDIF
+
+    IF rr= 300 THEN
+        VALUES "mn" 4,8
+        IF mn = 4 THEN
+            VALUES "md" 30,36
+            IF md = 30 THEN
+                listCode=10
+                C=0.46
+                C1=0.37
+                T2=0.032
+            ENDIF 
+            IF md = 36 THEN
+                listCode=11
+                C=0.46
+                C1=0.37
+                T2=0.040
+            ENDIF
+        ELSE
+            VALUES "md" 30,36
+            IF md = 30 THEN
+                listCode=12
+                C=0.50
+                C1=0.41
+                C2=0.24
+                T2=0.036
+            ENDIF 
+            IF md = 36 THEN
+                listCode=13
+                C=0.51
+                C1=0.42
+                C2=0.22
+                T2=0.044
+            ENDIF
+        ENDIF
+    ENDIF
+
+    IF rr= 350 THEN
+        VALUES "mn" 4,8
+        IF mn = 4 THEN
+            values "md" 30
+            listCode=14
+            C=0.51
+            C1=0.42
+            T2=0.032
+        ELSE
+            VALUES "md" 30,36,42  
+            IF md = 30 THEN
+                listCode=15
+                C=0.55
+                C1=0.46
+                C2=0.29
+                T2=0.036
+            ENDIF 
+            IF md = 36 THEN
+                listCode=16
+                C=0.56
+                C1=0.47
+                C2=0.27
+                T2=0.040
+            ENDIF
+            IF md = 42 THEN
+                listCode=17
+                C=0.59
+                C1=0.48
+                C2=0.26
+                T2=0.048
+            ENDIF
+        ENDIF
+    ENDIF
+
+    IF rr= 400 THEN
+        values "mn" 8
+        VALUES "md" 30,36,42
+        IF md = 30 THEN
+            listCode=23
+            C=0.6
+            C1=0.51
+            C2=0.34
+            T2=0.036
+        ENDIF 
+        IF md = 36 THEN
+            listCode=24
+            C=0.61
+            C1=0.52
+            C2=0.32
+            T2=0.040
+        ENDIF
+        IF md = 42 THEN
+            listCode=25
+            C=0.64
+            C1=0.53
+            C2=0.31
+            T2=0.048
+        ENDIF
+    ENDIF
+
+    IF rr= 450 THEN
+        values "mn" 8
+        VALUES "md" 36,42
+        IF md = 36 THEN
+            listCode=31
+            C=0.66
+            C1=0.57
+            C2=0.37
+            T2=0.044
+        ENDIF
+        IF md = 42 THEN
+            listCode=32
+            C=0.69
+            C1=0.58
+            C2=0.36
+            T2=0.048
+        ENDIF
+    ENDIF
+
+    IF rr= 500 THEN
+        VALUES "mn" 8,12
+        IF mn = 8 THEN
+            VALUES "md" 36,42
+            IF md = 36 THEN
+                listCode=38
+                C=0.71
+                C1=0.62
+                C2=0.42
+                T2=0.044
+            ENDIF
+            IF md = 42 THEN
+                listCode=39
+                C=0.74
+                C1=0.63
+                C2=0.41
+                T2=0.048
+            ENDIF
+        ELSE
+            values "md" 42
+            listCode=40
+            C=0.74
+            C1=0.63
+            C2=0.6
+            C3=0.35
+            T2=0.06
+        ENDIF
+    ENDIF
+
+    IF rr= 550 THEN
+        VALUES "mn" 8,12
+        values "md" 42
+        IF mn=8 THEN
+            listCode=49
+            C=0.8
+            C1=0.69
+            C2=0.47
+            T2=0.048
+        ENDIF
+        IF mn=12 THEN
+            listCode=50
+            C=0.79
+            C1=0.68
+            C2=0.65
+            C3=0.4
+            T2=0.06
+        ENDIF
+    ENDIF
+else
+    VALUES{2} "rr"  350, "350", 400, "400",450, "450",500, "500",550, "550", 600, "600",650, "650", 700, "700",
+        750, "750", 800, "800",850, "850", 900, "900",950, "950", 1000, "1000",1050, "1050",1100, "1100",
+        1150, "1150",1200, "1200"
+
+    IF rr= 350 THEN
+        VALUES "mn" 4,8
+        IF mn = 4 THEN
+            VALUES "md" 42,48
+            IF md = 42 THEN
+                listCode=18
+                C=0.55
+                C1=0.44
+                T2=0.05
+                H=0.075
+                EE=0.356
+                FF=0.28
+            ENDIF
+            IF md = 48 THEN
+                listCode=19
+                C=0.59
+                C1=0.46
+                T2=0.061
+                H=0.090
+                EE=0.356
+                FF=0.28
+            ENDIF
+        ELSE
+            VALUES "md" 30,36,42 
+            IF md = 30 THEN
+                listCode=20
+                C=0.54
+                C1=0.45
+                C2=0.28
+                EE=0.356
+                FF=0.28
+                H=0.055
+                T2=0.028
+            ENDIF 
+            IF md = 36 THEN
+                listCode=21
+                C=0.56
+                C1=0.47
+                C2=0.27
+                EE=0.356
+                FF=0.28
+                H=0.065
+                T2=0.036
+            ENDIF
+            IF md = 42 THEN
+                listCode=22
+                C=0.59
+                C1=0.48
+                C2=0.26	   
+                EE=0.356
+                FF=0.28	   
+                H=0.070
+                T2=0.045
+            ENDIF
+        ENDIF 
+    ENDIF
+
+    IF rr= 400 THEN
+        VALUES "mn" 4,8
+        IF mn = 4 THEN
+            VALUES "md" 42,48
+            IF md = 42 THEN
+                listCode=26
+                C=0.6
+                C1=0.49
+                EE=0.408
+                FF=0.32
+                H=0.075
+                T2=0.049
+            ENDIF 
+            IF md = 48 THEN
+                listCode=27
+                C=0.64
+                C1=0.51
+                EE=0.408
+                FF=0.32
+                H=0.085
+                T2=0.059
+            ENDIF
+        ELSE
+            VALUES "md" 36,42,48
+            IF md = 36 THEN
+                listCode=28
+                C=0.61
+                C1=0.52
+                C2=0.32
+                EE=0.408
+                FF=0.32
+                H=0.060
+                T2=0.034
+            ENDIF 
+            IF md = 42 THEN
+                listCode=29
+                C=0.64
+                C1=0.53
+                C2=0.31
+                EE=0.408
+                FF=0.32
+                H=0.070
+                T2=0.042
+            ENDIF
+            IF md = 48 THEN
+                listCode=30
+                C=0.68
+                C1=0.55
+                C2=0.3
+                EE=0.408
+                FF=0.32
+                H=0.080
+                T2=0.052
+            ENDIF 
+        ENDIF
+    ENDIF
+
+    IF rr= 450 THEN
+        VALUES "mn" 4,8
+        IF mn = 4 THEN
+            VALUES "md" 42,48
+            IF md = 42 THEN
+                listCode=33
+                C=0.65
+                C1=0.54
+                EE=0.458
+                FF=0.36
+                H=0.075
+                T2=0.048
+            ENDIF
+            IF md = 48 THEN
+                listCode=34
+                C=0.69
+                C1=0.56
+                EE=0.458
+                FF=0.36
+                H=0.085
+                T2=0.058
+            ENDIF 
+        ELSE
+            VALUES "md" 36,42,48
+            IF md = 36 THEN
+                listCode=35
+                C=0.66
+                C1=0.57
+                C2=0.37
+                EE=0.458
+                FF=0.36
+                H=0.06
+                T2=0.032
+            ENDIF 
+            IF md = 42 THEN
+                listCode=36
+                C=0.69
+                C1=0.58
+                C2=0.36
+                EE=0.458
+                FF=0.36
+                H=0.065
+                T2=0.04
+            ENDIF 
+            IF md = 48 THEN
+                listCode=37
+                C=0.73
+                C1=0.6
+                C2=0.35
+                EE=0.458
+                FF=0.36
+                H=0.075
+                T2=0.049
+            ENDIF 
+        ENDIF
+    ENDIF
+
+    IF rr= 500 THEN
+        VALUES "mn" 4,8,12
+        IF mn = 4 THEN
+            VALUES "md" 42,48
+            IF md = 42 THEN
+                listCode=41
+                C=0.7
+                C1=0.59
+                EE=0.508
+                FF=0.4
+                H=0.08
+                T2=0.047
+            ENDIF 
+            IF md = 48 THEN
+                listCode=42
+                C=0.74
+                C1=0.61
+                EE=0.458
+                FF=0.36
+                H=0.09
+                T2=0.057
+            ENDIF    
+        ENDIF
+        IF mn = 8 THEN
+            VALUES "md" 36,42,48,64 
+            IF md = 36 THEN
+                listCode=43
+                C=0.71
+                C1=0.62
+                C2=0.42
+                EE=0.508
+                FF=0.4
+                H=0.065
+                T2=0.03
+            ENDIF 
+            IF md = 42 THEN
+                listCode=44
+                C=0.74
+                C1=0.63
+                C2=0.41
+                EE=0.508
+                FF=0.4
+                H=0.07
+                T2=0.037
+            ENDIF 
+            IF md = 48 THEN
+                listCode=45
+                C=0.78
+                C1=0.65
+                C2=0.40
+                EE=0.508
+                FF=0.4
+                H=0.080
+                T2=0.046
+            ENDIF 
+            IF md = 64 THEN
+                listCode=46
+                C=0.85
+                C1=0.69
+                C2=0.39
+                EE=0.508
+                FF=0.4
+                H=0.105
+                T2=0.068
+            ENDIF 
+        ENDIF
+        IF mn = 12 THEN
+            VALUES "md" 48,56
+            IF md = 48 THEN
+                listCode=47
+                C=0.78
+                C1=0.65
+                C2=0.61
+                C3=0.32
+                EE=0.508
+                FF=0.4
+                H=0.09
+                T2=0.057
+            ENDIF 
+            IF md = 56 THEN
+                listCode=48
+                C=0.81
+                C1=0.67
+                C2=0.63
+                C3=0.30
+                EE=0.508
+                FF=0.4
+                H=0.105
+                T2=0.072
+            ENDIF 
+        ENDIF
+    ENDIF
+
+
+
+    IF rr= 550 THEN
+        VALUES "mn" 4,8,12
+        IF mn = 4 THEN
+            VALUES "md" 48,56       
+            IF md = 48 THEN
+                listCode=51
+                C=0.79
+                C1=0.66
+                EE=0.558
+                FF=0.450
+                H=0.090
+                T2=0.056
+            ENDIF        
+            IF md = 56 THEN
+                listCode=52
+                C=0.82
+                C1=0.68
+                EE=0.508
+                FF=0.4
+                H=0.100
+                T2=0.069
+            ENDIF    
+        ENDIF
+        IF mn = 8 THEN
+            VALUES "md" 36,42,48,64
+            IF md = 36 THEN
+                listCode=53
+                C=0.76
+                C1=0.67
+                C2=0.47
+                EE=0.558
+                FF=0.450
+                H=0.065
+                T2=0.029
+            ENDIF 
+            IF md = 42 THEN
+                listCode=54
+                C=0.79
+                C1=0.68
+                C2=0.46
+                EE=0.558
+                FF=0.450
+                H=0.070
+                T2=0.036
+            ENDIF 
+            IF md = 48 THEN
+                listCode=55
+                C=0.83
+                C1=0.70
+                C2=0.45
+                EE=0.558
+                FF=0.450
+                H=0.075
+                T2=0.045
+            ENDIF 
+            IF md = 64 THEN
+                listCode=56
+                C=0.9
+                C1=0.74
+                C2=0.44
+                EE=0.558
+                FF=0.450
+                H=0.095
+                T2=0.065
+            ENDIF    
+        ENDIF
+        IF mn = 12 THEN
+            VALUES "md" 48,56
+            IF md = 48 THEN
+                listCode=57
+                C=0.83
+                C1=0.7
+                C2=0.66
+                C3=0.37
+                EE=0.558
+                FF=0.450
+                H=0.085
+                T2=0.055
+            ENDIF 
+            IF md = 56 THEN
+                listCode=58
+                C=0.86
+                C1=0.72
+                C2=0.68
+                C3=0.35
+                EE=0.558
+                FF=0.450
+                H=0.100
+                T2=0.069
+            ENDIF
+        ENDIF
+    ENDIF
+
+    IF rr= 600 THEN
+        VALUES "mn" 8,12
+        IF mn = 8 THEN
+            VALUES "md" 42,48,64 
+            IF md = 42 THEN
+                listCode=59
+                C=0.84
+                C1=0.73
+                C2=0.51
+                EE=0.61
+                FF=0.5
+                H=0.070
+                T2=0.035
+            ENDIF 
+            IF md = 48 THEN
+                listCode=60
+                C=0.88
+                C1=0.75
+                C2=0.50
+                EE=0.61
+                FF=0.5
+                H=0.075
+                T2=0.043
+            ENDIF 
+            IF md = 64 THEN
+                listCode=61
+                C=0.96
+                C1=0.8
+                C2=0.5
+                EE=0.61
+                FF=0.5
+                H=0.095
+                T2=0.04
+            ENDIF     
+        ELSE
+            VALUES "md" 48,56,64
+            IF md = 48 THEN
+                listCode=62
+                C=0.88
+                C1=0.75
+                C2=0.71
+                C3=0.42
+                EE=0.61
+                FF=0.5
+                H=0.085
+                T2=0.052
+            ENDIF
+            IF md = 56 THEN
+                listCode=63
+                C=0.91
+                C1=0.77
+                C2=0.73
+                C3=0.40
+                EE=0.61
+                FF=0.5
+                H=0.1
+                T2=0.066
+            ENDIF
+            IF md = 64 THEN
+                listCode=64
+                C=0.95
+                C1=0.79
+                C2=0.74
+                C3=0.37
+                EE=0.61
+                FF=0.5
+                H=0.110
+                T2=0.080
+            ENDIF
+        ENDIF
+    ENDIF
+
+    IF rr= 650 THEN
+        VALUES "mn" 8,12
+        IF mn = 8 THEN
+            VALUES "md" 42,48,56,64,72
+            IF md = 42 THEN
+                listCode=65
+                C=0.89
+                C1=0.78
+                C2=0.56
+                EE=0.66
+                FF=0.55
+                H=0.075
+                T2=0.034
+            ENDIF
+            IF md = 48 THEN
+                listCode=66
+                C=0.93
+                C1=0.8
+                C2=0.55
+                EE=0.66
+                FF=0.55
+                H=0.075
+                T2=0.042
+            ENDIF
+            IF md = 56 THEN
+                listCode=67
+                C=0.96
+                C1=0.82
+                C2=0.54
+                EE=0.66
+                FF=0.55
+                H=0.085
+                T2=0.051
+            ENDIF
+            IF md = 64 THEN
+                listCode=68
+                C=0.99
+                C1=0.83
+                C2=0.53
+                EE=0.66
+                FF=0.55
+                H=0.095
+                T2=0.058
+            ENDIF
+            IF md = 72 THEN
+                listCode=69
+                C=1.020
+                C1=0.85
+                C2=0.52
+                EE=0.66
+                FF=0.55
+                H=0.105
+                T2=0.069
+            ENDIF
+        ELSE
+            VALUES "md" 56,64 
+            IF md = 56 THEN
+                listCode=70
+                C=0.96
+                C1=0.82
+                C2=0.78
+                C3=0.45
+                EE=0.66
+                FF=0.55
+                H=0.095
+                T2=0.064
+            ENDIF
+            IF md = 64 THEN
+                listCode=71
+                C=1
+                C1=0.84
+                C2=0.79
+                C3=0.42
+                EE=0.66
+                FF=0.55
+                H=0.110
+                T2=0.077
+            ENDIF
+        ENDIF
+    ENDIF
+
+    IF rr= 700 THEN
+        VALUES "mn" 8,12
+        IF mn = 8 THEN
+            VALUES "md" 42,48,56,64,72
+            IF md = 42 THEN
+                listCode=72
+                C=0.94
+                C1=0.83
+                C2=0.61
+                EE=0.71
+                FF=0.60
+                H=0.070
+                T2=0.032
+            ENDIF
+            IF md = 48 THEN
+                listCode=73
+                C=0.98
+                C1=0.85
+                C2=0.6
+                EE=0.71
+                FF=0.60
+                H=0.075
+                T2=0.041
+            ENDIF
+            IF md = 56 THEN
+                listCode=74
+                C=1.01
+                C1=0.87
+                C2=0.59
+                EE=0.71
+                FF=0.60
+                H=0.080
+                T2=0.050
+            ENDIF
+            IF md = 64 THEN
+                listCode=75
+                C=1.05
+                C1=0.89
+                C2=0.59
+                EE=0.71
+                FF=0.60
+                H=0.095
+                T2=0.058
+            ENDIF
+            IF md = 72 THEN
+                listCode=76
+                C=1.07
+                C1=0.9
+                C2=0.57
+                EE=0.71
+                FF=0.60
+                H=0.105
+                T2=0.067
+            ENDIF
+        ELSE
+            VALUES "md" 56,64
+            IF md = 56 THEN
+                listCode=77
+                C=1.01
+                C1=0.87
+                C2=0.83
+                C3=0.5
+                EE=0.71
+                FF=0.60
+                H=0.095
+                T2=0.062
+            ENDIF
+            IF md = 64 THEN
+                listCode=78
+                C=1.05
+                C1=0.89
+                C2=0.84
+                C3=0.47
+                EE=0.71
+                FF=0.60
+                H=0.105
+                T2=0.074
+            ENDIF
+        ENDIF
+    ENDIF
+
+    IF rr= 750 THEN
+        VALUES "mn" 8,12
+        IF mn = 8 THEN
+            values "md" 48
+            listCode=79
+            C=1.03
+            C1=0.9
+            C2=0.65
+            EE=0.76
+            FF=0.65
+            H=0.085
+            T2=0.039
+        ELSE
+            VALUES "md" 48,56,64,72
+            IF md = 48 THEN
+                listCode=80
+                C=1.03
+                C1=0.9
+                C2=0.86
+                C3=0.57
+                EE=0.76
+                FF=0.65
+                H=0.085
+                T2=0.047
+            ENDIF
+            IF md = 56 THEN
+                listCode=81
+                C=1.06
+                C1=0.92
+                C2=0.88
+                C3=0.55
+                EE=0.76
+                FF=0.65
+                H=0.09
+                T2=0.06
+            ENDIF
+            IF md = 64 THEN
+                listCode=82
+                C=1.100
+                C1=0.94
+                C2=0.89
+                C3=0.52
+                EE=0.76
+                FF=0.65
+                H=0.105
+                T2=0.072
+            ENDIF
+            IF md = 72 THEN
+                listCode=83
+                C=1.120
+                C1=0.95
+                C2=0.90
+                C3=0.49
+                EE=0.76
+                FF=0.65
+                H=0.115
+                T2=0.084
+            ENDIF
+        ENDIF
+    ENDIF
+
+    IF rr= 800 THEN
+        VALUES "mn" 8,12
+        IF mn = 8 THEN
+            values "md" 56 
+            listCode=84
+            C=1.11
+            C1=0.97
+            C2=0.69
+            EE=0.81
+            FF=0.7
+            H=0.09
+            T2=0.047
+        ELSE
+            VALUES "md" 56,64,72
+            IF md = 56 THEN
+                listCode=85
+                C=1.11
+                C1=0.97
+                C2=0.93
+                C3=0.6
+                EE=0.81
+                FF=0.7
+                H=0.09
+                T2=0.058
+            ENDIF
+            IF md = 64 THEN
+                listCode=86
+                C=1.150
+                C1=0.99
+                C2=0.94
+                C3=0.57
+                EE=0.81
+                FF=0.7
+                H=0.1
+                T2=0.07
+            ENDIF
+            IF md = 72 THEN
+                listCode=87
+                C=1.170
+                C1=1
+                C2=0.95
+                C3=0.54
+                EE=0.81
+                FF=0.7
+                H=0.115
+                T2=0.081
+            ENDIF
+        ENDIF
+    ENDIF
+
+    IF rr= 850 THEN
+        values "mn" 12
+        VALUES "md" 56,64,72 
+        IF md = 56 THEN
+            listCode=88
+            C=1.16
+            C1=1.02
+            C2=0.98
+            C3=0.65
+            EE=0.86
+            FF=0.75
+            H=0.1
+            T2=0.056
+        ENDIF
+        IF md = 64 THEN
+            listCode=89
+            C=1.200
+            C1=1.040
+            C2=0.99
+            C3=0.62
+            EE=0.86
+            FF=0.75
+            H=0.1
+            T2=0.068
+        ENDIF
+        IF md = 72 THEN
+            listCode=90
+            C=1.220
+            C1=1.050
+            C2=1
+            C3=0.59
+            EE=0.86
+            FF=0.75
+            H=0.110
+            T2=0.079
+        ENDIF
+    ENDIF
+
+    IF rr= 900 THEN
+        values "mn" 12
+        VALUES "md" 56,64,72
+        IF md = 56 THEN
+            listCode=91
+            C=1.210
+            C1=1.07
+            C2=1.03
+            C3=0.7
+            EE=0.91
+            FF=0.8
+            H=0.105
+            T2=0.055
+        ENDIF
+        IF md = 64 THEN
+            listCode=92
+            C=1.250
+            C1=1.09
+            C2=1.04
+            C3=0.67
+            EE=0.91
+            FF=0.8
+            H=0.105
+            T2=0.066
+        ENDIF
+        IF md = 72 THEN
+            listCode=93
+            C=1.270
+            C1=1.1
+            C2=1.05
+            C3=0.64
+            EE=0.91
+            FF=0.8
+            H=0.110
+            T2=0.077
+        ENDIF
+    ENDIF
+
+    IF rr= 950 THEN
+        values "mn" 12
+        VALUES "md" 56,64,72
+        IF md = 56 THEN
+            listCode=94
+            C=1.26
+            C1=1.12
+            C2=1.08
+            C3=0.75
+            EE=0.96
+            FF=0.85
+            H=0.11
+            T2=0.054
+        ENDIF
+        IF md = 64 THEN
+            listCode=95
+            C=1.3
+            C1=1.140
+            C2=1.09
+            C3=0.72
+            EE=0.96
+            FF=0.85
+            H=0.11
+            T2=0.061
+        ENDIF
+        IF md = 72 THEN
+            listCode=96
+            C=1.320
+            C1=1.150
+            C2=1.100
+            C3=0.69
+            EE=0.96
+            FF=0.85
+            H=0.110
+            T2=0.075
+        ENDIF
+    ENDIF
+
+    IF rr= 1000 THEN
+        values "mn" 12
+        VALUES "md" 56,64,72
+        IF md = 56 THEN
+            listCode=97
+            C=1.31
+            C1=1.17
+            C2=1.13
+            C3=0.8
+            EE=1.01
+            FF=0.9
+            H=0.115
+            T2=0.052
+        ENDIF
+        IF md = 64 THEN
+            listCode=98
+            C=1.34
+            C1=1.18
+            C2=1.13
+            C3=0.76
+            EE=1.01
+            FF=0.9
+            H=0.110
+            T2=0.059
+        ENDIF
+        IF md = 72 THEN
+            listCode=99
+            C=1.34
+            C1=1.18
+            C2=1.13
+            C3=0.72
+            EE=1.01
+            FF=0.9
+            H=0.115
+            T2=0.066
+        ENDIF
+    ENDIF
+
+    IF rr= 1050 THEN
+        values "mn" 12
+        VALUES "md" 64,72
+        IF md = 64 THEN
+            listCode=100
+            C=1.4
+            C1=1.24
+            C2=1.19
+            C3=0.82
+            EE=1.06
+            FF=0.95
+            H=0.12
+            T2=0.062
+        ENDIF
+        IF md = 72 THEN
+            listCode=101
+            C=1.42
+            C1=1.25
+            C2=1.2
+            C3=0.79
+            EE=1.06
+            FF=0.95
+            H=0.12
+            T2=0.071
+        ENDIF
+    ENDIF
+
+    IF rr= 1100 THEN
+        values "mn" 12
+        VALUES "md" 64,72
+        IF md = 64 THEN
+            listCode=102
+            C=1.45
+            C1=1.29
+            C2=1.24
+            C3=0.87
+            EE=1.11
+            FF=1
+            H=0.125
+            T2=0.06
+        ENDIF
+        IF md = 72 THEN
+            listCode=103
+            C=1.47
+            C1=1.3
+            C2=1.25
+            C3=0.84
+            EE=1.11
+            FF=1
+            H=0.125
+            T2=0.07
+        ENDIF
+    ENDIF
+
+    IF rr= 1150 THEN
+        values "mn" 12
+        VALUES "md" 64,72
+        IF md = 64 THEN
+            listCode=104
+            C=1.5
+            C1=1.34
+            C2=1.29
+            C3=0.92
+            EE=1.16
+            FF=1.05
+            H=0.13
+            T2=0.059
+        ENDIF
+        IF md = 72 THEN
+            listCode=105
+            C=1.52
+            C1=1.35
+            C2=1.3
+            C3=0.89
+            EE=1.16
+            FF=1.05
+            H=0.13
+            T2=0.068
+        ENDIF
+    ENDIF
+
+    IF rr= 1200 THEN
+        values "mn" 12
+        VALUES "md" 64,72  
+        IF md = 64 THEN
+            listCode=106
+            C=1.55
+            C1=1.39
+            C2=1.34
+            C3=0.97
+            EE=1.21
+            FF=1.1
+            H=0.135
+            T2=0.058
+        ENDIF
+        IF md = 72 THEN
+            listCode=107
+            C=1.57
+            C1=1.4
+            C2=1.35
+            C3=0.94
+            EE=1.21
+            FF=1.1
+            H=0.135
+            T2=0.067
+        ENDIF
+    ENDIF
+endif
+
+
+parameters \
+C=C,
+C1=C1,
+C2=C2,
+C3=C3,
+T2=T2,
+EE=EE,
+FF=FF,
+H=H
+
+
+!定着版寸法
+IF md = 24 THEN
+    ARR=0.029
+
+    IF mn = 4 THEN
+        TS=16/1000
+        DS=70/1000
+    ENDIF
+ENDIF
+
+IF md = 30 THEN
+    ARR=0.035
+
+    IF mn = 4 THEN
+        TS=16/1000
+        DS=90/1000
+    ENDIF
+
+    IF mn = 8 THEN
+        TS=9/1000
+        AD=180/1000
+        DS=65/1000   
+    ENDIF
+ENDIF
+
+IF md = 36 THEN
+    ARR=0.041
+    
+    IF mn = 4 THEN
+        TS=19/1000
+        DS=100/1000
+    ENDIF
+
+    IF mn = 8 THEN
+        TS=9/1000
+        AD=215/1000
+        DS=75/1000
+    ENDIF
+ENDIF
+
+IF md = 42 THEN
+    ARR=0.048
+
+    IF mn = 4 THEN
+        TS=22/1000
+        DS=120/1000
+    ENDIF
+
+    IF mn = 8 THEN
+        TS=9/1000
+        AD=240/1000
+        DS=85/1000
+    ENDIF
+
+    IF mn = 12 THEN
+        TS=9/1000
+        AT=225/1000
+        DS=85/1000  
+    ENDIF
+ENDIF
+
+IF md = 48 THEN
+    ARR=0.054
+
+    IF mn = 4 THEN
+        TS=25/1000
+        DS=140/1000
+    ENDIF
+
+    IF mn = 8 THEN
+        TS=9/1000
+        AD=270/1000
+        DS=95/1000
+    ENDIF
+
+    IF mn = 12 THEN
+        TS=9/1000
+        AT=260/1000
+        DS=95/1000  
+    ENDIF
+ENDIF
+
+IF md = 56 THEN
+    ARR=0.062
+
+    IF mn = 4 THEN
+        TS=28/1000
+        DS=160/1000
+    ENDIF
+
+    IF mn = 8 THEN
+        TS=9/1000
+        AD=305/1000
+        DS=110/1000
+    ENDIF
+
+    IF mn = 12 THEN
+        TS=9/1000
+        AT=295/1000
+        DS=110/1000  
+    ENDIF
+ENDIF
+
+IF md = 64 THEN
+    ARR=0.070
+
+    IF mn = 4 THEN
+        TS=32/1000
+        DS=180/1000
+    ENDIF
+
+    IF mn = 8 THEN
+        TS=12/1000
+        AD=330/1000
+        DS=130/1000
+    ENDIF
+
+    IF mn = 12 THEN
+        TS=12/1000
+        AT=340/1000
+        DS=130/1000  
+    ENDIF
+ENDIF
+
+IF md = 72 THEN
+    ARR=0.079
+
+    IF mn = 8 THEN
+        TS=16/1000
+        AD=380/1000
+        DS=145/1000
+    ENDIF
+
+    IF mn = 12 THEN
+        TS=16/1000
+        AT=375/1000
+        DS=145/1000  
+    ENDIF
+ENDIF
+
+parameters \
+ARR=ARR,
+TS=TS,
+DS=DS,
+AD=AD,
+AT=AT
+
+
+
+!アンカーボルト寸法
+IF type = 1 then
+    IF MD=24 then	
+        d=24/1000
+        dd=29 /1000
+        a=10/1000
+        D1=56/1000
+        C0=53/1000
+        CD=42/1000
+        TW=6/1000
+        H0=22/1000
+        H1=19/1000
+
+        if mn=4 then
+            s=95/1000
+            L=400/1000
+            LL=550/1000
+        else
+            s=105/1000
+            L=480/1000
+            LL=645/1000
+        endif
+    endif
+
+    if MD=30 then	
+        d=30/1000
+        dd=35/1000
+        a=13/1000
+        D1=60/1000
+        C0=58/1000
+        CD=53/1000
+        TW=6/1000
+        H0=27/1000
+        H1=24/1000
+
+        if mn=4 then
+            s=110/1000
+            L=400/1000
+            LL=580/1000
+        else
+            s=130/1000
+            L=600/1000
+            LL=800/1000
+        endif
+    endif
+
+    if MD=36 then	
+        d=36/1000
+        dd=41/1000
+        a=16/1000
+        D1=66/1000
+        C0=64/1000
+        CD=64/1000
+        TW=6/1000
+        H0=33/1000
+        H1=29/1000
+
+        if mn=4 then
+            s=130/1000
+            L=480/1000
+            LL=690/1000
+        else
+            s=130/1000
+            L=720/1000
+            LL=925/1000
+        endif
+    endif
+
+    if MD=42 then	
+        d=42/1000
+        dd=48 /1000
+        a=18/1000
+        D1=78/1000
+        C0=75/1000
+        CD=75/1000
+        TW=9/1000
+        H0=38/1000
+        H1=34/1000
+        s=155/1000
+        L=840/1000
+        LL=1080/1000
+    endif
+ENDIF
+
+IF type = 2 then
+    IF MD=24 then	
+        d=24/1000
+        a=10/1000
+        dd=29 /1000
+        H1=19/1000
+        CD=42/1000
+        TW=6/1000
+        D1=44/1000
+        s=105/1000
+        L=480/1000
+        LL=645/1000
+    endif
+
+    if MD=30 then	
+        d=30/1000
+        a=13/1000
+        dd=35 /1000
+        H1=24/1000
+        CD=53/1000
+        TW=6/1000
+        D1=56/1000
+        s=130/1000
+        L=600/1000
+        LL=800/1000
+    endif
+
+    if MD=36 then	
+        d=36/1000
+        a=16/1000
+        dd=41 /1000
+        H1=29/1000
+        CD=64/1000
+        TW=6/1000
+        D1=66/1000
+        s=130/1000
+        L=720/1000
+        LL=925/1000
+    endif
+
+    if MD=42 then	
+        d=42/1000
+        a=18/1000
+        dd=48 /1000
+        H1=34/1000
+        CD=75/1000
+        TW=9/1000
+        D1=92/1000
+        s=155/1000
+        L=840/1000
+        LL=1080/1000
+    endif
+
+    if MD=48 then	
+        d=48/1000
+        a=22/1000
+        dd=54 /1000
+        H1=38/1000
+        CD=87/1000
+        TW=9/1000
+        D1=92/1000
+        L=960/1000
+        s=175/1000				
+        LL=1235/1000
+    endif
+
+    if MD=56 then	
+        d=56/1000
+        a=24/1000
+        dd=62 /1000
+        H1=45/1000
+        CD=98/1000
+        TW=9/1000
+        D1=105/1000
+        L=1120/1000
+        s=185/1000			
+        LL=1420/1000
+    endif
+
+    if MD=64 then	
+        d=64/1000
+        a=28/1000
+        dd=70 /1000
+        H1=51/1000
+        CD=110/1000
+        TW=12/1000
+        D1=115/1000
+        L=1280/1000
+        s=200/1000	
+        LL=1610/1000
+    endif
+
+    if MD=72 then	
+        d=72/1000
+        a=30/1000
+        dd=79/1000
+        H1=58/1000
+        CD=121/1000
+        TW=12/1000
+        D1=125/1000
+        L=1440/1000
+        s=250/1000
+        LL=1850/1000
+    endif
+ENDIF
+
+parameters \
+d=d,
+dd=dd,
+a=a,
+D1=D1,
+C0=C0,
+CD=CD,
+TW=TW,
+H0=H0,
+H1=H1,
+s=s,
+L=L,
+LL=LL
+
+
+
+!L1リスト
+dim _L1List[]
+_L1List[1] =80	/1000
+_L1List[2] =80	/1000
+_L1List[3] =80	/1000
+_L1List[4] =102	/1000
+_L1List[5] =117	/1000
+_L1List[6] =80	/1000
+_L1List[7] =102	/1000
+_L1List[8] =117	/1000
+_L1List[9] =110	/1000
+_L1List[10]=102	/1000
+_L1List[11]=117	/1000
+_L1List[12]=106	/1000
+_L1List[13]=121	/1000
+_L1List[14]=102	/1000
+_L1List[15]=106	/1000
+_L1List[16]=117	/1000
+_L1List[17]=138	/1000
+_L1List[18]=145	/1000
+_L1List[19]=168	/1000
+_L1List[20]=95	/1000
+_L1List[21]=116	/1000
+_L1List[22]=140	/1000
+_L1List[23]=106	/1000
+_L1List[24]=117	/1000
+_L1List[25]=138	/1000
+_L1List[26]=144	/1000
+_L1List[27]=166	/1000
+_L1List[28]=114	/1000
+_L1List[29]=137	/1000
+_L1List[30]=159	/1000
+_L1List[31]=121	/1000
+_L1List[32]=138	/1000
+_L1List[33]=143	/1000
+_L1List[34]=165	/1000
+_L1List[35]=112	/1000
+_L1List[36]=135	/1000
+_L1List[37]=156	/1000
+_L1List[38]=121	/1000
+_L1List[39]=138	/1000
+_L1List[40]=150	/1000
+_L1List[41]=142	/1000
+_L1List[42]=164	/1000
+_L1List[43]=110	/1000
+_L1List[44]=132	/1000
+_L1List[45]=153	/1000
+_L1List[46]=210	/1000
+_L1List[47]=164	/1000
+_L1List[48]=195	/1000
+_L1List[49]=138	/1000
+_L1List[50]=150	/1000
+_L1List[51]=163	/1000
+_L1List[52]=192	/1000
+_L1List[53]=109	/1000
+_L1List[54]=131	/1000
+_L1List[55]=152	/1000
+_L1List[56]=207	/1000
+_L1List[57]=162	/1000
+_L1List[58]=192	/1000
+
+if listCode<=58 then
+    L1=_L1List[listCode]
+else
+    L1=0
+endif
+parameters L1=L1
+
+
+
+if poszChanged=0 and listCode<=58 then
+    fixAnchorPosz=L1
+else
+    fixAnchorPosz=fixAnchorPosz
+endif
+parameters fixAnchorPosz=fixAnchorPosz
+
+
+!配筋関係
+values{2} "usePlace" 1,"側・隅柱用",2,"中柱用"
+values{2} "zoneType" 1,"Ⅰゾーン",2,"Ⅱゾーン"
+
+!Ltリスト
+dim _LtList[]
+_LtList[1] =200	/1000
+_LtList[2] =190	/1000
+_LtList[3] =190	/1000
+_LtList[4] =290	/1000
+_LtList[5] =330	/1000
+_LtList[6] =190	/1000
+_LtList[7] =280	/1000
+_LtList[8] =330	/1000
+_LtList[9] =430	/1000
+_LtList[10]=270	/1000
+_LtList[11]=330	/1000
+_LtList[12]=410	/1000
+_LtList[13]=570	/1000
+_LtList[14]=240	/1000
+_LtList[15]=460	/1000
+_LtList[16]=540	/1000
+_LtList[17]=710	/1000
+_LtList[18]=480	/1000
+_LtList[19]=580	/1000
+_LtList[20]=470	/1000
+_LtList[21]=560	/1000
+_LtList[22]=610	/1000
+_LtList[23]=450	/1000
+_LtList[24]=530	/1000
+_LtList[25]=680	/1000
+_LtList[26]=400	/1000
+_LtList[27]=500	/1000
+_LtList[28]=540	/1000
+_LtList[29]=600	/1000
+_LtList[30]=790	/1000
+_LtList[31]=520	/1000
+_LtList[32]=670	/1000
+_LtList[33]=390	/1000
+_LtList[34]=480	/1000
+_LtList[35]=520	/1000
+_LtList[36]=680	/1000
+_LtList[37]=770	/1000
+_LtList[38]=510	/1000
+_LtList[39]=660	/1000
+_LtList[40]=600	/1000
+_LtList[41]=390	/1000
+_LtList[42]=470	/1000
+_LtList[43]=510	/1000
+_LtList[44]=660	/1000
+_LtList[45]=740	/1000
+_LtList[46]=1100/1000
+_LtList[47]=760	/1000
+_LtList[48]=980	/1000
+_LtList[49]=650	/1000
+_LtList[50]=600	/1000
+_LtList[51]=460	/1000
+_LtList[52]=580	/1000
+_LtList[53]=500	/1000
+_LtList[54]=650	/1000
+_LtList[55]=820	/1000
+_LtList[56]=1100/1000
+_LtList[57]=760	/1000
+_LtList[58]=980	/1000
+
+
+!柱形b寸法リスト
+dim _columnBList[]
+if zoneType=1 then
+    _columnBList[1] =500 /1000
+    _columnBList[2] =520 /1000
+    _columnBList[3] =550 /1000
+    _columnBList[4] =570 /1000
+    _columnBList[5] =580 /1000
+    _columnBList[6] =600 /1000
+    _columnBList[7] =610 /1000
+    _columnBList[8] =610 /1000
+    _columnBList[9] =640 /1000
+    _columnBList[10]=660 /1000
+    _columnBList[11]=660 /1000
+    _columnBList[12]=700 /1000
+    _columnBList[13]=720 /1000
+    _columnBList[14]=710 /1000
+    _columnBList[15]=750 /1000
+    _columnBList[16]=770 /1000
+    _columnBList[17]=790 /1000
+    _columnBList[18]=750 /1000
+    _columnBList[19]=790 /1000
+    _columnBList[20]=740 /1000
+    _columnBList[21]=770 /1000
+    _columnBList[22]=790 /1000
+    _columnBList[23]=800 /1000
+    _columnBList[24]=820 /1000
+    _columnBList[25]=840 /1000
+    _columnBList[26]=810 /1000
+    _columnBList[27]=840 /1000
+    _columnBList[28]=820 /1000
+    _columnBList[29]=840 /1000
+    _columnBList[30]=880 /1000
+    _columnBList[31]=870 /1000
+    _columnBList[32]=890 /1000
+    _columnBList[33]=860 /1000
+    _columnBList[34]=890 /1000
+    _columnBList[35]=870 /1000
+    _columnBList[36]=890 /1000
+    _columnBList[37]=930 /1000
+    _columnBList[38]=950 /1000
+    _columnBList[39]=950 /1000
+    _columnBList[40]=950 /1000
+    _columnBList[41]=910 /1000
+    _columnBList[42]=950 /1000
+    _columnBList[43]=950 /1000
+    _columnBList[44]=950 /1000
+    _columnBList[45]=1000/1000
+    _columnBList[46]=1100/1000
+    _columnBList[47]=1000/1000
+    _columnBList[48]=1050/1000
+    _columnBList[49]=1000/1000
+    _columnBList[50]=1000/1000
+    _columnBList[51]=1000/1000
+    _columnBList[52]=1050/1000
+    _columnBList[53]=1000/1000
+    _columnBList[54]=1000/1000
+    _columnBList[55]=1050/1000
+    _columnBList[56]=1150/1000
+    _columnBList[57]=1050/1000
+    _columnBList[58]=1100/1000
+endif
+
+if zoneType=2 then
+    _columnBList[1] =500 /1000
+    _columnBList[2] =520 /1000
+    _columnBList[3] =550 /1000
+    _columnBList[4] =570 /1000
+    _columnBList[5] =580 /1000
+    _columnBList[6] =600 /1000
+    _columnBList[7] =610 /1000
+    _columnBList[8] =610 /1000
+    _columnBList[9] =640 /1000
+    _columnBList[10]=660 /1000
+    _columnBList[11]=660 /1000
+    _columnBList[12]=700 /1000
+    _columnBList[13]=720 /1000
+    _columnBList[14]=710 /1000
+    _columnBList[15]=750 /1000
+    _columnBList[16]=770 /1000
+    _columnBList[17]=790 /1000
+    _columnBList[18]=750 /1000
+    _columnBList[19]=790 /1000
+    _columnBList[20]=740 /1000
+    _columnBList[21]=770 /1000
+    _columnBList[22]=800 /1000
+    _columnBList[23]=800 /1000
+    _columnBList[24]=820 /1000
+    _columnBList[25]=840 /1000
+    _columnBList[26]=810 /1000
+    _columnBList[27]=840 /1000
+    _columnBList[28]=820 /1000
+    _columnBList[29]=850 /1000
+    _columnBList[30]=890 /1000
+    _columnBList[31]=870 /1000
+    _columnBList[32]=890 /1000
+    _columnBList[33]=860 /1000
+    _columnBList[34]=890 /1000
+    _columnBList[35]=870 /1000
+    _columnBList[36]=890 /1000
+    _columnBList[37]=940 /1000
+    _columnBList[38]=950 /1000
+    _columnBList[39]=950 /1000
+    _columnBList[40]=1050/1000
+    _columnBList[41]=910 /1000
+    _columnBList[42]=950 /1000
+    _columnBList[43]=950 /1000
+    _columnBList[44]=950 /1000
+    _columnBList[45]=1000/1000
+    _columnBList[46]=1150/1000
+    _columnBList[47]=1100/1000
+    _columnBList[48]=1500/1000
+    _columnBList[49]=1000/1000
+    _columnBList[50]=1050/1000
+    _columnBList[51]=1000/1000
+    _columnBList[52]=1050/1000
+    _columnBList[53]=1000/1000
+    _columnBList[54]=1000/1000
+    _columnBList[55]=1050/1000
+    _columnBList[56]=1150/1000
+    _columnBList[57]=1100/1000
+    _columnBList[58]=1500/1000
+endif
+
+!主筋本数
+dim _mbarNum[]
+if usePlace=1 then
+    if zoneType=1 then
+        _mbarNum[1] =8
+        _mbarNum[2] =8
+        _mbarNum[3] =8
+        _mbarNum[4] =8
+        _mbarNum[5] =12
+        _mbarNum[6] =8
+        _mbarNum[7] =8
+        _mbarNum[8] =12
+        _mbarNum[9] =12
+        _mbarNum[10]=8
+        _mbarNum[11]=12
+        _mbarNum[12]=16
+        _mbarNum[13]=16
+        _mbarNum[14]=8
+        _mbarNum[15]=16
+        _mbarNum[16]=16
+        _mbarNum[17]=20
+        _mbarNum[18]=12
+        _mbarNum[19]=12
+        _mbarNum[20]=16
+        _mbarNum[21]=16
+        _mbarNum[22]=20
+        _mbarNum[23]=16
+        _mbarNum[24]=16
+        _mbarNum[25]=20
+        _mbarNum[26]=12
+        _mbarNum[27]=12
+        _mbarNum[28]=16
+        _mbarNum[29]=20
+        _mbarNum[30]=20
+        _mbarNum[31]=16
+        _mbarNum[32]=24
+        _mbarNum[33]=12
+        _mbarNum[34]=12
+        _mbarNum[35]=16
+        _mbarNum[36]=24
+        _mbarNum[37]=20
+        _mbarNum[38]=16
+        _mbarNum[39]=24
+        _mbarNum[40]=28
+        _mbarNum[41]=12
+        _mbarNum[42]=12
+        _mbarNum[43]=16
+        _mbarNum[44]=20
+        _mbarNum[45]=20
+        _mbarNum[46]=32
+        _mbarNum[47]=24
+        _mbarNum[48]=32
+        _mbarNum[49]=24
+        _mbarNum[50]=28
+        _mbarNum[51]=12
+        _mbarNum[52]=16
+        _mbarNum[53]=16
+        _mbarNum[54]=24
+        _mbarNum[55]=20
+        _mbarNum[56]=32
+        _mbarNum[57]=24
+        _mbarNum[58]=32
+    endif
+    if zoneType=2 then
+        _mbarNum[1] =16
+        _mbarNum[2] =16
+        _mbarNum[3] =16
+        _mbarNum[4] =16
+        _mbarNum[5] =20
+        _mbarNum[6] =12
+        _mbarNum[7] =16
+        _mbarNum[8] =20
+        _mbarNum[9] =20
+        _mbarNum[10]=16
+        _mbarNum[11]=20
+        _mbarNum[12]=20
+        _mbarNum[13]=24
+        _mbarNum[14]=16
+        _mbarNum[15]=20
+        _mbarNum[16]=24
+        _mbarNum[17]=32
+        _mbarNum[18]=16
+        _mbarNum[19]=20
+        _mbarNum[20]=20
+        _mbarNum[21]=24
+        _mbarNum[22]=32
+        _mbarNum[23]=20
+        _mbarNum[24]=24
+        _mbarNum[25]=32
+        _mbarNum[26]=16
+        _mbarNum[27]=20
+        _mbarNum[28]=24
+        _mbarNum[29]=32
+        _mbarNum[30]=28
+        _mbarNum[31]=24
+        _mbarNum[32]=32
+        _mbarNum[33]=16
+        _mbarNum[34]=20
+        _mbarNum[35]=24
+        _mbarNum[36]=32
+        _mbarNum[37]=28
+        _mbarNum[38]=24
+        _mbarNum[39]=32
+        _mbarNum[40]=44
+        _mbarNum[41]=16
+        _mbarNum[42]=20
+        _mbarNum[43]=24
+        _mbarNum[44]=32
+        _mbarNum[45]=28
+        _mbarNum[46]=48
+        _mbarNum[47]=40
+        _mbarNum[48]=56
+        _mbarNum[49]=32
+        _mbarNum[50]=44
+        _mbarNum[51]=20
+        _mbarNum[52]=28
+        _mbarNum[53]=24
+        _mbarNum[54]=32
+        _mbarNum[55]=28
+        _mbarNum[56]=48
+        _mbarNum[57]=40
+        _mbarNum[58]=56
+    endif
+endif
+
+if usePlace=2 then
+    if zoneType=1 then
+        _mbarNum[1] =8
+        _mbarNum[2] =8
+        _mbarNum[3] =8
+        _mbarNum[4] =8
+        _mbarNum[5] =12
+        _mbarNum[6] =8
+        _mbarNum[7] =8
+        _mbarNum[8] =12
+        _mbarNum[9] =12
+        _mbarNum[10]=8
+        _mbarNum[11]=12
+        _mbarNum[12]=16
+        _mbarNum[13]=16
+        _mbarNum[14]=8
+        _mbarNum[15]=16
+        _mbarNum[16]=16
+        _mbarNum[17]=20
+        _mbarNum[18]=12
+        _mbarNum[19]=12
+        _mbarNum[20]=16
+        _mbarNum[21]=16
+        _mbarNum[22]=20
+        _mbarNum[23]=12
+        _mbarNum[24]=12
+        _mbarNum[25]=20
+        _mbarNum[26]=12
+        _mbarNum[27]=12
+        _mbarNum[28]=16
+        _mbarNum[29]=20
+        _mbarNum[30]=20
+        _mbarNum[31]=16
+        _mbarNum[32]=20
+        _mbarNum[33]=12
+        _mbarNum[34]=12
+        _mbarNum[35]=16
+        _mbarNum[36]=20
+        _mbarNum[37]=20
+        _mbarNum[38]=12
+        _mbarNum[39]=20
+        _mbarNum[40]=20
+        _mbarNum[41]=12
+        _mbarNum[42]=12
+        _mbarNum[43]=16
+        _mbarNum[44]=20
+        _mbarNum[45]=20
+        _mbarNum[46]=28
+        _mbarNum[47]=16
+        _mbarNum[48]=24
+        _mbarNum[49]=20
+        _mbarNum[50]=20
+        _mbarNum[51]=12
+        _mbarNum[52]=16
+        _mbarNum[53]=16
+        _mbarNum[54]=20
+        _mbarNum[55]=20
+        _mbarNum[56]=28
+        _mbarNum[57]=20
+        _mbarNum[58]=24
+    endif
+    if zoneType=2 then
+        _mbarNum[1] =16
+        _mbarNum[2] =16
+        _mbarNum[3] =16
+        _mbarNum[4] =16
+        _mbarNum[5] =20
+        _mbarNum[6] =12
+        _mbarNum[7] =16
+        _mbarNum[8] =20
+        _mbarNum[9] =20
+        _mbarNum[10]=16
+        _mbarNum[11]=20
+        _mbarNum[12]=20
+        _mbarNum[13]=24
+        _mbarNum[14]=16
+        _mbarNum[15]=20
+        _mbarNum[16]=24
+        _mbarNum[17]=32
+        _mbarNum[18]=16
+        _mbarNum[19]=20
+        _mbarNum[20]=20
+        _mbarNum[21]=24
+        _mbarNum[22]=32
+        _mbarNum[23]=20
+        _mbarNum[24]=24
+        _mbarNum[25]=32
+        _mbarNum[26]=16
+        _mbarNum[27]=20
+        _mbarNum[28]=24
+        _mbarNum[29]=32
+        _mbarNum[30]=28
+        _mbarNum[31]=24
+        _mbarNum[32]=32
+        _mbarNum[33]=16
+        _mbarNum[34]=20
+        _mbarNum[35]=24
+        _mbarNum[36]=32
+        _mbarNum[37]=28
+        _mbarNum[38]=24
+        _mbarNum[39]=32
+        _mbarNum[40]=44
+        _mbarNum[41]=16
+        _mbarNum[42]=20
+        _mbarNum[43]=24
+        _mbarNum[44]=32
+        _mbarNum[45]=28
+        _mbarNum[46]=48
+        _mbarNum[47]=40
+        _mbarNum[48]=56
+        _mbarNum[49]=32
+        _mbarNum[50]=44
+        _mbarNum[51]=20
+        _mbarNum[52]=28
+        _mbarNum[53]=24
+        _mbarNum[54]=32
+        _mbarNum[55]=28
+        _mbarNum[56]=48
+        _mbarNum[57]=40
+        _mbarNum[58]=56
+    endif
+endif
+
+!主筋呼び径
+dim _mbarDia[]
+_mbarDia[1] =16
+_mbarDia[2] =16
+_mbarDia[3] =16
+_mbarDia[4] =19
+_mbarDia[5] =19
+_mbarDia[6] =19
+_mbarDia[7] =19
+_mbarDia[8] =19
+_mbarDia[9] =22
+_mbarDia[10]=19
+_mbarDia[11]=19
+_mbarDia[12]=22
+_mbarDia[13]=25
+_mbarDia[14]=19
+_mbarDia[15]=22
+_mbarDia[16]=25
+_mbarDia[17]=25
+_mbarDia[18]=25
+_mbarDia[19]=25
+_mbarDia[20]=22
+_mbarDia[21]=25
+_mbarDia[22]=25
+_mbarDia[23]=22
+_mbarDia[24]=25
+_mbarDia[25]=25
+_mbarDia[26]=25
+_mbarDia[27]=25
+_mbarDia[28]=25
+_mbarDia[29]=25
+_mbarDia[30]=29
+_mbarDia[31]=25
+_mbarDia[32]=25
+_mbarDia[33]=25
+_mbarDia[34]=25
+_mbarDia[35]=25
+_mbarDia[36]=25
+_mbarDia[37]=29
+_mbarDia[38]=25
+_mbarDia[39]=25
+_mbarDia[40]=25
+_mbarDia[41]=25
+_mbarDia[42]=25
+_mbarDia[43]=25
+_mbarDia[44]=25
+_mbarDia[45]=29
+_mbarDia[46]=29
+_mbarDia[47]=29
+_mbarDia[48]=29
+_mbarDia[49]=25
+_mbarDia[50]=25
+_mbarDia[51]=25
+_mbarDia[52]=25
+_mbarDia[53]=25
+_mbarDia[54]=25
+_mbarDia[55]=29
+_mbarDia[56]=29
+_mbarDia[57]=29
+_mbarDia[58]=29
+
+!帯筋本数
+dim _hoopNum[]
+if zoneType=1 then
+    _hoopNum[1] =2
+    _hoopNum[2] =2
+    _hoopNum[3] =2
+    _hoopNum[4] =2
+    _hoopNum[5] =2
+    _hoopNum[6] =2
+    _hoopNum[7] =2
+    _hoopNum[8] =2
+    _hoopNum[9] =2
+    _hoopNum[10]=2
+    _hoopNum[11]=2
+    _hoopNum[12]=2
+    _hoopNum[13]=2
+    _hoopNum[14]=2
+    _hoopNum[15]=2
+    _hoopNum[16]=2
+    _hoopNum[17]=2
+    _hoopNum[18]=2
+    _hoopNum[19]=2
+    _hoopNum[20]=2
+    _hoopNum[21]=2
+    _hoopNum[22]=2
+    _hoopNum[23]=2
+    _hoopNum[24]=2
+    _hoopNum[25]=2
+    _hoopNum[26]=2
+    _hoopNum[27]=2
+    _hoopNum[28]=2
+    _hoopNum[29]=2
+    _hoopNum[30]=2
+    _hoopNum[31]=2
+    _hoopNum[32]=2
+    _hoopNum[33]=2
+    _hoopNum[34]=2
+    _hoopNum[35]=2
+    _hoopNum[36]=2
+    _hoopNum[37]=2
+    _hoopNum[38]=2
+    _hoopNum[39]=2
+    _hoopNum[40]=4
+    _hoopNum[41]=2
+    _hoopNum[42]=2
+    _hoopNum[43]=2
+    _hoopNum[44]=2
+    _hoopNum[45]=2
+    _hoopNum[46]=2
+    _hoopNum[47]=4
+    _hoopNum[48]=4
+    _hoopNum[49]=2
+    _hoopNum[50]=4
+    _hoopNum[51]=2
+    _hoopNum[52]=2
+    _hoopNum[53]=2
+    _hoopNum[54]=2
+    _hoopNum[55]=2
+    _hoopNum[56]=2
+    _hoopNum[57]=4
+    _hoopNum[58]=4
+endif
+
+if zoneType=2 then
+    _hoopNum[1] =2
+    _hoopNum[2] =2
+    _hoopNum[3] =2
+    _hoopNum[4] =2
+    _hoopNum[5] =2
+    _hoopNum[6] =2
+    _hoopNum[7] =2
+    _hoopNum[8] =2
+    _hoopNum[9] =2
+    _hoopNum[10]=2
+    _hoopNum[11]=2
+    _hoopNum[12]=2
+    _hoopNum[13]=2
+    _hoopNum[14]=2
+    _hoopNum[15]=2
+    _hoopNum[16]=2
+    _hoopNum[17]=2
+    _hoopNum[18]=2
+    _hoopNum[19]=2
+    _hoopNum[20]=2
+    _hoopNum[21]=2
+    _hoopNum[22]=2
+    _hoopNum[23]=2
+    _hoopNum[24]=2
+    _hoopNum[25]=2
+    _hoopNum[26]=2
+    _hoopNum[27]=2
+    _hoopNum[28]=2
+    _hoopNum[29]=2
+    _hoopNum[30]=2
+    _hoopNum[31]=2
+    _hoopNum[32]=2
+    _hoopNum[33]=2
+    _hoopNum[34]=2
+    _hoopNum[35]=2
+    _hoopNum[36]=2
+    _hoopNum[37]=2
+    _hoopNum[38]=2
+    _hoopNum[39]=2
+    _hoopNum[40]=4
+    _hoopNum[41]=2
+    _hoopNum[42]=2
+    _hoopNum[43]=2
+    _hoopNum[44]=2
+    _hoopNum[45]=2
+    _hoopNum[46]=2
+    _hoopNum[47]=4
+    _hoopNum[48]=4
+    _hoopNum[49]=2
+    _hoopNum[50]=4
+    _hoopNum[51]=2
+    _hoopNum[52]=2
+    _hoopNum[53]=2
+    _hoopNum[54]=2
+    _hoopNum[55]=2
+    _hoopNum[56]=2
+    _hoopNum[57]=4
+    _hoopNum[58]=4
+endif
+
+!帯筋呼び径
+dim _hoopDia[]
+if zoneType=1 then
+    _hoopDia[1] =13
+    _hoopDia[2] =13
+    _hoopDia[3] =13
+    _hoopDia[4] =13
+    _hoopDia[5] =13
+    _hoopDia[6] =13
+    _hoopDia[7] =13
+    _hoopDia[8] =13
+    _hoopDia[9] =13
+    _hoopDia[10]=13
+    _hoopDia[11]=13
+    _hoopDia[12]=13
+    _hoopDia[13]=13
+    _hoopDia[14]=13
+    _hoopDia[15]=13
+    _hoopDia[16]=13
+    _hoopDia[17]=13
+    _hoopDia[18]=13
+    _hoopDia[19]=13
+    _hoopDia[20]=13
+    _hoopDia[21]=13
+    _hoopDia[22]=13
+    _hoopDia[23]=13
+    _hoopDia[24]=13
+    _hoopDia[25]=13
+    _hoopDia[26]=13
+    _hoopDia[27]=13
+    _hoopDia[28]=13
+    _hoopDia[29]=13
+    _hoopDia[30]=13
+    _hoopDia[31]=13
+    _hoopDia[32]=13
+    _hoopDia[33]=13
+    _hoopDia[34]=13
+    _hoopDia[35]=13
+    _hoopDia[36]=13
+    _hoopDia[37]=13
+    _hoopDia[38]=13
+    _hoopDia[39]=13
+    _hoopDia[40]=16
+    _hoopDia[41]=13
+    _hoopDia[42]=13
+    _hoopDia[43]=13
+    _hoopDia[44]=13
+    _hoopDia[45]=13
+    _hoopDia[46]=16
+    _hoopDia[47]=16
+    _hoopDia[48]=16
+    _hoopDia[49]=13
+    _hoopDia[50]=16
+    _hoopDia[51]=16
+    _hoopDia[52]=16
+    _hoopDia[53]=13
+    _hoopDia[54]=13
+    _hoopDia[55]=16
+    _hoopDia[56]=16
+    _hoopDia[57]=16
+    _hoopDia[58]=16
+endif
+
+if zoneType=2 then
+    _hoopDia[1] =13
+    _hoopDia[2] =13
+    _hoopDia[3] =13
+    _hoopDia[4] =13
+    _hoopDia[5] =13
+    _hoopDia[6] =13
+    _hoopDia[7] =13
+    _hoopDia[8] =13
+    _hoopDia[9] =13
+    _hoopDia[10]=13
+    _hoopDia[11]=13
+    _hoopDia[12]=13
+    _hoopDia[13]=13
+    _hoopDia[14]=13
+    _hoopDia[15]=13
+    _hoopDia[16]=13
+    _hoopDia[17]=13
+    _hoopDia[18]=13
+    _hoopDia[19]=13
+    _hoopDia[20]=13
+    _hoopDia[21]=13
+    _hoopDia[22]=16
+    _hoopDia[23]=13
+    _hoopDia[24]=13
+    _hoopDia[25]=13
+    _hoopDia[26]=13
+    _hoopDia[27]=13
+    _hoopDia[28]=13
+    _hoopDia[29]=16
+    _hoopDia[30]=16
+    _hoopDia[31]=13
+    _hoopDia[32]=13
+    _hoopDia[33]=13
+    _hoopDia[34]=13
+    _hoopDia[35]=13
+    _hoopDia[36]=13
+    _hoopDia[37]=16
+    _hoopDia[38]=13
+    _hoopDia[39]=13
+    _hoopDia[40]=16
+    _hoopDia[41]=13
+    _hoopDia[42]=13
+    _hoopDia[43]=13
+    _hoopDia[44]=13
+    _hoopDia[45]=16
+    _hoopDia[46]=16
+    _hoopDia[47]=16
+    _hoopDia[48]=16
+    _hoopDia[49]=13
+    _hoopDia[50]=16
+    _hoopDia[51]=16
+    _hoopDia[52]=16
+    _hoopDia[53]=13
+    _hoopDia[54]=13
+    _hoopDia[55]=16
+    _hoopDia[56]=16
+    _hoopDia[57]=16
+    _hoopDia[58]=16
+endif
+
+!帯筋ピッチ
+dim _hoopPitch[]
+if zoneType=1 then
+    _hoopPitch[1] =	150	/1000
+    _hoopPitch[2] =	150	/1000
+    _hoopPitch[3] =	150	/1000
+    _hoopPitch[4] =	150	/1000
+    _hoopPitch[5] =	150	/1000
+    _hoopPitch[6] =	150	/1000
+    _hoopPitch[7] =	150	/1000
+    _hoopPitch[8] =	150	/1000
+    _hoopPitch[9] =	150	/1000
+    _hoopPitch[10]=	150	/1000
+    _hoopPitch[11]=	100	/1000
+    _hoopPitch[12]=	150	/1000
+    _hoopPitch[13]=	150	/1000
+    _hoopPitch[14]=	100	/1000
+    _hoopPitch[15]=	150	/1000
+    _hoopPitch[16]=	150	/1000
+    _hoopPitch[17]=	150	/1000
+    _hoopPitch[18]=	150	/1000
+    _hoopPitch[19]=	150	/1000
+    _hoopPitch[20]=	150	/1000
+    _hoopPitch[21]=	150	/1000
+    _hoopPitch[22]=	100	/1000
+    _hoopPitch[23]=	150	/1000
+    _hoopPitch[24]=	100	/1000
+    _hoopPitch[25]=	100	/1000
+    _hoopPitch[26]=	100	/1000
+    _hoopPitch[27]=	100	/1000
+    _hoopPitch[28]=	100	/1000
+    _hoopPitch[29]=	100	/1000
+    _hoopPitch[30]=	100	/1000
+    _hoopPitch[31]=	100	/1000
+    _hoopPitch[32]=	100	/1000
+    _hoopPitch[33]=	100	/1000
+    _hoopPitch[34]=	100	/1000
+    _hoopPitch[35]=	100	/1000
+    _hoopPitch[36]=	100	/1000
+    _hoopPitch[37]=	100	/1000
+    _hoopPitch[38]=	100	/1000
+    _hoopPitch[39]=	100	/1000
+    _hoopPitch[40]=	100	/1000
+    _hoopPitch[41]=	100	/1000
+    _hoopPitch[42]=	100	/1000
+    _hoopPitch[43]=	100	/1000
+    _hoopPitch[44]=	100	/1000
+    _hoopPitch[45]=	100	/1000
+    _hoopPitch[46]=	100	/1000
+    _hoopPitch[47]=	100	/1000
+    _hoopPitch[48]=	100	/1000
+    _hoopPitch[49]=	100	/1000
+    _hoopPitch[50]=	100	/1000
+    _hoopPitch[51]=	150	/1000
+    _hoopPitch[52]=	150	/1000
+    _hoopPitch[53]=	100	/1000
+    _hoopPitch[54]=	100	/1000
+    _hoopPitch[55]=	150	/1000
+    _hoopPitch[56]=	100	/1000
+    _hoopPitch[57]=	100	/1000
+    _hoopPitch[58]=	100	/1000
+endif
+
+if zoneType=2 then
+    _hoopPitch[1] =	150	/1000
+    _hoopPitch[2] =	150	/1000
+    _hoopPitch[3] =	150	/1000
+    _hoopPitch[4] =	150	/1000
+    _hoopPitch[5] =	100	/1000
+    _hoopPitch[6] =	150	/1000
+    _hoopPitch[7] =	150	/1000
+    _hoopPitch[8] =	100	/1000
+    _hoopPitch[9] =	100	/1000
+    _hoopPitch[10]=	150	/1000
+    _hoopPitch[11]=	100	/1000
+    _hoopPitch[12]=	100	/1000
+    _hoopPitch[13]=	100	/1000
+    _hoopPitch[14]=	100	/1000
+    _hoopPitch[15]=	150	/1000
+    _hoopPitch[16]=	100	/1000
+    _hoopPitch[17]=	100	/1000
+    _hoopPitch[18]=	150	/1000
+    _hoopPitch[19]=	150	/1000
+    _hoopPitch[20]=	150	/1000
+    _hoopPitch[21]=	100	/1000
+    _hoopPitch[22]=	100	/1000
+    _hoopPitch[23]=	150	/1000
+    _hoopPitch[24]=	100	/1000
+    _hoopPitch[25]=	100	/1000
+    _hoopPitch[26]=	100	/1000
+    _hoopPitch[27]=	100	/1000
+    _hoopPitch[28]=	100	/1000
+    _hoopPitch[29]=	100	/1000
+    _hoopPitch[30]=	100	/1000
+    _hoopPitch[31]=	100	/1000
+    _hoopPitch[32]=	100	/1000
+    _hoopPitch[33]=	100	/1000
+    _hoopPitch[34]=	100	/1000
+    _hoopPitch[35]=	100	/1000
+    _hoopPitch[36]=	100	/1000
+    _hoopPitch[37]=	100	/1000
+    _hoopPitch[38]=	100	/1000
+    _hoopPitch[39]=	100	/1000
+    _hoopPitch[40]=	100	/1000
+    _hoopPitch[41]=	100	/1000
+    _hoopPitch[42]=	100	/1000
+    _hoopPitch[43]=	100	/1000
+    _hoopPitch[44]=	100	/1000
+    _hoopPitch[45]=	100	/1000
+    _hoopPitch[46]=	75	/1000
+    _hoopPitch[47]=	100	/1000
+    _hoopPitch[48]=	100	/1000
+    _hoopPitch[49]=	100	/1000
+    _hoopPitch[50]=	100	/1000
+    _hoopPitch[51]=	150	/1000
+    _hoopPitch[52]=	150	/1000
+    _hoopPitch[53]=	100	/1000
+    _hoopPitch[54]=	100	/1000
+    _hoopPitch[55]=	150	/1000
+    _hoopPitch[56]=	75	/1000
+    _hoopPitch[57]=	100	/1000
+    _hoopPitch[58]=	100	/1000
+endif
+
+
+if listCode<=58 then
+    Lt=_L1List[listCode]
+    columnB=_columnBList[listCode]
+    mbarNum=_mbarNum[listCode]
+    mbarDia=_mbarDia[listCode]
+    hoopNum=_hoopNum[listCode]
+    hoopDia=_hoopDia[listCode]
+    hoopPitch=_hoopPitch[listCode]
+else
+    Lt=0
+    columnB=0
+    mbarNum=0
+    mbarDia=0
+    hoopNum=0
+    hoopDia=0
+    hoopPitch=0
+endif
+parameters \
+Lt=Lt,
+columnB=columnB,
+mbarNum=mbarNum,
+mbarDia=mbarDia,
+hoopNum=hoopNum,
+hoopDia=hoopDia,
+hoopPitch=hoopPitch
+
+LOCK "Lt","columnB","mbarNum","mbarDia","hoopNum","hoopDia","hoopPitch"

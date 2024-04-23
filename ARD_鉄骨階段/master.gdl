@@ -1,0 +1,502 @@
+code=1
+x=1
+y=2
+z=3
+
+
+!=====================================================直線階段
+!蹴込角度
+nosing_a=atn(step_nosing/step_riser)
+
+
+!階段角度
+step_a=atn(step_riser/step_tread)
+
+
+!ササラ厚み
+if switch_ssr1 then
+	ssr1_thi=ssr_thi
+else
+	ssr1_thi=0
+endif
+
+if switch_ssr2 then
+	ssr2_thi=ssr_thi
+else
+	ssr2_thi=0
+endif
+
+
+!フロア踊り場move_x
+if stair_mode=2 then
+	floor_x=(step_num_down-step_num_up)*step_tread+landing_size1-landing_size2
+else
+	floor_x=(step_num_tot-1)*step_tread+step_thi
+endif
+
+if stair_mode=2 then
+	landing_x=(step_num_down-1)*step_tread+step_thi
+else
+	landing_x=step_num_up*step_tread+floor_size1-floor_size2
+endif
+
+
+!ササラ仕上げ材質
+if switch_ssr_fin then
+	m_step_ssr_in=m_ssr_in_fin
+	m_step_ssr_out=m_ssr_out_fin
+else
+	m_step_ssr_in=m_step
+	m_step_ssr_out=m_step
+endif
+
+
+!階段仕上げ材質
+if step_fin_type=1 then
+	m_step_riser=m_riser_fin
+	m_step_tread=m_tread_fin
+else
+	m_step_riser=m_step
+	m_step_tread=m_step
+endif
+
+if switch_step_down_fin then
+	m_step_riser_down=m_riser_down_fin
+	m_step_tread_down=m_tread_down_fin
+else
+	m_step_riser_down=m_step
+	m_step_tread_down=m_step
+endif
+
+
+!踊り場仕上げ材質
+if step_fin_type=1 then
+	m_step_landing=m_landing_fin
+	m_step_floor=m_floor_fin
+else
+	m_step_landing=m_step
+	m_step_floor=m_step
+endif
+
+if switch_step_down_fin then
+	m_step_landing_down=m_landing_down_fin
+	m_step_floor_down=m_floor_down_fin
+else
+	m_step_landing_down=m_step
+	m_step_floor_down=m_step
+endif
+
+
+!ササラ上端・下端方程式y=kx+b式
+equ_k1=step_riser/step_tread
+
+equ_b1=step_riser+step_nosing*equ_k1
+if stair_type=1 then
+	equ_b2=-step_thi-step_thi*equ_k1
+else
+	equ_b2=-step_t2_size-step_thi*equ_k1
+endif
+
+if stair_mode=1 then
+	equ_b3=equ_b1-(landing_len-step_tread+step_thi)*equ_k1
+	equ_b4=equ_b2-(landing_len-step_tread+step_thi)*equ_k1
+else
+	equ_k2=-step_riser/step_tread
+
+	equ_b3=floor_hei-equ_k2*(floor_x+step_thi+step_nosing)
+	if stair_type=1 then
+		equ_b4=(floor_hei-step_riser-step_thi)-equ_k2*(floor_x)
+	else
+		equ_b4=(floor_hei-step_riser-step_t2_size)-equ_k2*(floor_x)
+	endif
+endif
+
+!ササラ幅
+ssr_wid=cos(step_a)*abs(equ_b1-equ_b2)
+
+
+!===================================================基本設定
+values "floor_num" range[2,]
+values{2} "stair_form" 1,"開放階段",2,"壁付階段"
+if stair_form=2 then hideparameter "switch_opening"
+
+values{2} "stair_mode" 1,"直線階段",2,"廻り階段",3,"直線+廻り階段"
+!values{2} "stair_place" 1,"内部階段",2,"外部階段"
+values{2} "stair_place" 2,"外部階段"
+values "valid_wid" 0.9,1.2
+values{2} "switch_painting" 0,"標準仕様: 粉体塗装",1,"塩害対策仕様: 溶融亜鉛メッキ+粉体焼付塗装"
+
+step_wid1=valid_wid
+step_wid2=valid_wid
+
+parameters \
+step_wid1=step_wid1,
+step_wid2=step_wid2
+
+lock "step_wid1","step_wid2"
+
+step_wid_tot=step_wid1+step_wid2+landing_gap
+
+!BI-code
+dim _bi_code[]
+_bi_code[1]=0
+
+bi_code_count=1
+
+if stair_form=1 then
+    if stair_mode=2 then
+        if switch_roof=0 then
+            if switch_opening=0 then
+                if valid_wid=0.9 then _bi_code[bi_code_count]=25001
+                if valid_wid=1.2 then _bi_code[bi_code_count]=25002
+            else
+                if valid_wid=0.9 then _bi_code[bi_code_count]=25003
+                if valid_wid=1.2 then _bi_code[bi_code_count]=25004
+            endif
+        else
+            if switch_opening=0 then
+                if valid_wid=0.9 then _bi_code[bi_code_count]=25005
+                if valid_wid=1.2 then _bi_code[bi_code_count]=25006
+            else
+                if valid_wid=0.9 then _bi_code[bi_code_count]=25007
+                if valid_wid=1.2 then _bi_code[bi_code_count]=25008
+            endif
+        endif
+    endif
+
+    if stair_mode=1 then
+        if switch_roof=0 then
+            if switch_opening=0 then
+                if valid_wid=0.9 then _bi_code[bi_code_count]=25021
+                if valid_wid=1.2 then _bi_code[bi_code_count]=25022
+            else
+                if valid_wid=0.9 then _bi_code[bi_code_count]=25023
+                if valid_wid=1.2 then _bi_code[bi_code_count]=25024
+            endif
+        else
+            if switch_opening=0 then
+                if valid_wid=0.9 then _bi_code[bi_code_count]=25025
+                if valid_wid=1.2 then _bi_code[bi_code_count]=25026
+            else
+                if valid_wid=0.9 then _bi_code[bi_code_count]=25027
+                if valid_wid=1.2 then _bi_code[bi_code_count]=25028
+            endif
+        endif
+    endif
+
+	if stair_mode=3 then
+        if switch_roof=0 then
+            if switch_opening=0 then
+                if valid_wid=0.9 then _bi_code[bi_code_count]=25041
+                if valid_wid=1.2 then _bi_code[bi_code_count]=25042
+            else
+                if valid_wid=0.9 then _bi_code[bi_code_count]=25043
+                if valid_wid=1.2 then _bi_code[bi_code_count]=25044
+            endif
+        else
+            if switch_opening=0 then
+                if valid_wid=0.9 then _bi_code[bi_code_count]=25045
+                if valid_wid=1.2 then _bi_code[bi_code_count]=25046
+            else
+                if valid_wid=0.9 then _bi_code[bi_code_count]=25047
+                if valid_wid=1.2 then _bi_code[bi_code_count]=25048
+            endif
+        endif
+	endif
+endif
+
+if stair_form=2 then
+    if stair_mode=2 then
+        if switch_roof=0 then
+            if valid_wid=0.9 then _bi_code[bi_code_count]=25101
+            if valid_wid=1.2 then _bi_code[bi_code_count]=25102
+        else
+            if valid_wid=0.9 then _bi_code[bi_code_count]=25105
+            if valid_wid=1.2 then _bi_code[bi_code_count]=25106
+        endif
+    endif
+
+    if stair_mode=1 then
+        if switch_roof=0 then
+            if valid_wid=0.9 then _bi_code[bi_code_count]=25121
+            if valid_wid=1.2 then _bi_code[bi_code_count]=25122
+        else
+            if valid_wid=0.9 then _bi_code[bi_code_count]=25125
+            if valid_wid=1.2 then _bi_code[bi_code_count]=25126
+        endif
+    endif
+
+    if stair_mode=3 then
+        if switch_roof=0 then
+            if valid_wid=0.9 then _bi_code[bi_code_count]=25141
+            if valid_wid=1.2 then _bi_code[bi_code_count]=25142
+        else
+            if valid_wid=0.9 then _bi_code[bi_code_count]=25145
+            if valid_wid=1.2 then _bi_code[bi_code_count]=25146
+        endif
+    endif
+endif
+
+if step_fin_type=2 then
+	bi_code_count=bi_code_count+1
+	if valid_wid=0.9 then _bi_code[bi_code_count]=13004
+	if valid_wid=1.2 then _bi_code[bi_code_count]=13005
+
+	bi_code_count=bi_code_count+1
+	_bi_code[bi_code_count]=13003
+endif
+
+if switch_painting=1 then
+	bi_code_count=bi_code_count+1
+	_bi_code[bi_code_count]=25191
+endif
+
+bi_code=_bi_code
+parameters bi_code=_bi_code
+
+
+!===================================================階段形状
+dim _dis_floor_2D_index[],_dis_floor_2D_text[]
+_dis_floor_2D_index[1]=1
+_dis_floor_2D_text[1]=""
+
+for i=1 to floor_num
+	_dis_floor_2D_index[i]=i
+	_dis_floor_2D_text[i]=str(i,1,0)+"F"
+next i
+
+_dis_floor_2D_index[floor_num+1]=0
+_dis_floor_2D_text[floor_num+1]="表示しない"
+
+values{2} "dis_floor_2D" _dis_floor_2D_index,_dis_floor_2D_text
+
+!現在のフロアのインデックスと名前を返す
+floor_index=0
+n = REQUEST ("Story", "", floor_index, story_name)
+floor_index=floor_index+1
+
+if dis_floor_auto=1 then
+	if floor_index>=1 and floor_index<=floor_num then
+		dis_floor_2D=floor_index
+	else
+		dis_floor_2D=0
+	endif
+
+	parameters dis_floor_2D=dis_floor_2D
+	lock "dis_floor_2D"
+else
+	dis_floor_2D=dis_floor_2D
+endif
+
+values{2} "stair_type" 1,"DYS-P階段",2,"DYS-M階段"
+values{2} "switch_mode" 1,"蹴上により階層高自動計算",2,"階層高により蹴上自動計算"
+
+values "step_wid1" range[0,]
+values "step_wid2" range[0,]
+values "step_tread" range[0,]
+values "step_riser" range[0,]
+values "step_nosing" range[0,]
+values "step_thi" range[0,]
+values "step_num_tot" range[2,]
+
+!高さ調整モード
+if switch_mode=1 then
+	floor_hei=step_num_tot*step_riser
+	parameters floor_hei=floor_hei
+	lock "floor_hei"
+else
+	step_riser=floor_hei/step_num_tot
+	parameters step_riser=step_riser
+	lock "step_riser"
+endif
+
+
+!===================================================階段詳細設定
+!=======================中間踊り場
+if stair_mode=1 then switch_landing=0
+if stair_mode=2 then switch_landing=1
+if stair_mode=3 then switch_landing=1
+
+landing_num=0
+if stair_mode=2 then landing_num=floor_num-1
+if stair_mode=3 then landing_num=floor_num-2
+
+values "landing_thi" range[0,]
+values "landing_len" range[0,]
+values "landing_gap" range[0,]
+values "landing_size1" range[0,]
+
+if stair_mode=3 then
+	landing_size2=(2*step_num_down-step_num_tot)*step_tread-floor_size1+floor_size2+landing_size1
+else
+	values "landing_size2" range[0,]
+endif
+
+!中間踊り場下部段数・中間踊り場上部段数
+values "step_num_down" range[1,step_num_tot-1]
+
+step_num_up=step_num_tot-step_num_down
+parameters step_num_up=step_num_up
+lock "step_num_up"
+
+if switch_landing=0 then
+	hideparameter "step_num_down","step_num_up","landing_thi","landing_len","landing_gap"
+endif
+
+
+!=======================フロア踊り場
+values "floor_thi" range[0,]
+values "floor_len" range[0,]
+values "floor_size1" range[0,]
+
+if stair_mode=2 then
+	floor_size2=(step_num_up-step_num_down)*step_tread-landing_size1+landing_size2+floor_size1
+else
+	values "floor_size2" range[0,]
+endif
+
+if switch_floor=0 then
+	hideparameter "floor_thi","floor_len","floor_size1"
+endif
+
+
+!=======================ササラ
+values "ssr_thi" range[0,]
+values "ssr_wid1" range[0,]
+values "ssr_wid2" range[0,]
+
+!if stair_mode=1 then
+!	if switch_floor=0 then floor_len=0
+!	values "ssr_offset_end1" range[-floor_len+ssr_thi,]
+!	values "ssr_offset_end2" range[-floor_len+ssr_thi,]
+!else
+!	if switch_floor=0 then
+!		values "ssr_offset_end1" range[0,]
+!		values "ssr_offset_end2" range[0,]
+!	else
+!		values "ssr_offset_end1" range[-floor_size2+ssr_thi,]
+!		values "ssr_offset_end2" range[-floor_size2+ssr_thi,]
+!	endif
+!endif
+
+
+!=======================手すり
+values{2} "handrail_op" 1,"右側",2,"左側"
+
+
+!===================================================仕上げ材設定
+values{2} "step_fin_type" 1,"ノンスリップ",2,"タキステップ",0,"なし"
+
+if step_fin_type=1 then
+	values "nonslip_wid" range[0,]
+	values "nonslip_thi" range[0,]
+else
+	hideparameter "m_nonslip","nonslip_wid","nonslip_thi"
+endif
+
+if step_fin_type=2 then
+	values "taki_thi" range[0,]
+	values "seal_thi" range[0.002,0.005]
+else
+	hideparameter "m_taki","m_seal","taki_thi","seal_thi"
+endif
+
+
+!===================================================階段ステップ座標
+step_num_sum=0
+dim _step_pos[][],_step_rtz[],_step_flag[]
+
+for j=1 to floor_num-1
+	for i=1 to step_num_tot
+		step_num_sum=step_num_sum+1
+		_step_flag[step_num_sum]=0
+
+		if stair_mode=1 then !直線階段
+			_step_rtz[step_num_sum]=0
+			_step_pos[step_num_sum][x]=(i-1)*step_tread
+			_step_pos[step_num_sum][y]=0
+			_step_pos[step_num_sum][z]=(i-1)*step_riser+(j-1)*floor_hei
+
+			if i=1 then _step_flag[step_num_sum]=-1 !始点
+			if i=step_num_tot then
+				if switch_floor then
+					_step_flag[step_num_sum]=1  !終点
+				else
+					_step_flag[step_num_sum]=2
+				endif
+			endif
+		endif
+
+		if stair_mode=2 then !廻り階段
+			if i<=step_num_down then
+				_step_rtz[step_num_sum]=0
+				_step_pos[step_num_sum][x]=(i-1)*step_tread
+				_step_pos[step_num_sum][y]=0
+				_step_pos[step_num_sum][z]=(i-1)*step_riser+(j-1)*floor_hei
+
+				if i=1 then _step_flag[step_num_sum]=-1 !始点
+				if i=step_num_down then _step_flag[step_num_sum]=1  !終点
+			else
+				_step_rtz[step_num_sum]=180
+				_step_pos[step_num_sum][x]=(2*step_num_down-i)*step_tread+step_thi+landing_size1-landing_size2
+				_step_pos[step_num_sum][y]=step_wid_tot
+				_step_pos[step_num_sum][z]=(i-1)*step_riser+(j-1)*floor_hei
+
+				if i=step_num_down+1 then _step_flag[step_num_sum]=-1 !始点
+				if i=step_num_tot then
+					if switch_floor then
+						_step_flag[step_num_sum]=1  !終点
+					else
+						_step_flag[step_num_sum]=2
+					endif
+				endif
+			endif
+		endif
+
+		if stair_mode=3 then !直線+廻り階段
+			if j=1 then
+				_step_rtz[step_num_sum]=0
+				_step_pos[step_num_sum][x]=(i-1)*step_tread
+				_step_pos[step_num_sum][y]=0
+				_step_pos[step_num_sum][z]=(i-1)*step_riser
+
+				if i=1 then _step_flag[step_num_sum]=-1 !始点
+				if i=step_num_tot then
+					if switch_floor then
+						_step_flag[step_num_sum]=1  !終点
+					else
+						_step_flag[step_num_sum]=2
+					endif
+				endif
+			else
+				if i<=step_num_down then
+					_step_rtz[step_num_sum]=180
+					_step_pos[step_num_sum][x]=(step_num_tot-i)*step_tread+step_thi+floor_size1-floor_size2
+					_step_pos[step_num_sum][y]=step_wid_tot
+					_step_pos[step_num_sum][z]=(i-1)*step_riser+(j-1)*floor_hei
+
+					if i=1 then _step_flag[step_num_sum]=-1 !始点
+					if i=step_num_down then _step_flag[step_num_sum]=1  !終点
+				else
+					_step_rtz[step_num_sum]=0
+					_step_pos[step_num_sum][x]=(i-1)*step_tread
+					_step_pos[step_num_sum][y]=0
+					_step_pos[step_num_sum][z]=(i-1)*step_riser+(j-1)*floor_hei
+
+					if i=step_num_down+1 then _step_flag[step_num_sum]=-1 !始点
+					if i=step_num_tot then
+						if switch_floor then
+							_step_flag[step_num_sum]=1  !終点
+						else
+							_step_flag[step_num_sum]=2
+						endif
+					endif
+				endif
+			endif
+		endif
+	next i
+next j
+
+
+
+

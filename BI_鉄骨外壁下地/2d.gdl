@@ -1,0 +1,5 @@
+project2{3} 3,270,3+32+1024, 1+2+4+8+16+32, backgroundColor, fillOrigoX, fillOrigoY, filldirection
+
+                hotspot2 0                           ,0    ,unID,frameRange[1][1],1+256     :unID=unID+1    !BASE
+                hotspot2 frameRange[1][1]  ,0    ,unID,frameRange[1][1],2         :unID=unID+1    !MOVE
+                hotspot2 0-1                        ,0    ,unID,frameRange[1][1],3         :unID=unID+1    !REF

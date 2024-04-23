@@ -1,0 +1,222 @@
+!================================================================大引き
+for i=1 to 2
+    hotspot 0               ,sleeperPos[i][y],0,code,sleeperPos[i][x],1+128:code=code+1
+    hotspot sleeperPos[i][x],sleeperPos[i][y],0,code,sleeperPos[i][x],2    :code=code+1
+    hotspot -1              ,sleeperPos[i][y],0,code,sleeperPos[i][x],3    :code=code+1
+
+    hotspot sleeperPos[i][x],0               ,0,code,sleeperPos[i][y],1+128:code=code+1
+    hotspot sleeperPos[i][x],sleeperPos[i][y],0,code,sleeperPos[i][y],2    :code=code+1
+    hotspot sleeperPos[i][x],-1              ,0,code,sleeperPos[i][y],3    :code=code+1
+next i
+
+
+group "sleeper"
+    material sleeperMat
+
+    add sleeperPos[1][x],sleeperPos[1][y],0
+    rotz sleeperRtz
+        add 0,-_sleeperWid[sleeperSize]/2,-_sleeperWid[sleeperSize]
+            block sleeperLen,_sleeperWid[sleeperSize],_sleeperWid[sleeperSize]
+        del 1
+
+        hotspot 0,-_sleeperWid[sleeperSize]/2,0
+        hotspot 0,_sleeperWid[sleeperSize]/2,0
+        hotspot 0,-_sleeperWid[sleeperSize]/2,-_sleeperWid[sleeperSize]
+        hotspot 0,_sleeperWid[sleeperSize]/2,-_sleeperWid[sleeperSize]
+
+        hotspot sleeperLen,-_sleeperWid[sleeperSize]/2,0
+        hotspot sleeperLen,_sleeperWid[sleeperSize]/2,0
+        hotspot sleeperLen,-_sleeperWid[sleeperSize]/2,-_sleeperWid[sleeperSize]
+        hotspot sleeperLen,_sleeperWid[sleeperSize]/2,-_sleeperWid[sleeperSize]
+    del 2
+endgroup
+
+placegroup "sleeper"
+
+
+!================================================================端部金物
+group "hardware_type1"
+    material hardwareMat
+
+    thi=0.0032
+    sideWid1=0.02
+    sideWid2=0.04
+    sideHei=0.055
+    sideSlope=0.01
+    plateWid=0.04
+    plateSlope=0.005
+
+    add 0,-_sleeperWid[sleeperSize]/2,-_sleeperWid[sleeperSize]
+        !down
+        add sideWid1,0,-thi
+            block sideWid2-sideWid1,_sleeperWid[sleeperSize],thi
+        del 1
+
+        !side
+        for i=1 to 2
+            ruledsegmented 8,1+2+4+8+16+32,
+            sideWid2,0   ,-thi                              ,0,
+            sideWid1,0   ,-thi                              ,0,
+            sideWid1,0   ,_sleeperWid[sleeperSize]-sideHei  ,0,
+            0       ,0   ,_sleeperWid[sleeperSize]-sideHei  ,0,
+            0       ,0   ,_sleeperWid[sleeperSize]          ,0,
+            thi     ,0   ,_sleeperWid[sleeperSize]          ,0,
+            sideWid2,0   ,_sleeperWid[sleeperSize]-sideSlope,0,
+            sideWid2,0   ,-thi                              ,0,
+            sideWid2,-thi,-thi                              ,
+            sideWid1,-thi,-thi                              ,
+            sideWid1,-thi,_sleeperWid[sleeperSize]-sideHei  ,
+            0       ,-thi,_sleeperWid[sleeperSize]-sideHei  ,
+            0       ,-thi,_sleeperWid[sleeperSize]          ,
+            thi     ,-thi,_sleeperWid[sleeperSize]          ,
+            sideWid2,-thi,_sleeperWid[sleeperSize]-sideSlope,
+            sideWid2,-thi,-thi                              
+        addy _sleeperWid[sleeperSize]+thi
+        next i
+        del 2
+
+        !plate
+        for i=1 to 2
+            ruledsegmented 6,1+2+4+8+16+32,
+            0  ,-thi                ,_sleeperWid[sleeperSize]                   ,0,
+            0  ,-plateWid+plateSlope,_sleeperWid[sleeperSize]                   ,0,
+            0  ,-plateWid           ,_sleeperWid[sleeperSize]-plateSlope        ,0,
+            0  ,-plateWid           ,_sleeperWid[sleeperSize]-sideHei+plateSlope,0,
+            0  ,-thi                ,_sleeperWid[sleeperSize]-sideHei           ,0,
+            0  ,-thi                ,_sleeperWid[sleeperSize]                   ,0,
+            thi,-thi                ,_sleeperWid[sleeperSize]                   ,
+            thi,-plateWid+plateSlope,_sleeperWid[sleeperSize]                   ,
+            thi,-plateWid           ,_sleeperWid[sleeperSize]-plateSlope        ,
+            thi,-plateWid           ,_sleeperWid[sleeperSize]-sideHei+plateSlope,
+            thi,-thi                ,_sleeperWid[sleeperSize]-sideHei           ,
+            thi,-thi                ,_sleeperWid[sleeperSize]                   
+        addy _sleeperWid[sleeperSize]
+        muly -1
+        next i
+        del 2*2
+    del 1
+endgroup
+
+
+group "hardware_type2"
+    material hardwareMat
+
+    thi=0.0023
+    topWid=0.008
+    downWid=0.03
+    sideWid1=0.015
+    sideWid2=0.04
+    sideSlope=0.01
+
+    add -thi,-_sleeperWid[sleeperSize]/2,-_sleeperWid[sleeperSize]
+        !back
+        block thi,_sleeperWid[sleeperSize],_sleeperWid[sleeperSize]
+
+        !top
+        addz _sleeperWid[sleeperSize]
+            block thi+topWid,_sleeperWid[sleeperSize],thi
+        del 1
+
+        !down
+        addz -thi
+            block thi+downWid,_sleeperWid[sleeperSize],thi
+        del 1
+
+        !side
+        for i=1 to 2
+            ruledsegmented 10,1+2+4+8+16+32,
+            0           ,0   ,thi                                   ,0,
+            0           ,0   ,_sleeperWid[sleeperSize]-thi          ,0,
+            thi+sideWid1,0   ,_sleeperWid[sleeperSize]-thi          ,0,
+            thi+sideWid2,0   ,_sleeperWid[sleeperSize]-thi-sideSlope,0,
+            thi+sideWid2,0   ,0                                     ,0,
+            thi+downWid ,0   ,0                                     ,0,
+            thi+downWid ,0   ,-thi                                  ,0,
+            2*thi       ,0   ,-thi                                  ,0,
+            2*thi       ,0   ,thi                                   ,0,
+            0           ,0   ,thi                                   ,0,
+            0           ,-thi,thi                                   ,
+            0           ,-thi,_sleeperWid[sleeperSize]-thi          ,
+            thi+sideWid1,-thi,_sleeperWid[sleeperSize]-thi          ,
+            thi+sideWid2,-thi,_sleeperWid[sleeperSize]-thi-sideSlope,
+            thi+sideWid2,-thi,0                                     ,
+            thi+downWid ,-thi,0                                     ,
+            thi+downWid ,-thi,-thi                                  ,
+            2*thi       ,-thi,-thi                                  ,
+            2*thi       ,-thi,thi                                   ,
+            0           ,-thi,thi                                   
+        addy _sleeperWid[sleeperSize]+thi
+        next i
+        del 2
+
+        !sideDown
+        for i=1 to 2
+            add 2*thi,-thi,-2*thi
+                block downWid-thi,thi+_sleeperWid[sleeperSize]/4,thi
+            del 1
+        addy _sleeperWid[sleeperSize]*3/4+thi
+        next i
+        del 2
+    del 1
+endgroup
+
+add sleeperPos[1][x],sleeperPos[1][y],0
+rotz sleeperRtz
+    for i=1 to 2
+        if hardwareType=1 then
+            placegroup "hardware_type1"
+        endif
+
+        if hardwareType=2 then
+            placegroup "hardware_type2"
+        endif
+    addx sleeperLen
+    rotz 180
+    next i
+    del 2*2
+del 2
+
+
+!================================================================鋼製束
+group "supporting"
+    material supportingMat
+
+    thi=0.0023
+    topX=0.07
+    topY=0.09
+    sideHei=0.028
+    supportRad=0.01
+
+    !top
+    add -topX/2,-_sleeperWid[sleeperSize]/2-thi,-_sleeperWid[sleeperSize]-thi
+        block topX,topY,thi
+    del 1
+
+    !side
+    add -topX/2,-_sleeperWid[sleeperSize]/2-thi,-_sleeperWid[sleeperSize]
+        block topX,thi,sideHei
+    del 1
+
+    !support
+    add 0,-_sleeperWid[sleeperSize]/2-thi+topY/2,-_sleeperWid[sleeperSize]-supportingHei+thi
+        cylind supportingHei-2*thi,supportRad
+    del 1
+
+    !down
+    add -topY/2,-_sleeperWid[sleeperSize]/2-thi,-_sleeperWid[sleeperSize]-supportingHei
+        block topY,topY,thi
+    del 1
+endgroup
+
+add sleeperPos[1][x],sleeperPos[1][y],0
+rotz sleeperRtz
+    for i=1 to supportingNum
+        addx supportingPos[i]
+            placegroup "supporting"
+
+            hotspot 0,-_sleeperWid[sleeperSize]/2-thi+topY/2,-_sleeperWid[sleeperSize]              ,code,supportingHei,1+128:code=code+1
+            hotspot 0,-_sleeperWid[sleeperSize]/2-thi+topY/2,-_sleeperWid[sleeperSize]-supportingHei,code,supportingHei,2    :code=code+1
+            hotspot 0,-_sleeperWid[sleeperSize]/2-thi+topY/2,-_sleeperWid[sleeperSize]+1            ,code,supportingHei,3    :code=code+1
+        del 1
+    next i
+del 2

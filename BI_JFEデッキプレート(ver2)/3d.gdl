@@ -1,0 +1,1669 @@
+!========================================================================屋根基準線
+if dis_base then
+	for i=1 to 2
+		hotspot 0,base_pos[i][2],0,code,base_pos[i][1],1+128:code=code+1
+		hotspot base_pos[i][1],base_pos[i][2],0,code,base_pos[i][1],2:code=code+1
+		hotspot -1,base_pos[i][2],0,code,base_pos[i][1],3:code=code+1
+	
+		hotspot base_pos[i][1],0,0,code,base_pos[i][2],1+128:code=code+1
+		hotspot base_pos[i][1],base_pos[i][2],0,code,base_pos[i][2],2:code=code+1
+		hotspot base_pos[i][1],-1,0,code,base_pos[i][2],3:code=code+1
+	next i
+
+	lin_ base_pos[1][1],base_pos[1][2],0,base_pos[2][1],base_pos[2][2],0
+
+	add (base_pos[1][1]+base_pos[2][1])/2,(base_pos[1][2]+base_pos[2][2])/2,0
+	rotz base_rtz
+		lin_ 0,0,0,0,-0.2*base_dir,0
+		hotspot 0,0,0,code,base_dir,1+128:code=code+1
+		hotspot 0,-0.2*base_dir,0,code,base_dir,2:code=code+1
+		hotspot 0,1,0,code,base_dir,3:code=code+1
+	del 2
+endif
+
+
+
+!========================================================================スラブ
+for i=1 to 4
+	hotspot new_pos[i][1],new_pos[i][2],new_z[i]
+	hotline new_pos[i][1],new_pos[i][2],new_z[i],new_pos[i+1][1],new_pos[i+1][2],new_z[i+1],code
+next i
+
+for i=1 to 4
+	if i=1 then
+		tem_x1=slab_offset[1][1]+slab_offset[4][1]
+		tem_x2=slab_pos[1][1]+slab_offset[1][1]+slab_offset[4][1]
+		tem_x3=-1+slab_offset[1][1]+slab_offset[4][1]
+		tem_y=slab_pos[1][2]+slab_offset[1][2]+slab_offset[4][2]
+
+		hotspot tem_x1,tem_y,(base_a*tem_x1+base_b*tem_y+base_c)*dir_flag*tan(rat),code,slab_pos[1][1],1+128:code=code+1
+		hotspot tem_x2,tem_y,(base_a*tem_x2+base_b*tem_y+base_c)*dir_flag*tan(rat),code,slab_pos[1][1],2:code=code+1
+		hotspot tem_x3,tem_y,(base_a*tem_x3+base_b*tem_y+base_c)*dir_flag*tan(rat),code,slab_pos[1][1],3:code=code+1
+
+		tem_x=slab_pos[1][1]+slab_offset[1][1]+slab_offset[4][1]
+		tem_y1=slab_offset[1][2]+slab_offset[4][2]
+		tem_y2=slab_pos[1][2]+slab_offset[1][2]+slab_offset[4][2]
+		tem_y3=-1+slab_offset[1][2]+slab_offset[4][2]
+	
+		hotspot tem_x,tem_y1,(base_a*tem_x+base_b*tem_y1+base_c)*dir_flag*tan(rat),code,slab_pos[1][2],1+128:code=code+1
+		hotspot tem_x,tem_y2,(base_a*tem_x+base_b*tem_y2+base_c)*dir_flag*tan(rat),code,slab_pos[1][2],2:code=code+1
+		hotspot tem_x,tem_y3,(base_a*tem_x+base_b*tem_y3+base_c)*dir_flag*tan(rat),code,slab_pos[1][2],3:code=code+1
+	else
+		tem_x1=slab_offset[i][1]+slab_offset[i-1][1]
+		tem_x2=slab_pos[i][1]+slab_offset[i][1]+slab_offset[i-1][1]
+		tem_x3=-1+slab_offset[i][1]+slab_offset[i-1][1]
+		tem_y=slab_pos[i][2]+slab_offset[i][2]+slab_offset[i-1][2]
+
+		hotspot tem_x1,tem_y,(base_a*tem_x1+base_b*tem_y+base_c)*dir_flag*tan(rat),code,slab_pos[i][1],1+128:code=code+1
+		hotspot tem_x2,tem_y,(base_a*tem_x2+base_b*tem_y+base_c)*dir_flag*tan(rat),code,slab_pos[i][1],2:code=code+1
+		hotspot tem_x3,tem_y,(base_a*tem_x3+base_b*tem_y+base_c)*dir_flag*tan(rat),code,slab_pos[i][1],3:code=code+1
+
+		tem_x=slab_pos[i][1]+slab_offset[i][1]+slab_offset[i-1][1]
+		tem_y1=slab_offset[i][2]+slab_offset[i-1][2]
+		tem_y2=slab_pos[i][2]+slab_offset[i][2]+slab_offset[i-1][2]
+		tem_y3=-1+slab_offset[i][2]+slab_offset[i-1][2]
+
+		hotspot tem_x,tem_y1,(base_a*tem_x+base_b*tem_y1+base_c)*dir_flag*tan(rat),code,slab_pos[i][2],1+128:code=code+1
+		hotspot tem_x,tem_y2,(base_a*tem_x+base_b*tem_y2+base_c)*dir_flag*tan(rat),code,slab_pos[i][2],2:code=code+1
+		hotspot tem_x,tem_y3,(base_a*tem_x+base_b*tem_y3+base_c)*dir_flag*tan(rat),code,slab_pos[i][2],3:code=code+1
+	endif
+
+	hotspot equ_pos[i][1],equ_pos[i][2],equ_z[i]
+next i
+
+
+if switch_deck_offset=0 then
+	tem_x1=(slab_pos[1][1]+slab_offset[4][1]+slab_pos[2][1]+slab_offset[2][1])/2
+	tem_x2=(slab_pos[1][1]+slab_offset[1][1]+slab_offset[4][1]+slab_pos[2][1]+slab_offset[2][1]+slab_offset[1][1])/2
+	tem_x3=(slab_pos[1][1]-1+slab_offset[4][1]+slab_pos[2][1]+slab_offset[2][1]-1)/2
+	tem_y=(slab_pos[1][2]+slab_offset[1][2]+slab_offset[4][2]+slab_pos[2][2]+slab_offset[2][2]+slab_offset[1][2])/2
+
+	hotspot tem_x1,tem_y,(base_a*tem_x1+base_b*tem_y+base_c)*dir_flag*tan(rat),code,slab_offset[1][1],1+128:code=code+1
+	hotspot tem_x2,tem_y,(base_a*tem_x2+base_b*tem_y+base_c)*dir_flag*tan(rat),code,slab_offset[1][1],2:code=code+1
+	hotspot tem_x3,tem_y,(base_a*tem_x3+base_b*tem_y+base_c)*dir_flag*tan(rat),code,slab_offset[1][1],3:code=code+1
+
+	tem_x=(slab_pos[1][1]+slab_offset[1][1]+slab_offset[4][1]+slab_pos[2][1]+slab_offset[2][1]+slab_offset[1][1])/2
+	tem_y1=(slab_pos[1][2]+slab_offset[4][2]+slab_pos[2][2]+slab_offset[2][2])/2
+	tem_y2=(slab_pos[1][2]+slab_offset[1][2]+slab_offset[4][2]+slab_pos[2][2]+slab_offset[2][2]+slab_offset[1][2])/2
+	tem_y3=(slab_pos[1][2]-1+slab_offset[4][2]+slab_pos[2][2]+slab_offset[2][2]-1)/2
+
+	hotspot tem_x,tem_y1,(base_a*tem_x+base_b*tem_y1+base_c)*dir_flag*tan(rat),code,slab_offset[1][2],1+128:code=code+1
+	hotspot tem_x,tem_y2,(base_a*tem_x+base_b*tem_y2+base_c)*dir_flag*tan(rat),code,slab_offset[1][2],2:code=code+1
+	hotspot tem_x,tem_y3,(base_a*tem_x+base_b*tem_y3+base_c)*dir_flag*tan(rat),code,slab_offset[1][2],3:code=code+1
+	
+	for i=2 to 4
+		tem_x1=(slab_pos[i][1]+slab_offset[i-1][1]+slab_pos[i+1][1]+slab_offset[i+1][1])/2
+		tem_x2=(slab_pos[i][1]+slab_offset[i][1]+slab_offset[i-1][1]+slab_pos[i+1][1]+slab_offset[i+1][1]+slab_offset[i][1])/2
+		tem_x3=(slab_pos[i][1]-1+slab_offset[i-1][1]+slab_pos[i+1][1]+slab_offset[i+1][1]-1)/2
+		tem_y=(slab_pos[i][2]+slab_offset[i][2]+slab_offset[i-1][2]+slab_pos[i+1][2]+slab_offset[i+1][2]+slab_offset[i][2])/2
+
+		hotspot tem_x1,tem_y,(base_a*tem_x1+base_b*tem_y+base_c)*dir_flag*tan(rat),code,slab_offset[i][1],1+128:code=code+1
+		hotspot tem_x2,tem_y,(base_a*tem_x2+base_b*tem_y+base_c)*dir_flag*tan(rat),code,slab_offset[i][1],2:code=code+1
+		hotspot tem_x3,tem_y,(base_a*tem_x3+base_b*tem_y+base_c)*dir_flag*tan(rat),code,slab_offset[i][1],3:code=code+1
+
+		tem_x=(slab_pos[i][1]+slab_offset[i][1]+slab_offset[i-1][1]+slab_pos[i+1][1]+slab_offset[i+1][1]+slab_offset[i][1])/2
+		tem_y1=(slab_pos[i][2]+slab_offset[i-1][2]+slab_pos[i+1][2]+slab_offset[i+1][2])/2
+		tem_y2=(slab_pos[i][2]+slab_offset[i][2]+slab_offset[i-1][2]+slab_pos[i+1][2]+slab_offset[i+1][2]+slab_offset[i][2])/2
+		tem_y3=(slab_pos[i][2]-1+slab_offset[i-1][2]+slab_pos[i+1][2]+slab_offset[i+1][2]-1)/2
+
+		hotspot tem_x,tem_y1,(base_a*tem_x+base_b*tem_y1+base_c)*dir_flag*tan(rat),code,slab_offset[i][2],1+128:code=code+1
+		hotspot tem_x,tem_y2,(base_a*tem_x+base_b*tem_y2+base_c)*dir_flag*tan(rat),code,slab_offset[i][2],2:code=code+1
+		hotspot tem_x,tem_y3,(base_a*tem_x+base_b*tem_y3+base_c)*dir_flag*tan(rat),code,slab_offset[i][2],3:code=code+1
+	next i
+endif
+
+
+!========================================================================柱欠き
+group "column"
+	material m_deck
+
+	if switch_column then
+		for i=1 to 4
+			add equ_pos[i][1]+column_move[i][1]-column_offset[i][1],equ_pos[i][2]+column_move[i][2]-column_offset[i][2],-deck_hei/cos(rat)+minz
+				block max(2*column_offset[i][1],0),max(2*column_offset[i][2],0),2*deck_hei/cos(rat)+(maxz-minz)
+			del 1
+		next i	
+	endif
+endgroup
+
+
+if switch_column then
+	for i=1 to 4
+		hotspot equ_pos[i][1],equ_pos[i][2]+column_move[i][2],(base_a*(equ_pos[i][1])+base_b*(equ_pos[i][2]+column_move[i][2])+base_c)*dir_flag*tan(rat),code,column_move[i][1],1+128:code=code+1
+		hotspot equ_pos[i][1]+column_move[i][1],equ_pos[i][2]+column_move[i][2],(base_a*(equ_pos[i][1]+column_move[i][1])+base_b*(equ_pos[i][2]+column_move[i][2])+base_c)*dir_flag*tan(rat),code,column_move[i][1],2:code=code+1
+		hotspot equ_pos[i][1]-1,equ_pos[i][2]+column_move[i][2],(base_a*(equ_pos[i][1]-1)+base_b*(equ_pos[i][2]+column_move[i][2])+base_c)*dir_flag*tan(rat),code,column_move[i][1],3:code=code+1
+
+		hotspot equ_pos[i][1]+column_move[i][1],equ_pos[i][2],(base_a*(equ_pos[i][1]+column_move[i][1])+base_b*(equ_pos[i][2])+base_c)*dir_flag*tan(rat),code,column_move[i][2],1+128:code=code+1
+		hotspot equ_pos[i][1]+column_move[i][1],equ_pos[i][2]+column_move[i][2],(base_a*(equ_pos[i][1]+column_move[i][1])+base_b*(equ_pos[i][2]+column_move[i][2])+base_c)*dir_flag*tan(rat),code,column_move[i][2],2:code=code+1
+		hotspot equ_pos[i][1]+column_move[i][1],equ_pos[i][2]-1,(base_a*(equ_pos[i][1]+column_move[i][1])+base_b*(equ_pos[i][2]-1)+base_c)*dir_flag*tan(rat),code,column_move[i][2],3:code=code+1
+
+		add equ_pos[i][1]+column_move[i][1],equ_pos[i][2]+column_move[i][2],equ_z[i]
+			lin_ -column_offset[i][1],-column_offset[i][2],0,column_offset[i][1],-column_offset[i][2],0
+			lin_ column_offset[i][1],-column_offset[i][2],0,column_offset[i][1],column_offset[i][2],0
+			lin_ column_offset[i][1],column_offset[i][2],0,-column_offset[i][1],column_offset[i][2],0
+			lin_ -column_offset[i][1],column_offset[i][2],0,-column_offset[i][1],-column_offset[i][2],0
+			
+			!左下角
+			hotspot 0,-column_offset[i][2],0,code,column_offset[i][1],1+128:code=code+1
+			hotspot -column_offset[i][1],-column_offset[i][2],0,code,column_offset[i][1],2:code=code+1
+			hotspot 1,-column_offset[i][2],0,code,column_offset[i][1],3:code=code+1
+			
+			hotspot -column_offset[i][1],0,0,code,column_offset[i][2],1+128:code=code+1
+			hotspot -column_offset[i][1],-column_offset[i][2],0,code,column_offset[i][2],2:code=code+1
+			hotspot -column_offset[i][1],1,0,code,column_offset[i][2],3:code=code+1
+	
+			!右下角
+			hotspot 0,-column_offset[i][2],0,code,column_offset[i][1],1+128:code=code+1
+			hotspot column_offset[i][1],-column_offset[i][2],0,code,column_offset[i][1],2:code=code+1
+			hotspot -1,-column_offset[i][2],0,code,column_offset[i][1],3:code=code+1
+			
+			hotspot column_offset[i][1],0,0,code,column_offset[i][2],1+128:code=code+1
+			hotspot column_offset[i][1],-column_offset[i][2],0,code,column_offset[i][2],2:code=code+1
+			hotspot column_offset[i][1],1,0,code,column_offset[i][2],3:code=code+1
+	
+			!右上角
+			hotspot 0,column_offset[i][2],0,code,column_offset[i][1],1+128:code=code+1
+			hotspot column_offset[i][1],column_offset[i][2],0,code,column_offset[i][1],2:code=code+1
+			hotspot -1,column_offset[i][2],0,code,column_offset[i][1],3:code=code+1
+			
+			hotspot column_offset[i][1],0,0,code,column_offset[i][2],1+128:code=code+1
+			hotspot column_offset[i][1],column_offset[i][2],0,code,column_offset[i][2],2:code=code+1
+			hotspot column_offset[i][1],-1,0,code,column_offset[i][2],3:code=code+1
+	
+			!左上角
+			hotspot 0,column_offset[i][2],0,code,column_offset[i][1],1+128:code=code+1
+			hotspot -column_offset[i][1],column_offset[i][2],0,code,column_offset[i][1],2:code=code+1
+			hotspot 1,column_offset[i][2],0,code,column_offset[i][1],3:code=code+1
+			
+			hotspot -column_offset[i][1],0,0,code,column_offset[i][2],1+128:code=code+1
+			hotspot -column_offset[i][1],column_offset[i][2],0,code,column_offset[i][2],2:code=code+1
+			hotspot -column_offset[i][1],-1,0,code,column_offset[i][2],3:code=code+1
+		del 1
+	next i
+endif
+
+
+!========================================================================梁オフセット
+group "beam"
+	material m_deck
+
+	for i=1 to 4
+		tube 5,4,1+2+16+32+64,
+		-max(beam_offset[i]-cover_offset,0),-deck_hei,0,
+		max(beam_offset[i]-cover_offset,0),-deck_hei,0,
+		max(beam_offset[i]-cover_offset,0),deck_hei,0,
+		-max(beam_offset[i]-cover_offset,0),deck_hei,0,
+		-max(beam_offset[i]-cover_offset,0),-deck_hei,0,
+		2*slab_pos[i][1]-slab_pos[i+1][1],2*slab_pos[i][2]-slab_pos[i+1][2],2*slab_z[i]-slab_z[i+1],0,
+		slab_pos[i][1],slab_pos[i][2],slab_z[i],0,
+		slab_pos[i+1][1],slab_pos[i+1][2],slab_z[i+1],0,
+		2*slab_pos[i+1][1]-slab_pos[i][1],2*slab_pos[i+1][2]-slab_pos[i][2],2*slab_z[i+1]-slab_z[i],0
+	next i
+endgroup
+
+!!梁幅寸法
+!for i=1 to 4
+!	add slab_pos[i][1],slab_pos[i][2],0
+!	rotz slab_rtz[i]
+!		hotspot slab_len[i]/2,0,0,code,beam_offset[i],1+128:code=code+1
+!		hotspot slab_len[i]/2,beam_offset[i],0,code,beam_offset[i],2:code=code+1
+!		hotspot slab_len[i]/2,-1,0,code,beam_offset[i],3:code=code+1
+!	del 2
+!next i
+
+
+!========================================================================サブライン
+group "subline"
+	if top_line then addz deck_thi
+	
+	for i=1 to 4
+		beam_subline_num=int((new_len[i]+0.04)/0.1)
+	
+		for j=1 to beam_subline_num
+			add new_pos[i][1],new_pos[i][2],new_z[i]
+				lin_ 0,0,0,0.06*((new_pos[i+1][1]-new_pos[i][1])/new_len[i]),0.06*((new_pos[i+1][2]-new_pos[i][2])/new_len[i]),0.06*((new_z[i+1]-new_z[i])/new_len[i])
+			del 1
+		add 0.1*((new_pos[i+1][1]-new_pos[i][1])/new_len[i]),0.1*((new_pos[i+1][2]-new_pos[i][2])/new_len[i]),0.1*((new_z[i+1]-new_z[i])/new_len[i])
+		next j
+		del beam_subline_num
+	
+		lin_ equ_pos[i][1],equ_pos[i][2],equ_z[i],equ_pos[i+1][1],equ_pos[i+1][2],equ_z[i+1]
+	next i
+
+	if top_line then del 1
+endgroup
+
+subline_1=subgroup("subline","column")
+subline_2=subgroup(subline_1,"beam")
+
+if dis_line then
+	if top_line then
+		placegroup subline_1
+	else
+		placegroup "subline"
+	endif
+endif
+
+
+!========================================================================スラブ
+!group "slab"
+!	for i=1 to 5
+!		put slab_pos[i][1],slab_pos[i][2],0
+!	next i
+!
+!	extrude 5,0,0,deck_hei,1+2+4+16+32+64,
+!	get(nsp)
+!endgroup
+
+
+group "op"
+	material m_deck
+
+	if op_num>0 then
+		for i=1 to op_num
+			ruledsegmented 5,1+2+4+8+16+32+64,
+			op_pos[i][1],op_pos[i][2],(base_a*(op_pos[i][1])+base_b*(op_pos[i][2])+base_c)*dir_flag*tan(rat)-deck_hei/cos(rat),0,
+			op_pos[i][1]+op_len[i],op_pos[i][2],(base_a*(op_pos[i][1]+op_len[i])+base_b*(op_pos[i][2])+base_c)*dir_flag*tan(rat)-deck_hei/cos(rat),0,
+			op_pos[i][1]+op_len[i],op_pos[i][2]+op_wid[i],(base_a*(op_pos[i][1]+op_len[i])+base_b*(op_pos[i][2]+op_wid[i])+base_c)*dir_flag*tan(rat)-deck_hei/cos(rat),0,
+			op_pos[i][1],op_pos[i][2]+op_wid[i],(base_a*(op_pos[i][1])+base_b*(op_pos[i][2]+op_wid[i])+base_c)*dir_flag*tan(rat)-deck_hei/cos(rat),0,
+			op_pos[i][1],op_pos[i][2],(base_a*(op_pos[i][1])+base_b*(op_pos[i][2])+base_c)*dir_flag*tan(rat)-deck_hei/cos(rat),0,
+			op_pos[i][1],op_pos[i][2],(base_a*(op_pos[i][1])+base_b*(op_pos[i][2])+base_c)*dir_flag*tan(rat)+deck_hei/cos(rat),
+			op_pos[i][1]+op_len[i],op_pos[i][2],(base_a*(op_pos[i][1]+op_len[i])+base_b*(op_pos[i][2])+base_c)*dir_flag*tan(rat)+deck_hei/cos(rat),
+			op_pos[i][1]+op_len[i],op_pos[i][2]+op_wid[i],(base_a*(op_pos[i][1]+op_len[i])+base_b*(op_pos[i][2]+op_wid[i])+base_c)*dir_flag*tan(rat)+deck_hei/cos(rat),
+			op_pos[i][1],op_pos[i][2]+op_wid[i],(base_a*(op_pos[i][1])+base_b*(op_pos[i][2]+op_wid[i])+base_c)*dir_flag*tan(rat)+deck_hei/cos(rat),
+			op_pos[i][1],op_pos[i][2],(base_a*(op_pos[i][1])+base_b*(op_pos[i][2])+base_c)*dir_flag*tan(rat)+deck_hei/cos(rat)
+		next i
+	endif
+endgroup
+
+!slab_1=subgroup("slab","op")
+!slab_2=subgroup(slab_1,"column")
+!slab_3=subgroup(slab_2,"beam")
+
+
+if op_num>0 then
+	for i=1 to op_num
+		hotspot 0,op_pos[i][2],(base_a*(0)+base_b*(op_pos[i][2])+base_c)*dir_flag*tan(rat),code,op_pos[i][1],1+128:code=code+1
+		hotspot op_pos[i][1],op_pos[i][2],(base_a*(op_pos[i][1])+base_b*(op_pos[i][2])+base_c)*dir_flag*tan(rat),code,op_pos[i][1],2:code=code+1
+		hotspot -1,op_pos[i][2],(base_a*(-1)+base_b*(op_pos[i][2])+base_c)*dir_flag*tan(rat),code,op_pos[i][1],3:code=code+1
+
+		hotspot op_pos[i][1],0,(base_a*(op_pos[i][1])+base_b*(0)+base_c)*dir_flag*tan(rat),code,op_pos[i][2],1+128:code=code+1
+		hotspot op_pos[i][1],op_pos[i][2],(base_a*(op_pos[i][1])+base_b*(op_pos[i][2])+base_c)*dir_flag*tan(rat),code,op_pos[i][2],2:code=code+1
+		hotspot op_pos[i][1],-1,(base_a*(op_pos[i][1])+base_b*(-1)+base_c)*dir_flag*tan(rat),code,op_pos[i][2],3:code=code+1
+
+		hotspot op_pos[i][1],op_pos[i][2]+op_wid[i]/2,(base_a*(op_pos[i][1])+base_b*(op_pos[i][2]+op_wid[i]/2)+base_c)*dir_flag*tan(rat),code,op_len[i],1+128:code=code+1
+		hotspot op_pos[i][1]+op_len[i],op_pos[i][2]+op_wid[i]/2,(base_a*(op_pos[i][1]+op_len[i])+base_b*(op_pos[i][2]+op_wid[i]/2)+base_c)*dir_flag*tan(rat),code,op_len[i],2:code=code+1
+		hotspot op_pos[i][1]-1,op_pos[i][2]+op_wid[i]/2,(base_a*(op_pos[i][1]-1)+base_b*(op_pos[i][2]+op_wid[i]/2)+base_c)*dir_flag*tan(rat),code,op_len[i],3:code=code+1
+
+		hotspot op_pos[i][1]+op_len[i]/2,op_pos[i][2],(base_a*(op_pos[i][1]+op_len[i]/2)+base_b*(op_pos[i][2])+base_c)*dir_flag*tan(rat),code,op_wid[i],1+128:code=code+1
+		hotspot op_pos[i][1]+op_len[i]/2,op_pos[i][2]+op_wid[i],(base_a*(op_pos[i][1]+op_len[i]/2)+base_b*(op_pos[i][2]+op_wid[i])+base_c)*dir_flag*tan(rat),code,op_wid[i],2:code=code+1
+		hotspot op_pos[i][1]+op_len[i]/2,op_pos[i][2]-1,(base_a*(op_pos[i][1]+op_len[i]/2)+base_b*(op_pos[i][2]-1)+base_c)*dir_flag*tan(rat),code,op_wid[i],3:code=code+1
+
+		!開口内法寸法点線
+		op_subline_x=int((op_len[i]-2*op_subline+0.02)/0.05)
+		op_subline_z=int((op_wid[i]-2*op_subline+0.02)/0.05)
+
+		if op_subline_x>0 and op_subline_z>0 then
+			add op_pos[i][1]+op_subline,op_pos[i][2]+op_subline,(base_a*(op_pos[i][1]+op_subline)+base_b*(op_pos[i][2]+op_subline)+base_c)*dir_flag*tan(rat)
+		
+				for n=1 to 2
+				
+					for j=1 to op_subline_x
+						lin_ 0,0,0,0.03,0,0.03/(op_len[i]-2*op_subline)*(base_a*(op_len[i]-2*op_subline)*dir_flag*tan(rat))
+					add 0.05,0,0.05/(op_len[i]-2*op_subline)*(base_a*(op_len[i]-2*op_subline)*dir_flag*tan(rat))
+					next j
+					del op_subline_x
+				
+				add 0,op_wid[i]-2*op_subline,base_b*(op_wid[i]-2*op_subline)*dir_flag*tan(rat)
+				next n
+				del 2
+		
+				for n=1 to 2
+				
+					for j=1 to op_subline_z
+						lin_ 0,0,0,0,0.03,0.03/(op_wid[i]-2*op_subline)*(base_b*(op_wid[i]-2*op_subline)*dir_flag*tan(rat))
+					add 0,0.05,0.05/(op_wid[i]-2*op_subline)*(base_b*(op_wid[i]-2*op_subline)*dir_flag*tan(rat))
+					next j
+					del op_subline_z
+				
+				add op_len[i]-2*op_subline,0,base_a*(op_len[i]-2*op_subline)*dir_flag*tan(rat)
+				next n
+				del 2
+		
+			del 1
+		
+			hotspot op_pos[i][1]+op_subline,op_pos[i][2]+op_subline,(base_a*(op_pos[i][1]+op_subline)+base_b*(op_pos[i][2]+op_subline)+base_c)*dir_flag*tan(rat)
+			hotspot op_pos[i][1]+op_len[i]-op_subline,op_pos[i][2]+op_subline,(base_a*(op_pos[i][1]+op_len[i]-op_subline)+base_b*(op_pos[i][2]+op_subline)+base_c)*dir_flag*tan(rat)
+			hotspot op_pos[i][1]+op_subline,op_pos[i][2]+op_wid[i]-op_subline,(base_a*(op_pos[i][1]+op_subline)+base_b*(op_pos[i][2]+op_wid[i]-op_subline)+base_c)*dir_flag*tan(rat)
+			hotspot op_pos[i][1]+op_len[i]-op_subline,op_pos[i][2]+op_wid[i]-op_subline,(base_a*(op_pos[i][1]+op_len[i]-op_subline)+base_b*(op_pos[i][2]+op_wid[i]-op_subline)+base_c)*dir_flag*tan(rat)
+		endif
+	next i
+endif
+
+
+!========================================================================デッキ端部オフセット
+if switch_deck_offset then
+	for i=1 to deck_num1+deck_num2+deck_num3
+		if deck_dir=1 then
+			hotspot deck_pos[i],_deck_start_pos[i],(base_a*(deck_pos[i])+base_b*(_deck_start_pos[i])+base_c)*dir_flag*tan(rat),code,deck_start_offset[i],1+128:code=code+1
+			hotspot deck_pos[i],_deck_start_pos[i]+deck_start_offset[i],(base_a*(deck_pos[i])+base_b*(_deck_start_pos[i]+deck_start_offset[i])+base_c)*dir_flag*tan(rat),code,deck_start_offset[i],2:code=code+1
+			hotspot deck_pos[i],_deck_start_pos[i]-1,(base_a*(deck_pos[i])+base_b*(_deck_start_pos[i]-1)+base_c)*dir_flag*tan(rat),code,deck_start_offset[i],3:code=code+1
+
+			hotspot deck_pos[i],_deck_end_pos[i],(base_a*(deck_pos[i])+base_b*(_deck_end_pos[i])+base_c)*dir_flag*tan(rat),code,deck_end_offset[i],1+128:code=code+1
+			hotspot deck_pos[i],_deck_end_pos[i]+deck_end_offset[i],(base_a*(deck_pos[i])+base_b*(_deck_end_pos[i]+deck_end_offset[i])+base_c)*dir_flag*tan(rat),code,deck_end_offset[i],2:code=code+1
+			hotspot deck_pos[i],_deck_end_pos[i]-1,(base_a*(deck_pos[i])+base_b*(_deck_end_pos[i]-1)+base_c)*dir_flag*tan(rat),code,deck_end_offset[i],3:code=code+1
+		else
+			hotspot _deck_start_pos[i],deck_pos[i],(base_a*(_deck_start_pos[i])+base_b*(deck_pos[i])+base_c)*dir_flag*tan(rat),code,deck_start_offset[i],1+128:code=code+1
+			hotspot _deck_start_pos[i]+deck_start_offset[i],deck_pos[i],(base_a*(_deck_start_pos[i]+deck_start_offset[i])+base_b*(deck_pos[i])+base_c)*dir_flag*tan(rat),code,deck_start_offset[i],2:code=code+1
+			hotspot _deck_start_pos[i]-1,deck_pos[i],(base_a*(_deck_start_pos[i]-1)+base_b*(deck_pos[i])+base_c)*dir_flag*tan(rat),code,deck_start_offset[i],3:code=code+1
+
+			hotspot _deck_end_pos[i],deck_pos[i],(base_a*(_deck_end_pos[i])+base_b*(deck_pos[i])+base_c)*dir_flag*tan(rat),code,deck_end_offset[i],1+128:code=code+1
+			hotspot _deck_end_pos[i]+deck_end_offset[i],deck_pos[i],(base_a*(_deck_end_pos[i]+deck_end_offset[i])+base_b*(deck_pos[i])+base_c)*dir_flag*tan(rat),code,deck_end_offset[i],2:code=code+1
+			hotspot _deck_end_pos[i]-1,deck_pos[i],(base_a*(_deck_end_pos[i]-1)+base_b*(deck_pos[i])+base_c)*dir_flag*tan(rat),code,deck_end_offset[i],3:code=code+1
+		endif
+	next i
+endif
+
+for i=1 to deck_num1+deck_num2+deck_num3
+	if deck_dir=1 then
+		hotspot deck_pos[i]-deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i],(base_a*(deck_pos[i]-deck_wid[i]/2)+base_b*(_deck_start_pos[i]+deck_start_offset[i])+base_c)*dir_flag*tan(rat)
+		hotspot deck_pos[i]+deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i],(base_a*(deck_pos[i]+deck_wid[i]/2)+base_b*(_deck_start_pos[i]+deck_start_offset[i])+base_c)*dir_flag*tan(rat)
+		hotspot deck_pos[i]-deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i],(base_a*(deck_pos[i]-deck_wid[i]/2)+base_b*(_deck_end_pos[i]+deck_end_offset[i])+base_c)*dir_flag*tan(rat)
+		hotspot deck_pos[i]+deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i],(base_a*(deck_pos[i]+deck_wid[i]/2)+base_b*(_deck_end_pos[i]+deck_end_offset[i])+base_c)*dir_flag*tan(rat)
+	else
+		hotspot _deck_start_pos[i]+deck_start_offset[i],deck_pos[i]-deck_wid[i]/2,(base_a*(_deck_start_pos[i]+deck_start_offset[i])+base_b*(deck_pos[i]-deck_wid[i]/2)+base_c)*dir_flag*tan(rat)
+		hotspot _deck_start_pos[i]+deck_start_offset[i],deck_pos[i]+deck_wid[i]/2,(base_a*(_deck_start_pos[i]+deck_start_offset[i])+base_b*(deck_pos[i]+deck_wid[i]/2)+base_c)*dir_flag*tan(rat)
+		hotspot _deck_end_pos[i]+deck_end_offset[i],deck_pos[i]-deck_wid[i]/2,(base_a*(_deck_end_pos[i]+deck_end_offset[i])+base_b*(deck_pos[i]-deck_wid[i]/2)+base_c)*dir_flag*tan(rat)
+		hotspot _deck_end_pos[i]+deck_end_offset[i],deck_pos[i]+deck_wid[i]/2,(base_a*(_deck_end_pos[i]+deck_end_offset[i])+base_b*(deck_pos[i]+deck_wid[i]/2)+base_c)*dir_flag*tan(rat)
+	endif
+next i
+
+
+!========================================================================デッキ
+if rtz=0 or rtz=180 then
+	mul_x=1
+	mul_y=1/cos(rat)
+else
+	mul_x=1/cos(rat)
+	mul_y=1
+endif
+
+if deck_dir=1 then
+	!デッキプレート終点
+	for i=1 to deck_num1+deck_num2+deck_num3
+		_deck_end_pos[i]=_deck_start_pos[i]+(_deck_end_pos[i]-_deck_start_pos[i])*mul_y
+	next i
+
+	!デッキプレート幅
+	for i=1 to deck_num1+deck_num2+deck_num3
+		deck_wid[i]=deck_wid[i]*mul_x
+	next i
+
+	!デッキプレート位置
+	for i=1 to deck_num1+deck_num2+deck_num3
+		deck_pos[i]=start_pos+(deck_pos[i]-start_pos)*mul_x
+	next i
+else
+	!デッキプレート終点
+	for i=1 to deck_num1+deck_num2+deck_num3
+		_deck_end_pos[i]=_deck_start_pos[i]+(_deck_end_pos[i]-_deck_start_pos[i])*mul_x
+	next i
+
+	!デッキプレート幅
+	for i=1 to deck_num1+deck_num2+deck_num3
+		deck_wid[i]=deck_wid[i]*mul_y
+	next i
+
+	!デッキプレート位置
+	for i=1 to deck_num1+deck_num2+deck_num3
+		deck_pos[i]=start_pos+(deck_pos[i]-start_pos)*mul_y
+	next i
+endif
+
+
+!========================================================================QLデッキ
+if deck_type=1 or deck_type=3 then
+group "ql_deck_body"
+	material m_deck
+
+	if mode_3d=2 then
+		if deck_dir=1 then
+			for i=1 to deck_num1+deck_num2+deck_num3
+				add deck_pos[i],0,0
+					if i<=deck_num1 then
+						gosub "二山"
+					else
+						if i<=deck_num1+deck_num2 then
+							gosub "一山"
+						else
+							gosub "調整板"
+						endif
+					endif
+	
+					tube point_num,4,1+2+16+32+64,
+					get(point_num*3),
+					0,2*(_deck_start_pos[i]+deck_start_offset[i])-(_deck_end_pos[i]+deck_end_offset[i]),0,0,
+					0,_deck_start_pos[i]+deck_start_offset[i],0,0,
+					0,_deck_end_pos[i]+deck_end_offset[i],0,0,
+					0,2*(_deck_end_pos[i]+deck_end_offset[i])-(_deck_start_pos[i]+deck_start_offset[i]),0,0
+				del 1
+			next i
+		else
+			for i=1 to deck_num1+deck_num2+deck_num3
+				add 0,deck_pos[i],0
+					if i<=deck_num1 then
+						gosub "二山"
+					else
+						if i<=deck_num1+deck_num2 then
+							gosub "一山"
+						else
+							gosub "調整板"
+						endif
+					endif
+	
+					tube point_num,4,1+2+16+32+64,
+					get(point_num*3),
+					2*(_deck_start_pos[i]+deck_start_offset[i])-(_deck_end_pos[i]+deck_end_offset[i]),0,0,0,
+					_deck_start_pos[i]+deck_start_offset[i],0,0,0,
+					_deck_end_pos[i]+deck_end_offset[i],0,0,0,
+					2*(_deck_end_pos[i]+deck_end_offset[i])-(_deck_start_pos[i]+deck_start_offset[i]),0,0,0
+				del 1
+			next i
+		endif
+	else
+		if deck_dir=1 then
+			for i=1 to deck_totnum
+				if i>1 and deck_wid[i]<>deck_unit then offset_z=offset_z+deck_thi
+
+				add deck_pos[i]-deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i],offset_z
+					block deck_wid[i],(_deck_end_pos[i]+deck_end_offset[i])-(_deck_start_pos[i]+deck_start_offset[i]),deck_thi
+				del 1
+			next i
+		else
+			for i=1 to deck_totnum
+				if i>1 and deck_wid[i]<>deck_unit then offset_z=offset_z+deck_thi
+
+				add _deck_start_pos[i]+deck_start_offset[i],deck_pos[i]-deck_wid[i]/2,offset_z
+					block (_deck_end_pos[i]+deck_end_offset[i])-(_deck_start_pos[i]+deck_start_offset[i]),deck_wid[i],deck_thi
+				del 1
+			next i
+		endif
+	endif
+endgroup
+
+
+!エンドクローズ
+group "ql_deck_edge_minus"
+	material m_deck
+
+	if mode_3d=2 then
+		if deck_dir=1 then
+			for i=1 to deck_num1+deck_num2+deck_num3
+				add deck_pos[i],0,0
+					if edge_type1=1 then
+						ruledsegmented 5,1+2+4+16+32+64,
+						-deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i],deck_thi,0,
+						-deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i],deck_hei,0,
+						-deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid,deck_hei,0,
+						-deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i]+cover_offset,deck_thi,-1,
+						-deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i],deck_thi,-1,
+						deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i],deck_thi,
+						deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i],deck_hei,
+						deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid,deck_hei,
+						deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i]+cover_offset,deck_thi,
+						deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i],deck_thi
+					endif
+
+					if edge_type2=1 then
+						ruledsegmented 5,1+2+4+16+32+64,
+						-deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i],deck_thi,0,
+						-deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i],deck_hei,0,
+						-deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid,deck_hei,0,
+						-deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i]-cover_offset,deck_thi,0,
+						-deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i],deck_thi,-1,
+						deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i],deck_thi,
+						deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i],deck_hei,
+						deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid,deck_hei,
+						deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i]-cover_offset,deck_thi,
+						deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i],deck_thi
+					endif
+				del 1
+			next i
+		else
+			for i=1 to deck_num1+deck_num2+deck_num3
+				add 0,deck_pos[i],0
+					if edge_type1=1 then
+						ruledsegmented 5,1+2+4+16+32+64,
+						_deck_start_pos[i]+deck_start_offset[i],-deck_wid[i]/2,deck_thi,0,
+						_deck_start_pos[i]+deck_start_offset[i],-deck_wid[i]/2,deck_hei,0,
+						_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid,-deck_wid[i]/2,deck_hei,0,
+						_deck_start_pos[i]+deck_start_offset[i]+cover_offset,-deck_wid[i]/2,deck_thi,-1,
+						_deck_start_pos[i]+deck_start_offset[i],-deck_wid[i]/2,deck_thi,-1,
+						_deck_start_pos[i]+deck_start_offset[i],deck_wid[i]/2,deck_thi,
+						_deck_start_pos[i]+deck_start_offset[i],deck_wid[i]/2,deck_hei,
+						_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid,deck_wid[i]/2,deck_hei,
+						_deck_start_pos[i]+deck_start_offset[i]+cover_offset,deck_wid[i]/2,deck_thi,
+						_deck_start_pos[i]+deck_start_offset[i],deck_wid[i]/2,deck_thi
+					endif
+
+					if edge_type2=1 then
+						ruledsegmented 5,1+2+4+16+32+64,
+						_deck_end_pos[i]+deck_end_offset[i],-deck_wid[i]/2,deck_thi,0,
+						_deck_end_pos[i]+deck_end_offset[i],-deck_wid[i]/2,deck_hei,0,
+						_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid,-deck_wid[i]/2,deck_hei,0,
+						_deck_end_pos[i]+deck_end_offset[i]-cover_offset,-deck_wid[i]/2,deck_thi,-1,
+						_deck_end_pos[i]+deck_end_offset[i],-deck_wid[i]/2,deck_thi,-1,
+						_deck_end_pos[i]+deck_end_offset[i],deck_wid[i]/2,deck_thi,
+						_deck_end_pos[i]+deck_end_offset[i],deck_wid[i]/2,deck_hei,
+						_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid,deck_wid[i]/2,deck_hei,
+						_deck_end_pos[i]+deck_end_offset[i]-cover_offset,deck_wid[i]/2,deck_thi,
+						_deck_end_pos[i]+deck_end_offset[i],deck_wid[i]/2,deck_thi
+					endif
+				del 1
+			next i
+		endif
+	endif
+endgroup
+
+
+group "ql_deck_edge_1"
+	material m_deck
+
+	if deck_dir=1 then
+		for i=1 to deck_num1+deck_num2+deck_num3
+			add deck_pos[i],0,0
+				if edge_type1=1 then
+					ruledsegmented 7,1+2+4+16+32+64,
+					-deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i]+cover_offset,deck_thi,0,
+					-deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid,deck_hei,0,
+					-deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid+deck_thi/sin(atn(deck_hei/deck_edge_wid)),deck_hei,0,
+					-deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i]+cover_offset,0,0,
+					-deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i],0,0,
+					-deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i],deck_thi,0,
+					-deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i]+cover_offset,deck_thi,-1,
+					deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i]+cover_offset,deck_thi,
+					deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid,deck_hei,
+					deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid+deck_thi/sin(atn(deck_hei/deck_edge_wid)),deck_hei,
+					deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i]+cover_offset,0,
+					deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i],0,
+					deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i],deck_thi,
+					deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i]+cover_offset,deck_thi
+				endif
+
+				if edge_type2=1 then
+					ruledsegmented 7,1+2+4+16+32+64,
+					-deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i]-cover_offset,deck_thi,0,
+					-deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid,deck_hei,0,
+					-deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid-deck_thi/sin(atn(deck_hei/deck_edge_wid)),deck_hei,0,
+					-deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i]-cover_offset,0,0,
+					-deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i],0,0,
+					-deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i],deck_thi,0,
+					-deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i]-cover_offset,deck_thi,-1,
+					deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i]-cover_offset,deck_thi,
+					deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid,deck_hei,
+					deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid-deck_thi/sin(atn(deck_hei/deck_edge_wid)),deck_hei,
+					deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i]-cover_offset,0,
+					deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i],0,
+					deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i],deck_thi,
+					deck_wid[i]/2,_deck_end_pos[i]+deck_end_offset[i]-cover_offset,deck_thi
+				endif
+			del 1
+		next i
+	else
+		for i=1 to deck_num1+deck_num2+deck_num3
+			add 0,deck_pos[i],0
+				if edge_type1=1 then
+					ruledsegmented 7,1+2+4+16+32+64,
+					_deck_start_pos[i]+deck_start_offset[i]+cover_offset,-deck_wid[i]/2,deck_thi,0,
+					_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid,-deck_wid[i]/2,deck_hei,0,
+					_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid+deck_thi/sin(atn(deck_hei/deck_edge_wid)),-deck_wid[i]/2,deck_hei,0,
+					_deck_start_pos[i]+deck_start_offset[i]+cover_offset,-deck_wid[i]/2,0,0,
+					_deck_start_pos[i]+deck_start_offset[i],-deck_wid[i]/2,0,0,
+					_deck_start_pos[i]+deck_start_offset[i],-deck_wid[i]/2,deck_thi,0,
+					_deck_start_pos[i]+deck_start_offset[i]+cover_offset,-deck_wid[i]/2,deck_thi,-1,
+					_deck_start_pos[i]+deck_start_offset[i]+cover_offset,deck_wid[i]/2,deck_thi,
+					_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid,deck_wid[i]/2,deck_hei,
+					_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid+deck_thi/sin(atn(deck_hei/deck_edge_wid)),deck_wid[i]/2,deck_hei,
+					_deck_start_pos[i]+deck_start_offset[i]+cover_offset,deck_wid[i]/2,0,
+					_deck_start_pos[i]+deck_start_offset[i],deck_wid[i]/2,0,
+					_deck_start_pos[i]+deck_start_offset[i],deck_wid[i]/2,deck_thi,
+					_deck_start_pos[i]+deck_start_offset[i]+cover_offset,deck_wid[i]/2,deck_thi
+				endif
+
+				if edge_type2=1 then
+					ruledsegmented 7,1+2+4+16+32+64,
+					_deck_end_pos[i]+deck_end_offset[i]-cover_offset,-deck_wid[i]/2,deck_thi,0,
+					_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid,-deck_wid[i]/2,deck_hei,0,
+					_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid-deck_thi/sin(atn(deck_hei/deck_edge_wid)),-deck_wid[i]/2,deck_hei,0,
+					_deck_end_pos[i]+deck_end_offset[i]-cover_offset,-deck_wid[i]/2,0,0,
+					_deck_end_pos[i]+deck_end_offset[i],-deck_wid[i]/2,0,0,
+					_deck_end_pos[i]+deck_end_offset[i],-deck_wid[i]/2,deck_thi,0,
+					_deck_end_pos[i]+deck_end_offset[i]-cover_offset,-deck_wid[i]/2,deck_thi,-1,
+					_deck_end_pos[i]+deck_end_offset[i]-cover_offset,deck_wid[i]/2,deck_thi,
+					_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid,deck_wid[i]/2,deck_hei,
+					_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid-deck_thi/sin(atn(deck_hei/deck_edge_wid)),deck_wid[i]/2,deck_hei,
+					_deck_end_pos[i]+deck_end_offset[i]-cover_offset,deck_wid[i]/2,0,
+					_deck_end_pos[i]+deck_end_offset[i],deck_wid[i]/2,0,
+					_deck_end_pos[i]+deck_end_offset[i],deck_wid[i]/2,deck_thi,
+					_deck_end_pos[i]+deck_end_offset[i]-cover_offset,deck_wid[i]/2,deck_thi
+				endif
+			del 1
+		next i
+	endif
+endgroup
+
+
+group "ql_deck_edge_2"
+	material m_deck
+	
+	if deck_dir=1 then
+		for i=1 to deck_num1+deck_num2+deck_num3
+			add deck_pos[i],0,0
+				if i<=deck_num1 then
+					gosub "二山2"
+				else
+					if i<=deck_num1+deck_num2 then
+						gosub "一山2"
+					else
+						gosub "調整板"
+					endif
+				endif
+
+				tube point_num,4,1+2+16+32+64,
+				get(point_num*3),
+				0,2*(_deck_end_pos[i]+deck_end_offset[i])-(_deck_start_pos[i]+deck_start_offset[i]),0,0,
+				0,_deck_end_pos[i]+deck_end_offset[i],0,0,
+				0,_deck_start_pos[i]+deck_start_offset[i],0,0,
+				0,2*(_deck_start_pos[i]+deck_start_offset[i])-(_deck_end_pos[i]+deck_end_offset[i]),0,0
+			del 1
+		next i
+	else
+		for i=1 to deck_num1+deck_num2+deck_num3
+			add 0,deck_pos[i],0
+				if i<=deck_num1 then
+					gosub "二山2"
+				else
+					if i<=deck_num1+deck_num2 then
+						gosub "一山2"
+					else
+						gosub "調整板"
+					endif
+				endif
+
+				tube point_num,4,1+2+16+32+64,
+				get(point_num*3),
+				2*(_deck_start_pos[i]+deck_start_offset[i])-(_deck_end_pos[i]+deck_end_offset[i]),0,0,0,
+				_deck_start_pos[i]+deck_start_offset[i],0,0,0,
+				_deck_end_pos[i]+deck_end_offset[i],0,0,0,
+				2*(_deck_end_pos[i]+deck_end_offset[i])-(_deck_start_pos[i]+deck_start_offset[i]),0,0,0
+			del 1
+		next i
+	endif
+endgroup
+
+
+group "ql_deck_edge"
+	if mode_3d=2 then
+		placegroup isectgroup("ql_deck_edge_1","ql_deck_edge_2")
+	endif
+endgroup
+
+
+ql_deck_1=subgroup("ql_deck_body","ql_deck_edge_minus")
+ql_deck_2=addgroup(ql_deck_1,"ql_deck_edge")
+
+endif
+
+
+!========================================================================JFデッキ
+if deck_type=2 then
+offset_z=0
+
+group "jf_deck_body"
+	material m_deck
+	
+	if mode_3d=2 then
+		if deck_dir=1 then
+			for i=1 to deck_num1+deck_num2+deck_num3
+				add 0,_deck_end_pos[i]+deck_end_offset[i],0
+				muly -1
+				roty 90
+					cutpoly 4,
+					0,0,
+					0,deck_edge_wid/3,
+					deck_hei-deck_thi,deck_edge_wid,
+					deck_hei-deck_thi,0,
+					0,0,deck_wid[i]
+				del 3
+					add 0,_deck_start_pos[i]+deck_start_offset[i],0
+					roty 90
+						cutpoly 4,
+						0,0,
+						0,deck_edge_wid/3,
+						deck_hei-deck_thi,deck_edge_wid,
+						deck_hei-deck_thi,0,
+						0,0,deck_wid[i]
+					del 2
+		
+						if i>1 and deck_wid[i]<>deck_unit then offset_z=offset_z+deck_thi
+
+						add deck_pos[i],0,deck_thi+offset_z
+							if product_num<=27 then
+								if deck_order[i]=1 then gosub "標準"
+								if deck_order[i]=2 then gosub "A0"
+								if deck_order[i]=3 then gosub "B0"
+								if deck_order[i]=4 then gosub "C0"
+								if deck_order[i]=5 then gosub "D0"
+								if deck_order[i]=6 then gosub "調整プレート"
+							else
+								if deck_order[i]=1 then gosub "標準"
+								if deck_order[i]=2 then gosub "S"
+								if deck_order[i]=3 then gosub "S1"
+								if deck_order[i]=6 then gosub "調整プレート"
+							endif
+			
+							if deck_start=2 then mulx -1
+								tube point_num,4,1+2+16+32+64,
+								get(point_num*3),
+								0,2*(_deck_end_pos[i]+deck_end_offset[i])-(_deck_start_pos[i]+deck_start_offset[i]),0,0,
+								0,_deck_end_pos[i]+deck_end_offset[i],0,0,
+								0,_deck_start_pos[i]+deck_start_offset[i],0,0,
+								0,2*(_deck_start_pos[i]+deck_start_offset[i])-(_deck_end_pos[i]+deck_end_offset[i]),0,0
+							if deck_start=2 then del 1
+						del 1
+					cutend
+				cutend
+			next i
+		else
+			for i=1 to deck_num1+deck_num2+deck_num3
+				add _deck_end_pos[i]+deck_end_offset[i],0,0
+				mulx -1
+				rotx 90					
+					cutpoly 4,
+					0,0,
+					deck_edge_wid/3,0,
+					deck_edge_wid,-(deck_hei-deck_thi),
+					0,-(deck_hei-deck_thi),
+					0,0,deck_wid[i]
+				del 3
+					add _deck_start_pos[i]+deck_start_offset[i],0,0
+					rotx 90					
+						cutpoly 4,
+						0,0,
+						deck_edge_wid/3,0,
+						deck_edge_wid,-(deck_hei-deck_thi),
+						0,-(deck_hei-deck_thi),
+						0,0,deck_wid[i]
+					del 2
+
+						if i>1 and deck_wid[i]<>deck_unit then offset_z=offset_z+deck_thi
+
+						add 0,deck_pos[i],deck_thi+offset_z
+							if product_num<=27 then
+								if deck_order[i]=1 then gosub "標準"
+								if deck_order[i]=2 then gosub "A0"
+								if deck_order[i]=3 then gosub "B0"
+								if deck_order[i]=4 then gosub "C0"
+								if deck_order[i]=5 then gosub "D0"
+								if deck_order[i]=6 then gosub "調整プレート"
+							else
+								if deck_order[i]=1 then gosub "標準"
+								if deck_order[i]=2 then gosub "S"
+								if deck_order[i]=3 then gosub "S1"
+								if deck_order[i]=6 then gosub "調整プレート"
+							endif
+			
+							if deck_start=2 then muly -1
+								tube point_num,4,1+2+16+32+64,
+								get(point_num*3),
+								2*(_deck_start_pos[i]+deck_start_offset[i])-(_deck_end_pos[i]+deck_end_offset[i]),0,0,0,
+								_deck_start_pos[i]+deck_start_offset[i],0,0,0,
+								_deck_end_pos[i]+deck_end_offset[i],0,0,0,
+								2*(_deck_end_pos[i]+deck_end_offset[i])-(_deck_start_pos[i]+deck_start_offset[i]),0,0,0
+							if deck_start=2 then del 1
+						del 1
+					cutend
+				cutend
+			next i
+		endif
+	else
+		if deck_dir=1 then
+			for i=1 to deck_totnum
+				if i>1 and deck_wid[i]<>deck_unit then offset_z=offset_z+deck_thi
+
+				add deck_pos[i]-deck_wid[i]/2,_deck_start_pos[i]+deck_start_offset[i],offset_z
+					block deck_wid[i],(_deck_end_pos[i]+deck_end_offset[i])-(_deck_start_pos[i]+deck_start_offset[i]),deck_thi
+				del 1
+			next i
+		else
+			for i=1 to deck_totnum
+				if i>1 and deck_wid[i]<>deck_unit then offset_z=offset_z+deck_thi
+
+				add _deck_start_pos[i]+deck_start_offset[i],deck_pos[i]-deck_wid[i]/2,offset_z
+					block (_deck_end_pos[i]+deck_end_offset[i])-(_deck_start_pos[i]+deck_start_offset[i]),deck_wid[i],deck_thi
+				del 1
+			next i
+		endif
+	endif
+endgroup
+
+
+group "jf_deck_edge"
+	material m_deck
+	
+	offset_z=0
+
+	if mode_3d=2 then
+		if deck_dir=1 then
+			for i=1 to deck_num1+deck_num2+deck_num3
+				if i>1 and deck_wid[i]<>deck_unit then offset_z=offset_z+deck_thi
+
+				if i<=deck_num1+deck_num2 then
+					add deck_pos[i],0,deck_thi+offset_z
+						if deck_start=2 then mulx -1
+							gosub "標準端部"
+						if deck_start=2 then del 1
+					del 1
+				endif
+			next i
+		else
+			for i=1 to deck_num1+deck_num2+deck_num3
+				if i>1 and deck_wid[i]<>deck_unit then offset_z=offset_z+deck_thi
+
+				if i<=deck_num1+deck_num2 then
+					add 0,deck_pos[i],deck_thi+offset_z
+						if deck_start=2 then muly -1
+							mulx -1
+							rotz 90
+								gosub "標準端部"
+							del 2
+						if deck_start=2 then del 1
+					del 1
+				endif
+			next i
+		endif
+	endif
+endgroup
+
+jf_deck_1=addgroup("jf_deck_body","jf_deck_edge")
+
+endif
+
+
+!デッキ
+group "deck_body"
+	add minx,miny,(base_a*minx+base_b*miny+base_c)*dir_flag*tan(rat)
+	if rtz=0 or rtz=180 then
+		rotx -rat*dir_flag
+	else
+		roty rat*dir_flag
+	endif
+	add -minx,-miny,0
+		!デッキ
+		if deck_type=1 or deck_type=3 then
+			placegroup ql_deck_2
+		else
+			placegroup jf_deck_1
+		endif
+	del 3
+endgroup
+
+group "hypo_cut"
+	if hypo_cut then
+		for i=1 to 5
+			put equ_pos[i][x],equ_pos[i][y],0
+		next i
+
+		addz -deck_thi-deck_hei
+			extrude 5,0,0,2*deck_thi+2*deck_hei,1+2+4+8+16+32,
+			get(nsp)
+		del 1
+	endif
+endgroup
+
+deck_body_1=subgroup("deck_body","column")
+deck_body_2=subgroup(deck_body_1,"op")
+deck_body_3=isectgroup(deck_body_2,"hypo_cut")
+
+if dis_deck then
+	if hypo_cut then
+		placegroup deck_body_3
+	else
+		placegroup deck_body_2
+	endif
+endif
+
+
+!========================================================================ひび割れ拡大防止筋
+group "ref_steel"
+	material m_ref
+	pen pen_ref
+
+	if (deck_type=1 or deck_type=3) and switch_ref then
+		if ref_ver_num>0 then
+			for i=1 to ref_ver_num
+				if mode_3d=2 then
+					tube_r=ref_d/2
+					gosub "鉄筋断面計算sub"
+				
+					put 2*ref_ver_coor[i][1]-ref_ver_coor[i][4],2*ref_ver_coor[i][2]-ref_ver_coor[i][5],2*ref_ver_coor[i][3]-ref_ver_coor[i][6],0
+					put ref_ver_coor[i][1],ref_ver_coor[i][2],ref_ver_coor[i][3],0
+					put ref_ver_coor[i][4],ref_ver_coor[i][5],ref_ver_coor[i][6],0
+					put 2*ref_ver_coor[i][4]-ref_ver_coor[i][1],2*ref_ver_coor[i][5]-ref_ver_coor[i][2],2*ref_ver_coor[i][6]-ref_ver_coor[i][3],0
+				
+					tube SDresol+1,4,1+2+16+32+64,
+					get ((SDresol+1)*3),
+					get(4*4)
+				else
+					lin_ ref_ver_coor[i][1],ref_ver_coor[i][2],ref_ver_coor[i][3],ref_ver_coor[i][4],ref_ver_coor[i][5],ref_ver_coor[i][6]
+				endif
+			next i
+		endif
+	
+		if ref_hor_num>0 then
+			for i=1 to ref_hor_num
+				if mode_3d=2 then
+					tube_r=ref_d/2
+					gosub "鉄筋断面計算sub"
+	
+					put 2*ref_hor_coor[i][1]-ref_hor_coor[i][4],2*ref_hor_coor[i][2]-ref_hor_coor[i][5],2*ref_hor_coor[i][3]-ref_hor_coor[i][6],0
+					put ref_hor_coor[i][1],ref_hor_coor[i][2],ref_hor_coor[i][3],0
+					put ref_hor_coor[i][4],ref_hor_coor[i][5],ref_hor_coor[i][6],0
+					put 2*ref_hor_coor[i][4]-ref_hor_coor[i][1],2*ref_hor_coor[i][5]-ref_hor_coor[i][2],2*ref_hor_coor[i][6]-ref_hor_coor[i][3],0
+				
+					tube SDresol+1,4,1+2+16+32+64,
+					get ((SDresol+1)*3),
+					get(4*4)
+				else
+					lin_ ref_hor_coor[i][1],ref_hor_coor[i][2],ref_hor_coor[i][3],ref_hor_coor[i][4],ref_hor_coor[i][5],ref_hor_coor[i][6]
+				endif
+			next i
+		endif
+	endif
+endgroup
+
+if (deck_type=1 or deck_type=3) and switch_ref then
+	placegroup "ref_steel"
+endif
+
+
+!========================================================================耐火補強筋
+group "fire_steel"
+	material m_fire
+	pen pen_fire
+
+	if (deck_type=1 or deck_type=3) and switch_fire then
+		if fire_num>0 then
+			for i=1 to fire_num
+				if mode_3d=2 then
+					tube_r=fire_d/1000/2
+					gosub "鉄筋断面計算sub"
+				
+					put 2*fire_coor[i][1]-fire_coor[i][4],2*fire_coor[i][2]-fire_coor[i][5],2*fire_coor[i][3]-fire_coor[i][6],0
+					put fire_coor[i][1],fire_coor[i][2],fire_coor[i][3],0
+					put fire_coor[i][4],fire_coor[i][5],fire_coor[i][6],0
+					put 2*fire_coor[i][4]-fire_coor[i][1],2*fire_coor[i][5]-fire_coor[i][2],2*fire_coor[i][6]-fire_coor[i][3],0
+				
+					tube SDresol+1,4,1+2+16+32+64,
+					get ((SDresol+1)*3),
+					get(4*4)
+				else
+					lin_ fire_coor[i][1],fire_coor[i][2],fire_coor[i][3],fire_coor[i][4],fire_coor[i][5],fire_coor[i][6]
+				endif
+			next i
+		endif
+	endif
+endgroup
+
+if (deck_type=1 or deck_type=3) and switch_fire then
+	placegroup "fire_steel"
+endif
+
+
+!========================================================================支保工
+group "sleeper"
+	material m_sle
+
+	if deck_type=2 and switch_sup then
+		for i=1 to sle_num
+			put 2*sle_coor[i][1]-sle_coor[i][4],2*sle_coor[i][2]-sle_coor[i][5],2*sle_coor[i][3]-sle_coor[i][6],0
+			put sle_coor[i][1],sle_coor[i][2],sle_coor[i][3],0
+			put sle_coor[i][4],sle_coor[i][5],sle_coor[i][6],0
+			put 2*sle_coor[i][4]-sle_coor[i][1],2*sle_coor[i][5]-sle_coor[i][2],2*sle_coor[i][6]-sle_coor[i][3],0
+		
+			tube 5,4,1+2+16+32+64,
+			-sle_x/2,0,0,
+			sle_x/2,0,0,
+			sle_x/2,-sle_y,0,
+			-sle_x/2,-sle_y,0,
+			-sle_x/2,0,0,
+			get(4*4)
+		next i
+	endif
+endgroup
+
+group "support"
+	material m_sup
+
+	if deck_type=2 and switch_sup then
+		for i=1 to sup_num
+			add sup_coor[i][1],sup_coor[i][2],-deck_hei+deck_thi-sup_hei+(base_a*(sup_coor[i][1])+base_b*(sup_coor[i][2])+base_c)*dir_flag*tan(rat)
+				add -sle_x/2,-sle_x/2,0
+					block sle_x,sle_x,sup_thi
+				del 1
+
+				addz sup_thi
+					cylind sup_hei-2*sup_thi-sle_y,sup_d/2
+				del 1
+
+				add -sle_x/2,-sle_x/2,sup_hei-sup_thi-sle_y
+					block sle_x,sle_x,sup_thi
+				del 1
+			del 1
+		next i
+	endif
+endgroup
+
+if deck_type=2 and switch_sup then
+	placegroup "sleeper"
+	placegroup "support"
+
+	for i=1 to sup_num
+		hotspot sup_coor[i][1],sup_coor[i][2],-deck_hei+deck_thi+(base_a*(sup_coor[i][1])+base_b*(sup_coor[i][2])+base_c)*dir_flag*tan(rat),code,sup_hei,1+128:code=code+1
+		hotspot sup_coor[i][1],sup_coor[i][2],-deck_hei+deck_thi-sup_hei+(base_a*(sup_coor[i][1])+base_b*(sup_coor[i][2])+base_c)*dir_flag*tan(rat),code,sup_hei,2:code=code+1
+		hotspot sup_coor[i][1],sup_coor[i][2],-deck_hei+deck_thi+1+(base_a*(sup_coor[i][1])+base_b*(sup_coor[i][2])+base_c)*dir_flag*tan(rat),code,sup_hei,3:code=code+1
+	next i
+endif
+
+
+!========================================================================デッキ分割線
+group "parting_line"
+	pen pen_line
+
+	offset_z=0
+
+	add minx,miny,(base_a*minx+base_b*miny+base_c)*dir_flag*tan(rat)
+	if rtz=0 or rtz=180 then
+		rotx -rat*dir_flag
+	else
+		roty rat*dir_flag
+	endif
+	add -minx,-miny,0
+		if deck_dir=1 then
+			for i=1 to deck_totnum
+				if deck_type=2 and i>1 and deck_wid[i]<>deck_unit then offset_z=offset_z+deck_thi
+				addz offset_z
+					lin_ deck_pos[i]-deck_wid[i]/2,_deck_start_pos[i],deck_thi,deck_pos[i]-deck_wid[i]/2,_deck_end_pos[i],deck_thi
+					lin_ deck_pos[i]+deck_wid[i]/2,_deck_start_pos[i],deck_thi,deck_pos[i]+deck_wid[i]/2,_deck_end_pos[i],deck_thi
+				del 1
+			next i
+		else
+			for i=1 to deck_totnum
+				if deck_type=2 and i>1 and deck_wid[i]<>deck_unit then offset_z=offset_z+deck_thi
+				addz offset_z
+					lin_ _deck_start_pos[i],deck_pos[i]-deck_wid[i]/2,deck_thi,_deck_end_pos[i],deck_pos[i]-deck_wid[i]/2,deck_thi
+					lin_ _deck_start_pos[i],deck_pos[i]+deck_wid[i]/2,deck_thi,_deck_end_pos[i],deck_pos[i]+deck_wid[i]/2,deck_thi
+				del 1
+			next i
+		endif
+	del 3
+endgroup
+
+parting_line_1=subgroup("parting_line","column")
+parting_line_2=subgroup(parting_line_1,"op")
+parting_line_3=isectgroup(parting_line_2,"hypo_cut")
+
+if dis_parting then
+	if hypo_cut then
+		placegroup parting_line_3
+	else
+		placegroup parting_line_2
+	endif
+endif
+
+
+!======================================================================工区・梱包番号
+add minx,miny,(base_a*minx+base_b*miny+base_c)*dir_flag*tan(rat)
+if rtz=0 or rtz=180 then
+	rotx -rat*dir_flag
+else
+	roty rat*dir_flag
+endif
+add -minx,-miny,0
+	if dis_detail_3d then
+		define style "moji" textfont,1*100,5,1
+		style "moji"
+
+		if mode_3d=2 and deck_type<>2 then
+			addz deck_hei
+		else
+			addz 0
+		endif
+		add (minx+maxx)/2,(miny+maxy)/2,deck_thi
+			addy 0.1
+				text 0.001,0,"工区："+construction_area
+			del 1
+			addy -0.1
+				text 0.001,0,"梱包番号："+str(packing_num,1,0)
+			del 1
+		del 2
+	endif
+del 3
+
+
+
+
+end
+
+
+
+
+
+
+
+
+!===========================================================デッキプレートsub
+"二山":
+	point_num=21
+
+	put -deck_unit1/2,0,0
+	put -(deck_unit1/2-deck_unit1/10),0,0
+	put -(deck_unit1/2-deck_unit1/10-deck_unit1/20),deck_hei-deck_thi,0
+	put -(deck_unit1/2-deck_unit1/10-deck_unit1/20-deck_unit1/5),deck_hei-deck_thi,0
+	put -(deck_unit1/2-deck_unit1/5-deck_unit1/5),0,0
+	put (deck_unit1/2-deck_unit1/5-deck_unit1/5),0,0
+	put (deck_unit1/2-deck_unit1/10-deck_unit1/20-deck_unit1/5),deck_hei-deck_thi,0
+	put (deck_unit1/2-deck_unit1/10-deck_unit1/20),deck_hei-deck_thi,0
+	put (deck_unit1/2-deck_unit1/10),0,0
+	put deck_unit1/2,0,0
+	put deck_unit1/2,deck_thi,0
+	put (deck_unit1/2-deck_unit1/10)+deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit1/20)))/2),deck_thi,0
+	put (deck_unit1/2-deck_unit1/10-deck_unit1/20)+deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit1/20)))/2),deck_hei,0
+	put (deck_unit1/2-deck_unit1/10-deck_unit1/20-deck_unit1/5)-deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit1/20)))/2),deck_hei,0
+	put (deck_unit1/2-deck_unit1/5-deck_unit1/5)-deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit1/20)))/2),deck_thi,0
+	put -(deck_unit1/2-deck_unit1/5-deck_unit1/5)+deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit1/20)))/2),deck_thi,0
+	put -(deck_unit1/2-deck_unit1/10-deck_unit1/20-deck_unit1/5)+deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit1/20)))/2),deck_hei,0
+	put -(deck_unit1/2-deck_unit1/10-deck_unit1/20)-deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit1/20)))/2),deck_hei,0
+	put -(deck_unit1/2-deck_unit1/10)-deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit1/20)))/2),deck_thi,0
+	put -deck_unit1/2,deck_thi,0
+	put -deck_unit1/2,0,-1
+return
+
+
+"二山2":
+	point_num=13
+
+	put -deck_unit1/2,0,0
+	put deck_unit1/2,0,0
+	put deck_unit1/2,deck_thi,0
+	put (deck_unit1/2-deck_unit1/10)+deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit1/20)))/2),deck_thi,0
+	put (deck_unit1/2-deck_unit1/10-deck_unit1/20)+deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit1/20)))/2),deck_hei,0
+	put (deck_unit1/2-deck_unit1/10-deck_unit1/20-deck_unit1/5)-deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit1/20)))/2),deck_hei,0
+	put (deck_unit1/2-deck_unit1/5-deck_unit1/5)-deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit1/20)))/2),deck_thi,0
+	put -(deck_unit1/2-deck_unit1/5-deck_unit1/5)+deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit1/20)))/2),deck_thi,0
+	put -(deck_unit1/2-deck_unit1/10-deck_unit1/20-deck_unit1/5)+deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit1/20)))/2),deck_hei,0
+	put -(deck_unit1/2-deck_unit1/10-deck_unit1/20)-deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit1/20)))/2),deck_hei,0
+	put -(deck_unit1/2-deck_unit1/10)-deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit1/20)))/2),deck_thi,0
+	put -deck_unit1/2,deck_thi,0
+	put -deck_unit1/2,0,-1
+return
+
+
+"一山":
+	point_num=13
+
+	put -deck_unit2/2,0,0
+	put -(deck_unit2/2-deck_unit2/5),0,0
+	put -(deck_unit2/2-deck_unit2/5-deck_unit2/10),deck_hei-deck_thi,0
+	put (deck_unit2/2-deck_unit2/5-deck_unit2/10),deck_hei-deck_thi,0
+	put (deck_unit2/2-deck_unit2/5),0,0
+	put deck_unit2/2,0,0
+	put deck_unit2/2,deck_thi,0
+	put (deck_unit2/2-deck_unit2/5)+deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit2/10)))/2),deck_thi,0
+	put (deck_unit2/2-deck_unit2/5-deck_unit2/10)+deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit2/10)))/2),deck_hei,0
+	put -(deck_unit2/2-deck_unit2/5-deck_unit2/10)-deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit2/10)))/2),deck_hei,0
+	put -(deck_unit2/2-deck_unit2/5)-deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit2/10)))/2),deck_thi,0
+	put -deck_unit2/2,deck_thi,0
+	put -deck_unit2/2,0,-1
+return
+
+
+"一山2":
+	point_num=9
+
+	put -deck_unit2/2,0,0
+	put deck_unit2/2,0,0
+	put deck_unit2/2,deck_thi,0
+	put (deck_unit2/2-deck_unit2/5)+deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit2/10)))/2),deck_thi,0
+	put (deck_unit2/2-deck_unit2/5-deck_unit2/10)+deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit2/10)))/2),deck_hei,0
+	put -(deck_unit2/2-deck_unit2/5-deck_unit2/10)-deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit2/10)))/2),deck_hei,0
+	put -(deck_unit2/2-deck_unit2/5)-deck_thi/tan((180-atn((deck_hei-deck_thi)/(deck_unit2/10)))/2),deck_thi,0
+	put -deck_unit2/2,deck_thi,0
+	put -deck_unit2/2,0,-1
+return
+
+
+"調整板":
+	point_num=5
+
+	put -deck_wid[i]/2,0,0
+	put deck_wid[i]/2,0,0
+	put deck_wid[i]/2,deck_thi,0
+	put -deck_wid[i]/2,deck_thi,0
+	put -deck_wid[i]/2,0,-1
+return
+
+
+"標準":
+	if product_num<28 then
+		point_num=39
+	
+		put 0-deck_unit/2,0,0
+		put 0-deck_unit/2,-deck_thi,0
+		put deck_unit/3-deck_thi-deck_unit/2,-deck_thi,0
+		put deck_unit/3-deck_thi-deck_unit/2,-deck_hei/3,0
+		put deck_unit/3-deck_yama/2-deck_unit/2,-deck_hei,0
+		put deck_unit/3+deck_yama/2-deck_unit/2,-deck_hei,0
+		put deck_unit/3+deck_thi-deck_unit/2,-deck_hei/3,0
+		put deck_unit/3+deck_thi-deck_unit/2,-deck_thi,0
+		put deck_unit*2/3-deck_thi-deck_unit/2,-deck_thi,0
+		put deck_unit*2/3-deck_thi-deck_unit/2,-deck_hei/3,0
+		put deck_unit*2/3-deck_yama/2-deck_unit/2,-deck_hei,0
+		put deck_unit*2/3+deck_yama/2-deck_unit/2,-deck_hei,0
+		put deck_unit*2/3+deck_thi-deck_unit/2,-deck_hei/3,0
+		put deck_unit*2/3+deck_thi-deck_unit/2,-deck_thi,0
+		put deck_unit-deck_thi-deck_unit/2,-deck_thi,0
+		put deck_unit-deck_thi-deck_unit/2,-deck_hei/3,0
+		put deck_unit-deck_yama/2-deck_unit/2,-deck_hei,0
+		put deck_unit+deck_yama/2-deck_unit/2,-deck_hei,0
+		put deck_unit+deck_thi-deck_unit/2,-deck_hei/3,0
+		put deck_unit+deck_thi-deck_unit/2,-deck_thi,0
+		put deck_unit-deck_unit/2,-deck_thi,0
+		put deck_unit-deck_unit/2,-deck_hei/3,0
+		put deck_unit+deck_yama/2-1.5*deck_thi-deck_unit/2,-deck_hei+deck_thi,0
+		put deck_unit-deck_yama/2+1.5*deck_thi-deck_unit/2,-deck_hei+deck_thi,0
+		put deck_unit-deck_unit/2,-deck_hei/3,0
+		put deck_unit-deck_unit/2,0,0
+		put deck_unit*2/3-deck_unit/2,0,0
+		put deck_unit*2/3-deck_unit/2,-deck_hei/3,0
+		put deck_unit*2/3+deck_yama/2-1.5*deck_thi-deck_unit/2,-deck_hei+deck_thi,0
+		put deck_unit*2/3-deck_yama/2+1.5*deck_thi-deck_unit/2,-deck_hei+deck_thi,0
+		put deck_unit*2/3-deck_unit/2,-deck_hei/3,0
+		put deck_unit*2/3-deck_unit/2,0,0
+		put deck_unit/3-deck_unit/2,0,0
+		put deck_unit/3-deck_unit/2,-deck_hei/3,0
+		put deck_unit/3+deck_yama/2-1.5*deck_thi-deck_unit/2,-deck_hei+deck_thi,0
+		put deck_unit/3-deck_yama/2+1.5*deck_thi-deck_unit/2,-deck_hei+deck_thi,0
+		put deck_unit/3-deck_unit/2,-deck_hei/3,0
+		put deck_unit/3-deck_unit/2,0,0
+		put 0-deck_unit/2,0,0
+	else
+		point_num=27
+
+		put 0-deck_unit/2,0,0
+		put 0-deck_unit/2,-deck_thi,0
+		put deck_unit/2-deck_thi-deck_unit/2,-deck_thi,0
+		put deck_unit/2-deck_thi-deck_unit/2,-deck_hei/3,0
+		put deck_unit/2-deck_yama/2-deck_unit/2,-deck_hei,0
+		put deck_unit/2+deck_yama/2-deck_unit/2,-deck_hei,0
+		put deck_unit/2+deck_thi-deck_unit/2,-deck_hei/3,0
+		put deck_unit/2+deck_thi-deck_unit/2,-deck_thi,0
+		put deck_unit-deck_thi-deck_unit/2,-deck_thi,0
+		put deck_unit-deck_thi-deck_unit/2,-deck_hei/3,0
+		put deck_unit-deck_yama/2-deck_unit/2,-deck_hei,0
+		put deck_unit+deck_yama/2-deck_unit/2,-deck_hei,0
+		put deck_unit+deck_thi-deck_unit/2,-deck_hei/3,0
+		put deck_unit+deck_thi-deck_unit/2,-deck_thi,0
+		put deck_unit-deck_unit/2,-deck_thi,0
+		put deck_unit-deck_unit/2,-deck_hei/3,0
+		put deck_unit+deck_yama/2-1.5*deck_thi-deck_unit/2,-deck_hei+deck_thi,0
+		put deck_unit-deck_yama/2+1.5*deck_thi-deck_unit/2,-deck_hei+deck_thi,0
+		put deck_unit-deck_unit/2,-deck_hei/3,0
+		put deck_unit-deck_unit/2,0,0
+		put deck_unit/2-deck_unit/2,0,0
+		put deck_unit/2-deck_unit/2,-deck_hei/3,0
+		put deck_unit/2+deck_yama/2-1.5*deck_thi-deck_unit/2,-deck_hei+deck_thi,0
+		put deck_unit/2-deck_yama/2+1.5*deck_thi-deck_unit/2,-deck_hei+deck_thi,0
+		put deck_unit/2-deck_unit/2,-deck_hei/3,0
+		put deck_unit/2-deck_unit/2,0,0
+		put 0-deck_unit/2,0,0
+	endif
+return
+
+
+"A0":
+	point_num=39
+
+	put 0-deck_a0/2,0,0
+	put 0-deck_a0/2,-deck_thi,0
+	put deck_a0*205/625-deck_thi-deck_a0/2,-deck_thi,0
+	put deck_a0*205/625-deck_thi-deck_a0/2,-deck_hei/3,0
+	put deck_a0*205/625-deck_yama/2-deck_a0/2,-deck_hei,0
+	put deck_a0*205/625+deck_yama/2-deck_a0/2,-deck_hei,0
+	put deck_a0*205/625+deck_thi-deck_a0/2,-deck_hei/3,0
+	put deck_a0*205/625+deck_thi-deck_a0/2,-deck_thi,0
+	put deck_a0*415/625-deck_thi-deck_a0/2,-deck_thi,0
+	put deck_a0*415/625-deck_thi-deck_a0/2,-deck_hei/3,0
+	put deck_a0*415/625-deck_yama/2-deck_a0/2,-deck_hei,0
+	put deck_a0*415/625+deck_yama/2-deck_a0/2,-deck_hei,0
+	put deck_a0*415/625+deck_thi-deck_a0/2,-deck_hei/3,0
+	put deck_a0*415/625+deck_thi-deck_a0/2,-deck_thi,0
+	put deck_a0-deck_thi-deck_a0/2,-deck_thi,0
+	put deck_a0-deck_thi-deck_a0/2,-deck_hei/3,0
+	put deck_a0-deck_yama/2-deck_a0/2,-deck_hei,0
+	put deck_a0+deck_yama/2-deck_a0/2,-deck_hei,0
+	put deck_a0+deck_thi-deck_a0/2,-deck_hei/3,0
+	put deck_a0+deck_thi-deck_a0/2,-deck_thi,0
+	put deck_a0-deck_a0/2,-deck_thi,0
+	put deck_a0-deck_a0/2,-deck_hei/3,0
+	put deck_a0+deck_yama/2-1.5*deck_thi-deck_a0/2,-deck_hei+deck_thi,0
+	put deck_a0-deck_yama/2+1.5*deck_thi-deck_a0/2,-deck_hei+deck_thi,0
+	put deck_a0-deck_a0/2,-deck_hei/3,0
+	put deck_a0-deck_a0/2,0,0
+	put deck_a0*415/625-deck_a0/2,0,0
+	put deck_a0*415/625-deck_a0/2,-deck_hei/3,0
+	put deck_a0*415/625+deck_yama/2-1.5*deck_thi-deck_a0/2,-deck_hei+deck_thi,0
+	put deck_a0*415/625-deck_yama/2+1.5*deck_thi-deck_a0/2,-deck_hei+deck_thi,0
+	put deck_a0*415/625-deck_a0/2,-deck_hei/3,0
+	put deck_a0*415/625-deck_a0/2,0,0
+	put deck_a0*205/625-deck_a0/2,0,0
+	put deck_a0*205/625-deck_a0/2,-deck_hei/3,0
+	put deck_a0*205/625+deck_yama/2-1.5*deck_thi-deck_a0/2,-deck_hei+deck_thi,0
+	put deck_a0*205/625-deck_yama/2+1.5*deck_thi-deck_a0/2,-deck_hei+deck_thi,0
+	put deck_a0*205/625-deck_a0/2,-deck_hei/3,0
+	put deck_a0*205/625-deck_a0/2,0,0
+	put 0-deck_a0/2,0,0
+return
+
+
+"B0":
+	point_num=39
+
+	put 0-deck_b0/2,0,0
+	put 0-deck_b0/2,-deck_thi,0
+	put deck_b0*080/500-deck_thi-deck_b0/2,-deck_thi,0
+	put deck_b0*080/500-deck_thi-deck_b0/2,-deck_hei/3,0
+	put deck_b0*080/500-deck_yama/2-deck_b0/2,-deck_hei,0
+	put deck_b0*080/500+deck_yama/2-deck_b0/2,-deck_hei,0
+	put deck_b0*080/500+deck_thi-deck_b0/2,-deck_hei/3,0
+	put deck_b0*080/500+deck_thi-deck_b0/2,-deck_thi,0
+	put deck_b0*290/500-deck_thi-deck_b0/2,-deck_thi,0
+	put deck_b0*290/500-deck_thi-deck_b0/2,-deck_hei/3,0
+	put deck_b0*290/500-deck_yama/2-deck_b0/2,-deck_hei,0
+	put deck_b0*290/500+deck_yama/2-deck_b0/2,-deck_hei,0
+	put deck_b0*290/500+deck_thi-deck_b0/2,-deck_hei/3,0
+	put deck_b0*290/500+deck_thi-deck_b0/2,-deck_thi,0
+	put deck_b0-deck_thi-deck_b0/2,-deck_thi,0
+	put deck_b0-deck_thi-deck_b0/2,-deck_hei/3,0
+	put deck_b0-deck_yama/2-deck_b0/2,-deck_hei,0
+	put deck_b0+deck_yama/2-deck_b0/2,-deck_hei,0
+	put deck_b0+deck_thi-deck_b0/2,-deck_hei/3,0
+	put deck_b0+deck_thi-deck_b0/2,-deck_thi,0
+	put deck_b0-deck_b0/2,-deck_thi,0
+	put deck_b0-deck_b0/2,-deck_hei/3,0
+	put deck_b0+deck_yama/2-1.5*deck_thi-deck_b0/2,-deck_hei+deck_thi,0
+	put deck_b0-deck_yama/2+1.5*deck_thi-deck_b0/2,-deck_hei+deck_thi,0
+	put deck_b0-deck_b0/2,-deck_hei/3,0
+	put deck_b0-deck_b0/2,0,0
+	put deck_b0*290/500-deck_b0/2,0,0
+	put deck_b0*290/500-deck_b0/2,-deck_hei/3,0
+	put deck_b0*290/500+deck_yama/2-1.5*deck_thi-deck_b0/2,-deck_hei+deck_thi,0
+	put deck_b0*290/500-deck_yama/2+1.5*deck_thi-deck_b0/2,-deck_hei+deck_thi,0
+	put deck_b0*290/500-deck_b0/2,-deck_hei/3,0
+	put deck_b0*290/500-deck_b0/2,0,0
+	put deck_b0*080/500-deck_b0/2,0,0
+	put deck_b0*080/500-deck_b0/2,-deck_hei/3,0
+	put deck_b0*080/500+deck_yama/2-1.5*deck_thi-deck_b0/2,-deck_hei+deck_thi,0
+	put deck_b0*080/500-deck_yama/2+1.5*deck_thi-deck_b0/2,-deck_hei+deck_thi,0
+	put deck_b0*080/500-deck_b0/2,-deck_hei/3,0
+	put deck_b0*080/500-deck_b0/2,0,0
+	put 0-deck_b0/2,0,0
+return
+
+
+"C0":
+	point_num=29
+
+	put 0-deck_c0/2,0,0
+	put 0-deck_c0/2,-deck_thi,0
+	put deck_c0*205/495-deck_thi-deck_c0/2,-deck_thi,0
+	put deck_c0*205/495-deck_thi-deck_c0/2,-deck_hei/3,0
+	put deck_c0*205/495-deck_yama/2-deck_c0/2,-deck_hei,0
+	put deck_c0*205/495+deck_yama/2-deck_c0/2,-deck_hei,0
+	put deck_c0*205/495+deck_thi-deck_c0/2,-deck_hei/3,0
+	put deck_c0*205/495+deck_thi-deck_c0/2,-deck_thi,0
+	put deck_c0*415/495-deck_thi-deck_c0/2,-deck_thi,0
+	put deck_c0*415/495-deck_thi-deck_c0/2,-deck_hei/3,0
+	put deck_c0*415/495-deck_yama/2-deck_c0/2,-deck_hei,0
+	put deck_c0*415/495+deck_yama/2-deck_c0/2,-deck_hei,0
+	put deck_c0*415/495+deck_thi-deck_c0/2,-deck_hei/3,0
+	put deck_c0*415/495+deck_thi-deck_c0/2,-deck_thi,0
+	put deck_c0-deck_c0/2,-deck_thi,0
+	put deck_c0-deck_c0/2,0,0
+	put deck_c0*415/495-deck_c0/2,0,0
+	put deck_c0*415/495-deck_c0/2,-deck_hei/3,0
+	put deck_c0*415/495+deck_yama/2-1.5*deck_thi-deck_c0/2,-deck_hei+deck_thi,0
+	put deck_c0*415/495-deck_yama/2+1.5*deck_thi-deck_c0/2,-deck_hei+deck_thi,0
+	put deck_c0*415/495-deck_c0/2,-deck_hei/3,0
+	put deck_c0*415/495-deck_c0/2,0,0
+	put deck_c0*205/495-deck_c0/2,0,0
+	put deck_c0*205/495-deck_c0/2,-deck_hei/3,0
+	put deck_c0*205/495+deck_yama/2-1.5*deck_thi-deck_c0/2,-deck_hei+deck_thi,0
+	put deck_c0*205/495-deck_yama/2+1.5*deck_thi-deck_c0/2,-deck_hei+deck_thi,0
+	put deck_c0*205/495-deck_c0/2,-deck_hei/3,0
+	put deck_c0*205/495-deck_c0/2,0,0
+	put 0-deck_c0/2,0,0
+return
+
+
+"D0":
+	point_num=29
+
+	put 0-deck_d0/2,0,0
+	put 0-deck_d0/2,-deck_thi,0
+	put deck_d0*205/560-deck_thi-deck_d0/2,-deck_thi,0
+	put deck_d0*205/560-deck_thi-deck_d0/2,-deck_hei/3,0
+	put deck_d0*205/560-deck_yama/2-deck_d0/2,-deck_hei,0
+	put deck_d0*205/560+deck_yama/2-deck_d0/2,-deck_hei,0
+	put deck_d0*205/560+deck_thi-deck_d0/2,-deck_hei/3,0
+	put deck_d0*205/560+deck_thi-deck_d0/2,-deck_thi,0
+	put deck_d0*415/560-deck_thi-deck_d0/2,-deck_thi,0
+	put deck_d0*415/560-deck_thi-deck_d0/2,-deck_hei/3,0
+	put deck_d0*415/560-deck_yama/2-deck_d0/2,-deck_hei,0
+	put deck_d0*415/560+deck_yama/2-deck_d0/2,-deck_hei,0
+	put deck_d0*415/560+deck_thi-deck_d0/2,-deck_hei/3,0
+	put deck_d0*415/560+deck_thi-deck_d0/2,-deck_thi,0
+	put deck_d0-deck_d0/2,-deck_thi,0
+	put deck_d0-deck_d0/2,0,0
+	put deck_d0*415/560-deck_d0/2,0,0
+	put deck_d0*415/560-deck_d0/2,-deck_hei/3,0
+	put deck_d0*415/560+deck_yama/2-1.5*deck_thi-deck_d0/2,-deck_hei+deck_thi,0
+	put deck_d0*415/560-deck_yama/2+1.5*deck_thi-deck_d0/2,-deck_hei+deck_thi,0
+	put deck_d0*415/560-deck_d0/2,-deck_hei/3,0
+	put deck_d0*415/560-deck_d0/2,0,0
+	put deck_d0*205/560-deck_d0/2,0,0
+	put deck_d0*205/560-deck_d0/2,-deck_hei/3,0
+	put deck_d0*205/560+deck_yama/2-1.5*deck_thi-deck_d0/2,-deck_hei+deck_thi,0
+	put deck_d0*205/560-deck_yama/2+1.5*deck_thi-deck_d0/2,-deck_hei+deck_thi,0
+	put deck_d0*205/560-deck_d0/2,-deck_hei/3,0
+	put deck_d0*205/560-deck_d0/2,0,0
+	put 0-deck_d0/2,0,0
+return
+
+
+"S":
+	point_num=27
+
+	put 0-deck_s/2,0,0
+	put 0-deck_s/2,-deck_thi,0
+	put deck_s*190/390-deck_thi-deck_s/2,-deck_thi,0
+	put deck_s*190/390-deck_thi-deck_s/2,-deck_hei/3,0
+	put deck_s*190/390-deck_yama/2-deck_s/2,-deck_hei,0
+	put deck_s*190/390+deck_yama/2-deck_s/2,-deck_hei,0
+	put deck_s*190/390+deck_thi-deck_s/2,-deck_hei/3,0
+	put deck_s*190/390+deck_thi-deck_s/2,-deck_thi,0
+	put deck_s-deck_thi-deck_s/2,-deck_thi,0
+	put deck_s-deck_thi-deck_s/2,-deck_hei/3,0
+	put deck_s-deck_yama/2-deck_s/2,-deck_hei,0
+	put deck_s+deck_yama/2-deck_s/2,-deck_hei,0
+	put deck_s+deck_thi-deck_s/2,-deck_hei/3,0
+	put deck_s+deck_thi-deck_s/2,-deck_thi,0
+	put deck_s-deck_s/2,-deck_thi,0
+	put deck_s-deck_s/2,-deck_hei/3,0
+	put deck_s+deck_yama/2-1.5*deck_thi-deck_s/2,-deck_hei+deck_thi,0
+	put deck_s-deck_yama/2+1.5*deck_thi-deck_s/2,-deck_hei+deck_thi,0
+	put deck_s-deck_s/2,-deck_hei/3,0
+	put deck_s-deck_s/2,0,0
+	put deck_s*190/390-deck_s/2,0,0
+	put deck_s*190/390-deck_s/2,-deck_hei/3,0
+	put deck_s*190/390+deck_yama/2-1.5*deck_thi-deck_s/2,-deck_hei+deck_thi,0
+	put deck_s*190/390-deck_yama/2+1.5*deck_thi-deck_s/2,-deck_hei+deck_thi,0
+	put deck_s*190/390-deck_s/2,-deck_hei/3,0
+	put deck_s*190/390-deck_s/2,0,0
+	put 0-deck_s/2,0,0
+return
+
+
+"S1":
+	point_num=27
+
+	put 0-deck_s1/2,0,0
+	put 0-deck_s1/2,-deck_thi,0
+	put deck_s1*90/290-deck_thi-deck_s1/2,-deck_thi,0
+	put deck_s1*90/290-deck_thi-deck_s1/2,-deck_hei/3,0
+	put deck_s1*90/290-deck_yama/2-deck_s1/2,-deck_hei,0
+	put deck_s1*90/290+deck_yama/2-deck_s1/2,-deck_hei,0
+	put deck_s1*90/290+deck_thi-deck_s1/2,-deck_hei/3,0
+	put deck_s1*90/290+deck_thi-deck_s1/2,-deck_thi,0
+	put deck_s1-deck_thi-deck_s1/2,-deck_thi,0
+	put deck_s1-deck_thi-deck_s1/2,-deck_hei/3,0
+	put deck_s1-deck_yama/2-deck_s1/2,-deck_hei,0
+	put deck_s1+deck_yama/2-deck_s1/2,-deck_hei,0
+	put deck_s1+deck_thi-deck_s1/2,-deck_hei/3,0
+	put deck_s1+deck_thi-deck_s1/2,-deck_thi,0
+	put deck_s1-deck_s1/2,-deck_thi,0
+	put deck_s1-deck_s1/2,-deck_hei/3,0
+	put deck_s1+deck_yama/2-1.5*deck_thi-deck_s1/2,-deck_hei+deck_thi,0
+	put deck_s1-deck_yama/2+1.5*deck_thi-deck_s1/2,-deck_hei+deck_thi,0
+	put deck_s1-deck_s1/2,-deck_hei/3,0
+	put deck_s1-deck_s1/2,0,0
+	put deck_s1*90/290-deck_s1/2,0,0
+	put deck_s1*90/290-deck_s1/2,-deck_hei/3,0
+	put deck_s1*90/290+deck_yama/2-1.5*deck_thi-deck_s1/2,-deck_hei+deck_thi,0
+	put deck_s1*90/290-deck_yama/2+1.5*deck_thi-deck_s1/2,-deck_hei+deck_thi,0
+	put deck_s1*90/290-deck_s1/2,-deck_hei/3,0
+	put deck_s1*90/290-deck_s1/2,0,0
+	put 0-deck_s1/2,0,0
+return
+
+
+"調整プレート":
+	point_num=5
+
+	put -deck_wid[i]/2,0,0
+	put deck_wid[i]/2,0,0
+	put deck_wid[i]/2,-deck_thi,0
+	put -deck_wid[i]/2,-deck_thi,0
+	put -deck_wid[i]/2,0,-1
+return
+
+
+"標準端部":
+	dim move_x[]
+
+	if product_num<=27 then !JF75
+		if deck_order[i]=1 then !標準
+			loop_num=3
+			move_x[1]=-deck_unit/2+0.210
+			move_x[2]=-deck_unit/2+0.210+0.210
+			move_x[3]=-deck_unit/2+0.210+0.210+0.210
+		endif
+
+		if deck_order[i]=2 then !A0
+			loop_num=3
+			move_x[1]=-deck_a0/2+0.205
+			move_x[2]=-deck_a0/2+0.205+0.210
+			move_x[3]=-deck_a0/2+0.205+0.210+0.210
+		endif
+
+		if deck_order[i]=3 then !B0
+			loop_num=3
+			move_x[1]=-deck_b0/2+0.080
+			move_x[2]=-deck_b0/2+0.080+0.210
+			move_x[3]=-deck_b0/2+0.080+0.210+0.210
+		endif
+
+		if deck_order[i]=4 then !C0
+			loop_num=2
+			move_x[1]=-deck_c0/2+0.205
+			move_x[2]=-deck_c0/2+0.205+0.210
+		endif
+
+		if deck_order[i]=5 then !D0
+			loop_num=2
+			move_x[1]=-deck_d0/2+0.205
+			move_x[2]=-deck_d0/2+0.205+0.210
+		endif
+	else !JF100
+		if deck_order[i]=1 then !標準
+			loop_num=2
+			move_x[1]=-deck_unit/2+0.200
+			move_x[2]=-deck_unit/2+0.200+0.200
+		endif
+
+		if deck_order[i]=2 then !S
+			loop_num=2
+			move_x[1]=-deck_s/2+0.190
+			move_x[2]=-deck_s/2+0.190+0.200
+		endif
+
+		if deck_order[i]=3 then !S1
+			loop_num=2
+			move_x[1]=-deck_s1/2+0.090
+			move_x[2]=-deck_s1/2+0.090+0.200
+		endif
+	endif
+
+	for n=1 to loop_num
+		addx move_x[n]
+			if edge_type1=1 then
+				ruledsegmented 4,1+2+4+16+32+64,
+				0,_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid/3+(deck_edge_wid*2/3)/(deck_hei-deck_thi)*(deck_hei/3-deck_thi),-deck_hei/3,0,
+				0-deck_yama/2,_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid,-deck_hei,0,
+				0+deck_yama/2,_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid,-deck_hei,0,
+				0,_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid/3+(deck_edge_wid*2/3)/(deck_hei-deck_thi)*(deck_hei/3-deck_thi),-deck_hei/3,0,
+				0,_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid/3+(deck_edge_wid*2/3)/(deck_hei-deck_thi)*(deck_hei/3-deck_thi)+1.5*deck_thi,-deck_hei/3,
+				0-deck_yama/2,_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid+1.5*deck_thi,-deck_hei,
+				0+deck_yama/2,_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid+1.5*deck_thi,-deck_hei,
+				0,_deck_start_pos[i]+deck_start_offset[i]+deck_edge_wid/3+(deck_edge_wid*2/3)/(deck_hei-deck_thi)*(deck_hei/3-deck_thi)+1.5*deck_thi,-deck_hei/3
+			endif
+
+			if edge_type2=1 then
+				ruledsegmented 4,1+2+4+16+32+64,
+				0,_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid/3-(deck_edge_wid*2/3)/(deck_hei-deck_thi)*(deck_hei/3-deck_thi),-deck_hei/3,0,
+				0-deck_yama/2,_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid,-deck_hei,0,
+				0+deck_yama/2,_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid,-deck_hei,0,
+				0,_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid/3-(deck_edge_wid*2/3)/(deck_hei-deck_thi)*(deck_hei/3-deck_thi),-deck_hei/3,0,
+				0,_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid/3-(deck_edge_wid*2/3)/(deck_hei-deck_thi)*(deck_hei/3-deck_thi)-1.5*deck_thi,-deck_hei/3,
+				0-deck_yama/2,_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid-1.5*deck_thi,-deck_hei,
+				0+deck_yama/2,_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid-1.5*deck_thi,-deck_hei,
+				0,_deck_end_pos[i]+deck_end_offset[i]-deck_edge_wid/3-(deck_edge_wid*2/3)/(deck_hei-deck_thi)*(deck_hei/3-deck_thi)-1.5*deck_thi,-deck_hei/3
+			endif
+		del 1
+	next n
+return
+
+
+!==========================================鉄筋断面座標リスト
+"鉄筋断面計算sub":
+
+	for t=1 to SDresol
+		put tube_r*cos((1-t)*360/SDresol),tube_r*sin((1-t)*360/SDresol),0
+	next t
+	
+	put tube_r,0,0
+
+return
+
+
+

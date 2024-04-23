@@ -1,0 +1,191 @@
+code=1
+x=1
+y=2
+z=3
+eps=1e-5
+
+Opos[1][z]=0
+Apos[1][z]=hei
+Bpos[1][z]=hei
+
+parameters Opos=Opos,Apos=Apos,Bpos=Bpos
+
+
+!OA仰角
+Arte=atn(hei/sqr((Apos[1][x]-Opos[1][x])^2+(Apos[1][y]-Opos[1][y])^2))
+
+
+!OA方位角
+Artz=0
+
+if Apos[1][y]>Opos[1][y]+eps then
+    Artz=acs((Apos[1][x]-Opos[1][x])/sqr((Apos[1][x]-Opos[1][x])^2+(Apos[1][y]-Opos[1][y])^2))
+endif
+
+if Apos[1][y]<=Opos[1][y]+eps and Opos[1][y]+eps>=Opos[1][y]-eps then
+    if Apos[1][x]>=Opos[1][x] then
+        Artz=0
+    else
+        Artz=180
+    endif
+endif
+
+if Apos[1][y]<Opos[1][y]-eps then
+    Artz=360-acs((Apos[1][x]-Opos[1][x])/sqr((Apos[1][x]-Opos[1][x])^2+(Apos[1][y]-Opos[1][y])^2))
+endif
+
+
+!A1
+dim A1pos[1][3]
+A1pos[1][x]=Opos[1][x]+sphereRad*cos(Arte)*cos(Artz)
+A1pos[1][y]=Opos[1][y]+sphereRad*cos(Arte)*sin(Artz)
+A1pos[1][Z]=Opos[1][z]+sphereRad*sin(Arte)
+
+
+!A2
+dim A2pos[1][2]
+A2pos[1][x]=Opos[1][x]+sphereRad*cos(Artz)
+A2pos[1][y]=Opos[1][y]+sphereRad*sin(Artz)
+
+
+!OB仰角
+Brte=atn(hei/sqr((Bpos[1][x]-Opos[1][x])^2+(Bpos[1][y]-Opos[1][y])^2))
+
+
+!OB方位角
+Brtz=0
+
+if Bpos[1][y]>Opos[1][y]+eps then
+    Brtz=acs((Bpos[1][x]-Opos[1][x])/sqr((Bpos[1][x]-Opos[1][x])^2+(Bpos[1][y]-Opos[1][y])^2))
+endif
+
+if Bpos[1][y]<=Opos[1][y]+eps and Opos[1][y]+eps>=Opos[1][y]-eps then
+    if Bpos[1][x]>=Opos[1][x] then
+        Brtz=0
+    else
+        Brtz=180
+    endif
+endif
+
+if Bpos[1][y]<Opos[1][y]-eps then
+    Brtz=360-acs((Bpos[1][x]-Opos[1][x])/sqr((Bpos[1][x]-Opos[1][x])^2+(Bpos[1][y]-Opos[1][y])^2))
+endif
+
+
+!B1
+dim B1pos[1][3]
+B1pos[1][x]=Opos[1][x]+sphereRad*cos(Brte)*cos(Brtz)
+B1pos[1][y]=Opos[1][y]+sphereRad*cos(Brte)*sin(Brtz)
+B1pos[1][z]=Opos[1][z]+sphereRad*sin(Brte)
+
+
+!B2
+dim B2pos[1][2]
+B2pos[1][x]=Opos[1][x]+sphereRad*cos(Brtz)
+B2pos[1][y]=Opos[1][y]+sphereRad*sin(Brtz)
+
+
+
+
+
+
+
+
+
+
+
+!Oから直線ABの垂心F
+dim Fpos[1][3]
+Fk=-((Apos[1][x]-Opos[1][x])*(Bpos[1][x]-Apos[1][x])+(Apos[1][y]-Opos[1][y])*(Bpos[1][y]-Apos[1][y]))/(((Bpos[1][x]-Apos[1][x])^2+(Bpos[1][y]-Apos[1][y])^2))
+Fpos[1][x]=Fk*(Bpos[1][x]-Apos[1][x])+Apos[1][x]
+Fpos[1][y]=Fk*(Bpos[1][y]-Apos[1][y])+Apos[1][y]
+Fpos[1][z]=hei
+
+
+!仰角
+rte=atn(hei/sqr((Fpos[1][x]-Opos[1][x])^2+(Fpos[1][y]-Opos[1][y])^2))
+parameters rte=rte
+
+
+!方位角
+rtz=0
+
+if Fpos[1][y]>Opos[1][y]+eps then
+    rtz=acs((Fpos[1][x]-Opos[1][x])/sqr((Fpos[1][x]-Opos[1][x])^2+(Fpos[1][y]-Opos[1][y])^2))
+endif
+
+if Fpos[1][y]<=Opos[1][y]+eps and Opos[1][y]+eps>=Opos[1][y]-eps then
+    if Fpos[1][x]>=Opos[1][x] then
+        rtz=0
+    else
+        rtz=180
+    endif
+endif
+
+if Fpos[1][y]<Opos[1][y]-eps then
+    rtz=360-acs((Fpos[1][x]-Opos[1][x])/sqr((Fpos[1][x]-Opos[1][x])^2+(Fpos[1][y]-Opos[1][y])^2))
+endif
+
+rtz=rtz-90
+parameters rtz=rtz
+
+
+!楕円方程式
+ellipse_a=sphereRad
+ellipse_b=sphereRad*cos(rte)
+ellipse_c=sqr(ellipse_a^2-ellipse_b^2)
+ellipse_e=ellipse_c/ellipse_a
+ellipse_l=ellipse_b^2/ellipse_a
+!r=ellipse_l/(1-ellipse_e*cos(theta))
+
+
+!(Apos[1][x]-Opos[1][x],Apos[1][y]-Opos[1][y],Apos[1][z]-Opos[1][z]) !vectorOA
+!(Bpos[1][x]-Opos[1][x],Bpos[1][y]-Opos[1][y],Bpos[1][z]-Opos[1][z]) !vectorOB
+vectorOALen=sqr((Apos[1][x]-Opos[1][x])^2+(Apos[1][y]-Opos[1][y])^2+(Apos[1][z]-Opos[1][z])^2)
+vectorOBLen=sqr((Bpos[1][x]-Opos[1][x])^2+(Bpos[1][y]-Opos[1][y])^2+(Bpos[1][z]-Opos[1][z])^2)
+AOBangle=acs(((Apos[1][x]-Opos[1][x])*(Bpos[1][x]-Opos[1][x])+(Apos[1][y]-Opos[1][y])*(Bpos[1][y]-Opos[1][y])+(Apos[1][z]-Opos[1][z])*(Bpos[1][z]-Opos[1][z]))/(vectorOALen*vectorOBLen)) !angleAOB
+parameters AOBangle=AOBangle
+
+
+!A1B1の中点E
+dim Epos[1][3]
+Epos[1][x]=(A1pos[1][x]+B1pos[1][x])/2
+Epos[1][y]=(A1pos[1][y]+B1pos[1][y])/2
+Epos[1][z]=(A1pos[1][z]+B1pos[1][z])/2
+
+
+!OE仰角
+Erte=atn((Epos[1][z]-Opos[1][z])/sqr((Epos[1][x]-Opos[1][x])^2+(Epos[1][y]-Opos[1][y])^2))
+
+
+!OE方位角
+Ertz=0
+
+if Epos[1][y]>Opos[1][y]+eps then
+    Ertz=acs((Epos[1][x]-Opos[1][x])/sqr((Epos[1][x]-Opos[1][x])^2+(Epos[1][y]-Opos[1][y])^2))
+endif
+
+if Epos[1][y]<=Opos[1][y]+eps and Opos[1][y]+eps>=Opos[1][y]-eps then
+    if Epos[1][x]>=Opos[1][x] then
+        Ertz=0
+    else
+        Ertz=180
+    endif
+endif
+
+if Epos[1][y]<Opos[1][y]-eps then
+    Ertz=360-acs((Epos[1][x]-Opos[1][x])/sqr((Epos[1][x]-Opos[1][x])^2+(Epos[1][y]-Opos[1][y])^2))
+endif
+
+
+!切線までの移動距離
+moveD3D=sphereRad-sphereRad*cos(AOBangle/2)
+parameters moveD3D=moveD3D
+moveD2D=moveD3D*cos(Erte)
+parameters moveD2D=moveD2D
+
+moveX=moveD3D*cos(Erte)*cos(Ertz)
+moveY=moveD3D*cos(Erte)*sin(Ertz)
+moveZ=moveD3D*sin(Erte)
+
+

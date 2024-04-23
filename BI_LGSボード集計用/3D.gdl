@@ -1,0 +1,147 @@
+define style "moji_font" fonttype,moji_font_size*10,5,0
+define style "moji_font2" fonttype,moji_font_size*10,4,0
+moji_font_size2=1.5*moji_font_size
+
+
+board_type_moji_wid=0
+put stw("タイプ")/75
+for i=1 to board_type_totnum
+    put stw(board_type_totmoji[i][1])/75
+next i
+board_type_moji_wid=max(get(nsp))
+
+board_thi_moji_wid=0
+put stw("厚み")/75
+for i=1 to board_type_totnum
+    put stw(board_type_totmoji[i][2])/75
+next i
+board_thi_moji_wid=max(get(nsp))
+
+board_size_moji_wid=0
+put stw("サイズ")/75
+for i=1 to board_type_totnum
+    put stw(board_type_totmoji[i][3])/75
+next i
+board_size_moji_wid=max(get(nsp))
+
+board_num_moji_wid=0
+put stw("枚数")/75
+for i=1 to board_type_totnum
+    if board_num_ceil=0 then
+        put stw(str(board_num_totlist[i],3,2)+"枚")/75
+    else
+        put stw(str(board_num_totlist[i],1,0)+"枚")/75
+    endif
+next i
+board_num_moji_wid=max(get(nsp))
+
+board_area_moji_wid=0
+put stw("面積")/75
+for i=1 to board_type_totnum
+    put stw(str(board_area_totlist[i],3,2)+"㎡")/75
+next i
+board_area_moji_wid=max(get(nsp))
+
+!フォームサイズ
+form_x=moji_font_size/100+board_type_moji_wid+stw("  ")/100+board_thi_moji_wid+stw("  ")/100+board_size_moji_wid+\
+       stw("  ")/100+board_num_moji_wid+(stw("  ")/100+board_area_moji_wid)*dis_board_detail*dis_board_area_detail
+form_y=(dis_room_name+0.5*dis_room_name*dis_board_detail+(board_type_totnum+1)*dis_board_detail)*moji_font_size2/100
+form_x=max(form_x,stw(room_name)/75+moji_font_size/75)
+
+!フォーム頂点座標・方程式
+center_x=(minx+maxx)/2+form_offset[1][1]
+center_y=(miny+maxy)/2+form_offset[1][2]
+
+
+material m_3Dmoji
+
+hotspot 0,0,0
+
+if dis_3d then
+    !フォーム
+    if dis_form and (dis_room_name or dis_board_detail) then
+        add center_x-form_x/2,center_y-form_y/2,0
+            hotspot 0     ,0     ,0
+            hotspot form_x,0     ,0
+            hotspot form_x,form_y,0
+            hotspot 0     ,form_y,0
+
+            lin_ 0,0,0,form_x,0,0
+            lin_ form_x,0,0,form_x,form_y,0
+            lin_ form_x,form_y,0,0,form_y,0
+            lin_ 0,form_y,0,0,0,0
+        del 1
+    endif
+
+    !部屋名
+    style "moji_font"
+
+    if dis_room_name then
+        add center_x,center_y+form_y/2-moji_font_size2/100/2,0
+            text moji_thi,0,room_name
+        del 1
+    endif
+
+    style "moji_font2"
+
+    if dis_board_detail then
+        add center_x,center_y+form_y/2-moji_font_size2/100*3/2*dis_room_name-moji_font_size2/100/2,0
+            if board_type_totnum>0 then
+                add -form_x/2+moji_font_size/200,0,0
+                    text moji_thi,0,"タイプ"
+                del 1
+
+                add -form_x/2+moji_font_size/200+board_type_moji_wid+stw("  ")/1000,0,0
+                    text moji_thi,0,"厚み"
+                del 1
+
+                add -form_x/2+moji_font_size/200+board_type_moji_wid+stw("  ")/1000+board_thi_moji_wid+stw("  ")/1000,0,0
+                    text moji_thi,0,"サイズ"
+                del 1
+
+                add -form_x/2+moji_font_size/200+board_type_moji_wid+stw("  ")/1000+board_thi_moji_wid+stw("  ")/1000+board_size_moji_wid+stw("  ")/1000,0,0
+                    text moji_thi,0,"枚数"
+                del 1
+
+                if dis_board_area_detail then
+                    add -form_x/2+moji_font_size/200+board_type_moji_wid+stw("  ")/1000+board_thi_moji_wid+stw("  ")/1000+board_size_moji_wid+stw("  ")/1000+board_num_moji_wid+stw("  ")/1000,0,0
+                        text moji_thi,0,"面積"
+                    del 1
+                endif
+            endif
+
+            for i=1 to board_type_totnum
+                add 0,-moji_font_size2/100,0
+
+                add -form_x/2+moji_font_size/200,0,0
+                    text moji_thi,0,board_type_totmoji[i][1]
+                del 1
+
+                add -form_x/2+moji_font_size/200+board_type_moji_wid+stw("  ")/1000,0,0
+                    text moji_thi,0,board_type_totmoji[i][2]
+                del 1
+
+                add -form_x/2+moji_font_size/200+board_type_moji_wid+stw("  ")/1000+board_thi_moji_wid+stw("  ")/1000,0,0
+                    text moji_thi,0,board_type_totmoji[i][3]
+                del 1
+
+                if board_num_ceil=0 then
+                    add -form_x/2+moji_font_size/200+board_type_moji_wid+stw("  ")/1000+board_thi_moji_wid+stw("  ")/1000+board_size_moji_wid+stw("  ")/1000,0,0
+                        text moji_thi,0,str(board_num_totlist[i],3,2)+"枚"
+                    del 1
+                else
+                    add -form_x/2+moji_font_size/200+board_type_moji_wid+stw("  ")/1000+board_thi_moji_wid+stw("  ")/1000+board_size_moji_wid+stw("  ")/1000,0,0
+                        text moji_thi,0,str(board_num_totlist[i],1,0)+"枚"
+                    del 1
+                endif
+
+                if dis_board_area_detail then
+                    add -form_x/2+moji_font_size/200+board_type_moji_wid+stw("  ")/1000+board_thi_moji_wid+stw("  ")/1000+board_size_moji_wid+stw("  ")/1000+board_num_moji_wid+stw("  ")/1000,0,0
+                        text moji_thi,0,str(board_area_totlist[i],3,2)+"㎡"
+                    del 1
+                endif
+            next i
+            del board_type_totnum
+        del 1
+    endif
+endif

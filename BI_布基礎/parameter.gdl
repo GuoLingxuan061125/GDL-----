@@ -1,0 +1,12 @@
+!====================================================================コンクリート数量
+conVol=baseLen*baseWid*baseHei+footingLen*footingWid*footingHei
+parameters conVol=conVol
+
+
+!====================================================================型枠面積
+frameArea=0
+frameArea=frameArea+baseHei*(vertexLen+startOutBaseOffset+endOutBaseOffset)
+frameArea=frameArea+baseHei*(vertexLen+startInBaseOffset+endInBaseOffset)
+frameArea=frameArea+footingHei*(vertexLen+startOutFootingOffset+endOutFootingOffset)
+frameArea=frameArea+footingHei*(vertexLen+startInFootingOffset+endInFootingOffset)
+parameters frameArea=frameArea

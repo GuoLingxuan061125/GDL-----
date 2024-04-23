@@ -1,0 +1,165 @@
+code=1
+x=1
+y=2
+z=3
+eps=1e-5
+
+!=================================================================スラブ設定
+!勾配基準線回転角
+base_rtz=0
+if base_pos[2][2]>base_pos[1][2] then
+	base_rtz=acs((base_pos[2][1]-base_pos[1][1])/(sqr((base_pos[2][1]-base_pos[1][1])^2+(base_pos[2][2]-base_pos[1][2])^2)+eps))
+endif
+if base_pos[2][2]=base_pos[1][2] then
+	if base_pos[2][1]>=base_pos[1][1] then
+		base_rtz=0
+	else
+		base_rtz=180
+	endif
+endif
+if base_pos[2][2]<base_pos[1][2] then
+	base_rtz=360-acs((base_pos[2][1]-base_pos[1][1])/(sqr((base_pos[2][1]-base_pos[1][1])^2+(base_pos[2][2]-base_pos[1][2])^2)+eps))
+endif
+
+!勾配基準線方程式
+base_a=base_pos[2][2]-base_pos[1][2]
+base_b=base_pos[1][1]-base_pos[2][1]
+base_c=base_pos[2][1]*base_pos[1][2]-base_pos[1][1]*base_pos[2][2]
+
+values "base_dir" 1,-1
+values "rat" range[0,60]
+
+
+!マット寸法設定
+values{2} "boardThi" 1,"50",2,"65",3,"90",4,"100",5,"155"
+
+if boardThi=1 then
+    values{2} "boardWid" 2,"430"
+    sizeThi=0.050
+endif
+
+if boardThi=2 then
+    values{2} "boardWid" 1,"395",2,"430",3,"470"
+    sizeThi=0.065
+endif
+
+if boardThi=3 then
+    values{2} "boardWid" 1,"395",2,"430",3,"470"
+    sizeThi=0.090
+endif
+
+if boardThi=4 then
+    values{2} "boardWid" 1,"395",2,"430",3,"470"
+    sizeThi=0.100
+endif
+
+if boardThi=5 then
+    values{2} "boardWid" 2,"430",4,"455"
+    sizeThi=0.155
+endif
+
+if boardWid=1 then sizeWid=0.395
+if boardWid=2 then sizeWid=0.430
+if boardWid=3 then sizeWid=0.470
+if boardWid=4 then sizeWid=0.455
+
+if boardThi=5 then
+    boardHei=1.370
+else
+    boardHei=2.880
+endif
+parameters boardHei=boardHei
+lock "boardHei"
+
+
+!天井設定
+values "slabVertexNum" range[3,]
+
+dim _slabVertexPos[][],_slabVertexZ[]
+_slabVertexPos[1][x]=0 : _slabVertexPos[1][y]=0
+_slabVertexZ[1]=0
+
+for i=1 to slabVertexNum
+    _slabVertexPos[i][x]=slabVertexPos[i][x]
+    _slabVertexPos[i][y]=slabVertexPos[i][y]
+
+    _slabVertexZ[i]=(base_a*_slabVertexPos[i][1]+base_b*_slabVertexPos[i][2]+base_c)/sqr(base_a^2+base_b^2)*tan(rat)*base_dir
+next i
+
+slabVertexPos=_slabVertexPos
+parameters slabVertexPos=_slabVertexPos
+
+!基準線を軸にして平らにする頂点座標
+dim _slabNewPos[][]
+for i=1 to slabVertexNum
+    !頂点から基準線までの垂直交点
+    a1=base_a
+    b1=base_b
+    c1=base_c
+    a2=base_b
+    b2=-base_a
+    c2=(base_a*_slabVertexPos[i][y]-base_b*_slabVertexPos[i][x])
+
+    verticalX=(c2*b1-c1*b2)/(a1*b2-a2*b1)
+    verticalY=(c1*a2-c2*a1)/(a1*b2-a2*b1)
+    _slabNewPos[i][x]=verticalX+(_slabVertexPos[i][x]-verticalX)/cos(rat)
+    _slabNewPos[i][y]=verticalY+(_slabVertexPos[i][y]-verticalY)/cos(rat)
+next i
+
+for i=1 to slabVertexNum
+    put _slabNewPos[i][x]
+next i
+
+minx=min(use(nsp))
+maxx=max(get(nsp))
+
+for i=1 to slabVertexNum
+    put _slabNewPos[i][y]
+next i
+
+miny=min(use(nsp))
+maxy=max(get(nsp))
+
+values "centerX" range[minx,maxx]
+values "centerY" range[miny,maxy]
+
+
+!ループ数計算
+unitX=sizeWid
+unitY=boardHei
+
+loopCountX1=ceil((centerX-minx)/unitX)
+loopCountX2=ceil((maxx-centerX)/unitX)
+loopCountY1=ceil((centerY-miny)/unitY)
+loopCountY2=ceil((maxy-centerY)/unitY)
+
+boardTheoNum=0
+dim _boardPos[][]
+_boardPos[1][1]=0 : _boardPos[1][2]=0
+
+for i=1 to loopCountX1+loopCountX2
+    for j=1 to loopCountY1+loopCountY2
+        boardTheoNum=boardTheoNum+1
+        _boardPos[boardTheoNum][1]=centerX-loopCountX1*unitX+(i-1)*unitX
+        _boardPos[boardTheoNum][2]=centerY-loopCountY1*unitY+(j-1)*unitY
+    next j
+next i
+
+
+!枚数集計
+slabArea=0
+
+for i=1 to slabVertexNum
+    if i<slabVertexNum then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    slabArea=slabArea+(_slabNewPos[i2][x]-_slabNewPos[i][x])*(_slabNewPos[i2][y]+_slabNewPos[i][y])/2
+next i
+
+slabArea=abs(slabArea)
+boardNum=slabArea/(unitX*unitY)
+parameters boardNum=boardNum
+lock "boardNum"

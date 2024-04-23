@@ -1,0 +1,973 @@
+!===================================================積算
+!=========================仕上げ面積
+!=============外側
+riser_area=0
+tread_area=0
+landing_area=0
+floor_area=0
+
+!蹴上
+riser_area=(floor_num-1)*step_num_tot*(step_wid1-ssr1_thi-ssr2_thi)*(step_riser/cos(nosing_a))
+
+!踏面
+tread_area=(floor_num-1)*(step_num_tot-switch_landing-switch_floor)*(step_wid1-ssr1_thi-ssr2_thi)*(step_tread+step_nosing)
+
+!中間踊り場
+if switch_landing then
+    for i=1 to landing_num
+        landing_area=landing_area+(step_wid1-ssr1_thi-ssr2_thi)*(landing_size1+step_nosing+step_thi+ssr2_thi)+(step_wid2-ssr1_thi-ssr2_thi)*(landing_size2+ssr2_thi)+\
+            (step_wid_tot-2*ssr1_thi)*(landing_len-ssr1_thi-ssr2_thi)
+    next i
+endif
+
+!フロア踊り場
+if switch_floor then
+	if stair_mode=1 then
+        for i=1 to 2*(floor_num-1)-1
+            floor_area=floor_area+(step_wid1-ssr1_thi-ssr2_thi)*(floor_len+step_nosing+step_thi-ssr1_thi)
+        next i
+	else
+        for i=1 to floor_num-1
+            if i<floor_num-1 then
+                floor_area=floor_area+(step_wid1-ssr1_thi-ssr2_thi)*(floor_size1+step_nosing+step_thi+ssr2_thi)+(step_wid2-ssr1_thi-ssr2_thi)*(floor_size2+ssr2_thi)+\
+                    (step_wid_tot-2*ssr1_thi)*(floor_len-ssr1_thi-ssr2_thi)
+            else
+                floor_area=floor_area+(step_wid1-ssr1_thi-ssr2_thi)*(floor_size1+step_nosing+step_thi+ssr2_thi)+(step_wid_tot-2*ssr1_thi)*(floor_len-ssr1_thi-ssr2_thi)
+            endif
+        next i
+	endif
+endif
+
+!階段鉄骨数量
+stepWgt=0
+stepWgt=stepWgt+riser_area*step_thi*landingDensity/1000
+if stair_type=1 then
+    stepWgt=stepWgt+tread_area*step_thi*landingDensity/1000
+else
+    stepWgt=stepWgt+tread_area*step_t2_size*landingDensity/1000
+endif
+parameters stepWgt=stepWgt
+
+!中間踊り場鉄骨数量
+landingWgt=2*landing_area*step_thi*landingDensity/1000
+parameters landingWgt=landingWgt
+
+!フロア踊り場鉄骨数量
+floorWgt=2*floor_area*step_thi*landingDensity/1000
+parameters floorWgt=floorWgt
+
+!踊り場コンクリート体積
+conVol=landing_area*landing_thi+floor_area*floor_thi
+parameters conVol=conVol
+
+if step_fin_type=0 then
+	riser_area=0
+	tread_area=0
+    landing_area=0
+    floor_area=0
+endif
+
+parameters riser_area=riser_area
+parameters tread_area=tread_area
+parameters landing_area=landing_area
+parameters floor_area=floor_area
+
+
+!=============裏側
+riser_down_area=0
+tread_down_area=0
+landing_down_area=0
+floor_down_area=0
+
+!蹴上裏側
+if stair_type=1 then
+	riser_down_wid=sqr((-step_nosing*(step_riser-step_thi)/step_riser+step_t1_size*sin(nosing_a))^2+(step_riser-step_thi-step_t1_size*cos(nosing_a))^2)+step_thi
+	riser_down_minus=step_thi
+else
+	riser_down_wid=sqr((-step_nosing*(step_riser-step_t2_size)/step_riser)^2+(step_riser-step_t2_size)^2)+step_t2_size
+	riser_down_minus=step_t2_size
+endif
+
+for i=1 to floor_num-1
+    riser_down_area=riser_down_area+step_num_tot*(step_wid1-ssr1_thi-ssr2_thi)*riser_down_wid
+next i
+
+if switch_floor then
+	riser_down_area=riser_down_area-(step_wid1-ssr1_thi-ssr2_thi)*(2*step_thi+floor_thi)
+else
+    riser_down_area=riser_down_area-(floor_num-1)*(step_wid1-ssr1_thi-ssr2_thi)*riser_down_minus
+endif
+
+!踏面裏側
+if stair_type=1 then
+	tread_down_wid=abs(step_thi-step_nosing*(step_riser-step_thi)/step_riser+step_t1_size-step_tread)+sqr((step_t1_size*sin(nosing_a)-step_t1_size)^2+(-step_t1_size*cos(nosing_a))^2)
+else
+	tread_down_wid=abs(step_thi-step_nosing*(step_riser-step_t2_size)/step_riser-step_tread)
+endif
+
+tread_down_area=tread_down_area+(floor_num-1)*step_num_tot*(step_wid1-ssr1_thi-ssr2_thi)*tread_down_wid
+
+if switch_floor then
+    tread_down_area=tread_down_area-(floor_num-1)*(step_wid1-ssr1_thi-ssr2_thi)*tread_down_wid
+endif
+
+if switch_landing then
+    if stair_mode=2 then
+        tread_down_area=tread_down_area-landing_num*(step_wid1-ssr1_thi-ssr2_thi)*tread_down_wid
+    endif
+
+    if stair_mode=3 then
+        tread_down_area=tread_down_area-landing_num*(step_wid1-ssr1_thi-ssr2_thi)*tread_down_wid
+    endif
+endif
+
+!中間踊り場裏側
+if switch_landing then
+    for i=1 to landing_num
+        landing_area=landing_area+(step_wid1-ssr1_thi-ssr2_thi)*(landing_size1+step_nosing+step_thi+ssr2_thi)+(step_wid2-ssr1_thi-ssr2_thi)*(landing_size2+ssr2_thi)+\
+            (step_wid_tot-2*ssr1_thi)*(landing_len-ssr1_thi-ssr2_thi)
+    next i
+endif
+
+!フロア踊り場裏側
+if switch_floor then
+	if stair_mode=1 then
+        for i=1 to 2*(floor_num-1)-1
+            floor_area=floor_area+(step_wid1-ssr1_thi-ssr2_thi)*(floor_len+step_nosing+step_thi-ssr1_thi)
+        next i
+	else
+        for i=1 to floor_num-1
+            if i<floor_num-1 then
+                floor_area=floor_area+(step_wid1-ssr1_thi-ssr2_thi)*(floor_size1+step_nosing+step_thi+ssr2_thi)+(step_wid2-ssr1_thi-ssr2_thi)*(floor_size2+ssr2_thi)+\
+                    (step_wid_tot-2*ssr1_thi)*(floor_len-ssr1_thi-ssr2_thi)
+            else
+                floor_area=floor_area+(step_wid1-ssr1_thi-ssr2_thi)*(floor_size1+step_nosing+step_thi+ssr2_thi)+(step_wid_tot-2*ssr1_thi)*(floor_len-ssr1_thi-ssr2_thi)
+            endif
+        next i
+	endif
+endif
+
+if switch_step_down_fin=0 then
+	riser_down_area=0
+	tread_down_area=0
+	landing_down_area=0
+	floor_down_area=0
+endif
+
+parameters riser_down_area=riser_down_area
+parameters tread_down_area=tread_down_area
+parameters landing_down_area=landing_down_area
+parameters floor_down_area=floor_down_area
+
+
+!=========================ノンスリップ総長さ
+nonslip_len=0
+
+if step_fin_type=1 then
+	nonslip_len=(floor_num-1)*step_num_tot*(step_wid1-ssr1_thi-ssr2_thi)
+endif
+
+parameters nonslip_len=nonslip_len
+
+
+!=========================タキステップ枚数
+taki_nosing_num=0
+taki_riser_num=0
+taki_tread_num=0
+taki_landing_num=0
+taki_floor_num=0
+
+if step_fin_type=2 then
+    taki_nosing_num=taki_nosing_num+(floor_num-1)
+
+    if switch_landing then
+        taki_nosing_num=taki_nosing_num+landing_num
+    endif
+
+    taki_riser_num=taki_riser_num+(floor_num-1)*step_num_tot-taki_nosing_num
+
+	if switch_landing then
+		taki_landing_num=taki_landing_num+landing_num
+	endif
+
+    if switch_floor then
+        taki_floor_num=taki_floor_num+(floor_num-1)
+    else
+        taki_tread_num=taki_tread_num+(floor_num-1)
+    endif
+endif
+
+parameters taki_nosing_num=taki_nosing_num
+parameters taki_riser_num=taki_riser_num
+parameters taki_tread_num=taki_tread_num
+parameters taki_landing_num=taki_landing_num
+parameters taki_floor_num=taki_floor_num
+
+
+
+
+
+
+!=========================タキシール総長さ
+taki_seal_len=0
+
+if step_fin_type=2 then
+	!階段両側
+    taki_seal_len=taki_seal_len+(floor_num-1)*step_num_tot*(step_riser/cos(nosing_a)+step_tread+step_nosing)*2
+
+    if switch_landing then taki_seal_len=taki_seal_len-landing_num*(step_tread-step_thi)*2
+    if switch_floor then taki_seal_len=taki_seal_len-(floor_num-1)*(step_tread-step_thi)*2
+
+	!継目
+	taki_seal_len=taki_seal_len+(floor_num-1)*step_num_tot*(step_wid1-ssr1_thi-ssr2_thi)
+
+	!中間踊り場
+	if switch_landing then
+        for i=1 to landing_num
+            taki_seal_len=taki_seal_len+2*landing_size1+2*(landing_len-ssr1_thi)+2*landing_size2+(landing_gap+2*ssr2_thi)+(2*step_wid1+landing_gap-2*ssr1_thi)+(step_wid1-ssr1_thi-ssr2_thi)
+        next i
+    endif
+
+	!フロア踊り場
+	if switch_floor then
+		if stair_mode=1 then
+            for i=1 to 2*(floor_num-1)-1
+                taki_seal_len=taki_seal_len+2*floor_len+(step_wid1-ssr1_thi-ssr2_thi)
+            next i
+		else
+            for i=1 to floor_num-1
+			    taki_seal_len=taki_seal_len+2*floor_size1+2*(floor_len-ssr1_thi)+2*floor_size2+(landing_gap+2*ssr2_thi)+(2*step_wid1+landing_gap-2*ssr1_thi)+(step_wid1-ssr1_thi-ssr2_thi)
+            next i
+        endif
+	endif
+endif
+
+parameters taki_seal_len=taki_seal_len
+
+
+!=========================手すり長さ
+handrail_len=0
+ssr_out_len=0
+ssr_in_len=0
+
+for i=1 to floor_num-1
+    !外側
+        route_point=0
+
+        if stair_mode=1 then !直線階段
+            if i=1 then
+                route_point=route_point+1
+                put 0,0,-ssr_start_offset-1
+
+                route_point=route_point+1
+                put 0,0,-ssr_start_offset
+            else
+                if switch_floor then
+                    route_point=route_point+1
+                    put -floor_len+1,step_wid1,0
+
+                    route_point=route_point+1
+                    put -floor_len,step_wid1,0
+
+                    route_point=route_point+1
+                    put -floor_len,0,0
+                else
+                    route_point=route_point+1
+                    put 0,0,-1
+                endif
+
+                route_point=route_point+1
+                put 0,0,0
+            endif
+
+            route_point=route_point+1
+            put 0,0,step_riser
+            
+            route_point=route_point+1
+            put (step_num_tot-1)*step_tread,0,floor_hei
+
+            if switch_floor then
+                route_point=route_point+1
+                put floor_x+floor_len,0,floor_hei
+
+                route_point=route_point+1
+                put floor_x+floor_len,step_wid1,floor_hei
+
+                route_point=route_point+1
+                put floor_x+floor_len-1,step_wid1,floor_hei
+            else
+                route_point=route_point+1
+                put step_num_tot*step_tread,0,floor_hei
+
+                route_point=route_point+1
+                put step_num_tot*step_tread+1,0,floor_hei
+            endif
+        endif
+
+        if stair_mode=2 then !廻り階段
+            if i=1 then
+                route_point=route_point+1
+                put 0,0,-ssr_start_offset-1
+
+                route_point=route_point+1
+                put 0,0,-ssr_start_offset
+            else
+                if switch_floor then
+                    route_point=route_point+1
+                    put -1,0,0
+                else
+                    route_point=route_point+1
+                    put 0,0,-1
+                endif
+
+                route_point=route_point+1
+                put 0,0,0
+            endif
+
+            route_point=route_point+1
+            put 0,0,step_riser
+
+            route_point=route_point+1
+            put (step_num_down-1)*step_tread,0,step_num_down*step_riser
+
+            route_point=route_point+1
+            put landing_x+landing_size1+landing_len,0,step_num_down*step_riser
+
+            route_point=route_point+1
+            put landing_x+landing_size1+landing_len,step_wid_tot,step_num_down*step_riser
+
+            route_point=route_point+1
+            put landing_x+landing_size1-landing_size2,step_wid_tot,step_num_down*step_riser
+
+            route_point=route_point+1
+            put landing_x+landing_size1-landing_size2,step_wid_tot,(step_num_down+1)*step_riser
+
+            route_point=route_point+1
+            put floor_x+step_thi,step_wid_tot,floor_hei
+
+            if switch_floor then
+                route_point=route_point+1
+                put floor_x-floor_size1-floor_len,step_wid_tot,floor_hei
+
+                route_point=route_point+1
+                put floor_x-floor_size1-floor_len,0,floor_hei
+
+                if i=floor_num-1 then
+                    route_point=route_point+1
+                    put floor_x-floor_size1,0,floor_hei
+
+                    route_point=route_point+1
+                    put floor_x-floor_size1,1,floor_hei
+                else
+                    route_point=route_point+1
+                    put floor_x-floor_size1+floor_size2,0,floor_hei
+
+                    route_point=route_point+1
+                    put floor_x-floor_size1+floor_size2,0,floor_hei+1
+                endif
+            else
+                route_point=route_point+1
+                put floor_x+step_thi-step_tread,step_wid_tot,floor_hei
+
+                route_point=route_point+1
+                put floor_x+step_thi-step_tread-1,step_wid_tot,floor_hei
+            endif
+        endif
+
+        if stair_mode=3 then !直線+廻り階段
+            if i=1 then
+                route_point=route_point+1
+                put 0,0,-ssr_start_offset-1
+
+                route_point=route_point+1
+                put 0,0,-ssr_start_offset
+            else
+                if switch_floor then
+                    route_point=route_point+1
+                    put floor_x+floor_size1-floor_size2+1,step_wid_tot,0
+                else
+                    route_point=route_point+1
+                    put floor_x+floor_size1-floor_size2,step_wid_tot,-1
+                endif
+
+                route_point=route_point+1
+                put floor_x+floor_size1-floor_size2,step_wid_tot,0
+
+                route_point=route_point+1
+                put floor_x+floor_size1-floor_size2,step_wid_tot,step_riser
+
+                route_point=route_point+1
+                put landing_x+step_thi,step_wid_tot,step_num_down*step_riser
+
+                route_point=route_point+1
+                put landing_x-landing_size1-landing_len,step_wid_tot,step_num_down*step_riser
+
+                route_point=route_point+1
+                put landing_x-landing_size1-landing_len,0,step_num_down*step_riser
+
+                route_point=route_point+1
+                put landing_x-landing_size1+landing_size2,0,step_num_down*step_riser
+
+                route_point=route_point+1
+                put landing_x-landing_size1+landing_size2,0,(step_num_down+1)*step_riser
+            endif
+
+            route_point=route_point+1
+            put 0,0,step_riser
+
+            route_point=route_point+1
+            put (step_num_tot-1)*step_tread,0,floor_hei
+
+            if switch_floor then
+                route_point=route_point+1
+                put floor_x+floor_size1+floor_len,0,floor_hei
+
+                route_point=route_point+1
+                put floor_x+floor_size1+floor_len,step_wid_tot,floor_hei
+
+                if i=floor_num-1 then
+                    route_point=route_point+1
+                    put floor_x+floor_size1,step_wid_tot,floor_hei
+
+                    route_point=route_point+1
+                    put floor_x+floor_size1,step_wid_tot-1,floor_hei
+                else
+                    route_point=route_point+1
+                    put floor_x+floor_size1-floor_size2,step_wid_tot,floor_hei
+
+                    route_point=route_point+1
+                    put floor_x+floor_size1-floor_size2,step_wid_tot,floor_hei+1
+                endif
+            else
+                route_point=route_point+1
+                put step_num_tot*step_tread,0,floor_hei
+
+                route_point=route_point+1
+                put step_num_tot*step_tread+1,0,floor_hei
+            endif
+        endif
+        
+        for j=1 to 3
+            data_delete=get(1)
+        next j
+
+        dim _sasara1_pos[][]
+
+        for j=1 to route_point-2
+            _sasara1_pos[j][x]=get(1)
+            _sasara1_pos[j][y]=get(1)
+            _sasara1_pos[j][z]=get(1)
+        next j
+
+        for j=1 to nsp
+            data_delete=get(1)
+        next j
+
+        for j=1 to route_point-3
+            tempx1=_sasara1_pos[j][x]
+            tempy1=_sasara1_pos[j][y]
+            tempz1=_sasara1_pos[j][z]
+            tempx2=_sasara1_pos[j+1][x]
+            tempy2=_sasara1_pos[j+1][y]
+            tempz2=_sasara1_pos[j+1][z]
+
+            ssr_out_len=ssr_out_len+sqr((tempx2-tempx1)^2+(tempy2-tempy1)^2+(tempz2-tempz1)^2)
+        next j
+
+    !内側
+        if stair_mode=1 then !直線階段
+            route_point=0
+
+            if i=1 then
+                route_point=route_point+1
+                put 0,step_wid1,-ssr_start_offset-1
+
+                route_point=route_point+1
+                put 0,step_wid1,-ssr_start_offset
+            else
+                if switch_floor then
+                    route_point=route_point+1
+                    put -floor_len,step_wid1-1,0
+
+                    route_point=route_point+1
+                    put -floor_len,step_wid1,0
+                else
+                    route_point=route_point+1
+                    put 0,step_wid1,-1
+                endif
+
+                route_point=route_point+1
+                put 0,step_wid1,0
+            endif
+
+            route_point=route_point+1
+            put 0,step_wid1,step_riser
+            
+            route_point=route_point+1
+            put (step_num_tot-1)*step_tread,step_wid1,floor_hei
+
+            if switch_floor then
+                route_point=route_point+1
+                put floor_x+floor_len,step_wid1,floor_hei
+
+                route_point=route_point+1
+                put floor_x+floor_len,0,floor_hei
+            else
+                route_point=route_point+1
+                put step_num_tot*step_tread,step_wid1,floor_hei
+
+                route_point=route_point+1
+                put step_num_tot*step_tread+1,step_wid1,floor_hei
+            endif
+
+            for j=1 to 3
+                data_delete=get(1)
+            next j
+
+            dim _sasara2_pos[][]
+
+            for j=1 to route_point-2
+                _sasara2_pos[j][x]=get(1)
+                _sasara2_pos[j][y]=get(1)
+                _sasara2_pos[j][z]=get(1)
+            next j
+
+            for j=1 to nsp
+                data_delete=get(1)
+            next j
+
+            for j=1 to route_point-3
+                tempx1=_sasara2_pos[j][x]
+                tempy1=_sasara2_pos[j][y]
+                tempz1=_sasara2_pos[j][z]
+                tempx2=_sasara2_pos[j+1][x]
+                tempy2=_sasara2_pos[j+1][y]
+                tempz2=_sasara2_pos[j+1][z]
+
+                ssr_in_len=ssr_in_len+sqr((tempx2-tempx1)^2+(tempy2-tempy1)^2+(tempz2-tempz1)^2)
+            next j
+        endif
+
+        if stair_mode=2 then !廻り階段
+            route_point=0
+
+            if i=1 then
+                route_point=route_point+1
+                put 0,step_wid1,-ssr_start_offset-1
+
+                route_point=route_point+1
+                put 0,step_wid1,-ssr_start_offset
+            else
+                if switch_floor then
+                    route_point=route_point+1
+                    put 0,step_wid1,-(ssr_wid+ssr_wid2)-1
+
+                    route_point=route_point+1
+                    put 0,step_wid1,-(ssr_wid+ssr_wid2)
+                else
+                    route_point=route_point+1
+                    put 0,step_wid1,-1
+
+                    route_point=route_point+1
+                    put 0,step_wid1,0
+                endif
+            endif
+
+            route_point=route_point+1
+            put 0,step_wid1,step_riser
+
+            route_point=route_point+1
+            put (step_num_down-1)*step_tread,step_wid1,step_num_down*step_riser
+
+            route_point=route_point+1
+            put landing_x+landing_size1,step_wid1,step_num_down*step_riser
+
+            route_point=route_point+1
+            put landing_x+landing_size1,step_wid1+landing_gap,step_num_down*step_riser
+
+            route_point=route_point+1
+            put landing_x+landing_size1-landing_size2+ssr_wid1,step_wid1+landing_gap,step_num_down*step_riser
+
+            route_point=route_point+1
+            put landing_x+landing_size1-landing_size2+ssr_wid1-1,step_wid1+landing_gap,step_num_down*step_riser
+
+            for j=1 to 3
+                data_delete=get(1)
+            next j
+
+            dim _sasara2_pos[][]
+
+            for j=1 to route_point-2
+                _sasara2_pos[j][x]=get(1)
+                _sasara2_pos[j][y]=get(1)
+                _sasara2_pos[j][z]=get(1)
+            next j
+
+            for j=1 to nsp
+                data_delete=get(1)
+            next j
+
+            for j=1 to route_point-3
+                tempx1=_sasara2_pos[j][x]
+                tempy1=_sasara2_pos[j][y]
+                tempz1=_sasara2_pos[j][z]
+                tempx2=_sasara2_pos[j+1][x]
+                tempy2=_sasara2_pos[j+1][y]
+                tempz2=_sasara2_pos[j+1][z]
+
+                ssr_in_len=ssr_in_len+sqr((tempx2-tempx1)^2+(tempy2-tempy1)^2+(tempz2-tempz1)^2)
+            next j
+
+            route_point=0
+
+            route_point=route_point+1
+            put landing_x+landing_size1-landing_size2,step_wid1+landing_gap,step_num_down*step_riser-(ssr_wid+ssr_wid2)-1
+
+            route_point=route_point+1
+            put landing_x+landing_size1-landing_size2,step_wid1+landing_gap,step_num_down*step_riser-(ssr_wid+ssr_wid2)
+
+            route_point=route_point+1
+            put landing_x+landing_size1-landing_size2,step_wid1+landing_gap,(step_num_down+1)*step_riser
+
+            route_point=route_point+1
+            put floor_x+step_thi,step_wid1+landing_gap,floor_hei
+
+            if switch_floor then
+                route_point=route_point+1
+                put floor_x-floor_size1,step_wid1+landing_gap,floor_hei
+
+                route_point=route_point+1
+                put floor_x-floor_size1,step_wid1,floor_hei
+
+                if i=floor_num-1 then
+                    route_point=route_point+1
+                    put floor_x-floor_size1,0,floor_hei
+
+                    route_point=route_point+1
+                    put floor_x-floor_size1-1,0,floor_hei
+                else
+                    route_point=route_point+1
+                    put floor_x-floor_size1+floor_size2-ssr_wid1,step_wid1,floor_hei
+
+                    route_point=route_point+1
+                    put floor_x-floor_size1+floor_size2-ssr_wid1+1,step_wid1,floor_hei
+                endif
+            else
+                route_point=route_point+1
+                put floor_x+step_thi-step_tread,step_wid1+landing_gap,floor_hei
+
+                route_point=route_point+1
+                put floor_x+step_thi-step_tread-1,step_wid1+landing_gap,floor_hei
+            endif
+
+            for j=1 to 3
+                data_delete=get(1)
+            next j
+
+            dim _sasara2_pos[][]
+
+            for j=1 to route_point-2
+                _sasara2_pos[j][x]=get(1)
+                _sasara2_pos[j][y]=get(1)
+                _sasara2_pos[j][z]=get(1)
+            next j
+
+            for j=1 to nsp
+                data_delete=get(1)
+            next j
+
+            for j=1 to route_point-3
+                tempx1=_sasara2_pos[j][x]
+                tempy1=_sasara2_pos[j][y]
+                tempz1=_sasara2_pos[j][z]
+                tempx2=_sasara2_pos[j+1][x]
+                tempy2=_sasara2_pos[j+1][y]
+                tempz2=_sasara2_pos[j+1][z]
+
+                ssr_in_len=ssr_in_len+sqr((tempx2-tempx1)^2+(tempy2-tempy1)^2+(tempz2-tempz1)^2)
+            next j
+        endif
+
+        if stair_mode=3 then !直線+廻り階段
+            route_point=0
+
+            if i=1 then
+                route_point=route_point+1
+                put 0,step_wid1,-ssr_start_offset-1
+
+                route_point=route_point+1
+                put 0,step_wid1,-ssr_start_offset
+
+                route_point=route_point+1
+                put 0,step_wid1,step_riser
+            else
+                route_point=route_point+1
+                put step_num_down*step_tread,step_wid1,step_num_down*step_riser-(ssr_wid+ssr_wid2)-1
+
+                route_point=route_point+1
+                put step_num_down*step_tread,step_wid1,step_num_down*step_riser-(ssr_wid+ssr_wid2)
+
+                route_point=route_point+1
+                put step_num_down*step_tread,step_wid1,(step_num_down+1)*step_riser
+            endif
+
+            route_point=route_point+1
+            put (step_num_tot-1)*step_tread,step_wid1,floor_hei
+
+            if switch_floor then
+                route_point=route_point+1
+                put floor_x+floor_size1,step_wid1,floor_hei
+
+                if i=floor_num-1 then
+                    route_point=route_point+1
+                    put floor_x+floor_size1,step_wid_tot,floor_hei
+
+                    route_point=route_point+1
+                    put floor_x+floor_size1+1,step_wid_tot,floor_hei
+                else
+                    route_point=route_point+1
+                    put floor_x+floor_size1,step_wid1+landing_gap,floor_hei
+
+                    route_point=route_point+1
+                    put floor_x+floor_size1-floor_size2+ssr_wid1,step_wid1+landing_gap,floor_hei
+
+                    route_point=route_point+1
+                    put floor_x+floor_size1-floor_size2+ssr_wid1-1,step_wid1+landing_gap,floor_hei
+                endif
+            else
+                route_point=route_point+1
+                put step_num_tot*step_tread,step_wid1,floor_hei
+
+                route_point=route_point+1
+                put step_num_tot*step_tread+1,step_wid1,floor_hei
+            endif
+
+            for j=1 to 3
+                data_delete=get(1)
+            next j
+
+            dim _sasara2_pos[][]
+
+            for j=1 to route_point-2
+                _sasara2_pos[j][x]=get(1)
+                _sasara2_pos[j][y]=get(1)
+                _sasara2_pos[j][z]=get(1)
+            next j
+
+            for j=1 to nsp
+                data_delete=get(1)
+            next j
+
+            for j=1 to route_point-3
+                tempx1=_sasara2_pos[j][x]
+                tempy1=_sasara2_pos[j][y]
+                tempz1=_sasara2_pos[j][z]
+                tempx2=_sasara2_pos[j+1][x]
+                tempy2=_sasara2_pos[j+1][y]
+                tempz2=_sasara2_pos[j+1][z]
+
+                ssr_in_len=ssr_in_len+sqr((tempx2-tempx1)^2+(tempy2-tempy1)^2+(tempz2-tempz1)^2)
+            next j
+
+            if i>1 then
+                route_point=0
+
+                if switch_floor then
+                    route_point=route_point+1
+                    put floor_x+floor_size1-floor_size2,step_wid1+landing_gap,-(ssr_wid+ssr_wid2)-1
+
+                    route_point=route_point+1
+                    put floor_x+floor_size1-floor_size2,step_wid1+landing_gap,-(ssr_wid+ssr_wid2)
+                else
+                    route_point=route_point+1
+                    put floor_x+floor_size1-floor_size2,step_wid1+landing_gap,-1
+
+                    route_point=route_point+1
+                    put floor_x+floor_size1-floor_size2,step_wid1+landing_gap,0
+                endif
+
+                route_point=route_point+1
+                put floor_x+floor_size1-floor_size2,step_wid1+landing_gap,step_riser
+
+                route_point=route_point+1
+                put landing_x+step_thi,step_wid1+landing_gap,step_num_down*step_riser
+
+                route_point=route_point+1
+                put landing_x-landing_size1,step_wid1+landing_gap,step_num_down*step_riser
+
+                route_point=route_point+1
+                put landing_x-landing_size1,step_wid1,step_num_down*step_riser
+
+                route_point=route_point+1
+                put landing_x-landing_size1+landing_size2-ssr_wid1,step_wid1,step_num_down*step_riser
+
+                route_point=route_point+1
+                put landing_x-landing_size1+landing_size2-ssr_wid1+1,step_wid1,step_num_down*step_riser
+
+                for j=1 to 3
+                    data_delete=get(1)
+                next j
+
+                dim _sasara2_pos[][]
+
+                for j=1 to route_point-2
+                    _sasara2_pos[j][x]=get(1)
+                    _sasara2_pos[j][y]=get(1)
+                    _sasara2_pos[j][z]=get(1)
+                next j
+
+                for j=1 to nsp
+                    data_delete=get(1)
+                next j
+
+                for j=1 to route_point-3
+                    tempx1=_sasara2_pos[j][x]
+                    tempy1=_sasara2_pos[j][y]
+                    tempz1=_sasara2_pos[j][z]
+                    tempx2=_sasara2_pos[j+1][x]
+                    tempy2=_sasara2_pos[j+1][y]
+                    tempz2=_sasara2_pos[j+1][z]
+
+                    ssr_in_len=ssr_in_len+sqr((tempx2-tempx1)^2+(tempy2-tempy1)^2+(tempz2-tempz1)^2)
+                next j
+            endif
+        endif
+next i
+
+if switch_handrail1 then handrail_len=handrail_len+ssr_out_len
+if switch_handrail2 then handrail_len=handrail_len+ssr_in_len
+
+if switch_handrail1 then
+    if stair_mode=1 then
+        if switch_floor and handrail_op=1 then
+            handrail_len=handrail_len-(2*(floor_num-1)-1)*floor_len
+        endif
+    endif
+
+    if stair_mode=2 then
+        if handrail_op=1 then
+            handrail_len=handrail_len-landing_num*(landing_size1+landing_len)
+        else
+            handrail_len=handrail_len-landing_num*(landing_size2+landing_len)
+        endif
+
+        if switch_floor then
+            if handrail_op=1 then
+                handrail_len=handrail_len-(floor_num-2)*(floor_size2+floor_len)-floor_len
+            else
+                handrail_len=handrail_len-(floor_num-1)*(floor_size1+floor_len)
+            endif
+        endif
+    endif
+
+    if stair_mode=3 then
+        if switch_floor then
+            if handrail_op=1 then
+                handrail_len=handrail_len-(floor_num-1)*(floor_size1+floor_len)
+            else
+                handrail_len=handrail_len-(floor_num-2)*(floor_size2+floor_len)-floor_len
+            endif
+        endif
+
+        if handrail_op=1 then
+            handrail_len=handrail_len-landing_num*(landing_size1+landing_len)
+        else
+            handrail_len=handrail_len-landing_num*(landing_size2+landing_len)
+        endif
+    endif
+endif
+
+if switch_handrail2 and stair_mode=1 and switch_floor and handrail_op=2 then
+    handrail_len=handrail_len-(2*(floor_num-1)-1)*floor_len
+endif
+
+if switch_ssr1=0 then ssr_out_len=0
+if switch_ssr2=0 then ssr_in_len=0
+
+parameters \
+handrail_len=handrail_len,
+ssr_out_len=ssr_out_len,
+ssr_in_len=ssr_in_len
+
+
+!ササラ面積
+!外側
+sasaraOutArea=(ssr_out_len+ssr_in_len)*(ssr_wid1+ssr_wid+ssr_wid2)
+
+!内側
+sasaraInArea=(ssr_out_len+ssr_in_len)*(ssr_wid1+ssr_wid+ssr_wid2)
+if switch_ssr1 then
+    !蹴上
+    sasaraInArea=sasaraInArea-(floor_num-1)*step_num_tot*(step_riser/cos(nosing_a))*step_thi
+
+    !踏面
+    if stair_type=1 then
+        sasaraInArea=sasaraInArea-(floor_num-1)*(step_num_tot-switch_landing-switch_floor)*(step_tread+step_nosing)*step_thi
+    else
+        sasaraInArea=sasaraInArea-(floor_num-1)*(step_num_tot-switch_landing-switch_floor)*(step_tread+step_nosing)*step_t2_size
+    endif
+
+    !中間踊り場
+    if switch_landing then
+        sasaraInArea=sasaraInArea-landing_num*(landing_size1+landing_len+step_wid_tot+landing_len+landing_size2)*(landing_thi+2*step_thi)
+    endif
+
+    !フロア踊り場
+    if switch_floor then
+        if stair_mode=1 then
+            sasaraInArea=sasaraInArea-(2*(floor_num-1)-1)*(floor_len+step_wid1)*(floor_thi+2*step_thi)
+        else
+            sasaraInArea=sasaraInArea-(floor_num-2)*(floor_size1+floor_len+step_wid_tot+floor_len+floor_size2)*(floor_thi+2*step_thi)
+            sasaraInArea=sasaraInArea-(floor_size1+floor_len+step_wid_tot+floor_len)*(floor_thi+2*step_thi) !最上階
+        endif
+    endif
+endif
+
+if switch_ssr2 then
+    !蹴上
+    sasaraInArea=sasaraInArea-(floor_num-1)*step_num_tot*(step_riser/cos(nosing_a))*step_thi
+
+    !踏面
+    if stair_type=1 then
+        sasaraInArea=sasaraInArea-(floor_num-1)*(step_num_tot-switch_landing-switch_floor)*(step_tread+step_nosing)*step_thi
+    else
+        sasaraInArea=sasaraInArea-(floor_num-1)*(step_num_tot-switch_landing-switch_floor)*(step_tread+step_nosing)*step_t2_size
+    endif
+
+    !中間踊り場
+    if switch_landing then
+        sasaraInArea=sasaraInArea-landing_num*(landing_size1+landing_gap+landing_size2)*(landing_thi+2*step_thi)
+    endif
+
+    !フロア踊り場
+    if switch_floor then
+        if stair_mode=1 then
+            sasaraInArea=sasaraInArea-(2*(floor_num-1)-1)*(floor_len)*(floor_thi+2*step_thi)
+        else
+            sasaraInArea=sasaraInArea-(floor_num-2)*(floor_size1+landing_gap+floor_size2)*(floor_thi+2*step_thi)
+            sasaraInArea=sasaraInArea-(floor_size1+landing_gap+step_wid1)*(floor_thi+2*step_thi) !最上階
+        endif
+    endif
+endif
+
+sasaraArea=sasaraOutArea+sasaraInArea
+
+parameters \
+sasaraOutArea=sasaraOutArea,
+sasaraInArea=sasaraInArea,
+sasaraArea=sasaraArea
+
+
+
+!ササラ数量
+sasaraWgt=ssr_out_len*(ssr_wid1+ssr_wid+ssr_wid2)*ssr_thi*sasaraDensity/1000
+parameters sasaraWgt=sasaraWgt
+
+
+
+
+
+
+
+
+

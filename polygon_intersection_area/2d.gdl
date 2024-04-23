@@ -1,0 +1,98 @@
+define style "moji" fontType,fontSize*100/glob_scale,5,0
+style "moji"
+
+for i=1 to poly1Num
+    hotspot2 0                 ,poly1Pos[i][y],code,poly1Pos[i][x],1+128 : code=code+1
+    hotspot2 poly1Pos[i][x],poly1Pos[i][y],code,poly1Pos[i][x],2     : code=code+1
+    hotspot2 -1                ,poly1Pos[i][y],code,poly1Pos[i][x],3     : code=code+1
+
+    hotspot2 poly1Pos[i][x],0                 ,code,poly1Pos[i][y],1+128 : code=code+1
+    hotspot2 poly1Pos[i][x],poly1Pos[i][y],code,poly1Pos[i][y],2     : code=code+1
+    hotspot2 poly1Pos[i][x],-1                ,code,poly1Pos[i][y],3     : code=code+1
+
+    if i<poly1Num then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    pen poly1Pen
+    line2 poly1Pos[i][x],poly1Pos[i][y],poly1Pos[i2][x],poly1Pos[i2][y]
+next i
+
+
+for i=1 to poly2Num
+    hotspot2 0                 ,poly2Pos[i][y],code,poly2Pos[i][x],1+128 : code=code+1
+    hotspot2 poly2Pos[i][x],poly2Pos[i][y],code,poly2Pos[i][x],2     : code=code+1
+    hotspot2 -1                ,poly2Pos[i][y],code,poly2Pos[i][x],3     : code=code+1
+
+    hotspot2 poly2Pos[i][x],0                 ,code,poly2Pos[i][y],1+128 : code=code+1
+    hotspot2 poly2Pos[i][x],poly2Pos[i][y],code,poly2Pos[i][y],2     : code=code+1
+    hotspot2 poly2Pos[i][x],-1                ,code,poly2Pos[i][y],3     : code=code+1
+
+    if i<poly2Num then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    pen poly2Pen
+    line2 poly2Pos[i][x],poly2Pos[i][y],poly2Pos[i2][x],poly2Pos[i2][y]
+next i
+
+for i=1 to intsecAreaCount
+    if intsecAreaNum[i]>=3 then
+        for j=1 to intsecAreaNum[i]
+            put _intsecAreaPos[i][2*(j-1)+x],_intsecAreaPos[i][2*(j-1)+y],1
+        next j
+
+        fill intsecAreaFill
+        pen intsecAreaPen
+
+        poly2_ intsecAreaNum[i],1+2+4,
+        get(nsp)
+    endif
+next i
+
+
+!for i=1 to poly1Num
+!    hotspot2 poly1Pos[i][x],poly1Pos[i][y]
+!    text2 poly1Pos[i][x],poly1Pos[i][y],i
+!next i
+!
+!for i=1 to poly2Num
+!    hotspot2 poly2Pos[i][x],poly2Pos[i][y]
+!    text2 poly2Pos[i][x],poly2Pos[i][y],i
+!next i
+!
+!for i=1 to poly1NewNum
+!    hotspot2 poly1NewPos[i][x],poly1NewPos[i][y]
+!    text2 poly1NewPos[i][x],poly1NewPos[i][y],i
+!next i
+!
+!for i=1 to poly2NewNum
+!    hotspot2 poly2NewPos[i][x],poly2NewPos[i][y]
+!    text2 poly2NewPos[i][x],poly2NewPos[i][y],i
+!next i
+!
+!for i=1 to intsecAreaNum
+!    pen 1
+!    text2 _intsecAreaPos[i][x],_intsecAreaPos[i][y],i
+!next i
+
+if poly1FlagDisplay then
+    pen poly1Pen
+
+    for i=1 to poly1NewNum
+        text2 poly1NewPos[i][x],poly1NewPos[i][y],poly1NewFlag[i]
+    next i
+endif
+
+if poly2FlagDisplay then
+    pen poly2Pen
+
+    for i=1 to poly2NewNum
+        text2 poly2NewPos[i][x],poly2NewPos[i][y],poly2NewFlag[i]
+    next i
+endif
+

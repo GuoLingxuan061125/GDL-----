@@ -1,0 +1,47 @@
+
+project2 3,270,pro_2d+1
+hotspot2 0,0
+
+unID=1
+hotspot2 0   ,0 ,unID ,len ,1+256 :unID=unID+1
+hotspot2 -1  ,0 ,unID ,len ,3	  :unID=unID+1
+hotspot2 len ,0 ,unID ,len ,2	  :unID=unID+1
+ 
+
+hotspot2 0,0.0525
+hotspot2 0,-0.0525
+hotspot2 len,0.0525
+hotspot2 len,-0.0525
+
+for i=1 to num 
+    hotspot2 0    ,-ly[i],unID,lx[i],1+128:unID=unID+1
+    hotspot2 -1   ,-ly[i],unID,lx[i],3    :unID=unID+1
+    hotspot2 lx[i],-ly[i],unID,lx[i],2    :unID=unID+1
+    hotspot2 lx[i],0     ,unID,ly[i],1+128:unID=unID+1
+    hotspot2 lx[i],1     ,unID,ly[i],3    :unID=unID+1
+    hotspot2 lx[i],-ly[i],unID,ly[i],2    :unID=unID+1
+next i
+
+for j=1 to list_len
+    for i=1 to num2[j]
+        hotspot2 0       ,-jy[i][j],unID,jx[i][j],1+128:unID=unID+1
+        hotspot2 -1      ,-jy[i][j],unID,jx[i][j],3	   :unID=unID+1
+        hotspot2 jx[i][j],-jy[i][j],unID,jx[i][j],2	   :unID=unID+1
+        hotspot2 jx[i][j],0        ,unID,jy[i][j],1+128:unID=unID+1
+        hotspot2 jx[i][j],1        ,unID,jy[i][j],3	   :unID=unID+1
+        hotspot2 jx[i][j],-jy[i][j],unID,jy[i][j],2	   :unID=unID+1
+    next i
+next j
+
+hotspot2 len,0
+
+for j=1 to list_len2
+    for i=1 to num3[j]
+        hotspot2 0       ,-my[i][j],unID,mx[i][j],1+128:unID=unID+1
+        hotspot2 -1      ,-my[i][j],unID,mx[i][j],3	   :unID=unID+1
+        hotspot2 mx[i][j],-my[i][j],unID,mx[i][j],2	   :unID=unID+1
+        hotspot2 mx[i][j],0        ,unID,my[i][j],1+128:unID=unID+1
+        hotspot2 mx[i][j],1        ,unID,my[i][j],3    :unID=unID+1
+        hotspot2 mx[i][j],-my[i][j],unID,my[i][j],2    :unID=unID+1
+    next i
+next j

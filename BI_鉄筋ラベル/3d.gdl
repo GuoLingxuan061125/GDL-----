@@ -1,0 +1,166 @@
+if dis3D then
+    barRad=0.005
+    gosub barShape
+
+    dim _vertexPos[][]
+    for i=1 to vertexNum
+        _vertexPos[i][x]=get(1)
+        _vertexPos[i][y]=get(1)
+        _vertexPos[i][z]=get(1)
+    next i
+
+    put 2*_vertexPos[1][x]-_vertexPos[2][x],2*_vertexPos[1][y]-_vertexPos[2][y],2*_vertexPos[1][z]-_vertexPos[2][z],0
+    for i=1 to vertexNum
+        put _vertexPos[i][x],_vertexPos[i][y],_vertexPos[i][z],0
+    next i
+    put 2*_vertexPos[vertexNum][x]-_vertexPos[vertexNum-1][x],2*_vertexPos[vertexNum][y]-_vertexPos[vertexNum-1][y],2*_vertexPos[vertexNum][z]-_vertexPos[vertexNum-1][z],0
+
+    tube 5,vertexNum+2,1+2+4+8+16+32,
+    -barRad,-barRad,0,
+    barRad,-barRad,0,
+    barRad,barRad,0,
+    -barRad,barRad,0,
+    -barRad,-barRad,0,
+    get(nsp)
+endif
+
+end
+
+
+
+1:
+    vertexNum=2
+    put 0.1*frameX,0.5*frameY,0
+    put 0.9*frameX,0.5*frameY,0
+return
+
+2:
+    vertexNum=3
+    put 0.2*frameX,0.2*frameY,0
+    put 0.2*frameX,0.6*frameY,0
+    put 0.9*frameX,0.6*frameY,0
+return
+
+3:
+    vertexNum=7
+    put 0.2*frameX,0.2*frameY,0
+    put 0.2*frameX,0.6*frameY,0
+    put 0.85*frameX,0.6*frameY,0	
+    put 0.85*frameX+0.03*frameY,0.63*frameY,0
+    put 0.85*frameX+0.03*frameY,0.67*frameY,0
+    put 0.85*frameX,0.7*frameY,0
+    put 0.85*frameX-0.1*frameY,0.7*frameY,0
+return
+
+4:
+    vertexNum=7
+    put 0.2*frameX,0.2*frameY,0
+    put 0.2*frameX,0.6*frameY,0
+    put 0.85*frameX,0.6*frameY,0	
+    put 0.85*frameX+0.03*frameY,0.57*frameY,0
+    put 0.85*frameX+0.03*frameY,0.53*frameY,0
+    put 0.85*frameX,0.5*frameY,0
+    put 0.85*frameX-0.1*frameY,0.5*frameY,0
+return
+
+5:
+    vertexNum=10
+    put 0.15*frameX+0.1*frameY,0.5*frameY,0
+	put 0.15*frameX,0.5*frameY,0
+	put 0.15*frameX-0.03*frameY,0.53*frameY,0
+	put 0.15*frameX-0.03*frameY,0.57*frameY,0
+    put 0.15*frameX,0.6*frameY,0
+    put 0.85*frameX,0.6*frameY,0	
+    put 0.85*frameX+0.03*frameY,0.57*frameY,0
+    put 0.85*frameX+0.03*frameY,0.53*frameY,0
+    put 0.85*frameX,0.5*frameY,0
+    put 0.85*frameX-0.1*frameY,0.5*frameY,0
+return
+
+6:
+    vertexNum=6
+    put 0.15*frameX+0.1*frameY,0.5*frameY,0
+	put 0.15*frameX,0.5*frameY,0
+	put 0.15*frameX-0.03*frameY,0.53*frameY,0
+	put 0.15*frameX-0.03*frameY,0.57*frameY,0
+    put 0.15*frameX,0.6*frameY,0
+    put 0.85*frameX,0.6*frameY,0	
+return
+
+7:
+    vertexNum=3
+    put 0.2*frameX+0.3*frameY,0.3*frameY,0
+    put 0.2*frameX,0.6*frameY,0
+    put 0.9*frameX,0.6*frameY,0
+return
+
+8:
+    vertexNum=3
+    put 0.2*frameX,0.3*frameY,0
+    put 0.2*frameX+0.3*frameY,0.6*frameY,0
+    put 0.9*frameX,0.6*frameY,0
+return
+
+9:
+    vertexNum=4
+    put 0.15*frameX,0.2*frameY,0
+    put 0.15*frameX,0.6*frameY,0
+    put 0.85*frameX,0.6*frameY,0
+    put 0.85*frameX,0.2*frameY,0
+return
+
+10:
+    vertexNum=3
+    put 0.15*frameX,0.6*frameY,0
+    put 0.85*frameX,0.6*frameY,0
+    put 0.85*frameX,0.2*frameY,0
+return
+
+11:
+    vertexNum=4
+    put 0.2*frameX+0.15*frameY,0.45*frameY,0
+    put 0.2*frameX,0.6*frameY,0
+    put 0.8*frameX,0.6*frameY,0
+    put 0.8*frameX,0.4*frameY,0
+return
+
+12:
+    vertexNum=4
+    put 0.2*frameX+0.15*frameY,0.45*frameY,0
+    put 0.2*frameX,0.6*frameY,0
+    put 0.8*frameX,0.6*frameY,0
+    put 0.8*frameX-0.15*frameY,0.45*frameY,0
+return
+
+13:
+    vertexNum=4
+    put 0.2*frameX,0.2*frameY,0
+    put 0.2*frameX,0.5*frameY,0
+    put 0.8*frameX,0.5*frameY,0
+    put 0.8*frameX,0.8*frameY,0
+return
+
+14:
+    vertexNum=4
+    put 0.8*frameX,0.2*frameY,0
+    put 0.2*frameX,0.2*frameY,0
+    put 0.2*frameX,0.6*frameY,0
+    put 0.8*frameX,0.6*frameY,0
+return
+
+15:
+    vertexNum=5
+    put 0.2*frameX+0.3*frameY,0.35*frameY,0
+    put 0.2*frameX,0.35*frameY,0
+    put 0.2*frameX,0.65*frameY,0
+    put 0.8*frameX,0.65*frameY,0
+    put 0.8*frameX,0.35*frameY,0
+return
+
+16:
+    vertexNum=4
+    put 0.2*frameX+0.3*frameY,0.35*frameY,0
+    put 0.2*frameX,0.35*frameY,0
+    put 0.2*frameX,0.65*frameY,0
+    put 0.8*frameX,0.65*frameY,0
+return

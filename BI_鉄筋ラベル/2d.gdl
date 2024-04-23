@@ -1,0 +1,207 @@
+hotspot2 0,0
+hotspot2 -frameX/2,-frameY/2
+hotspot2 frameX/2,-frameY/2
+hotspot2 frameX/2,frameY/2
+hotspot2 -frameX/2,frameY/2
+
+fontSize=0.05
+define style "moji" fontType,fontSize*1000/GLOB_SCALE,5,1
+style "moji"
+
+add2 -frameX/2,-frameY/2
+    pen frameColor
+    rect2 0,0,frameX,frameY
+
+    pen lineColor
+    project2{3} 3,270,1,1+2+4+8+16,parameters dis3D=1
+
+    pen fontColor
+    gosub barShape
+del 1
+
+end
+
+
+
+1:
+    add2 0.5*frameX,0.5*frameY-fontSize
+        text2 0,0,barSize1*1000
+    del 1
+return
+
+2:
+    add2 0.2*frameX-fontSize,0.4*frameY
+    rot2 90
+        text2 0,0,barSize1*1000
+    del 2
+
+    add2 0.5*frameX,0.6*frameY-fontSize
+        text2 0,0,barSize2*1000
+    del 1
+return
+
+3:
+    add2 0.2*frameX-fontSize,0.4*frameY
+    rot2 90
+        text2 0,0,barSize1*1000
+    del 2
+
+    add2 0.*frameX,0.6*frameY-fontSize
+        text2 0,0,barSize2*1000
+    del 1
+return
+
+4:
+    add2 0.2*frameX-fontSize,0.4*frameY
+    rot2 90
+        text2 0,0,barSize1*1000
+    del 2
+
+    add2 0.5*frameX,0.6*frameY-fontSize
+        text2 0,0,barSize2*1000
+    del 1
+return
+
+5:
+    add2 0.5*frameX,0.6*frameY-fontSize
+        text2 0,0,barSize1*1000
+    del 1
+return
+
+6:
+    add2 0.5*frameX,0.6*frameY-fontSize
+        text2 0,0,barSize1*1000
+    del 1
+return
+
+7:
+    add2 0.2*frameX+0.15*frameY,0.45*frameY
+    rot2 -45
+    add2 0,-fontSize
+        text2 0,0,barSize1*1000
+    del 3
+
+    add2 0.5*frameX,0.6*frameY-fontSize
+        text2 0,0,barSize2*1000
+    del 1
+return
+
+8:
+    add2 0.2*frameX+0.15*frameY,0.45*frameY
+    rot2 45
+    add2 0,fontSize
+        text2 0,0,barSize1*1000
+    del 3
+
+    add2 0.5*frameX,0.6*frameY-fontSize
+        text2 0,0,barSize2*1000
+    del 1
+return
+
+9:
+    add2 0.15*frameX-fontSize,0.4*frameY
+    rot2 90
+        text2 0,0,barSize1*1000
+    del 2
+
+    add2 0.5*frameX,0.6*frameY+fontSize
+        text2 0,0,barSize2*1000
+    del 1
+
+    add2 0.85*frameX+fontSize,0.4*frameY
+    rot2 90
+        text2 0,0,barSize3*1000
+    del 2
+return
+
+10:
+    add2 0.5*frameX,0.6*frameY-fontSize
+        text2 0,0,barSize1*1000
+    del 1
+
+    add2 0.85*frameX+fontSize,0.4*frameY
+    rot2 90
+        text2 0,0,barSize2*1000
+    del 2
+return
+
+11:
+    add2 0.5*frameX,0.6*frameY-fontSize
+        text2 0,0,barSize1*1000
+    del 1
+
+    add2 0.8*frameX+fontSize,0.5*frameY
+    rot2 90
+        text2 0,0,barSize2*1000
+    del 2
+return
+
+12:
+    add2 0.5*frameX,0.6*frameY-fontSize
+        text2 0,0,barSize1*1000
+    del 1
+return
+
+13:
+    add2 0.2*frameX-fontSize,0.35*frameY
+    rot2 90
+        text2 0,0,barSize1*1000
+    del 2
+
+    add2 0.5*frameX,0.5*frameY-fontSize
+        text2 0,0,barSize2*1000
+    del 1
+
+    add2 0.8*frameX+fontSize,0.65*frameY
+    rot2 90
+        text2 0,0,barSize3*1000
+    del 2
+return
+
+14:
+    add2 0.2*frameX-fontSize,0.4*frameY
+    rot2 90
+        text2 0,0,barSize1*1000
+    del 2
+
+    add2 0.5*frameX,0.6*frameY+fontSize
+        text2 0,0,barSize2*1000
+    del 1
+return
+
+15:
+    add2 0.2*frameX-fontSize,0.5*frameY
+    rot2 90
+        text2 0,0,barSize1*1000
+    del 2
+
+    add2 0.5*frameX,0.65*frameY-fontSize
+        text2 0,0,barSize2*1000
+    del 1
+
+    add2 0.8*frameX+fontSize,0.5*frameY
+    rot2 90
+        text2 0,0,barSize3*1000
+    del 2
+return
+
+16:
+    add2 0.2*frameX-fontSize,0.5*frameY
+    rot2 90
+        text2 0,0,barSize1*1000
+    del 2
+
+    add2 0.5*frameX,0.65*frameY-fontSize
+        text2 0,0,barSize2*1000
+    del 1
+return
+
+
+
+
+
+
+
+
+
+

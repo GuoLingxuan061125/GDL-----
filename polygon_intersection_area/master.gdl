@@ -1,0 +1,696 @@
+code=1
+eps=1e-5
+x=1
+y=2
+
+values "poly1Num" range[3,]
+values "poly2Num" range[3,]
+
+dim _poly1Pos[][],_poly2Pos[][]
+
+for i=1 to poly1Num
+    _poly1Pos[i][x]=poly1Pos[i][x]
+    _poly1Pos[i][y]=poly1Pos[i][y]
+next i
+
+for i=1 to poly2Num
+    _poly2Pos[i][x]=poly2Pos[i][x]
+    _poly2Pos[i][y]=poly2Pos[i][y]
+next i
+
+poly1Pos=_poly1Pos
+poly2Pos=_poly2Pos
+parameters \
+poly1Pos=_poly1Pos,
+poly2Pos=_poly2Pos
+
+
+!poly1の辺の方程式(ax+by+c=0)
+dim _poly1EquA[],_poly1EquB[],_poly1EquC[]
+
+for i=1 to poly1Num
+    if i<poly1Num then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    _poly1EquA[i]=poly1Pos[i2][y]-poly1Pos[i][y]
+    _poly1EquB[i]=poly1Pos[i][x]-poly1Pos[i2][x]
+    _poly1EquC[i]=poly1Pos[i2][x]*poly1Pos[i][y]-poly1Pos[i][x]*poly1Pos[i2][y]
+next i
+
+
+!poly2の辺の方程式(ax+by+c=0)
+dim _poly2EquA[],_poly2EquB[],_poly2EquC[]
+
+for i=1 to poly2Num
+    if i<poly2Num then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    _poly2EquA[i]=poly2Pos[i2][y]-poly2Pos[i][y]
+    _poly2EquB[i]=poly2Pos[i][x]-poly2Pos[i2][x]
+    _poly2EquC[i]=poly2Pos[i2][x]*poly2Pos[i][y]-poly2Pos[i][x]*poly2Pos[i2][y]
+next i
+
+
+!poly1の頂点はpoly2の中にあるかを判断する
+dim _poly1InsideFlag[]
+
+for i=1 to poly1Num
+    _poly1InsideFlag[i]=0
+
+    tempXpos=_poly1Pos[i][x]
+    tempYpos=_poly1Pos[i][y]
+    tempIntsecNum=0
+
+    for j=1 to poly2Num
+        if j<poly2Num then
+            j2=j+1
+        else
+            j2=1
+        endif
+
+        !if (tempXpos>=min(_poly2Pos[j][x],_poly2Pos[j2][x]) and tempXpos<max(_poly2Pos[j][x],_poly2Pos[j2][x])) or \
+        !(tempXpos>min(_poly2Pos[j][x],_poly2Pos[j2][x]) and tempXpos<=max(_poly2Pos[j][x],_poly2Pos[j2][x])) then
+        if (tempXpos>=min(_poly2Pos[j][x],_poly2Pos[j2][x]) and tempXpos<max(_poly2Pos[j][x],_poly2Pos[j2][x])) then
+            intsecY=_poly2Pos[j][y]+(_poly2Pos[j2][y]-_poly2Pos[j][y])*(tempXpos-_poly2Pos[j][x])/(_poly2Pos[j2][x]-_poly2Pos[j][x])
+            if intsecY>=tempYpos then tempIntsecNum=tempIntsecNum+1
+        endif
+    next j
+
+    if fra(tempIntsecNum/2)<>0 then
+        _poly1InsideFlag[i]=-1
+    endif
+next i
+
+poly1InsideFlag=_poly1InsideFlag
+parameters poly1InsideFlag=_poly1InsideFlag
+
+
+!poly2の頂点はpoly1の中にあるかを判断する
+dim _poly2InsideFlag[]
+
+for i=1 to poly2Num
+    _poly2InsideFlag[i]=0
+
+    tempXpos=_poly2Pos[i][x]
+    tempYpos=_poly2Pos[i][y]
+    tempIntsecNum=0
+
+    for j=1 to poly1Num
+        if j<poly1Num then
+            j2=j+1
+        else
+            j2=1
+        endif
+
+        !if (tempXpos>=min(_poly1Pos[j][x],_poly1Pos[j2][x]) and tempXpos<max(_poly1Pos[j][x],_poly1Pos[j2][x])) or \
+        !(tempXpos>min(_poly1Pos[j][x],_poly1Pos[j2][x]) and tempXpos<=max(_poly1Pos[j][x],_poly1Pos[j2][x])) then
+        if (tempXpos>=min(_poly1Pos[j][x],_poly1Pos[j2][x]) and tempXpos<max(_poly1Pos[j][x],_poly1Pos[j2][x])) then
+            intsecY=_poly1Pos[j][y]+(_poly1Pos[j2][y]-_poly1Pos[j][y])*(tempXpos-_poly1Pos[j][x])/(_poly1Pos[j2][x]-_poly1Pos[j][x])
+            if intsecY>=tempYpos then tempIntsecNum=tempIntsecNum+1
+        endif
+    next j
+
+    if fra(tempIntsecNum/2)<>0 then
+        _poly2InsideFlag[i]=-1
+    endif
+next i
+
+poly2InsideFlag=_poly2InsideFlag
+parameters poly2InsideFlag=_poly2InsideFlag
+
+
+!poly1の辺とpoly2の交点
+dim _intsecPoint1Num[],_intsecPoint1Pos[][]
+_intsecPoint1Num[1]=0
+_intsecPoint1Pos[1][x]=0 : _intsecPoint1Pos[1][y]=0
+
+for i=1 to poly1Num
+    if i<poly1Num then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    _intsecPoint1Num[i]=0
+    _intsecPoint1Pos[i][1]=0 : _intsecPoint1Pos[i][2]=0
+
+    a1=_poly1EquA[i]
+    b1=_poly1EquB[i]
+    c1=_poly1EquC[i]
+
+    for j=1 to poly2Num
+        if j<poly2Num then
+            j2=j+1
+        else
+            j2=1
+        endif
+
+        a2=_poly2EquA[j]
+        b2=_poly2EquB[j]
+        c2=_poly2EquC[j]
+
+        if a1*b2<>b1*a2 then
+            intsecPointX=(c2*b1-c1*b2)/(a1*b2-a2*b1)
+            intsecPointY=(c1*a2-c2*a1)/(a1*b2-a2*b1)
+
+            if  intsecPointX>=min(_poly1Pos[i][x],_poly1Pos[i2][x])-eps and intsecPointX<=max(_poly1Pos[i][x],_poly1Pos[i2][x])+eps \
+            and intsecPointY>=min(_poly1Pos[i][y],_poly1Pos[i2][y])-eps and intsecPointY<=max(_poly1Pos[i][y],_poly1Pos[i2][y])+eps \
+            and intsecPointX>=min(_poly2Pos[j][x],_poly2Pos[j2][x])-eps and intsecPointX<=max(_poly2Pos[j][x],_poly2Pos[j2][x])+eps \
+            and intsecPointY>=min(_poly2Pos[j][y],_poly2Pos[j2][y])-eps and intsecPointY<=max(_poly2Pos[j][y],_poly2Pos[j2][y])+eps then
+                _intsecPoint1Num[i]=_intsecPoint1Num[i]+1
+                _intsecPoint1Pos[i][2*_intsecPoint1Num[i]-1]=intsecPointX
+                _intsecPoint1Pos[i][2*_intsecPoint1Num[i]]=intsecPointY
+            endif
+        endif
+    next j
+
+    !交点を順序する
+    if _intsecPoint1Num[i]>1 then
+        for j=1 to _intsecPoint1Num[i]
+            for n=1 to _intsecPoint1Num[i]-j
+                if sqr((_intsecPoint1Pos[i][2*n-1]-_poly1Pos[i][x])^2+(_intsecPoint1Pos[i][2*n]-_poly1Pos[i][y])^2)\
+                >sqr((_intsecPoint1Pos[i][2*(n+1)-1]-_poly1Pos[i][x])^2+(_intsecPoint1Pos[i][2*(n+1)]-_poly1Pos[i][y])^2) then
+                    tempX=_intsecPoint1Pos[i][2*n-1]
+                    tempY=_intsecPoint1Pos[i][2*n]
+                    _intsecPoint1Pos[i][2*n-1]=_intsecPoint1Pos[i][2*(n+1)-1]
+                    _intsecPoint1Pos[i][2*n]=_intsecPoint1Pos[i][2*(n+1)]
+                    _intsecPoint1Pos[i][2*(n+1)-1]=tempX
+                    _intsecPoint1Pos[i][2*(n+1)]=tempY
+                endif
+            next n
+        next j
+    endif
+next i
+
+intsecPoint1Num=_intsecPoint1Num
+intsecPoint1Pos=_intsecPoint1Pos
+parameters \
+intsecPoint1Num=_intsecPoint1Num,
+intsecPoint1Pos=_intsecPoint1Pos
+
+
+!poly1新しい座標
+poly1NewNum=1
+dim _poly1NewPos[][],_poly1NewFlag[]
+_poly1NewPos[1][x]=poly1Pos[1][x] : _poly1NewPos[1][y]=poly1Pos[1][y]
+_poly1NewFlag[1]=poly1InsideFlag[1]
+
+for i=1 to poly1Num
+    duplicationFlag=0
+
+    for j=1 to poly1NewNum
+        if  poly1Pos[i][x]>=_poly1NewPos[j][x]-eps and poly1Pos[i][x]<=_poly1NewPos[j][x]+eps \
+        and poly1Pos[i][y]>=_poly1NewPos[j][y]-eps and poly1Pos[i][y]<=_poly1NewPos[j][y]+eps then
+            duplicationFlag=1
+        endif
+    next j
+
+    if duplicationFlag=0 then
+        poly1NewNum=poly1NewNum+1
+        _poly1NewPos[poly1NewNum][x]=poly1Pos[i][x]
+        _poly1NewPos[poly1NewNum][y]=poly1Pos[i][y]
+        _poly1NewFlag[poly1NewNum]=poly1InsideFlag[i]
+    endif
+
+    if intsecPoint1Num[i]>0 then
+        for j=1 to intsecPoint1Num[i]
+            duplicationFlag=0
+            duplicationIndex=0
+
+            for m=1 to poly1NewNum
+                if  intsecPoint1Pos[i][2*j-1]>=_poly1NewPos[m][x]-eps and intsecPoint1Pos[i][2*j-1]<=_poly1NewPos[m][x]+eps \
+                and intsecPoint1Pos[i][2*j]  >=_poly1NewPos[m][y]-eps and intsecPoint1Pos[i][2*j]  <=_poly1NewPos[m][y]+eps then
+                    duplicationFlag=1
+                    duplicationIndex=m
+                endif
+            next m
+
+            if duplicationFlag=0 then
+                poly1NewNum=poly1NewNum+1
+                _poly1NewPos[poly1NewNum][x]=intsecPoint1Pos[i][2*j-1]
+                _poly1NewPos[poly1NewNum][y]=intsecPoint1Pos[i][2*j]
+                _poly1NewFlag[poly1NewNum]=-2
+            else
+                _poly1NewFlag[duplicationIndex]=-2
+            endif
+        next j
+    endif
+next i
+
+poly1NewNum=poly1NewNum
+poly1NewPos=_poly1NewPos
+parameters \
+poly1NewNum=poly1NewNum,
+poly1NewPos=_poly1NewPos
+
+
+!poly2の辺とpoly1の交点
+dim _intsecPoint2Num[],_intsecPoint2Pos[][]
+_intsecPoint2Num[1]=0
+_intsecPoint2Pos[1][x]=0 : _intsecPoint2Pos[1][y]=0
+
+for i=1 to poly2Num
+    if i<poly2Num then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    _intsecPoint2Num[i]=0
+    _intsecPoint2Pos[i][1]=0 : _intsecPoint2Pos[i][2]=0
+
+    a1=_poly2EquA[i]
+    b1=_poly2EquB[i]
+    c1=_poly2EquC[i]
+
+    for j=1 to poly1Num
+        if j<poly1Num then
+            j2=j+1
+        else
+            j2=1
+        endif
+
+        a2=_poly1EquA[j]
+        b2=_poly1EquB[j]
+        c2=_poly1EquC[j]
+
+        if a1*b2<>b1*a2 then
+            intsecPointX=(c2*b1-c1*b2)/(a1*b2-a2*b1)
+            intsecPointY=(c1*a2-c2*a1)/(a1*b2-a2*b1)
+
+            if  intsecPointX>=min(_poly2Pos[i][x],_poly2Pos[i2][x])-eps and intsecPointX<=max(_poly2Pos[i][x],_poly2Pos[i2][x])+eps \
+            and intsecPointY>=min(_poly2Pos[i][y],_poly2Pos[i2][y])-eps and intsecPointY<=max(_poly2Pos[i][y],_poly2Pos[i2][y])+eps \
+            and intsecPointX>=min(_poly1Pos[j][x],_poly1Pos[j2][x])-eps and intsecPointX<=max(_poly1Pos[j][x],_poly1Pos[j2][x])+eps \
+            and intsecPointY>=min(_poly1Pos[j][y],_poly1Pos[j2][y])-eps and intsecPointY<=max(_poly1Pos[j][y],_poly1Pos[j2][y])+eps then
+                _intsecPoint2Num[i]=_intsecPoint2Num[i]+1
+                _intsecPoint2Pos[i][2*_intsecPoint2Num[i]-1]=intsecPointX
+                _intsecPoint2Pos[i][2*_intsecPoint2Num[i]]=intsecPointY
+            endif
+        endif
+    next j
+
+    !交点を順序する
+    if _intsecPoint2Num[i]>1 then
+        for j=1 to _intsecPoint2Num[i]
+            for n=1 to _intsecPoint2Num[i]-j
+                if sqr((_intsecPoint2Pos[i][2*n-1]-_poly2Pos[i][x])^2+(_intsecPoint2Pos[i][2*n]-_poly2Pos[i][y])^2)\
+                >sqr((_intsecPoint2Pos[i][2*(n+1)-1]-_poly2Pos[i][x])^2+(_intsecPoint2Pos[i][2*(n+1)]-_poly2Pos[i][y])^2) then
+                    tempX=_intsecPoint2Pos[i][2*n-1]
+                    tempY=_intsecPoint2Pos[i][2*n]
+                    _intsecPoint2Pos[i][2*n-1]=_intsecPoint2Pos[i][2*(n+1)-1]
+                    _intsecPoint2Pos[i][2*n]=_intsecPoint2Pos[i][2*(n+1)]
+                    _intsecPoint2Pos[i][2*(n+1)-1]=tempX
+                    _intsecPoint2Pos[i][2*(n+1)]=tempY
+                endif
+            next n
+        next j
+    endif
+next i
+
+intsecPoint2Num=_intsecPoint2Num
+intsecPoint2Pos=_intsecPoint2Pos
+parameters \
+intsecPoint2Num=_intsecPoint2Num,
+intsecPoint2Pos=_intsecPoint2Pos
+
+
+!poly2新しい座標
+poly2NewNum=1
+dim _poly2NewPos[][],_poly2NewFlag[]
+_poly2NewPos[1][x]=poly2Pos[1][x] : _poly2NewPos[1][y]=poly2Pos[1][y]
+_poly2NewFlag[1]=poly2InsideFlag[1]
+
+for i=1 to poly2Num
+    duplicationFlag=0
+
+    for j=1 to poly2NewNum
+        if  poly2Pos[i][x]>=_poly2NewPos[j][x]-eps and poly2Pos[i][x]<=_poly2NewPos[j][x]+eps \
+        and poly2Pos[i][y]>=_poly2NewPos[j][y]-eps and poly2Pos[i][y]<=_poly2NewPos[j][y]+eps then
+            duplicationFlag=1
+        endif
+    next j
+
+    if duplicationFlag=0 then
+        poly2NewNum=poly2NewNum+1
+        _poly2NewPos[poly2NewNum][x]=poly2Pos[i][x]
+        _poly2NewPos[poly2NewNum][y]=poly2Pos[i][y]
+        _poly2NewFlag[poly2NewNum]=poly2InsideFlag[i]
+    endif
+
+    if intsecPoint2Num[i]>0 then
+        for j=1 to intsecPoint2Num[i]
+            duplicationFlag=0
+            duplicationIndex=0
+
+            for m=1 to poly2NewNum
+                if  intsecPoint2Pos[i][2*j-1]>=_poly2NewPos[m][x]-eps and intsecPoint2Pos[i][2*j-1]<=_poly2NewPos[m][x]+eps \
+                and intsecPoint2Pos[i][2*j]  >=_poly2NewPos[m][y]-eps and intsecPoint2Pos[i][2*j]  <=_poly2NewPos[m][y]+eps then
+                    duplicationFlag=1
+                    duplicationIndex=m
+                endif
+            next m
+
+            if duplicationFlag=0 then
+                poly2NewNum=poly2NewNum+1
+                _poly2NewPos[poly2NewNum][x]=intsecPoint2Pos[i][2*j-1]
+                _poly2NewPos[poly2NewNum][y]=intsecPoint2Pos[i][2*j]
+                _poly2NewFlag[poly2NewNum]=-2
+            else
+                _poly2NewFlag[duplicationIndex]=-2
+            endif
+        next j
+    endif
+next i
+
+poly2NewNum=poly2NewNum
+poly2NewPos=_poly2NewPos
+parameters \
+poly2NewNum=poly2NewNum,
+poly2NewPos=_poly2NewPos
+
+
+for i=1 to poly1NewNum
+    if _poly1NewFlag[i]=-2 then
+        for j=1 to poly2NewNum
+            if  poly1NewPos[i][x]>=poly2NewPos[j][x]-eps and poly1NewPos[i][x]<=poly2NewPos[j][x]+eps \
+            and poly1NewPos[i][y]>=poly2NewPos[j][y]-eps and poly1NewPos[i][y]<=poly2NewPos[j][y]+eps then
+                _poly1NewFlag[i]=j
+            endif
+        next j
+    endif
+next i
+
+poly1NewFlag=_poly1NewFlag
+parameters poly1NewFlag=_poly1NewFlag
+
+
+for i=1 to poly2NewNum
+    if _poly2NewFlag[i]=-2 then
+        for j=1 to poly1NewNum
+            if  poly2NewPos[i][x]>=poly1NewPos[j][x]-eps and poly2NewPos[i][x]<=poly1NewPos[j][x]+eps \
+            and poly2NewPos[i][y]>=poly1NewPos[j][y]-eps and poly2NewPos[i][y]<=poly1NewPos[j][y]+eps then
+                _poly2NewFlag[i]=j
+            endif
+        next j
+    endif
+next i
+
+poly2NewFlag=_poly2NewFlag
+parameters poly2NewFlag=_poly2NewFlag
+
+
+!重なるエリア
+intsecAreaCount=0 !エリア数
+dim _intsecAreaNum[],_intsecAreaPos[][]
+_intsecAreaNum[1]=0
+_intsecAreaPos[1][x]=0 : _intsecAreaPos[1][y]=0
+
+
+!重なるエリアの有無判定
+overlapFlag=0
+
+for i=1 to poly1NewNum
+    if poly1NewFlag[i]<>0 then
+        overlapFlag=1
+    endif
+next i
+
+for i=1 to poly2NewNum
+    if poly2NewFlag[i]<>0 then
+        overlapFlag=1
+    endif
+next i
+
+!重なるエリア有り
+if overlapFlag=1 then
+    !使用flag初期化
+    dim poly1UsedFlag[]
+    for i=1 to poly1NewNum
+        poly1UsedFlag[i]=1
+    next i
+    
+    dim poly2UsedFlag[]
+    for i=1 to poly2NewNum
+        poly2UsedFlag[i]=1
+    next i
+
+    existFlag=1
+
+    while existFlag=1 do
+        intsecAreaCount=intsecAreaCount+1
+
+        startFlag=0
+        routeFlag=0
+        routeIndex=0
+        endFlag=0
+        loopIndex=0
+        routeDir=1
+
+        !始点座標
+        for i=1 to poly1NewNum
+            if poly1NewFlag[i]<>0 and poly1UsedFlag[i]=1 and startFlag=0 then
+                startFlag=1
+                routeFlag=1
+                routeIndex=i
+                _intsecAreaNum[intsecAreaCount]=1
+                _intsecAreaPos[intsecAreaCount][2*(1-1)+x]=poly1NewPos[i][x]
+                _intsecAreaPos[intsecAreaCount][2*(1-1)+y]=poly1NewPos[i][y]
+                poly1UsedFlag[i]=0
+            endif
+        next i
+
+        for i=1 to poly2NewNum
+            if poly2NewFlag[i]<>0 and poly2UsedFlag[i]=1 and startFlag=0 then
+                startFlag=1
+                routeFlag=2
+                routeIndex=i
+                _intsecAreaNum[intsecAreaCount]=1
+                _intsecAreaPos[intsecAreaCount][2*(1-1)+x]=poly2NewPos[i][x]
+                _intsecAreaPos[intsecAreaCount][2*(1-1)+y]=poly2NewPos[i][y]
+                poly2UsedFlag[i]=0
+            endif
+        next i
+
+        !次の座標を探す
+        while endFlag=0 and loopIndex<20 do
+            loopIndex=loopIndex+1
+
+            if routeFlag=1 then
+                nextIndex=routeIndex+routeDir
+                if nextIndex>poly1NewNum then nextIndex=nextIndex%poly1NewNum
+                if nextIndex<1 then nextIndex=nextIndex+poly1NewNum
+
+                !次の点が無効だと回す方向を変える
+                if poly1NewFlag[nextIndex]=0 or poly1UsedFlag[nextIndex]=0 then
+                    if loopIndex=1 then
+                        routeDir=routeDir*(-1)
+                    endif
+                endif
+
+                nextIndex=routeIndex+routeDir
+                if nextIndex>poly1NewNum then nextIndex=nextIndex%poly1NewNum
+                if nextIndex<1 then nextIndex=nextIndex+poly1NewNum
+
+                if poly1NewFlag[nextIndex]<>0 and poly1UsedFlag[nextIndex]=1 then
+                    !今のルートで継続する
+                    _intsecAreaNum[intsecAreaCount]=_intsecAreaNum[intsecAreaCount]+1
+                    _intsecAreaPos[intsecAreaCount][2*(_intsecAreaNum[intsecAreaCount]-1)+x]=poly1NewPos[nextIndex][x]
+                    _intsecAreaPos[intsecAreaCount][2*(_intsecAreaNum[intsecAreaCount]-1)+y]=poly1NewPos[nextIndex][y]
+
+                    routeFlag=1
+                    routeIndex=nextIndex
+                    poly1UsedFlag[routeIndex]=0
+                else
+                    if poly1NewFlag[routeIndex]=-1 then
+                        endFlag=1
+                    else
+                        !仮にルートを変える
+                        nextIndex=poly1NewFlag[routeIndex]+routeDir
+                        if nextIndex>poly2NewNum then nextIndex=nextIndex%poly2NewNum
+                        if nextIndex<1 then nextIndex=nextIndex+poly2NewNum
+
+                        !次の点が無効だと回す方向を変える
+                        if poly2NewFlag[nextIndex]=0 or poly2UsedFlag[nextIndex]=0 then
+                            if loopIndex=1 then
+                                routeDir=routeDir*(-1)
+                            endif
+                        endif
+
+                        nextIndex=poly1NewFlag[routeIndex]+routeDir
+                        if nextIndex>poly2NewNum then nextIndex=nextIndex%poly2NewNum
+                        if nextIndex<1 then nextIndex=nextIndex+poly2NewNum
+
+                        if poly2NewFlag[nextIndex]<>0 and poly2UsedFlag[nextIndex]=1 then
+                            poly2UsedFlag[poly1NewFlag[routeIndex]]=0
+
+                            !ルートを変える 
+                            _intsecAreaNum[intsecAreaCount]=_intsecAreaNum[intsecAreaCount]+1
+                            _intsecAreaPos[intsecAreaCount][2*(_intsecAreaNum[intsecAreaCount]-1)+x]=poly2NewPos[nextIndex][x]
+                            _intsecAreaPos[intsecAreaCount][2*(_intsecAreaNum[intsecAreaCount]-1)+y]=poly2NewPos[nextIndex][y]
+
+                            routeFlag=2
+                            routeIndex=nextIndex
+                            poly2UsedFlag[routeIndex]=0
+                        else
+                            endFlag=1
+                        endif
+                    endif
+                endif
+            else
+                nextIndex=routeIndex+routeDir
+                if nextIndex>poly2NewNum then nextIndex=nextIndex%poly2NewNum
+                if nextIndex<1 then nextIndex=nextIndex+poly2NewNum
+
+                !次の点が無効だと回す方向を変える
+                if poly2NewFlag[nextIndex]=0 or poly2UsedFlag[nextIndex]=0 then
+                    if loopIndex=1 then
+                        routeDir=routeDir*(-1)
+                    endif
+                endif
+
+                nextIndex=routeIndex+routeDir
+                if nextIndex>poly2NewNum then nextIndex=nextIndex%poly2NewNum
+                if nextIndex<1 then nextIndex=nextIndex+poly2NewNum
+
+                if poly2NewFlag[nextIndex]<>0 and poly2UsedFlag[nextIndex]=1 then
+                    !今のルートで継続する
+                    _intsecAreaNum[intsecAreaCount]=_intsecAreaNum[intsecAreaCount]+1
+                    _intsecAreaPos[intsecAreaCount][2*(_intsecAreaNum[intsecAreaCount]-1)+x]=poly2NewPos[nextIndex][x]
+                    _intsecAreaPos[intsecAreaCount][2*(_intsecAreaNum[intsecAreaCount]-1)+y]=poly2NewPos[nextIndex][y]
+
+                    routeFlag=2
+                    routeIndex=nextIndex
+                    poly2UsedFlag[routeIndex]=0
+                else
+                    if poly2NewFlag[routeIndex]=-1 then
+                        endFlag=1
+                    else
+                        !仮にルートを変える
+                        nextIndex=poly2NewFlag[routeIndex]+routeDir
+                        if nextIndex>poly1NewNum then nextIndex=nextIndex%poly1NewNum
+                        if nextIndex<1 then nextIndex=nextIndex+poly1NewNum
+
+                        !次の点が無効だと回す方向を変える
+                        if poly1NewFlag[nextIndex]=0 or poly1UsedFlag[nextIndex]=0 then
+                            if loopIndex=1 then
+                                routeDir=routeDir*(-1)
+                            endif
+                        endif
+
+                        nextIndex=poly2NewFlag[routeIndex]+routeDir
+                        if nextIndex>poly1NewNum then nextIndex=nextIndex%poly1NewNum
+                        if nextIndex<1 then nextIndex=nextIndex+poly1NewNum
+
+                        if poly1NewFlag[nextIndex]<>0 and poly1UsedFlag[nextIndex]=1 then
+                            poly1UsedFlag[poly2NewFlag[routeIndex]]=0
+
+                            !ルートを変える 
+                            _intsecAreaNum[intsecAreaCount]=_intsecAreaNum[intsecAreaCount]+1
+                            _intsecAreaPos[intsecAreaCount][2*(_intsecAreaNum[intsecAreaCount]-1)+x]=poly1NewPos[nextIndex][x]
+                            _intsecAreaPos[intsecAreaCount][2*(_intsecAreaNum[intsecAreaCount]-1)+y]=poly1NewPos[nextIndex][y]
+
+                            routeFlag=1
+                            routeIndex=nextIndex
+                            poly1UsedFlag[routeIndex]=0
+                        else
+                            endFlag=1
+                        endif
+                    endif
+                endif
+            endif
+        endwhile
+
+        !残りの重なるエリアの有無判定
+        existFlag=0
+
+        for i=1 to poly1NewNum
+            if poly1NewFlag[i]<>0 and poly1UsedFlag[i]=1 then
+                existFlag=1
+            endif
+        next i
+        
+        for i=1 to poly2NewNum
+            if poly2NewFlag[i]<>0 and poly2UsedFlag[i]=1 then
+                existFlag=1
+            endif
+        next i        
+    endwhile
+endif
+
+intsecAreaNum=_intsecAreaNum
+intsecAreaPos=_intsecAreaPos
+parameters \
+intsecAreaCount=intsecAreaCount,
+intsecAreaNum=_intsecAreaNum,
+intsecAreaPos=_intsecAreaPos
+
+
+!==================================================集計
+poly1Area=0
+
+for i=1 to poly1Num
+    if i<poly1Num then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    poly1Area=poly1Area+(poly1Pos[i2][x]-poly1Pos[i][x])*(poly1Pos[i2][y]+poly1Pos[i][y])/2
+next i
+
+poly1Area=abs(poly1Area)
+parameters poly1Area=poly1Area
+
+
+poly2Area=0
+
+for i=1 to poly2Num
+    if i<poly2Num then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    poly2Area=poly2Area+(poly2Pos[i2][x]-poly2Pos[i][x])*(poly2Pos[i2][y]+poly2Pos[i][y])/2
+next i
+
+poly2Area=abs(poly2Area)
+parameters poly2Area=poly2Area
+
+
+intsecArea=0
+for j=1 to intsecAreaCount
+    addArea=0
+
+    for i=1 to intsecAreaNum[j]
+        if i<intsecAreaNum[j] then
+            i2=i+1
+        else
+            i2=1
+        endif
+
+        addArea=addArea+(intsecAreaPos[j][2*(i2-1)+x]-intsecAreaPos[j][2*(i-1)+x])*(intsecAreaPos[j][2*(i2-1)+y]+intsecAreaPos[j][2*(i-1)+y])/2
+    next i
+
+    intsecArea=intsecArea+abs(addArea)
+next j
+parameters intsecArea=intsecArea
+
+
+areaPercentage1=intsecArea/max(poly1Area,eps)
+parameters areaPercentage1=areaPercentage1
+
+
+areaPercentage2=intsecArea/max(poly2Area,eps)
+parameters areaPercentage2=areaPercentage2
+
+
+
+
+

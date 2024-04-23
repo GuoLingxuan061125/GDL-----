@@ -1,0 +1,3520 @@
+!==============================================================================階段
+values{2} "step_dir" 1,"逆時計回り",2,"時計回り"
+values "floor_num" range[2,]
+
+parameters step_rat_angle=atn(step_rat/(step_tread+step_nosing))
+parameters step_angle=atn(step_riser/step_tread)
+values "step_num_totle" range[3,]
+
+values{2} "switch_mode" 1,"蹴上により階層高自動計算",2,"階層高により蹴上自動計算"
+
+if switch_mode=1 then
+	parameters floor_hei=step_num_totle*step_riser
+	lock "floor_hei"
+else
+	parameters step_riser=floor_hei/step_num_totle
+	lock "step_riser"
+endif
+
+values "step_wid1" range[0,]
+values "step_wid2" range[0,]
+values "step_tread" range[0,]
+values "step_riser" range[0,]
+values "step_nosing" range[0,]
+values "step_rat" range[0,]
+
+
+!==============================================================================踊り場
+values "step_num_down" range[2,step_num_totle-1]
+
+parameters step_num_up=step_num_totle-step_num_down
+lock "step_num_up"
+
+values "landing_1" range[step_tread,]
+values "landing_2" range[0,]
+values "handrail_wid" range[0,]
+values "landing_dep" range(0,]
+values "landing_thi" range(0,]
+values "landing_rat" range[0,landing_thi/landing_dep*100]
+if standard_x>=step_tread then
+	values "floor_1" range[0,]
+else
+	values "floor_1" range[step_tread-max(standard_x,0),]
+endif
+values "floor_dep" range(0,]
+values "floor_thi" range(0,]
+values "floor_rat" range[0,floor_thi/floor_dep*100]
+
+if switch_floor=0 then
+	hideparameter "floor_dep","floor_rat"
+endif
+
+
+!==============================================================================1階下がり
+values "gl_num" range[1,]
+
+if switch_gl=0 then
+	hideparameter "gl_num"
+endif
+
+
+!==============================================================================立上り
+values{2} "hr2_type" 1,"手すり",2,"壁"
+if switch_floor then
+	values{2} "hr_hide" 0,"なし",1,"フロア踊り場側",2,"下部階段側",3,"上部階段側"
+else
+	values{2} "hr_hide" 0,"なし",2,"下部階段側",3,"上部階段側"
+endif
+
+if hr_hide=1 then
+	values "hr_hide_start" range[0,step_wid1+handrail_wid+step_wid2-2*hr_wid-hr_hide_end)
+	values "hr_hide_end" range[0,step_wid1+handrail_wid+step_wid2-2*hr_wid-hr_hide_start)
+endif
+if hr_hide=2 or hr_hide=3 then
+	if switch_floor then
+		values "hr_hide_start" range[0,floor_dep+floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-2*hr_wid-hr_hide_end]
+		values "hr_hide_end" range[0,floor_dep+floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-2*hr_wid-hr_hide_start]
+	else
+		values "hr_hide_start" range[0,floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid-hr_hide_end]
+		values "hr_hide_end" range[0,floor_1+abs(min(standard_x,0))+(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid-hr_hide_start]
+	endif
+endif
+
+if switch_hr2=0 then hideparameter "hr2_type"
+
+if switch_hr2 and hr2_type=2 then values "handrail_wid"　range(0,]
+
+values "hr_hei" range(0,]
+values "hr2_hei" range(0,]
+
+
+!==============================================================================配筋設定
+values{2} "conFc" 18,"18 N/㎟",21,"21 N/㎟",24,"24 N/㎟",27,"27 N/㎟",30,"30 N/㎟",33,"33 N/㎟",36,"36 N/㎟",39,"39 N/㎟",42,"42 N/㎟",45,"45 N/㎟",\
+				  48,"48 N/㎟",51,"51 N/㎟",54,"54 N/㎟",57,"57 N/㎟",60,"60 N/㎟"
+
+if conFc=18 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345"
+if conFc=21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390"
+if conFc>21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390",4,"SD490"
+
+parameters l2=l2_list[sdType][conFc]
+parameters l2h=l2h_list[sdType][conFc]
+
+values "SDresol" range[3,]
+
+values "anc_down_Lb" range[0.03,]
+values "anc_up_Lb" range[0.03,]
+values "anc_landing_Lb" range[0.03,]
+values "anc_floor_Lb" range[0.03,]
+
+if switch_anc_down=0 then hideparameter "anc_down_Lb"
+if switch_anc_up=0 then hideparameter "anc_up_Lb"
+if switch_anc_landing=0 then hideparameter "anc_landing_Lb"
+if switch_anc_floor=0 then hideparameter "anc_floor_Lb"
+
+
+!==============================================================================踊り場縦筋半径設定
+values{2} "lver_up_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+values{2} "lver_down_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+values{2} "fver_up_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+values{2} "fver_down_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+
+lver_up_r=dr_list[lver_up_steel]
+lver_down_r=dr_list[lver_down_steel]
+fver_up_r=dr_list[fver_up_steel]
+fver_down_r=dr_list[fver_down_steel]
+
+
+!==============================================================================流し筋
+values{2} "ngs_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+ngs_r=dr_list[ngs_steel]
+ngs_nd=nd_list[ngs_steel]
+ngs_mat=SDmat[scode_list[ngs_steel]]
+ngs_pen=SDpen[scode_list[ngs_steel]]
+values "ngs_pitch" range[0.1,]
+values "ngs_side_cover" range[0,]
+values "ngs_down_cover" range[0,]
+
+parameters ngs_r=ngs_r,
+	ngs_nd=ngs_nd,
+	ngs_mat=ngs_mat,
+	ngs_pen=ngs_pen
+
+values "ngs_down_anc_len" range(0,]
+values "ngs_top_anc_len" range(0,]
+if switch_ngs_down_anc=0 then hideparameter "ngs_down_anc_len"
+if switch_ngs_top_anc=0 then hideparameter "ngs_top_anc_len"
+
+dim _ngs_point[]
+dim _ngs_pos[][]
+ngs_num=0
+
+for i=1 to floor_num-1
+	ngs_x_offset=ngs_side_cover+ngs_r
+
+	if floor_bar_position=1 then
+		floor_down_z=-floor_thi+floor_down_cover+2*fver_down_r+ngs_r
+	else
+		floor_down_z=-floor_thi+floor_down_cover+ngs_r
+	endif
+	
+	if landing_bar_position=1 then
+		landing_down_z=-landing_thi+landing_down_cover+2*lver_down_r+ngs_r
+	else
+		landing_down_z=-landing_thi+landing_down_cover+ngs_r
+	endif
+
+	!下部階段
+	ngs_x_num1=ceil((step_wid1-2*ngs_side_cover-2*ngs_r)/ngs_pitch)+1
+	ngs_pitch1=(step_wid1-2*ngs_side_cover-2*ngs_r)/(ngs_x_num1-1)
+
+	down_k=tan(step_angle)
+	down_b=-(step_thi-ngs_down_cover-ngs_r)/cos(step_angle)
+
+	for j=1 to ngs_x_num1
+		ngs_num=ngs_num+1
+		_ngs_point[ngs_num]=0
+	
+		!下端水平定着
+		if switch_ngs_down_anc then
+			_ngs_point[ngs_num]=_ngs_point[ngs_num]+1
+			put (floor_down_z-down_b)/down_k-ngs_down_anc_len
+			put ngs_x_offset+(j-1)*ngs_pitch1
+			put floor_down_z+(i-1)*floor_hei
+		endif
+	
+		!下端
+		_ngs_point[ngs_num]=_ngs_point[ngs_num]+1
+		put (floor_down_z-down_b)/down_k
+		put ngs_x_offset+(j-1)*ngs_pitch1
+		put floor_down_z+(i-1)*floor_hei
+
+		!上端
+		_ngs_point[ngs_num]=_ngs_point[ngs_num]+1
+		put ((step_num_down*step_riser+landing_down_z)-down_b)/down_k
+		put ngs_x_offset+(j-1)*ngs_pitch1
+		put step_num_down*step_riser+landing_down_z+(i-1)*floor_hei
+
+		!上端水平定着
+		if switch_ngs_top_anc then
+			_ngs_point[ngs_num]=_ngs_point[ngs_num]+1
+			put ((step_num_down*step_riser+landing_down_z)-down_b)/down_k+ngs_top_anc_len
+			put ngs_x_offset+(j-1)*ngs_pitch1
+			put (step_num_down*step_riser+landing_down_z)+(i-1)*floor_hei
+		endif
+
+		for m=1 to 3*_ngs_point[ngs_num]
+			_ngs_pos[ngs_num][m]=get(1)
+		next m
+	next j
+
+	!上部階段
+	ngs_x_num2=ceil((step_wid2-2*ngs_side_cover-2*ngs_r)/ngs_pitch)+1
+	ngs_pitch2=(step_wid2-2*ngs_side_cover-2*ngs_r)/(ngs_x_num2-1)
+
+	up_k=-tan(step_angle)
+	up_b=(step_num_down*step_riser+tan(step_angle)*((step_num_down-1)*step_tread+landing_1-landing_2))-(step_thi-ngs_down_cover-ngs_r)/cos(step_angle)
+
+	for j=1 to ngs_x_num2
+		ngs_num=ngs_num+1
+		_ngs_point[ngs_num]=0
+	
+		!下端水平定着
+		if switch_ngs_down_anc then
+			_ngs_point[ngs_num]=_ngs_point[ngs_num]+1
+			put ((step_num_down*step_riser+landing_down_z)-up_b)/up_k+ngs_down_anc_len
+			put step_wid1+handrail_wid+ngs_x_offset+(j-1)*ngs_pitch2
+			put step_num_down*step_riser+landing_down_z+(i-1)*floor_hei
+		endif
+	
+		!下端
+		_ngs_point[ngs_num]=_ngs_point[ngs_num]+1
+		put ((step_num_down*step_riser+landing_down_z)-up_b)/up_k
+		put step_wid1+handrail_wid+ngs_x_offset+(j-1)*ngs_pitch2
+		put step_num_down*step_riser+landing_down_z+(i-1)*floor_hei
+
+		!上端
+		_ngs_point[ngs_num]=_ngs_point[ngs_num]+1
+		put ((floor_hei+floor_down_z)-up_b)/up_k
+		put step_wid1+handrail_wid+ngs_x_offset+(j-1)*ngs_pitch2
+		put floor_hei+floor_down_z+(i-1)*floor_hei
+
+		!上端水平定着
+		if switch_ngs_top_anc then
+			_ngs_point[ngs_num]=_ngs_point[ngs_num]+1
+			put ((floor_hei+floor_down_z)-up_b)/up_k-ngs_top_anc_len
+			put step_wid1+handrail_wid+ngs_x_offset+(j-1)*ngs_pitch2
+			put floor_hei+floor_down_z+(i-1)*floor_hei
+		endif
+
+		for m=1 to 3*_ngs_point[ngs_num]
+			_ngs_pos[ngs_num][m]=get(1)
+		next m
+	next j
+next i
+
+!1階下がり
+gl_k=-tan(step_angle)
+gl_b=(-step_num_up*step_riser+tan(step_angle)*((step_num_down-1)*step_tread+landing_1-landing_2))-(step_thi-ngs_down_cover-ngs_r)/cos(step_angle)
+
+if switch_gl then
+	for j=1 to ngs_x_num2
+		ngs_num=ngs_num+1
+		_ngs_point[ngs_num]=0
+
+		!下端水平定着
+		if switch_ngs_down_anc then
+			_ngs_point[ngs_num]=_ngs_point[ngs_num]+1
+			put ((-gl_num*step_riser+landing_down_z)-gl_b)/gl_k+ngs_down_anc_len
+			put step_wid1+handrail_wid+ngs_x_offset+(j-1)*ngs_pitch2
+			put -gl_num*step_riser+landing_down_z
+		endif
+	
+		!下端
+		_ngs_point[ngs_num]=_ngs_point[ngs_num]+1
+		put ((-gl_num*step_riser+landing_down_z)-gl_b)/gl_k
+		put step_wid1+handrail_wid+ngs_x_offset+(j-1)*ngs_pitch2
+		put -gl_num*step_riser+landing_down_z
+
+		!上端
+		_ngs_point[ngs_num]=_ngs_point[ngs_num]+1
+		put (floor_down_z-gl_b)/gl_k
+		put step_wid1+handrail_wid+ngs_x_offset+(j-1)*ngs_pitch2
+		put floor_down_z
+
+		!上端水平定着
+		if switch_ngs_top_anc then
+			_ngs_point[ngs_num]=_ngs_point[ngs_num]+1
+			put (floor_down_z-gl_b)/gl_k-ngs_top_anc_len
+			put step_wid1+handrail_wid+ngs_x_offset+(j-1)*ngs_pitch2
+			put floor_down_z
+		endif
+
+		for m=1 to 3*_ngs_point[ngs_num]
+			_ngs_pos[ngs_num][m]=get(1)
+		next m
+	next j
+endif
+
+parameters ngs_num=ngs_num,
+	ngs_point=_ngs_point,
+	ngs_pos=_ngs_pos
+
+lock "ngs_r","ngs_nd","ngs_mat","ngs_pen","ngs_num","ngs_point","ngs_pos"
+
+
+!==============================================================================稲妻筋
+values{2} "inzm_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+inzm_r=dr_list[inzm_steel]
+inzm_nd=nd_list[inzm_steel]
+inzm_mat=SDmat[scode_list[inzm_steel]]
+inzm_pen=SDpen[scode_list[inzm_steel]]
+values "inzm_pitch" range[0.1,]
+values "inzm_side_cover" range[0,]
+values "inzm_tread_cover" range[0,]
+
+parameters inzm_r=inzm_r,
+	inzm_nd=inzm_nd,
+	inzm_mat=inzm_mat,
+	inzm_pen=inzm_pen
+
+values "inzm_down_anc_len" range(0,]
+values "inzm_top_anc_len" range(0,]
+if switch_inzm_down_anc=0 then hideparameter "inzm_down_anc_len"
+if switch_inzm_top_anc=0 then hideparameter "inzm_top_anc_len"
+
+dim _inzm_point[]
+dim _inzm_pos[][]
+inzm_num=0
+
+if switch_inzm_top_anc=0 then
+	hideparameter "inzm_top_anc_len"
+endif
+
+for i=1 to floor_num-1
+	inzm_x_offset=inzm_side_cover+inzm_r
+
+	!下部階段
+	inzm_x_num1=ceil((step_wid1-2*inzm_side_cover-2*inzm_r)/inzm_pitch)+1
+	inzm_pitch1=(step_wid1-2*inzm_side_cover-2*inzm_r)/(inzm_x_num1-1)
+
+	for j=1 to inzm_x_num1
+		inzm_num=inzm_num+1
+		_inzm_point[inzm_num]=0
+
+		if switch_inzm_down_anc then
+			_inzm_point[inzm_num]=_inzm_point[inzm_num]+1
+			put inzm_tread_cover-inzm_down_anc_len
+			put inzm_x_offset+(j-1)*inzm_pitch1
+			put down_k*inzm_tread_cover+down_b+(i-1)*floor_hei
+		endif
+
+		for n=1 to step_num_down+1
+			if n=step_num_down+1 then
+				_inzm_point[inzm_num]=_inzm_point[inzm_num]+1
+				put (n-1)*step_tread+inzm_tread_cover+switch_inzm_top_anc*inzm_top_anc_len
+				put inzm_x_offset+(j-1)*inzm_pitch1
+				put down_k*((n-1)*step_tread+inzm_tread_cover)+down_b+(i-1)*floor_hei
+			else
+				_inzm_point[inzm_num]=_inzm_point[inzm_num]+1
+				put (n-1)*step_tread+inzm_tread_cover
+				put inzm_x_offset+(j-1)*inzm_pitch1
+				put down_k*((n-1)*step_tread+inzm_tread_cover)+down_b+(i-1)*floor_hei
+			endif
+		
+			if n<step_num_down+1 then
+				_inzm_point[inzm_num]=_inzm_point[inzm_num]+1
+				put (n-1)*step_tread-step_nosing+inzm_tread_cover
+				put inzm_x_offset+(j-1)*inzm_pitch1
+				put n*step_riser-step_rat-inzm_tread_cover+(i-1)*floor_hei
+			endif
+		next n
+
+		for m=1 to 3*_inzm_point[inzm_num]
+			_inzm_pos[inzm_num][m]=get(1)
+		next m
+	next j
+
+	!上部階段
+	inzm_x_num2=ceil((step_wid2-2*inzm_side_cover-2*inzm_r)/inzm_pitch)+1
+	inzm_pitch2=(step_wid2-2*inzm_side_cover-2*inzm_r)/(inzm_x_num2-1)
+
+	for j=1 to inzm_x_num2
+		inzm_num=inzm_num+1
+		_inzm_point[inzm_num]=0
+
+		if switch_inzm_down_anc then
+			_inzm_point[inzm_num]=_inzm_point[inzm_num]+1
+			put (step_num_down-1)*step_tread+landing_1-landing_2-inzm_tread_cover+inzm_down_anc_len
+			put step_wid1+handrail_wid+inzm_x_offset+(j-1)*inzm_pitch2
+			put up_k*((step_num_down-1)*step_tread+landing_1-landing_2-inzm_tread_cover)+up_b+(i-1)*floor_hei
+		endif
+
+		for n=1 to step_num_up+1
+			if n=step_num_up+1 then
+				_inzm_point[inzm_num]=_inzm_point[inzm_num]+1
+				put (step_num_down-n)*step_tread+landing_1-landing_2-inzm_tread_cover-switch_inzm_top_anc*inzm_top_anc_len
+				put step_wid1+handrail_wid+inzm_x_offset+(j-1)*inzm_pitch2
+				put up_k*((step_num_down-n)*step_tread+landing_1-landing_2-inzm_tread_cover)+up_b+(i-1)*floor_hei
+			else
+				_inzm_point[inzm_num]=_inzm_point[inzm_num]+1
+				put (step_num_down-n)*step_tread+landing_1-landing_2-inzm_tread_cover
+				put step_wid1+handrail_wid+inzm_x_offset+(j-1)*inzm_pitch2
+				put up_k*((step_num_down-n)*step_tread+landing_1-landing_2-inzm_tread_cover)+up_b+(i-1)*floor_hei
+			endif
+		
+			if n<step_num_up+1 then
+				_inzm_point[inzm_num]=_inzm_point[inzm_num]+1
+				put (step_num_down-n)*step_tread+landing_1-landing_2+step_nosing-inzm_tread_cover
+				put step_wid1+handrail_wid+inzm_x_offset+(j-1)*inzm_pitch2
+				put (step_num_down+n)*step_riser-step_rat-inzm_tread_cover+(i-1)*floor_hei
+			endif
+		next n
+
+		for m=1 to 3*_inzm_point[inzm_num]
+			_inzm_pos[inzm_num][m]=get(1)
+		next m
+	next j
+next i
+
+!1階下がり
+if switch_gl then
+	for j=1 to inzm_x_num2
+		inzm_num=inzm_num+1
+		_inzm_point[inzm_num]=0
+
+		if switch_inzm_down_anc then
+			_inzm_point[inzm_num]=_inzm_point[inzm_num]+1
+			put standard_x+(gl_num-1)*step_tread-inzm_tread_cover+inzm_down_anc_len
+			put step_wid1+handrail_wid+inzm_x_offset+(j-1)*inzm_pitch2
+			put gl_k*(standard_x+(gl_num-1)*step_tread-inzm_tread_cover)+gl_b
+		endif
+
+		for n=1 to gl_num+1
+			if n=gl_num+1 then
+				_inzm_point[inzm_num]=_inzm_point[inzm_num]+1
+				put standard_x+(gl_num-n)*step_tread-inzm_tread_cover-switch_inzm_top_anc*inzm_top_anc_len
+				put step_wid1+handrail_wid+inzm_x_offset+(j-1)*inzm_pitch2
+				put gl_k*(standard_x+(gl_num-n)*step_tread-inzm_tread_cover)+gl_b
+			else
+				_inzm_point[inzm_num]=_inzm_point[inzm_num]+1
+				put standard_x+(gl_num-n)*step_tread-inzm_tread_cover
+				put step_wid1+handrail_wid+inzm_x_offset+(j-1)*inzm_pitch2
+				put gl_k*(standard_x+(gl_num-n)*step_tread-inzm_tread_cover)+gl_b
+			endif
+		
+			if n<gl_num+1 then
+				_inzm_point[inzm_num]=_inzm_point[inzm_num]+1
+				put standard_x+(gl_num-n)*step_tread+step_nosing-inzm_tread_cover
+				put step_wid1+handrail_wid+inzm_x_offset+(j-1)*inzm_pitch2
+				put -step_rat-inzm_tread_cover+(n-gl_num)*step_riser
+			endif
+		next n
+
+		for m=1 to 3*_inzm_point[inzm_num]
+			_inzm_pos[inzm_num][m]=get(1)
+		next m
+	next j
+endif
+
+parameters inzm_num=inzm_num,
+	inzm_point=_inzm_point,
+	inzm_pos=_inzm_pos
+
+lock "inzm_r","inzm_nd","inzm_mat","inzm_pen","inzm_num","inzm_point","inzm_pos"
+
+
+!==============================================================================段押え筋
+values{2} "dose_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+dose_r=dr_list[dose_steel]
+dose_nd=nd_list[dose_steel]
+dose_mat=SDmat[scode_list[dose_steel]]
+dose_pen=SDpen[scode_list[dose_steel]]
+values "dose_side_cover" range[0,]
+
+parameters dose_r=dose_r,
+	dose_nd=dose_nd,
+	dose_mat=dose_mat,
+	dose_pen=dose_pen
+
+dim _dose_point[]
+dim _dose_pos[][]
+dose_num=0
+
+for i=1 to floor_num-1
+	!中間踊り場下部階段
+	for j=1 to step_num_down
+		dose_num=dose_num+1
+		_dose_point[dose_num]=2
+
+		if switch_anc_down then
+			_dose_point[dose_num]=_dose_point[dose_num]+1
+
+			put (j-1)*step_tread+inzm_tread_cover-(inzm_r*2+dose_r)
+			put -anc_down_Lb+dose_r
+			put down_k*((j-1)*step_tread+inzm_tread_cover)+down_b+(inzm_r*2+dose_r)+(i-1)*floor_hei-max(fra_mul*dose_nd,L2*dose_nd-anc_down_Lb)
+
+			put (j-1)*step_tread+inzm_tread_cover-(inzm_r*2+dose_r)
+			put -anc_down_Lb+dose_r
+			put down_k*((j-1)*step_tread+inzm_tread_cover)+down_b+(inzm_r*2+dose_r)+(i-1)*floor_hei
+		else
+			put (j-1)*step_tread+inzm_tread_cover-(inzm_r*2+dose_r)
+			put dose_side_cover
+			put down_k*((j-1)*step_tread+inzm_tread_cover)+down_b+(inzm_r*2+dose_r)+(i-1)*floor_hei
+		endif
+
+		if switch_hr2 and hr2_type=2 then
+			_dose_point[dose_num]=_dose_point[dose_num]+1
+		
+			put (j-1)*step_tread+inzm_tread_cover-(inzm_r*2+dose_r)
+			put step_wid1+handrail_wid/2+dose_r
+			put down_k*((j-1)*step_tread+inzm_tread_cover)+down_b+(inzm_r*2+dose_r)+(i-1)*floor_hei
+		
+			put (j-1)*step_tread+inzm_tread_cover-(inzm_r*2+dose_r)
+			put step_wid1+handrail_wid/2+dose_r
+			put down_k*((j-1)*step_tread+inzm_tread_cover)+down_b+(inzm_r*2+dose_r)+(i-1)*floor_hei-l2h*dose_nd
+		else
+			put (j-1)*step_tread+inzm_tread_cover-(inzm_r*2+dose_r)
+			put step_wid1-dose_side_cover
+			put down_k*((j-1)*step_tread+inzm_tread_cover)+down_b+(inzm_r*2+dose_r)+(i-1)*floor_hei
+		endif
+
+		for n=1 to _dose_point[dose_num]*3
+			_dose_pos[dose_num][n]=get(1)
+		next n
+	next j
+
+	!中間踊り場上部階段
+	for j=1 to step_num_up
+		dose_num=dose_num+1
+		_dose_point[dose_num]=2
+
+		if switch_hr2 and hr2_type=2 then
+			_dose_point[dose_num]=_dose_point[dose_num]+1
+
+			put (step_num_down-j)*step_tread+landing_1-landing_2-inzm_tread_cover+(inzm_r*2+dose_r)
+			put step_wid1+handrail_wid/2-dose_r
+			put up_k*((step_num_down-j)*step_tread+landing_1-landing_2-inzm_tread_cover)+up_b+(inzm_r*2+dose_r)+(i-1)*floor_hei-l2h*dose_nd
+
+			put (step_num_down-j)*step_tread+landing_1-landing_2-inzm_tread_cover+(inzm_r*2+dose_r)
+			put step_wid1+handrail_wid/2-dose_r
+			put up_k*((step_num_down-j)*step_tread+landing_1-landing_2-inzm_tread_cover)+up_b+(inzm_r*2+dose_r)+(i-1)*floor_hei
+		else
+			put (step_num_down-j)*step_tread+landing_1-landing_2-inzm_tread_cover+(inzm_r*2+dose_r)
+			put step_wid1+handrail_wid+dose_side_cover
+			put up_k*((step_num_down-j)*step_tread+landing_1-landing_2-inzm_tread_cover)+up_b+(inzm_r*2+dose_r)+(i-1)*floor_hei
+		endif
+		
+		if switch_anc_up then
+			_dose_point[dose_num]=_dose_point[dose_num]+1
+
+			put (step_num_down-j)*step_tread+landing_1-landing_2-inzm_tread_cover+(inzm_r*2+dose_r)
+			put step_wid1+handrail_wid+step_wid2+anc_up_Lb-dose_r
+			put up_k*((step_num_down-j)*step_tread+landing_1-landing_2-inzm_tread_cover)+up_b+(inzm_r*2+dose_r)+(i-1)*floor_hei
+
+			put (step_num_down-j)*step_tread+landing_1-landing_2-inzm_tread_cover+(inzm_r*2+dose_r)
+			put step_wid1+handrail_wid+step_wid2+anc_up_Lb-dose_r
+			put up_k*((step_num_down-j)*step_tread+landing_1-landing_2-inzm_tread_cover)+up_b+(inzm_r*2+dose_r)+(i-1)*floor_hei-max(fra_mul*dose_nd,L2*dose_nd-anc_down_Lb)
+		else
+			put (step_num_down-j)*step_tread+landing_1-landing_2-inzm_tread_cover+(inzm_r*2+dose_r)
+			put step_wid1+handrail_wid+step_wid2-dose_side_cover
+			put up_k*((step_num_down-j)*step_tread+landing_1-landing_2-inzm_tread_cover)+up_b+(inzm_r*2+dose_r)+(i-1)*floor_hei
+		endif
+
+		for n=1 to _dose_point[dose_num]*3
+			_dose_pos[dose_num][n]=get(1)
+		next n
+	next j
+next i
+
+!1階下がり
+if switch_gl then
+	for j=1 to gl_num-1
+		dose_num=dose_num+1
+		_dose_point[dose_num]=2
+	
+		if switch_hr2 and hr2_type=2 then
+			_dose_point[dose_num]=_dose_point[dose_num]+1
+
+			put standard_x+(j-1)*step_tread-inzm_tread_cover+(inzm_r*2+dose_r)
+			put step_wid1+handrail_wid/2-dose_r
+			put gl_k*(standard_x+(j-1)*step_tread-inzm_tread_cover)+gl_b+(inzm_r*2+dose_r)-l2h*dose_nd
+
+			put standard_x+(j-1)*step_tread-inzm_tread_cover+(inzm_r*2+dose_r)
+			put step_wid1+handrail_wid/2-dose_r
+			put gl_k*(standard_x+(j-1)*step_tread-inzm_tread_cover)+gl_b+(inzm_r*2+dose_r)
+		else
+			put standard_x+(j-1)*step_tread-inzm_tread_cover+(inzm_r*2+dose_r)
+			put step_wid1+handrail_wid+dose_side_cover
+			put gl_k*(standard_x+(j-1)*step_tread-inzm_tread_cover)+gl_b+(inzm_r*2+dose_r)
+		endif
+	
+		if switch_anc_up then
+			_dose_point[dose_num]=_dose_point[dose_num]+1
+
+			put standard_x+(j-1)*step_tread-inzm_tread_cover+(inzm_r*2+dose_r)
+			put step_wid1+handrail_wid+step_wid2+anc_up_Lb-dose_r
+			put gl_k*(standard_x+(j-1)*step_tread-inzm_tread_cover)+gl_b+(inzm_r*2+dose_r)
+
+			put standard_x+(j-1)*step_tread-inzm_tread_cover+(inzm_r*2+dose_r)
+			put step_wid1+handrail_wid+step_wid2+anc_up_Lb-dose_r
+			put gl_k*(standard_x+(j-1)*step_tread-inzm_tread_cover)+gl_b+(inzm_r*2+dose_r)-max(fra_mul*dose_nd,L2*dose_nd-anc_down_Lb)
+		else
+			put standard_x+(j-1)*step_tread-inzm_tread_cover+(inzm_r*2+dose_r)
+			put step_wid1+handrail_wid+step_wid2-dose_side_cover
+			put gl_k*(standard_x+(j-1)*step_tread-inzm_tread_cover)+gl_b+(inzm_r*2+dose_r)
+		endif
+	
+		for n=1 to _dose_point[dose_num]*3
+			_dose_pos[dose_num][n]=get(1)
+		next n
+	next j
+endif
+
+parameters dose_num=dose_num,
+	dose_point=_dose_point,
+	dose_pos=_dose_pos
+
+lock "dose_r","dose_nd","dose_mat","dose_pen","dose_num","dose_point","dose_pos"
+
+
+!==============================================================================段鼻筋
+values{2} "dbn_pattern" 1,"シングル",2,"ダブル"
+values{2} "dbn_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+dbn_r=dr_list[dbn_steel]
+dbn_nd=nd_list[dbn_steel]
+dbn_mat=SDmat[scode_list[dbn_steel]]
+dbn_pen=SDpen[scode_list[dbn_steel]]
+values "dbn_side_cover" range[0,]
+
+parameters dbn_r=dbn_r,
+	dbn_nd=dbn_nd,
+	dbn_mat=dbn_mat,
+	dbn_pen=dbn_pen
+
+dim _dbn_point[]
+dim _dbn_pos[][]
+dbn_num=0
+
+for i=1 to floor_num-1
+	!中間踊り場下部階段
+	for j=1 to step_num_down
+		for m=1 to dbn_pattern
+			dbn_num=dbn_num+1
+			_dbn_point[dbn_num]=4
+		
+			if switch_anc_down then
+				put (j-1)*step_tread-step_nosing+inzm_tread_cover+(inzm_r*2+dbn_r)+(m-1)*2*dbn_r
+				put -anc_down_Lb-dbn_r
+				put j*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)-max(fra_mul*dbn_nd,L2*dbn_nd-anc_down_Lb)+(i-1)*floor_hei-(m-1)/2*dbn_r
+		
+				put (j-1)*step_tread-step_nosing+inzm_tread_cover+(inzm_r*2+dbn_r)+(m-1)*2*dbn_r
+				put -anc_down_Lb-dbn_r
+				put j*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)+(i-1)*floor_hei-(m-1)/2*dbn_r
+			else
+				put (j-1)*step_tread-step_nosing+inzm_tread_cover+(inzm_r*2+dbn_r)+(m-1)*2*dbn_r
+				put dbn_side_cover+dbn_r
+				put (j-1)*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)+(i-1)*floor_hei-(m-1)/2*dbn_r
+		
+				put (j-1)*step_tread-step_nosing+inzm_tread_cover+(inzm_r*2+dbn_r)+(m-1)*2*dbn_r
+				put dbn_side_cover+dbn_r
+				put j*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)+(i-1)*floor_hei-(m-1)/2*dbn_r
+			endif
+		
+			if switch_hr2 and hr2_type=2 then
+				put (j-1)*step_tread-step_nosing+inzm_tread_cover+(inzm_r*2+dbn_r)+(m-1)*2*dbn_r
+				put step_wid1+handrail_wid/2+2*dose_r+dbn_r
+				put j*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)+(i-1)*floor_hei-(m-1)/2*dbn_r
+		
+				put (j-1)*step_tread-step_nosing+inzm_tread_cover+(inzm_r*2+dbn_r)+(m-1)*2*dbn_r
+				put step_wid1+handrail_wid/2+2*dose_r+dbn_r
+				put j*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)+(i-1)*floor_hei-l2h*dbn_nd-(m-1)/2*dbn_r
+			else
+				put (j-1)*step_tread-step_nosing+inzm_tread_cover+(inzm_r*2+dbn_r)+(m-1)*2*dbn_r
+				put step_wid1-(dbn_side_cover+dbn_r)
+				put j*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)+(i-1)*floor_hei-(m-1)/2*dbn_r
+
+				put (j-1)*step_tread-step_nosing+inzm_tread_cover+(inzm_r*2+dbn_r)+(m-1)*2*dbn_r
+				put step_wid1-(dbn_side_cover+dbn_r)
+				put (j-1)*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)+(i-1)*floor_hei-(m-1)/2*dbn_r
+			endif
+		
+			for n=1 to _dbn_point[dbn_num]*3
+				_dbn_pos[dbn_num][n]=get(1)
+			next n
+		next m
+	next j
+
+	!中間踊り場上部階段
+	for j=1 to step_num_up
+		for m=1 to dbn_pattern
+			dbn_num=dbn_num+1
+			_dbn_point[dbn_num]=4
+		
+			if switch_hr2 and hr2_type=2 then
+				put (step_num_down-j)*step_tread+landing_1-landing_2+step_nosing-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)*2*dbn_r
+				put step_wid1+handrail_wid/2-2*dose_r-dbn_r
+				put (step_num_down+j)*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)+(i-1)*floor_hei-l2h*dbn_nd-(m-1)/2*dbn_r
+		
+				put (step_num_down-j)*step_tread+landing_1-landing_2+step_nosing-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)*2*dbn_r
+				put step_wid1+handrail_wid/2-2*dose_r-dbn_r
+				put (step_num_down+j)*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)+(i-1)*floor_hei-(m-1)/2*dbn_r
+			else
+				put (step_num_down-j)*step_tread+landing_1-landing_2+step_nosing-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)*2*dbn_r
+				put step_wid1+handrail_wid+(dbn_side_cover+dbn_r)
+				put (step_num_down+j-1)*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)+(i-1)*floor_hei-(m-1)/2*dbn_r
+
+				put (step_num_down-j)*step_tread+landing_1-landing_2+step_nosing-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)*2*dbn_r
+				put step_wid1+handrail_wid+(dbn_side_cover+dbn_r)
+				put (step_num_down+j)*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)+(i-1)*floor_hei-(m-1)/2*dbn_r
+			endif
+			
+			if switch_anc_up then
+				put (step_num_down-j)*step_tread+landing_1-landing_2+step_nosing-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)*2*dbn_r
+				put step_wid1+handrail_wid+step_wid2+anc_up_Lb+dbn_r
+				put (step_num_down+j)*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)+(i-1)*floor_hei-(m-1)/2*dbn_r
+		
+				put (step_num_down-j)*step_tread+landing_1-landing_2+step_nosing-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)*2*dbn_r
+				put step_wid1+handrail_wid+step_wid2+anc_up_Lb+dbn_r
+				put (step_num_down+j)*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)-max(fra_mul*dbn_nd,L2*dbn_nd-anc_down_Lb)+(i-1)*floor_hei-(m-1)/2*dbn_r
+			else
+				put (step_num_down-j)*step_tread+landing_1-landing_2+step_nosing-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)*2*dbn_r
+				put step_wid1+handrail_wid+step_wid2-dbn_side_cover-dbn_r
+				put (step_num_down+j)*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)+(i-1)*floor_hei-(m-1)/2*dbn_r
+		
+				put (step_num_down-j)*step_tread+landing_1-landing_2+step_nosing-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)*2*dbn_r
+				put step_wid1+handrail_wid+step_wid2-dbn_side_cover-dbn_r
+				put (step_num_down+j-1)*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)+(i-1)*floor_hei-(m-1)/2*dbn_r
+			endif
+		
+			for n=1 to _dbn_point[dbn_num]*3
+				_dbn_pos[dbn_num][n]=get(1)
+			next n
+		next m
+	next j
+next i
+
+!1階下がり
+if switch_gl then
+	for j=1 to gl_num
+		for m=1 to dbn_pattern
+			dbn_num=dbn_num+1
+			_dbn_point[dbn_num]=4
+		
+			if switch_hr2 and hr2_type=2 then
+				put standard_x+(j-1)*step_tread+step_nosing-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)*2*dbn_r
+				put step_wid1+handrail_wid/2-2*dose_r-dbn_r
+				put -(j-1)*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)-l2h*dbn_nd-(m-1)/2*dbn_r
+	
+				put standard_x+(j-1)*step_tread+step_nosing-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)*2*dbn_r
+				put step_wid1+handrail_wid/2-2*dose_r-dbn_r
+				put -(j-1)*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)/2*dbn_r
+			else
+				put standard_x+(j-1)*step_tread+step_nosing-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)*2*dbn_r
+				put step_wid1+handrail_wid+(dbn_side_cover+dbn_r)
+				put -j*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)/2*dbn_r
+
+				put standard_x+(j-1)*step_tread+step_nosing-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)*2*dbn_r
+				put step_wid1+handrail_wid+(dbn_side_cover+dbn_r)
+				put -(j-1)*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)/2*dbn_r
+			endif	
+	
+			if switch_anc_up then
+				put standard_x+(j-1)*step_tread+step_nosing-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)*2*dbn_r
+				put step_wid1+handrail_wid+step_wid2+anc_up_Lb+dbn_r
+				put -(j-1)*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)/2*dbn_r
+	
+				put standard_x+(j-1)*step_tread+step_nosing-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)*2*dbn_r
+				put step_wid1+handrail_wid+step_wid2+anc_up_Lb+dbn_r
+				put -(j-1)*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)-max(fra_mul*dbn_nd,L2*dbn_nd-anc_down_Lb)-(m-1)/2*dbn_r
+			else
+				put standard_x+(j-1)*step_tread+step_nosing-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)*2*dbn_r
+				put step_wid1+handrail_wid+step_wid2-dbn_side_cover-dbn_r
+				put -(j-1)*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)/2*dbn_r
+	
+				put standard_x+(j-1)*step_tread+step_nosing-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)*2*dbn_r
+				put step_wid1+handrail_wid+step_wid2-dbn_side_cover-dbn_r
+				put -j*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)-(m-1)/2*dbn_r
+			endif
+		
+			for n=1 to _dbn_point[dbn_num]*3
+				_dbn_pos[dbn_num][n]=get(1)
+			next n
+		next m
+	next j
+endif
+
+parameters dbn_num=dbn_num,
+	dbn_point=_dbn_point,
+	dbn_pos=_dbn_pos
+
+lock "dbn_r","dbn_nd","dbn_mat","dbn_pen","dbn_num","dbn_point","dbn_pos"
+
+
+!==============================================================================中間踊り場配筋
+values "landing_top_cover" range[0,]
+values "landing_down_cover" range[0,]
+values{2} "landing_bar_position" 1,"縦筋が外側",2,"横筋が外側"
+
+dim _lver_r[]
+dim _lver_nd[]
+dim _lver_mat[]
+dim _lver_pen[]
+values "lver_side_cover" range[0,]
+values "lver_edge_cover" range[0,]
+values "lver_pitch" range[0.1,]
+
+values{2} "lhor_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+lhor_r=dr_list[lhor_steel]
+lhor_nd=nd_list[lhor_steel]
+lhor_mat=SDmat[scode_list[lhor_steel]]
+lhor_pen=SDpen[scode_list[lhor_steel]]
+values "lhor_side_cover" range[0,]
+values "lhor_edge_cover" range[0,]
+values "lhor_pitch" range[0.1,]
+
+!縦筋
+lver_x_num=int((landing_dep+max(landing_1,landing_2)-2*lver_side_cover-2*max(lver_down_r,lver_up_r))/lver_pitch)+1
+lver_x_offset=(landing_dep+max(landing_1,landing_2)-(lver_x_num-1)*lver_pitch)/2
+
+dim _lver_z[]
+if landing_bar_position=1 then
+	_lver_z[1]=step_num_down*step_riser-landing_thi+landing_down_cover+lver_down_r
+	_lver_z[2]=step_num_down*step_riser-landing_top_cover-lver_up_r
+else
+	_lver_z[1]=step_num_down*step_riser-landing_thi+landing_down_cover+2*lhor_r+lver_down_r
+	_lver_z[2]=step_num_down*step_riser-landing_top_cover-2*lhor_r-lver_up_r
+endif
+
+lver_num=0
+dim _lver_point[]
+dim _lver_pos[][]
+
+for i=1 to floor_num-1
+	for j=1 to lver_x_num
+		lver_x_pos=-max(landing_1,landing_2)+lver_x_offset+(j-1)*lver_pitch
+
+		for n=1 to 2
+			if lver_x_pos>=lver_side_cover then
+				lver_num=lver_num+1
+				_lver_point[lver_num]=2+switch_anc_down+switch_anc_up
+
+				if n=1 then
+					_lver_r[lver_num]=lver_down_r
+					_lver_nd[lver_num]=nd_list[lver_down_steel]
+					_lver_mat[lver_num]=SDmat[scode_list[lver_down_steel]]
+					_lver_pen[lver_num]=SDpen[scode_list[lver_down_steel]]
+				else
+					_lver_r[lver_num]=lver_up_r
+					_lver_nd[lver_num]=nd_list[lver_up_steel]
+					_lver_mat[lver_num]=SDmat[scode_list[lver_up_steel]]
+					_lver_pen[lver_num]=SDpen[scode_list[lver_up_steel]]
+				endif
+
+				if switch_anc_down then
+					put (step_num_down-1)*step_tread+landing_1+lver_x_pos
+					put -anc_down_Lb-(2*n-3)*_lver_r[lver_num]
+					put _lver_z[n]+(i-1)*floor_hei-max(fra_mul*_lver_nd[lver_num],L2*_lver_nd[lver_num]-anc_down_Lb)
+
+					put (step_num_down-1)*step_tread+landing_1+lver_x_pos
+					put -anc_down_Lb-(2*n-3)*_lver_r[lver_num]
+					put _lver_z[n]+(i-1)*floor_hei
+				else
+					put (step_num_down-1)*step_tread+landing_1+lver_x_pos
+					put lver_edge_cover
+					put _lver_z[n]+(i-1)*floor_hei
+				endif
+
+				if switch_anc_up then
+					put (step_num_down-1)*step_tread+landing_1+lver_x_pos
+					put step_wid1+handrail_wid+step_wid2+anc_up_Lb+(2*n-3)*_lver_r[lver_num]
+					put _lver_z[n]+(i-1)*floor_hei
+
+					put (step_num_down-1)*step_tread+landing_1+lver_x_pos
+					put step_wid1+handrail_wid+step_wid2+anc_up_Lb+(2*n-3)*_lver_r[lver_num]
+					put _lver_z[n]+(i-1)*floor_hei-max(fra_mul*_lver_nd[lver_num],L2*_lver_nd[lver_num]-anc_up_Lb)
+				else
+					put (step_num_down-1)*step_tread+landing_1+lver_x_pos
+					put step_wid1+handrail_wid+step_wid2-lver_edge_cover
+					put _lver_z[n]+(i-1)*floor_hei
+				endif
+	
+				for m=1 to _lver_point[lver_num]*3
+					_lver_pos[lver_num][m]=get(1)
+				next m
+			else
+				if lver_x_pos>=-landing_1 then
+					lver_num=lver_num+1
+					_lver_point[lver_num]=2+switch_anc_down
+
+					if n=1 then
+						_lver_r[lver_num]=lver_down_r
+						_lver_nd[lver_num]=nd_list[lver_down_steel]
+						_lver_mat[lver_num]=SDmat[scode_list[lver_down_steel]]
+						_lver_pen[lver_num]=SDpen[scode_list[lver_down_steel]]
+					else
+						_lver_r[lver_num]=lver_up_r
+						_lver_nd[lver_num]=nd_list[lver_up_steel]
+						_lver_mat[lver_num]=SDmat[scode_list[lver_up_steel]]
+						_lver_pen[lver_num]=SDpen[scode_list[lver_up_steel]]
+					endif
+
+					if switch_anc_down then
+						put (step_num_down-1)*step_tread+landing_1+lver_x_pos
+						put -anc_down_Lb-(2*n-3)*_lver_r[lver_num]
+						put _lver_z[n]+(i-1)*floor_hei-max(fra_mul*_lver_nd[lver_num],L2*_lver_nd[lver_num]-anc_down_Lb)
+
+						put (step_num_down-1)*step_tread+landing_1+lver_x_pos
+						put -anc_down_Lb-(2*n-3)*_lver_r[lver_num]
+						put _lver_z[n]+(i-1)*floor_hei
+					else
+						put (step_num_down-1)*step_tread+landing_1+lver_x_pos
+						put lver_edge_cover
+						put _lver_z[n]+(i-1)*floor_hei
+					endif
+					
+					put (step_num_down-1)*step_tread+landing_1+lver_x_pos
+					put step_wid1-lver_edge_cover
+					put _lver_z[n]+(i-1)*floor_hei
+		
+					for m=1 to _lver_point[lver_num]*3
+						_lver_pos[lver_num][m]=get(1)
+					next m
+				endif
+
+				if lver_x_pos>=-landing_2 then
+					lver_num=lver_num+1
+					_lver_point[lver_num]=2+switch_anc_up
+
+					if n=1 then
+						_lver_r[lver_num]=lver_down_r
+						_lver_nd[lver_num]=nd_list[lver_down_steel]
+						_lver_mat[lver_num]=SDmat[scode_list[lver_down_steel]]
+						_lver_pen[lver_num]=SDpen[scode_list[lver_down_steel]]
+					else
+						_lver_r[lver_num]=lver_up_r
+						_lver_nd[lver_num]=nd_list[lver_up_steel]
+						_lver_mat[lver_num]=SDmat[scode_list[lver_up_steel]]
+						_lver_pen[lver_num]=SDpen[scode_list[lver_up_steel]]
+					endif
+
+					put (step_num_down-1)*step_tread+landing_1+lver_x_pos
+					put step_wid1+handrail_wid+lver_edge_cover
+					put _lver_z[n]+(i-1)*floor_hei
+					
+					if switch_anc_up then
+						put (step_num_down-1)*step_tread+landing_1+lver_x_pos
+						put step_wid1+handrail_wid+step_wid2+anc_up_Lb+(2*n-3)*_lver_r[lver_num]
+						put _lver_z[n]+(i-1)*floor_hei
+
+						put (step_num_down-1)*step_tread+landing_1+lver_x_pos
+						put step_wid1+handrail_wid+step_wid2+anc_up_Lb+(2*n-3)*_lver_r[lver_num]
+						put _lver_z[n]+(i-1)*floor_hei-max(fra_mul*_lver_nd[lver_num],L2*_lver_nd[lver_num]-anc_up_Lb)
+					else
+						put (step_num_down-1)*step_tread+landing_1+lver_x_pos
+						put step_wid1+handrail_wid+step_wid2-lver_edge_cover
+						put _lver_z[n]+(i-1)*floor_hei
+					endif
+
+					for m=1 to _lver_point[lver_num]*3
+						_lver_pos[lver_num][m]=get(1)
+					next m
+				endif
+			endif
+		next n
+	next j
+next i
+
+parameters lver_r=_lver_r,
+	lver_nd=_lver_nd,
+	lver_mat=_lver_mat,
+	lver_pen=_lver_pen,
+	lver_num=lver_num,
+	lver_point=_lver_point,
+	lver_pos=_lver_pos
+
+!横筋
+lhor_y_num=int((step_wid1+handrail_wid+step_wid2-2*lhor_side_cover-2*lhor_r)/lhor_pitch)+1
+lhor_y_offset=(step_wid1+handrail_wid+step_wid2-(lhor_y_num-1)*lhor_pitch)/2
+
+dim _lhor_z[]
+if landing_bar_position=1 then
+	_lhor_z[1]=step_num_down*step_riser-landing_thi+landing_down_cover+2*lver_down_r+lhor_r
+	_lhor_z[2]=step_num_down*step_riser-landing_top_cover-2*lver_up_r-lhor_r
+else
+	_lhor_z[1]=step_num_down*step_riser-landing_thi+landing_down_cover+lhor_r
+	_lhor_z[2]=step_num_down*step_riser-landing_top_cover-lhor_r
+endif
+
+lhor_num=0
+dim _lhor_point[]
+dim _lhor_pos[][]
+
+for i=1 to floor_num-1
+	for j=1 to lhor_y_num
+		lhor_y_pos=lhor_y_offset+(j-1)*lhor_pitch
+
+		if lhor_y_pos<=step_wid1-lhor_side_cover-lhor_r then lhor_start_x=(step_num_down-1)*step_tread+lhor_edge_cover
+		if lhor_y_pos>step_wid1-lhor_side_cover-lhor_r and lhor_y_pos <step_wid1+handrail_wid+lhor_side_cover+lhor_r then lhor_start_x=(step_num_down-1)*step_tread+landing_1+lhor_edge_cover
+		if lhor_y_pos>=step_wid1+handrail_wid+lhor_side_cover+lhor_r then lhor_start_x=(step_num_down-1)*step_tread+landing_1-landing_2+lhor_edge_cover
+
+		for n=1 to 2
+			lhor_num=lhor_num+1
+			_lhor_point[lhor_num]=2+switch_anc_landing
+
+			put lhor_start_x
+			put lhor_y_pos
+			put _lhor_z[n]+(i-1)*floor_hei
+			
+			if switch_anc_landing then
+				put (step_num_down-1)*step_tread+landing_1+landing_dep+anc_landing_Lb+(2*n-3)*lhor_r
+				put lhor_y_pos
+				put _lhor_z[n]+(i-1)*floor_hei
+
+				put (step_num_down-1)*step_tread+landing_1+landing_dep+anc_landing_Lb+(2*n-3)*lhor_r
+				put lhor_y_pos
+				put _lhor_z[n]+(i-1)*floor_hei-max(fra_mul*lhor_nd,L2*lhor_nd-anc_landing_Lb)
+			else
+				put (step_num_down-1)*step_tread+landing_1+landing_dep-lhor_edge_cover
+				put lhor_y_pos
+				put _lhor_z[n]+(i-1)*floor_hei
+			endif
+
+			for m=1 to _lhor_point[lhor_num]*3
+				_lhor_pos[lhor_num][m]=get(1)
+			next m
+		next n
+	next j
+next i
+
+parameters lhor_r=lhor_r,
+	lhor_nd=lhor_nd,
+	lhor_mat=lhor_mat,
+	lhor_pen=lhor_pen,
+	lhor_num=lhor_num,
+	lhor_point=_lhor_point,
+	lhor_pos=_lhor_pos
+
+lock "lver_r","lver_nd","lver_mat","lver_pen","lver_num","lver_point","lver_pos","lhor_r","lhor_nd","lhor_mat","lhor_pen","lhor_num","lhor_point","lhor_pos"
+
+
+!==============================================================================フロア踊り場配筋
+values "floor_top_cover" range[0,]
+values "floor_down_cover" range[0,]
+values{2} "floor_bar_position" 1,"縦筋が外側",2,"横筋が外側"
+
+dim _fver_r[]
+dim _fver_nd[]
+dim _fver_mat[]
+dim _fver_pen[]
+values "fver_side_cover" range[0,]
+values "fver_edge_cover" range[0,]
+values "fver_pitch" range[0.1,]
+
+values{2} "fhor_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+fhor_r=dr_list[fhor_steel]
+fhor_nd=nd_list[fhor_steel]
+fhor_mat=SDmat[scode_list[fhor_steel]]
+fhor_pen=SDpen[scode_list[fhor_steel]]
+values "fhor_side_cover" range[0,]
+values "fhor_edge_cover" range[0,]
+values "fhor_pitch" range[0.1,]
+
+!縦筋
+fver_x_num=int((floor_dep+floor_1+abs(standard_x)-2*fver_side_cover-2*max(fver_down_r,fver_up_r))/fver_pitch)+1
+fver_x_offset=(floor_dep+floor_1+abs(standard_x)-(fver_x_num-1)*fver_pitch)/2
+
+dim _fver_z[]
+if floor_bar_position=1 then
+	_fver_z[1]=-floor_thi+floor_down_cover+fver_down_r
+	_fver_z[2]=-floor_top_cover-fver_up_r
+else
+	_fver_z[1]=-floor_thi+floor_down_cover+2*lhor_r+fver_down_r
+	_fver_z[2]=-floor_top_cover-2*lhor_r-fver_up_r
+endif
+
+fver_num=0
+dim _fver_point[]
+dim _fver_pos[][]
+
+for i=1 to floor_num-1+switch_gl
+	for j=1 to fver_x_num
+		fver_x_pos=-floor_dep+fver_x_offset+(j-1)*fver_pitch
+
+		for n=1 to 2
+			if fver_x_pos<=-fver_side_cover then
+				if switch_floor then
+					fver_num=fver_num+1
+					_fver_point[fver_num]=2+switch_anc_down+switch_anc_up
+				
+					if n=1 then
+						_fver_r[fver_num]=fver_down_r
+						_fver_nd[fver_num]=nd_list[fver_down_steel]
+						_fver_mat[fver_num]=SDmat[scode_list[fver_down_steel]]
+						_fver_pen[fver_num]=SDpen[scode_list[fver_down_steel]]
+					else
+						_fver_r[fver_num]=fver_up_r
+						_fver_nd[fver_num]=nd_list[fver_up_steel]
+						_fver_mat[fver_num]=SDmat[scode_list[fver_up_steel]]
+						_fver_pen[fver_num]=SDpen[scode_list[fver_up_steel]]
+					endif
+
+					if switch_anc_down then
+						put min(standard_x,0)-floor_1+fver_x_pos
+						put -anc_down_Lb-(2*n-3)*_fver_r[fver_num]
+						put _fver_z[n]+(floor_num-i)*floor_hei-max(fra_mul*_fver_nd[fver_num],L2*_fver_nd[fver_num]-anc_down_Lb)
+
+						put min(standard_x,0)-floor_1+fver_x_pos
+						put -anc_down_Lb-(2*n-3)*_fver_r[fver_num]
+						put _fver_z[n]+(floor_num-i)*floor_hei
+					else
+						put min(standard_x,0)-floor_1+fver_x_pos
+						put fver_edge_cover
+						put _fver_z[n]+(floor_num-i)*floor_hei
+					endif
+					
+					if switch_anc_up then
+						put min(standard_x,0)-floor_1+fver_x_pos
+						put step_wid1+handrail_wid+step_wid2+anc_up_Lb+(2*n-3)*_fver_r[fver_num]
+						put _fver_z[n]+(floor_num-i)*floor_hei
+
+						put min(standard_x,0)-floor_1+fver_x_pos
+						put step_wid1+handrail_wid+step_wid2+anc_up_Lb+(2*n-3)*_fver_r[fver_num]
+						put _fver_z[n]+(floor_num-i)*floor_hei-max(fra_mul*_fver_nd[fver_num],L2*_fver_nd[fver_num]-anc_up_Lb)
+					else
+						put min(standard_x,0)-floor_1+fver_x_pos
+						put step_wid1+handrail_wid+step_wid2-fver_edge_cover
+						put _fver_z[n]+(floor_num-i)*floor_hei
+					endif
+				
+					for m=1 to _fver_point[fver_num]*3
+						_fver_pos[fver_num][m]=get(1)
+					next m
+				endif
+			else
+				if switch_floor or fver_x_pos>=fver_side_cover then
+					if fver_x_pos<=floor_1 then
+						if standard_x>=0 and i>1 then
+							fver_num=fver_num+1
+							_fver_point[fver_num]=2+switch_anc_down
+	
+							if n=1 then
+								_fver_r[fver_num]=fver_down_r
+								_fver_nd[fver_num]=nd_list[fver_down_steel]
+								_fver_mat[fver_num]=SDmat[scode_list[fver_down_steel]]
+								_fver_pen[fver_num]=SDpen[scode_list[fver_down_steel]]
+							else
+								_fver_r[fver_num]=fver_up_r
+								_fver_nd[fver_num]=nd_list[fver_up_steel]
+								_fver_mat[fver_num]=SDmat[scode_list[fver_up_steel]]
+								_fver_pen[fver_num]=SDpen[scode_list[fver_up_steel]]
+							endif
+
+							if switch_anc_down then
+								put min(standard_x,0)-floor_1+fver_x_pos
+								put -anc_down_Lb-(2*n-3)*_fver_r[fver_num]
+								put _fver_z[n]+(floor_num-i)*floor_hei-max(fra_mul*_fver_nd[fver_num],L2*_fver_nd[fver_num]-anc_down_Lb)
+
+								put min(standard_x,0)-floor_1+fver_x_pos
+								put -anc_down_Lb-(2*n-3)*_fver_r[fver_num]
+								put _fver_z[n]+(floor_num-i)*floor_hei
+							else
+								put min(standard_x,0)-floor_1+fver_x_pos
+								put fver_edge_cover
+								put _fver_z[n]+(floor_num-i)*floor_hei
+							endif
+							
+							put min(standard_x,0)-floor_1+fver_x_pos
+							put step_wid1-fver_edge_cover
+							put _fver_z[n]+(floor_num-i)*floor_hei
+	
+							for m=1 to _fver_point[fver_num]*3
+								_fver_pos[fver_num][m]=get(1)
+							next m
+						endif
+	
+						if standard_x<0 then
+							fver_num=fver_num+1
+							_fver_point[fver_num]=2+switch_anc_up
+
+							if n=1 then
+								_fver_r[fver_num]=fver_down_r
+								_fver_nd[fver_num]=nd_list[fver_down_steel]
+								_fver_mat[fver_num]=SDmat[scode_list[fver_down_steel]]
+								_fver_pen[fver_num]=SDpen[scode_list[fver_down_steel]]
+							else
+								_fver_r[fver_num]=fver_up_r
+								_fver_nd[fver_num]=nd_list[fver_up_steel]
+								_fver_mat[fver_num]=SDmat[scode_list[fver_up_steel]]
+								_fver_pen[fver_num]=SDpen[scode_list[fver_up_steel]]
+							endif
+
+							put min(standard_x,0)-floor_1+fver_x_pos
+							put step_wid1+handrail_wid+fver_edge_cover
+							put _fver_z[n]+(floor_num-i)*floor_hei
+							
+							if switch_anc_up then
+								put min(standard_x,0)-floor_1+fver_x_pos
+								put step_wid1+handrail_wid+step_wid2+anc_up_Lb+(2*n-3)*_fver_r[fver_num]
+								put _fver_z[n]+(floor_num-i)*floor_hei
+
+								put min(standard_x,0)-floor_1+fver_x_pos
+								put step_wid1+handrail_wid+step_wid2+anc_up_Lb+(2*n-3)*_fver_r[fver_num]
+								put _fver_z[n]+(floor_num-i)*floor_hei-max(fra_mul*_fver_nd[fver_num],L2*_fver_nd[fver_num]-anc_up_Lb)
+							else
+								put min(standard_x,0)-floor_1+fver_x_pos
+								put step_wid1+handrail_wid+step_wid2-fver_edge_cover
+								put _fver_z[n]+(floor_num-i)*floor_hei
+							endif
+	
+							for m=1 to _fver_point[fver_num]*3
+								_fver_pos[fver_num][m]=get(1)
+							next m
+						endif
+					endif
+	
+					if fver_x_pos<=floor_1+abs(standard_x) then
+						if standard_x>=0 then
+							fver_num=fver_num+1
+							_fver_point[fver_num]=2+switch_anc_up
+
+							if n=1 then
+								_fver_r[fver_num]=fver_down_r
+								_fver_nd[fver_num]=nd_list[fver_down_steel]
+								_fver_mat[fver_num]=SDmat[scode_list[fver_down_steel]]
+								_fver_pen[fver_num]=SDpen[scode_list[fver_down_steel]]
+							else
+								_fver_r[fver_num]=fver_up_r
+								_fver_nd[fver_num]=nd_list[fver_up_steel]
+								_fver_mat[fver_num]=SDmat[scode_list[fver_up_steel]]
+								_fver_pen[fver_num]=SDpen[scode_list[fver_up_steel]]
+							endif
+	
+							put min(standard_x,0)-floor_1+fver_x_pos
+							put step_wid1+handrail_wid+fver_edge_cover
+							put _fver_z[n]+(floor_num-i)*floor_hei
+							
+							if switch_anc_up then
+								put min(standard_x,0)-floor_1+fver_x_pos
+								put step_wid1+handrail_wid+step_wid2+anc_up_Lb+(2*n-3)*_fver_r[fver_num]
+								put _fver_z[n]+(floor_num-i)*floor_hei
+
+								put min(standard_x,0)-floor_1+fver_x_pos
+								put step_wid1+handrail_wid+step_wid2+anc_up_Lb+(2*n-3)*_fver_r[fver_num]
+								put _fver_z[n]+(floor_num-i)*floor_hei-max(fra_mul*_fver_nd[fver_num],L2*_fver_nd[fver_num]-anc_up_Lb)
+							else
+								put min(standard_x,0)-floor_1+fver_x_pos
+								put step_wid1+handrail_wid+step_wid2-fver_edge_cover
+								put _fver_z[n]+(floor_num-i)*floor_hei
+							endif
+	
+							for m=1 to _fver_point[fver_num]*3
+								_fver_pos[fver_num][m]=get(1)
+							next m
+						endif
+	
+						if standard_x<0 and i>1 then
+							fver_num=fver_num+1
+							_fver_point[fver_num]=2+switch_anc_down
+
+							if n=1 then
+								_fver_r[fver_num]=fver_down_r
+								_fver_nd[fver_num]=nd_list[fver_down_steel]
+								_fver_mat[fver_num]=SDmat[scode_list[fver_down_steel]]
+								_fver_pen[fver_num]=SDpen[scode_list[fver_down_steel]]
+							else
+								_fver_r[fver_num]=fver_up_r
+								_fver_nd[fver_num]=nd_list[fver_up_steel]
+								_fver_mat[fver_num]=SDmat[scode_list[fver_up_steel]]
+								_fver_pen[fver_num]=SDpen[scode_list[fver_up_steel]]
+							endif
+	
+							if switch_anc_down then
+								put min(standard_x,0)-floor_1+fver_x_pos
+								put -anc_down_Lb-(2*n-3)*_fver_r[fver_num]
+								put _fver_z[n]+(floor_num-i)*floor_hei-max(fra_mul*_fver_nd[fver_num],L2*_fver_nd[fver_num]-anc_down_Lb)
+
+								put min(standard_x,0)-floor_1+fver_x_pos
+								put -anc_down_Lb-(2*n-3)*_fver_r[fver_num]
+								put _fver_z[n]+(floor_num-i)*floor_hei
+							else
+								put min(standard_x,0)-floor_1+fver_x_pos
+								put fver_edge_cover
+								put _fver_z[n]+(floor_num-i)*floor_hei
+							endif
+							
+							put min(standard_x,0)-floor_1+fver_x_pos
+							put step_wid1-fver_edge_cover
+							put _fver_z[n]+(floor_num-i)*floor_hei
+	
+							for m=1 to _fver_point[fver_num]*3
+								_fver_pos[fver_num][m]=get(1)
+							next m
+						endif
+					endif
+				endif
+			endif
+		next n
+	next j
+next i
+
+if fver_num=0 then
+	_fver_point[1]=0
+	_fver_pos[1][1]=0
+endif
+
+parameters fver_r=_fver_r,
+	fver_nd=_fver_nd,
+	fver_mat=_fver_mat,
+	fver_pen=_fver_pen,
+	fver_num=fver_num,
+	fver_point=_fver_point,
+	fver_pos=_fver_pos
+
+!横筋
+fhor_y_num=int((step_wid1+handrail_wid+step_wid2-2*fhor_side_cover-2*fhor_r)/fhor_pitch)+1
+fhor_y_offset=(step_wid1+handrail_wid+step_wid2-(fhor_y_num-1)*fhor_pitch)/2
+
+dim _fhor_z[]
+if floor_bar_position=1 then
+	_fhor_z[1]=-landing_thi+landing_down_cover+2*lver_down_r+fhor_r
+	_fhor_z[2]=-landing_top_cover-2*lver_up_r-fhor_r
+else
+	_fhor_z[1]=-landing_thi+landing_down_cover+fhor_r
+	_fhor_z[2]=-landing_top_cover-fhor_r
+endif
+
+fhor_num=0
+dim _fhor_point[]
+dim _fhor_pos[][]
+
+for i=1 to floor_num-1+switch_gl
+	for j=1 to fhor_y_num
+		fhor_y_pos=fhor_y_offset+(j-1)*fhor_pitch
+
+		if switch_floor then
+			fhor_start_x=min(standard_x,0)-floor_1-floor_dep
+		else
+			fhor_start_x=min(standard_x,0)-floor_1
+		endif
+
+		if fhor_y_pos<=step_wid1-fhor_side_cover-fhor_r then
+			if i=1 then
+				fhor_end_x=min(standard_x,0)-floor_1-fhor_edge_cover
+			else
+				fhor_end_x=-fhor_edge_cover
+			endif
+		endif
+		if fhor_y_pos>step_wid1-fhor_side_cover-fhor_r and fhor_y_pos <step_wid1+handrail_wid+fhor_side_cover+fhor_r then fhor_end_x=min(standard_x,0)-floor_1-fhor_edge_cover
+		if fhor_y_pos>=step_wid1+handrail_wid+fhor_side_cover+fhor_r then fhor_end_x=standard_x-fhor_edge_cover
+
+		if abs(fhor_end_x-fhor_start_x)>=steel_min_limit then
+			for n=1 to 2
+				fhor_num=fhor_num+1
+				_fhor_point[fhor_num]=2+switch_anc_floor
+		
+				if switch_anc_floor then
+					put fhor_start_x-anc_floor_Lb-(2*n-3)*fhor_r
+					put fhor_y_pos
+					put _fhor_z[n]+(floor_num-i)*floor_hei-max(fra_mul*fhor_nd,L2*fhor_nd-anc_floor_Lb)
+
+					put fhor_start_x-anc_floor_Lb-(2*n-3)*fhor_r
+					put fhor_y_pos
+					put _fhor_z[n]+(floor_num-i)*floor_hei
+				else
+					put fhor_start_x+fhor_edge_cover
+					put fhor_y_pos
+					put _fhor_z[n]+(floor_num-i)*floor_hei
+				endif
+				
+				put fhor_end_x
+				put fhor_y_pos
+				put _fhor_z[n]+(floor_num-i)*floor_hei
+				
+				for m=1 to _fhor_point[fhor_num]*3
+					_fhor_pos[fhor_num][m]=get(1)
+				next m
+			next n
+		endif
+	next j
+next i
+
+if fhor_num=0 then
+	_fhor_point[1]=0
+	_fhor_pos[1][1]=0
+endif
+
+parameters fhor_r=fhor_r,
+	fhor_nd=fhor_nd,
+	fhor_mat=fhor_mat,
+	fhor_pen=fhor_pen,
+	fhor_num=fhor_num,
+	fhor_point=_fhor_point,
+	fhor_pos=_fhor_pos
+
+lock "fver_r","fver_nd","fver_mat","fver_pen","fver_num","fver_point","fver_pos","fhor_r","fhor_nd","fhor_mat","fhor_pen","fhor_num","fhor_point","fhor_pos"
+
+
+
+!==============================================================================立上り縦筋
+values "pp_top_cover" range[0,]
+values{2} "pver_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+pver_r=dr_list[pver_steel]
+pver_nd=nd_list[pver_steel]
+pver_mat=SDmat[scode_list[pver_steel]]
+pver_pen=SDpen[scode_list[pver_steel]]
+
+parameters pver_r=pver_r,
+	pver_nd=pver_nd,
+	pver_mat=pver_mat,
+	pver_pen=pver_pen
+
+values "pver_pitch" range[0.1,]
+values "pp_anc_len" range[L2*pver_nd,]
+
+pver_num=0
+dim _pver_point[]
+dim _pver_pos[][]
+!=======================================外側立上り
+if switch_hr1 then
+	!階段側
+	start_pos=min(standard_x,0)-floor_1-floor_dep
+	end_pos=(step_num_down-1)*step_tread+landing_1+landing_dep
+	pver_x_num=int((end_pos-start_pos-hr_wid2-2*pver_r)/pver_pitch)+1
+
+	dim pver_down_pos[]
+	dim pver_up_pos[]
+	for i=1 to pver_x_num
+		pver_down_pos[i]=start_pos+((end_pos-start_pos)-(pver_x_num-1)*pver_pitch)/2+(i-1)*pver_pitch
+		pver_up_pos[i]=start_pos+((end_pos-start_pos)-(pver_x_num-1)*pver_pitch)/2+(i-1)*pver_pitch
+	next i
+
+	!下部階段側
+	for i=1 to floor_num
+		for j=1 to pver_x_num
+			dis_flag=0
+
+			if switch_floor or pver_down_pos[j]>=min(standard_x,0)-floor_1+pp_side_cover then
+				if i=floor_num then
+					if pver_down_pos[j]<=min(standard_x,0)-floor_1+hr_wid*switch_hr1_top-pp_side_cover then
+						dis_flag=1
+					endif
+				else
+					if i=1 and switch_gl=0 then
+						if pver_down_pos[j]>=-step_tread+pp_side_cover then
+							dis_flag=1
+						endif
+					else
+						dis_flag=1
+					endif
+				endif
+			endif
+
+			!上端z座標
+			if pver_down_pos[j]<=-step_tread+(floor_hr_hei-hr_hei)/tan(step_angle) then
+				z_top_pos=floor_hr_hei-pp_top_cover
+			endif
+			
+			if pver_down_pos[j]>-step_tread+(floor_hr_hei-hr_hei)/tan(step_angle) and pver_down_pos[j]<(step_num_down-1)*step_tread+(landing_hr_hei-hr_hei)/tan(step_angle) then
+				z_top_pos=tan(step_angle)*pver_down_pos[j]+step_riser+hr_hei-pp_top_cover/cos(step_angle)
+			endif
+			
+			if pver_down_pos[j]>=(step_num_down-1)*step_tread+(landing_hr_hei-hr_hei)/tan(step_angle) then
+				z_top_pos=step_num_down*step_riser+landing_hr_hei-pp_top_cover
+			endif
+
+			if i=1 and switch_gl=0 and pver_down_pos[j]<=0 then
+				z_top_pos=tan(step_angle)*pver_down_pos[j]+step_riser+hr_hei-pp_top_cover/cos(step_angle)
+			endif
+
+			if i=floor_num then
+				z_top_pos=floor_hr_hei-pp_top_cover
+			endif
+
+			!下端z座標
+			if pver_down_pos[j]<=0 then
+				z_down_pos=-floor_thi+floor_down_cover+2*fver_down_r*(floor_bar_position-1)+pver_r
+			endif
+
+			if pver_down_pos[j]>0 and pver_down_pos[j]<(step_num_down-1)*step_tread then
+				z_down_pos=down_k*pver_down_pos[j]+down_b+(ngs_r+pver_r)/cos(step_angle)
+			endif
+
+			if pver_down_pos[j]>=(step_num_down-1)*step_tread then
+				z_down_pos=step_num_down*step_riser-landing_thi+landing_down_cover+2*fver_down_r*(landing_bar_position-1)+pver_r
+			endif
+
+			if i=1 and switch_gl=0 and pver_down_pos[j]<=(-floor_thi/2-down_b)/down_k then
+				z_down_pos=-floor_thi/2+ngs_r+pver_r
+			endif
+
+			!立上り開口
+			if hr_hide=2 and pver_down_pos[j]>start_pos+hr_wid2+hr_hide_start-pp_side_cover-pver_r and pver_down_pos[j]<end_pos-hr_wid2-hr_hide_end+pp_side_cover+pver_r then
+				dis_flag=0
+			endif
+
+			if dis_flag then
+				pver_num=pver_num+1
+				_pver_point[pver_num]=3
+
+				put pver_down_pos[j]
+				put hr_wid/2+pver_r
+				put z_top_pos+(i-1)*floor_hei
+
+				put pver_down_pos[j]
+				put hr_wid/2+pver_r
+				put z_down_pos+(i-1)*floor_hei
+
+				put pver_down_pos[j]
+				put hr_wid/2+pver_r+pp_anc_len
+				put z_down_pos+(i-1)*floor_hei
+
+				for n=1 to _pver_point[pver_num]*3
+					_pver_pos[pver_num][n]=get(1)
+				next n
+			endif
+		next j	
+	next i
+
+	!上部階段側
+	for i=1 to floor_num-1+switch_gl
+		for j=1 to pver_x_num
+			dis_flag=0
+
+			if switch_floor or pver_up_pos[j]>=min(standard_x,0)-floor_1+pp_side_cover then
+				if switch_gl and i=1 then
+					if pver_down_pos[j]<=standard_x+gl_num*step_tread-pp_side_cover then
+						dis_flag=1
+					endif
+				else
+					dis_flag=1
+				endif
+			endif
+
+			!上端z座標
+			if pver_down_pos[j]<=(step_num_down-step_num_up)*step_tread+landing_1-landing_2-(floor_hr_hei-hr_hei)/tan(step_angle) then
+				z_top_pos=floor_hei+floor_hr_hei-pp_top_cover
+			endif
+
+			if pver_down_pos[j]>(step_num_down-step_num_up)*step_tread+landing_1-landing_2-(floor_hr_hei-hr_hei)/tan(step_angle) \
+			and pver_down_pos[j]<step_num_down*step_tread+landing_1-landing_2-(landing_hr_hei-hr_hei)/tan(step_angle) then
+				z_top_pos=up_k*pver_down_pos[j]+up_b-(ngs_down_cover+ngs_r)/cos(step_angle)+step_thi/cos(step_angle)+step_riser+hr_hei-pp_top_cover/cos(step_angle)
+			endif
+
+			if pver_down_pos[j]>=step_num_down*step_tread+landing_1-landing_2-(landing_hr_hei-hr_hei)/tan(step_angle) then
+				z_top_pos=step_num_down*step_riser+landing_hr_hei-pp_top_cover
+			endif
+
+			if i=1 and switch_gl and pver_down_pos[j]>=step_num_down*step_tread+landing_1-landing_2-(landing_hr_hei-hr_hei)/tan(step_angle) then
+				z_top_pos=up_k*pver_down_pos[j]+up_b-(ngs_down_cover+ngs_r)/cos(step_angle)+step_thi/cos(step_angle)+step_riser+hr_hei-pp_top_cover/cos(step_angle)
+			endif
+
+			!下端z座標
+			if pver_down_pos[j]<=standard_x then
+				z_down_pos=floor_hei-floor_thi+floor_down_cover+2*fver_down_r*(floor_bar_position-1)+pver_r
+			endif
+			
+			if pver_down_pos[j]>standard_x and pver_down_pos[j]<(step_num_down-1)*step_tread+landing_1-landing_2 then
+				z_down_pos=up_k*pver_down_pos[j]+up_b+(ngs_r+pver_r)/cos(step_angle)
+			endif
+			
+			if pver_down_pos[j]>=(step_num_down-1)*step_tread+landing_1-landing_2 then
+				z_down_pos=step_num_down*step_riser-landing_thi+landing_down_cover+2*fver_down_r*(landing_bar_position-1)+pver_r
+			endif
+
+			if i=1 and switch_gl then
+				if pver_down_pos[j]>standard_x then
+					z_down_pos=up_k*pver_down_pos[j]+up_b+(ngs_r+pver_r)/cos(step_angle)
+				endif
+
+				if pver_down_pos[j]>=((-gl_num*step_riser-landing_thi/2)-gl_b)/gl_k then
+					z_down_pos=floor_hei-gl_num*step_riser-landing_thi/2+ngs_r+pver_r
+				endif
+			endif
+
+			!立上り開口
+			if hr_hide=3 and pver_down_pos[j]>start_pos+hr_wid2+hr_hide_start-pp_side_cover-pver_r and pver_down_pos[j]<end_pos-hr_wid2-hr_hide_end+pp_side_cover+pver_r then
+				dis_flag=0
+			endif
+
+			if dis_flag then
+				pver_num=pver_num+1
+				_pver_point[pver_num]=3
+
+				put pver_down_pos[j]
+				put step_wid1+handrail_wid+step_wid2-(hr_wid/2+pver_r)
+				put z_top_pos+(i-1-switch_gl)*floor_hei
+
+				put pver_down_pos[j]
+				put step_wid1+handrail_wid+step_wid2-(hr_wid/2+pver_r)
+				put z_down_pos+(i-1-switch_gl)*floor_hei
+
+				put pver_down_pos[j]
+				put step_wid1+handrail_wid+step_wid2-(hr_wid/2+pver_r+pp_anc_len)
+				put z_down_pos+(i-1-switch_gl)*floor_hei
+
+				for n=1 to _pver_point[pver_num]*3
+					_pver_pos[pver_num][n]=get(1)
+				next n
+			endif
+		next j	
+	next i
+
+
+	
+	!踊り場側
+	start_pos=0
+	end_pos=step_wid1+handrail_wid+step_wid2
+	pver_x_num=int((end_pos-start_pos-hr_wid-2*pver_r)/pver_pitch)+1
+
+	dim pver_landing_pos[]
+	dim pver_floor_pos[]
+	for i=1 to pver_x_num
+		pver_landing_pos[i]=start_pos+((end_pos-start_pos)-(pver_x_num-1)*pver_pitch)/2+(i-1)*pver_pitch
+		pver_floor_pos[i]=start_pos+((end_pos-start_pos)-(pver_x_num-1)*pver_pitch)/2+(i-1)*pver_pitch
+	next i
+
+	!中間踊り場側
+	for i=1 to floor_num-1
+		for j=1 to pver_x_num
+			pver_num=pver_num+1
+			_pver_point[pver_num]=3
+			
+			put (step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2/2-pver_r
+			put pver_landing_pos[j]
+			put step_num_down*step_riser+landing_hr_hei-pp_top_cover+(i-1)*floor_hei
+
+			put (step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2/2-pver_r
+			put pver_landing_pos[j]
+			put step_num_down*step_riser-landing_thi+landing_down_cover+2*lver_down_r*(2-landing_bar_position)+pver_r+(i-1)*floor_hei
+
+			put (step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2/2-pver_r-pp_anc_len
+			put pver_landing_pos[j]
+			put step_num_down*step_riser-landing_thi+landing_down_cover+2*lver_down_r*(2-landing_bar_position)+pver_r+(i-1)*floor_hei
+			
+			for n=1 to _pver_point[pver_num]*3
+				_pver_pos[pver_num][n]=get(1)
+			next n
+		next j
+	next i
+
+	!フロア踊り場
+	if switch_floor then
+		for i=1 to floor_num-1+switch_gl
+			for j=1 to pver_x_num
+				if hr_hide=1 and pver_floor_pos[j]>hr_wid+hr_hide_start-pp_side_cover-pver_r and pver_floor_pos[j]<end_pos-hr_wid-hr_hide_end+pp_side_cover+pver_r then
+				else
+					pver_num=pver_num+1
+					_pver_point[pver_num]=3
+					
+					put min(standard_x,0)-floor_1-floor_dep+hr_wid2/2+pver_r
+					put pver_floor_pos[j]
+					put (floor_num-i)*floor_hei+floor_hr_hei-pp_top_cover
+
+					put min(standard_x,0)-floor_1-floor_dep+hr_wid2/2+pver_r
+					put pver_floor_pos[j]
+					put (floor_num-i)*floor_hei-floor_thi+floor_down_cover+2*fver_down_r*(2-floor_bar_position)+pver_r
+
+					put min(standard_x,0)-floor_1-floor_dep+hr_wid2/2+pver_r+pp_anc_len
+					put pver_floor_pos[j]
+					put (floor_num-i)*floor_hei-floor_thi+floor_down_cover+2*fver_down_r*(2-floor_bar_position)+pver_r
+					
+					for n=1 to _pver_point[pver_num]*3
+						_pver_pos[pver_num][n]=get(1)
+					next n
+				endif
+			next j
+		next i
+	endif
+endif
+
+
+!最上階外側立上り
+if switch_hr1_top then
+	start_pos=0
+	if hr2_type=1 then
+		end_pos=step_wid1+handrail_wid+hr2_wid
+	else
+		end_pos=step_wid1+handrail_wid
+	endif
+	pver_num_3=int((end_pos-start_pos-hr_wid/2-hr2_wid/2-2*pver_r)/pver_pitch)+1
+	
+	dim pver_rf_pos[]
+	for i=1 to pver_num_3
+		pver_rf_pos[i]=start_pos+((end_pos-start_pos)-(pver_num_3-1)*pver_pitch)/2+(i-1)*pver_pitch
+	next i
+
+	for i=1 to pver_num_3
+		pver_num=pver_num+1
+		_pver_point[pver_num]=3
+	
+		put min(standard_x,0)-floor_1+hr_wid/2-pver_r
+		put pver_rf_pos[i]
+		put (floor_num-1)*floor_hei+floor_hr_hei-pp_top_cover
+
+		put min(standard_x,0)-floor_1+hr_wid/2-pver_r
+		put pver_rf_pos[i]
+		put (floor_num-1)*floor_hei-floor_thi+floor_down_cover+2*fver_down_r+2*fhor_r+pver_r
+
+		put min(standard_x,0)-floor_1+hr_wid/2-pver_r-pp_anc_len
+		put pver_rf_pos[i]
+		put (floor_num-1)*floor_hei-floor_thi+floor_down_cover+2*fver_down_r+2*fhor_r+pver_r
+
+		for n=1 to _pver_point[pver_num]*3
+			_pver_pos[pver_num][n]=get(1)
+		next n
+	next i
+endif
+
+!=======================================内側立上り
+if switch_hr2 then
+	if hr2_type=1 then !手すりの場合
+		!階段側
+		start_pos=min(standard_x,0)-floor_1-hr2_wid
+		end_pos=(step_num_down-1)*step_tread+landing_1+hr2_wid
+		pver_x_num=int((end_pos-start_pos-hr2_wid-2*pver_r)/pver_pitch)+1
+	
+		dim pver_down2_pos[]
+		dim pver_up2_pos[]
+		for i=1 to pver_x_num
+			pver_down2_pos[i]=start_pos+((end_pos-start_pos)-(pver_x_num-1)*pver_pitch)/2+(i-1)*pver_pitch
+			pver_up2_pos[i]=start_pos+((end_pos-start_pos)-(pver_x_num-1)*pver_pitch)/2+(i-1)*pver_pitch
+		next i
+
+		!下部階段側
+		for i=1 to floor_num-1
+			for j=1 to pver_x_num
+				dis_flag=0
+			
+				if switch_floor or pver_down2_pos[j]>=min(standard_x,0)-floor_1+pp_side_cover then
+					if switch_gl=0 and i=1 then
+						if pver_down2_pos[j]>=max(-step_tread,min(standard_x,0)-floor_1-hr2_wid)+pp_side_cover then
+							dis_flag=1
+						endif
+					else
+						dis_flag=1
+					endif
+				endif
+			
+				!上端z座標
+				if pver_down2_pos[j]<=max(-step_tread,min(standard_x,0)-floor_1-hr2_wid) then
+					z_top_pos=hr2_hei-pp_top_cover
+				endif
+				
+				if pver_down2_pos[j]>max(-step_tread,min(standard_x,0)-floor_1-hr2_wid) and pver_down2_pos[j]<(step_num_down-1)*step_tread then
+					z_top_pos=tan(step_angle)*pver_down2_pos[j]+step_riser+hr2_hei-pp_top_cover/cos(step_angle)
+				endif
+				
+				if pver_down2_pos[j]>=(step_num_down-1)*step_tread then
+					z_top_pos=step_num_down*step_riser+hr2_hei-pp_top_cover
+				endif
+
+				!下端z座標
+				if pver_down2_pos[j]<=0 then
+					z_down_pos=-floor_thi+floor_down_cover+2*fver_down_r*(floor_bar_position-1)+pver_r
+				endif
+				
+				if pver_down2_pos[j]>0 and pver_down2_pos[j]<(step_num_down-1)*step_tread then
+					z_down_pos=down_k*pver_down2_pos[j]+down_b+(ngs_r+pver_r)/cos(step_angle)
+				endif
+				
+				if pver_down2_pos[j]>=(step_num_down-1)*step_tread then
+					z_down_pos=step_num_down*step_riser-landing_thi+landing_down_cover+2*fver_down_r*(landing_bar_position-1)+pver_r
+				endif
+
+				if i=1 and switch_gl=0 and pver_down2_pos[j]<=(-floor_thi/2-down_b)/down_k then
+					z_down_pos=-floor_thi/2+ngs_r+pver_r
+				endif
+
+				if dis_flag=1 then
+					pver_num=pver_num+1				
+					_pver_point[pver_num]=3
+
+					put pver_down2_pos[j]
+					put step_wid1-hr2_wid/2-pver_r
+					put z_top_pos+(i-1)*floor_hei
+
+					put pver_down2_pos[j]
+					put step_wid1-hr2_wid/2-pver_r
+					put z_down_pos+(i-1)*floor_hei
+
+					put pver_down2_pos[j]
+					put step_wid1-hr2_wid/2-pver_r-pp_anc_len
+					put z_down_pos+(i-1)*floor_hei
+	
+					for n=1 to _pver_point[pver_num]*3
+						_pver_pos[pver_num][n]=get(1)
+					next n
+				endif
+			next j
+		next i
+
+		!上部階段側
+		for i=1 to floor_num+switch_gl-1
+			for j=1 to pver_x_num
+				dis_flag=0
+			
+				if switch_floor or pver_up2_pos[j]>=min(standard_x,0)-floor_1+pp_side_cover then
+					if switch_gl and i=1 then
+						if pver_up2_pos[j]<=standard_x+gl_num*step_tread-pp_side_cover then
+							dis_flag=1
+						endif
+					else
+						if i=floor_num+switch_gl-1 then
+							if pver_up2_pos[j]>=min(standard_x,0)-floor_1+pp_side_cover then
+								dis_flag=1
+							endif
+						else
+							dis_flag=1
+						endif
+					endif
+				endif
+
+				!上端z座標
+				if pver_up2_pos[j]<=standard_x then
+					z_top_pos=floor_hei+hr2_hei-pp_top_cover
+				endif
+				
+				if pver_up2_pos[j]>standard_x and pver_up2_pos[j]<min(standard_x+step_num_up*step_tread,(step_num_down-1)*step_tread+landing_1+hr2_wid) then
+					z_top_pos=up_k*pver_up2_pos[j]+up_b+(step_thi-ngs_down_cover-ngs_r)/cos(step_angle)+step_riser+hr2_hei-pp_top_cover/cos(step_angle)
+				endif
+				
+				if pver_up2_pos[j]>=min(standard_x+step_num_up*step_tread,(step_num_down-1)*step_tread+landing_1+hr2_wid) then
+					z_top_pos=step_num_down*step_riser+hr2_hei-pp_top_cover
+				endif
+
+				if i=1 and switch_gl then
+					if pver_up2_pos[j]>standard_x then
+						z_top_pos=up_k*pver_up2_pos[j]+up_b+(step_thi-ngs_down_cover-ngs_r)/cos(step_angle)+step_riser+hr2_hei-pp_top_cover/cos(step_angle)
+					endif
+				endif
+
+				if i=floor_num+switch_gl-1 then
+					if pver_up2_pos[j]<=max(standard_x-(floor_hr_hei-hr2_hei)/tan(step_angle),min(standard_x,0)-floor_1) then
+						z_top_pos=floor_hei+floor_hr_hei-pp_top_cover
+					endif
+					
+					if pver_up2_pos[j]>max(standard_x-(floor_hr_hei-hr2_hei)/tan(step_angle),min(standard_x,0)-floor_1) and pver_up2_pos[j]<min(standard_x+step_num_up*step_tread,(step_num_down-1)*step_tread+landing_1+hr2_wid) then
+						z_top_pos=up_k*pver_up2_pos[j]+up_b+(step_thi-ngs_down_cover-ngs_r)/cos(step_angle)+step_riser+hr2_hei-pp_top_cover/cos(step_angle)
+					endif
+				endif
+
+				!下端z座標
+				if pver_up2_pos[j]<=standard_x then
+					z_down_pos=floor_hei-floor_thi+floor_down_cover+2*fver_down_r*(floor_bar_position-1)+pver_r
+				endif
+				
+				if pver_up2_pos[j]>standard_x and pver_up2_pos[j]<standard_x+(step_num_up-1)*step_tread then
+					z_down_pos=up_k*pver_up2_pos[j]+up_b+(ngs_r+pver_r)/cos(step_angle)
+				endif
+				
+				if pver_up2_pos[j]>=standard_x+(step_num_up-1)*step_tread then
+					z_down_pos=step_num_down*step_riser-landing_thi+landing_down_cover+2*fver_down_r*(landing_bar_position-1)+pver_r
+				endif
+
+				if i=1 and switch_gl then
+					if pver_up2_pos[j]>standard_x then
+						z_down_pos=up_k*pver_up2_pos[j]+up_b+(ngs_r+pver_r)/cos(step_angle)
+					endif
+
+					if pver_up2_pos[j]>=standard_x+(gl_num-1)*step_tread then
+						z_down_pos=floor_hei-gl_num*step_riser-landing_thi/2+ngs_r+pver_r
+					endif
+				endif
+
+				if dis_flag=1 then
+					pver_num=pver_num+1				
+					_pver_point[pver_num]=3
+
+					put pver_up2_pos[j]
+					put step_wid1+handrail_wid+hr2_wid/2+pver_r
+					put z_top_pos+(i-switch_gl-1)*floor_hei
+
+					put pver_up2_pos[j]
+					put step_wid1+handrail_wid+hr2_wid/2+pver_r
+					put z_down_pos+(i-switch_gl-1)*floor_hei
+
+					put pver_up2_pos[j]
+					put step_wid1+handrail_wid+hr2_wid/2+pver_r+pp_anc_len
+					put z_down_pos+(i-switch_gl-1)*floor_hei
+	
+					for n=1 to _pver_point[pver_num]*3
+						_pver_pos[pver_num][n]=get(1)
+					next n
+				endif
+			next j
+		next i
+
+		!踊り場側
+		start_pos=step_wid1-hr2_wid
+		end_pos=step_wid1+handrail_wid+hr2_wid
+		pver_x_num=max(int((end_pos-start_pos-hr2_wid-2*pver_r)/pver_pitch),0)+1
+	
+		dim pver_landing2_pos[]
+		dim pver_floor2_pos[]
+		for i=1 to pver_x_num
+			pver_landing2_pos[i]=start_pos+((end_pos-start_pos)-(pver_x_num-1)*pver_pitch)/2+(i-1)*pver_pitch
+			pver_floor2_pos[i]=start_pos+((end_pos-start_pos)-(pver_x_num-1)*pver_pitch)/2+(i-1)*pver_pitch
+		next i
+
+		!中間踊り場側
+		for i=1 to floor_num-1
+			for j=1 to pver_x_num
+				pver_num=pver_num+1
+				_pver_point[pver_num]=3
+				
+				put (step_num_down-1)*step_tread+landing_1+hr2_wid/2+pver_r
+				put pver_landing2_pos[j]
+				put step_num_down*step_riser+hr2_hei-pp_top_cover+(i-1)*floor_hei
+
+				put (step_num_down-1)*step_tread+landing_1+hr2_wid/2+pver_r
+				put pver_landing2_pos[j]
+				put step_num_down*step_riser-landing_thi+landing_down_cover+2*lver_down_r*(2-landing_bar_position)+pver_r+(i-1)*floor_hei
+
+				put (step_num_down-1)*step_tread+landing_1+hr2_wid/2+pver_r+pp_anc_len
+				put pver_landing2_pos[j]
+				put step_num_down*step_riser-landing_thi+landing_down_cover+2*lver_down_r*(2-landing_bar_position)+pver_r+(i-1)*floor_hei
+				
+				for n=1 to _pver_point[pver_num]*3
+					_pver_pos[pver_num][n]=get(1)
+				next n
+			next j
+		next i
+		
+		!フロア踊り場側
+		if switch_floor then
+			for i=1 to floor_num-2+switch_gl
+				for j=1 to pver_x_num
+					pver_num=pver_num+1
+					_pver_point[pver_num]=3
+					
+					put min(standard_x,0)-floor_1-hr2_wid/2-pver_r
+					put pver_landing2_pos[j]
+					put hr2_hei-pp_top_cover+(i-switch_gl)*floor_hei
+
+					put min(standard_x,0)-floor_1-hr2_wid/2-pver_r
+					put pver_landing2_pos[j]
+					put -floor_thi+floor_down_cover+2*fver_down_r*(2-floor_bar_position)+pver_r+(i-switch_gl)*floor_hei
+
+					put min(standard_x,0)-floor_1-hr2_wid/2-pver_r-pp_anc_len
+					put pver_landing2_pos[j]
+					put -floor_thi+floor_down_cover+2*fver_down_r*(2-floor_bar_position)+pver_r+(i-switch_gl)*floor_hei
+					
+					for n=1 to _pver_point[pver_num]*3
+						_pver_pos[pver_num][n]=get(1)
+					next n
+				next j
+			next i
+		endif
+	endif
+endif
+
+
+if pver_num=0 then
+	_pver_point[1]=0
+	_pver_pos[1][1]=0
+endif
+
+
+parameters pver_num=pver_num,
+	pver_point=_pver_point,
+	pver_pos=_pver_pos
+
+lock "pver_r","pver_nd","pver_mat","pver_pen","pver_num","pver_point","pver_pos"
+
+
+!==============================================================================立上り横筋
+values{2} "phor_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+values{2} "phor_top_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+values{2} "phor_down_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+values "phor_down_anc_len" range(0,]
+values{2} "down_sup_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+if switch_down_sup=0 then hideparameter "down_sup_steel"
+values "phor_pitch" range[0.1,]
+
+dim _phor_r[]
+dim _phor_nd[]
+dim _phor_mat[]
+dim _phor_pen[]
+
+phor_num=0
+dim _phor_point[]
+dim _phor_pos[][]
+
+!=======================================外側立上り
+if switch_hr1 then
+	!中間踊り場側
+	phor_z_num=ceil((landing_hr_hei-pp_top_cover-3*dr_list[phor_steel])/phor_pitch)
+	
+	for i=1 to floor_num-1
+		for j=1 to phor_z_num
+			if j=phor_z_num then
+				phor_z_pos=landing_hr_hei-pp_top_cover-dr_list[phor_top_steel]
+			else
+				phor_z_pos=j*phor_pitch
+			endif
+
+			phor_num=phor_num+1
+			_phor_point[phor_num]=4
+
+			if j=phor_z_num then
+				gosub "set_phor_parameters_2"
+			else
+				gosub "set_phor_parameters_1"
+			endif
+
+			_phor_pos[phor_num][1]=(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2/2+_phor_r[phor_num]-phor_overlap_len
+			_phor_pos[phor_num][2]=hr_wid/2-_phor_r[phor_num]
+			_phor_pos[phor_num][3]=step_num_down*step_riser+phor_z_pos-2*_phor_r[phor_num]+(i-1)*floor_hei
+
+			_phor_pos[phor_num][4]=(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2/2+_phor_r[phor_num]
+			_phor_pos[phor_num][5]=hr_wid/2-_phor_r[phor_num]
+			_phor_pos[phor_num][6]=step_num_down*step_riser+phor_z_pos-2*_phor_r[phor_num]+(i-1)*floor_hei
+
+			_phor_pos[phor_num][7]=(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2/2+_phor_r[phor_num]
+			_phor_pos[phor_num][8]=step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]
+			_phor_pos[phor_num][9]=step_num_down*step_riser+phor_z_pos-2*_phor_r[phor_num]+(i-1)*floor_hei
+
+			_phor_pos[phor_num][10]=(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2/2+_phor_r[phor_num]-phor_overlap_len
+			_phor_pos[phor_num][11]=step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]
+			_phor_pos[phor_num][12]=step_num_down*step_riser+phor_z_pos-2*_phor_r[phor_num]+(i-1)*floor_hei
+		next j
+	next i
+	
+	!フロア踊り場側
+	phor_z_num=ceil((floor_hr_hei-pp_top_cover-3*dr_list[phor_steel])/phor_pitch)
+	
+	for i=1 to floor_num+switch_gl-1
+		for j=1 to phor_z_num
+			if j=phor_z_num then
+				phor_z_pos=floor_hr_hei-pp_top_cover-dr_list[phor_top_steel]
+			else
+				phor_z_pos=j*phor_pitch
+			endif
+			
+			if switch_floor then
+				phor_num=phor_num+1
+				_phor_point[phor_num]=4
+
+				if j=phor_z_num then
+					gosub "set_phor_parameters_2"
+				else
+					gosub "set_phor_parameters_1"
+				endif
+
+				_phor_pos[phor_num][1]=min(standard_x,0)-floor_1-floor_dep+hr_wid2/2-_phor_r[phor_num]+phor_overlap_len
+				_phor_pos[phor_num][2]=hr_wid/2-_phor_r[phor_num]
+				_phor_pos[phor_num][3]=phor_z_pos+(i-switch_gl)*floor_hei-2*_phor_r[phor_num]
+
+				_phor_pos[phor_num][4]=min(standard_x,0)-floor_1-floor_dep+hr_wid2/2-_phor_r[phor_num]
+				_phor_pos[phor_num][5]=hr_wid/2-_phor_r[phor_num]
+				_phor_pos[phor_num][6]=phor_z_pos+(i-switch_gl)*floor_hei-2*_phor_r[phor_num]
+
+				_phor_pos[phor_num][7]=min(standard_x,0)-floor_1-floor_dep+hr_wid2/2-_phor_r[phor_num]
+				_phor_pos[phor_num][8]=step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]
+				_phor_pos[phor_num][9]=phor_z_pos+(i-switch_gl)*floor_hei-2*_phor_r[phor_num]
+
+				_phor_pos[phor_num][10]=min(standard_x,0)-floor_1-floor_dep+hr_wid2/2-_phor_r[phor_num]+phor_overlap_len
+				_phor_pos[phor_num][11]=step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]
+				_phor_pos[phor_num][12]=phor_z_pos+(i-switch_gl)*floor_hei-2*_phor_r[phor_num]
+			endif
+		next j
+	next i
+	
+	!下部階段
+	!天端
+	for i=1 to floor_num
+		if i=floor_num then
+			if switch_floor then
+				phor_num=phor_num+1
+				_phor_point[phor_num]=3
+
+				gosub "set_phor_parameters_2"
+
+				put min(standard_x,0)-floor_1-floor_dep+hr_wid2/2-_phor_r[phor_num]
+				put hr_wid/2-_phor_r[phor_num]+phor_overlap_len
+				put (floor_num-1)*floor_hei+floor_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+				put min(standard_x,0)-floor_1-floor_dep+hr_wid2/2-_phor_r[phor_num]
+				put hr_wid/2-_phor_r[phor_num]
+				put (floor_num-1)*floor_hei+floor_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+				if switch_hr1_top then
+					_phor_point[phor_num]=_phor_point[phor_num]+1
+
+					put min(standard_x,0)-floor_1+hr_wid/2+_phor_r[phor_num]
+					put hr_wid/2-_phor_r[phor_num]
+					put (floor_num-1)*floor_hei+floor_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+					put min(standard_x,0)-floor_1+hr_wid/2+_phor_r[phor_num]
+					put hr_wid/2-_phor_r[phor_num]+phor_overlap_len
+					put (floor_num-1)*floor_hei+floor_hr_hei-pp_top_cover-_phor_r[phor_num]
+				else
+					put min(standard_x,0)-floor_1-pp_side_cover
+					put hr_wid/2-_phor_r[phor_num]
+					put (floor_num-1)*floor_hei+floor_hr_hei-pp_top_cover-_phor_r[phor_num]
+				endif
+			endif
+		else
+			phor_num=phor_num+1
+
+			gosub "set_phor_parameters_2"
+
+			if i=1 and switch_gl=0 then
+				_phor_point[phor_num]=4
+
+				if switch_floor then
+					put -step_tread+pp_side_cover
+					put hr_wid/2-_phor_r[phor_num]
+					put (i-1)*floor_hei+hr_hei+pp_side_cover*tan(step_angle)-pp_top_cover-_phor_r[phor_num]
+				else
+					put max(-step_tread,min(standard_x,0)-floor_1)+pp_side_cover
+					put hr_wid/2-_phor_r[phor_num]
+					put (i-1)*floor_hei+tan(step_angle)*(max(-step_tread,min(standard_x,0)-floor_1))+step_riser+hr_hei+pp_side_cover*tan(step_angle)-pp_top_cover-_phor_r[phor_num]
+				endif
+
+				put (step_num_down-1)*step_tread+(landing_hr_hei-hr_hei)/tan(step_angle)
+				put hr_wid/2-_phor_r[phor_num]
+				put (i-1)*floor_hei+step_num_down*step_riser+landing_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+				put (step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2/2+_phor_r[phor_num]
+				put hr_wid/2-_phor_r[phor_num]
+				put (i-1)*floor_hei+step_num_down*step_riser+landing_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+				put (step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2/2+_phor_r[phor_num]
+				put hr_wid/2-_phor_r[phor_num]+phor_overlap_len
+				put (i-1)*floor_hei+step_num_down*step_riser+landing_hr_hei-pp_top_cover-_phor_r[phor_num]
+			else
+				_phor_point[phor_num]=5
+
+				if switch_floor then
+					_phor_point[phor_num]=_phor_point[phor_num]+1
+
+					put min(standard_x,0)-floor_1-floor_dep+hr_wid2/2-_phor_r[phor_num]
+					put hr_wid/2-_phor_r[phor_num]+phor_overlap_len
+					put (i-1)*floor_hei+floor_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+					put min(standard_x,0)-floor_1-floor_dep+hr_wid2/2-_phor_r[phor_num]
+				else
+					put min(standard_x,0)-floor_1+pp_side_cover
+				endif
+				put hr_wid/2-_phor_r[phor_num]
+				put (i-1)*floor_hei+floor_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+				put -step_tread+(floor_hr_hei-hr_hei)/tan(step_angle)
+				put hr_wid/2-_phor_r[phor_num]
+				put (i-1)*floor_hei+floor_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+				put (step_num_down-1)*step_tread+(landing_hr_hei-hr_hei)/tan(step_angle)
+				put hr_wid/2-_phor_r[phor_num]
+				put (i-1)*floor_hei+step_num_down*step_riser+landing_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+				put (step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2/2+_phor_r[phor_num]
+				put hr_wid/2-_phor_r[phor_num]
+				put (i-1)*floor_hei+step_num_down*step_riser+landing_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+				put (step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2/2+_phor_r[phor_num]
+				put hr_wid/2-_phor_r[phor_num]+phor_overlap_len
+				put (i-1)*floor_hei+step_num_down*step_riser+landing_hr_hei-pp_top_cover-_phor_r[phor_num]
+			endif
+		endif
+
+		if nsp=_phor_point[phor_num]*3 then
+			for j=1 to _phor_point[phor_num]*3
+				_phor_pos[phor_num][j]=get(1)
+			next j
+		endif
+	next i
+
+	!中間
+	phor_down_pos=0
+	phor_top_pos=step_num_down*step_riser+landing_hr_hei-pp_top_cover-3*dr_list[phor_steel]
+	phor_z_num=int((phor_top_pos-phor_down_pos)/phor_pitch)
+	
+	for i=1 to floor_num
+		for j=1 to phor_z_num
+			phor_z_pos=j*phor_pitch
+
+			bent_start=0
+			bent_end=0
+
+			if i=1 and switch_gl=0 then
+				if phor_z_pos<=hr_hei-pp_top_cover-3*dr_list[phor_steel] then
+					phor_start_pos=-step_tread+pp_side_cover
+				else
+					phor_start_pos=-step_tread+(floor_hr_hei-hr_hei)/tan(step_angle)+(phor_z_pos-floor_hr_hei)/tan(step_angle)+pp_side_cover/sin(step_angle)
+				endif
+
+				if switch_floor=0 and phor_z_pos<=tan(step_angle)*(max(-step_tread,min(standard_x,0)-floor_1))+step_riser+hr_hei then
+					phor_start_pos=max(-step_tread,min(standard_x,0)-floor_1)+pp_side_cover
+				endif
+			else
+				if phor_z_pos<=floor_hr_hei-pp_top_cover-3*dr_list[phor_steel] then
+					if switch_floor then
+						bent_start=1
+						phor_start_pos=min(standard_x,0)-floor_1-floor_dep+hr_wid2/2-dr_list[phor_steel]
+					else
+						phor_start_pos=min(standard_x,0)-floor_1+pp_side_cover
+					endif
+				else
+					phor_start_pos=-step_tread+(floor_hr_hei-hr_hei)/tan(step_angle)+(phor_z_pos-floor_hr_hei)/tan(step_angle)+pp_side_cover/sin(step_angle)
+				endif
+			endif
+
+			if i=floor_num then
+				if switch_hr1_top then
+					bent_end=1
+					phor_end_pos=min(standard_x,0)-floor_1+hr_wid/2+dr_list[phor_steel]
+				else
+					phor_end_pos=min(standard_x,0)-floor_1-pp_side_cover
+				endif
+			else
+				if phor_z_pos<=step_num_down*step_riser then
+					phor_end_pos=(phor_z_pos-down_b+(ngs_down_cover+ngs_r-pp_side_cover)/cos(step_angle))/down_k
+				else
+					bent_end=1
+					phor_end_pos=(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2/2+dr_list[phor_steel]
+				endif
+			endif
+
+			dis_flag=1
+	
+			if i=floor_num then
+				if phor_z_pos>floor_hr_hei-pp_top_cover-3*dr_list[phor_steel] or switch_floor=0 then
+					dis_flag=0
+				endif
+			endif
+
+			if phor_end_pos-phor_start_pos<steel_min_limit then
+				dis_flag=0
+			endif
+
+			if dis_flag=1 then
+				phor_num=phor_num+1
+				_phor_point[phor_num]=2
+
+				gosub "set_phor_parameters_1"
+
+				if bent_start=1 then
+					_phor_point[phor_num]=_phor_point[phor_num]+1
+				
+					put phor_start_pos
+					put hr_wid/2-_phor_r[phor_num]+phor_overlap_len
+					put (i-1)*floor_hei+phor_z_pos
+				endif
+
+				put phor_start_pos
+				put hr_wid/2-_phor_r[phor_num]
+				put (i-1)*floor_hei+phor_z_pos
+
+				put phor_end_pos
+				put hr_wid/2-_phor_r[phor_num]
+				put (i-1)*floor_hei+phor_z_pos
+
+				if bent_end=1 then
+					_phor_point[phor_num]=_phor_point[phor_num]+1
+
+					put phor_end_pos
+					put hr_wid/2-_phor_r[phor_num]+phor_overlap_len
+					put (i-1)*floor_hei+phor_z_pos
+				endif
+
+				for n=1 to _phor_point[phor_num]*3
+					_phor_pos[phor_num][n]=get(1)
+				next n
+			endif
+		next j
+	next i
+
+	!下端
+	dim floor_z[]
+	if floor_bar_position=1 then
+		floor_z[1]=-floor_thi+(floor_down_cover+2*fver_down_r+_phor_r[phor_num])
+		floor_z[2]=-(floor_down_cover+2*fver_down_r+_phor_r[phor_num])
+	else
+		floor_z[1]=-floor_thi+(floor_down_cover+_phor_r[phor_num])
+		floor_z[2]=-(floor_down_cover+_phor_r[phor_num])
+	endif
+
+	dim landing_z[]
+	if landing_bar_position=1 then
+		landing_z[1]=-landing_thi+(landing_down_cover+2*lver_down_r+_phor_r[phor_num])
+		landing_z[1]=-(landing_down_cover+2*lver_down_r+_phor_r[phor_num])
+	else
+		landing_z[1]=-landing_thi+(landing_down_cover+2*lhor_r-_phor_r[phor_num])
+		landing_z[2]=-(landing_down_cover+2*lhor_r-_phor_r[phor_num])
+	endif
+
+	dim down_offset[]
+	down_offset[1]=(-step_thi+ngs_down_cover+2*ngs_r+2*inzm_r+2*dose_r+_phor_r[phor_num])/cos(step_angle)
+	down_offset[2]=step_riser-step_rat-inzm_tread_cover-(inzm_r*2+2*dbn_r+_phor_r[phor_num])-(-step_nosing+inzm_tread_cover+2*inzm_r+2*dbn_r)*tan(step_angle)
+
+	dim down_y[]
+	down_y[1]=dbn_side_cover+2*dbn_r+_phor_r[phor_num]
+	down_y[2]=step_wid1-(dbn_side_cover+2*dbn_r+_phor_r[phor_num])
+
+	if switch_hr2 and hr2_type=1 then
+		down_index=2
+	else
+		down_index=1
+	endif
+
+	for i=1 to floor_num-1
+		for j=1 to 2
+			for m=1 to down_index
+				phor_num=phor_num+1
+				_phor_point[phor_num]=4
+	
+				_phor_r[phor_num]=dr_list[phor_down_steel]
+				_phor_nd[phor_num]=nd_list[phor_down_steel]
+				_phor_mat[phor_num]=SDmat[scode_list[phor_down_steel]]
+				_phor_pen[phor_num]=SDpen[scode_list[phor_down_steel]]
+	
+				put (floor_z[j]-down_offset[j])/down_k-phor_down_anc_len
+				put down_y[m]
+				put floor_z[j]+(i-1)*floor_hei
+	
+				put (floor_z[j]-down_offset[j])/down_k
+				put down_y[m]
+				put floor_z[j]+(i-1)*floor_hei
+	
+				put ((step_num_down*step_riser+landing_z[j])-down_offset[j])/down_k
+				put down_y[m]
+				put step_num_down*step_riser+landing_z[j]+(i-1)*floor_hei
+	
+				put ((step_num_down*step_riser+landing_z[j])-down_offset[j])/down_k+phor_down_anc_len
+				put down_y[m]
+				put step_num_down*step_riser+landing_z[j]+(i-1)*floor_hei
+	
+				for n=1 to 3*_phor_point[phor_num]
+					_phor_pos[phor_num][n]=get(1)
+				next n
+			next m
+		next j
+	next i
+
+	!下端横筋受筋
+	if switch_down_sup then
+		for i=1 to floor_num-1
+			for j=1 to 2
+				if i<>1 or switch_gl<>0 then
+					phor_num=phor_num+1
+					_phor_point[phor_num]=2
+		
+					_phor_r[phor_num]=dr_list[down_sup_steel]
+					_phor_nd[phor_num]=nd_list[down_sup_steel]
+					_phor_mat[phor_num]=SDmat[scode_list[down_sup_steel]]
+					_phor_pen[phor_num]=SDpen[scode_list[down_sup_steel]]
+					
+					put (floor_z[j]-down_offset[j])/down_k-_phor_r[phor_num]
+					put dbn_side_cover+2*dbn_r
+					put floor_z[j]+(i-1)*floor_hei-dr_list[phor_down_steel]-_phor_r[phor_num]
+					
+					put (floor_z[j]-down_offset[j])/down_k-_phor_r[phor_num]
+					put step_wid1-(dbn_side_cover+2*dbn_r)
+					put floor_z[j]+(i-1)*floor_hei-dr_list[phor_down_steel]-_phor_r[phor_num]
+		
+					for n=1 to 3*_phor_point[phor_num]
+						_phor_pos[phor_num][n]=get(1)
+					next n
+				endif
+	
+				phor_num=phor_num+1
+				_phor_point[phor_num]=2
+
+				_phor_r[phor_num]=dr_list[down_sup_steel]
+				_phor_nd[phor_num]=nd_list[down_sup_steel]
+				_phor_mat[phor_num]=SDmat[scode_list[down_sup_steel]]
+				_phor_pen[phor_num]=SDpen[scode_list[down_sup_steel]]
+				
+				put ((step_num_down*step_riser+landing_z[j])-down_offset[j])/down_k+_phor_r[phor_num]
+				put dbn_side_cover+2*dbn_r
+				put step_num_down*step_riser+landing_z[j]+(i-1)*floor_hei-dr_list[phor_down_steel]-_phor_r[phor_num]
+				
+				put ((step_num_down*step_riser+landing_z[j])-down_offset[j])/down_k+_phor_r[phor_num]
+				put step_wid1-(dbn_side_cover+2*dbn_r)
+				put step_num_down*step_riser+landing_z[j]+(i-1)*floor_hei-dr_list[phor_down_steel]-_phor_r[phor_num]
+
+				for n=1 to 3*_phor_point[phor_num]
+					_phor_pos[phor_num][n]=get(1)
+				next n
+			next j
+		next i
+	endif
+
+	!上部階段
+	!天端
+	for i=1 to floor_num-1+switch_gl
+		phor_num=phor_num+1
+
+		gosub "set_phor_parameters_2"
+
+		if i=1 and switch_gl then
+			_phor_point[phor_num]=3
+
+			if switch_floor then
+				_phor_point[phor_num]=_phor_point[phor_num]+1
+
+				put min(standard_x,0)-floor_1-floor_dep+hr_wid2/2-_phor_r[phor_num]
+				put step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]-phor_overlap_len
+				put (i-switch_gl)*floor_hei+floor_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+				put min(standard_x,0)-floor_1-floor_dep+hr_wid2/2-_phor_r[phor_num]
+			else
+				put min(standard_x,0)-floor_1+pp_side_cover
+			endif
+			put step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]
+			put (i-switch_gl)*floor_hei+floor_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+			put standard_x-(floor_hr_hei-hr_hei)/tan(step_angle)
+			put step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]
+			put (i-switch_gl)*floor_hei+floor_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+			put standard_x+gl_num*step_tread-pp_side_cover
+			put step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]
+			put (i-switch_gl)*floor_hei-gl_num*step_riser+pp_side_cover*tan(step_angle)+hr_hei-pp_top_cover-_phor_r[phor_num]
+		else
+			_phor_point[phor_num]=5
+
+			if switch_floor then
+				_phor_point[phor_num]=_phor_point[phor_num]+1
+
+				put min(standard_x,0)-floor_1-floor_dep+hr_wid2/2-_phor_r[phor_num]
+				put step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]-phor_overlap_len
+				put (i-switch_gl)*floor_hei+floor_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+				put min(standard_x,0)-floor_1-floor_dep+hr_wid2/2-_phor_r[phor_num]
+			else
+				put min(standard_x,0)-floor_1+pp_side_cover
+			endif
+			put step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]
+			put (i-switch_gl)*floor_hei+floor_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+			put standard_x-(floor_hr_hei-hr_hei)/tan(step_angle)
+			put step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]
+			put (i-switch_gl)*floor_hei+floor_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+			put step_num_down*step_tread+landing_1-landing_2-(landing_hr_hei-hr_hei)/tan(step_angle)
+			put step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]
+			put (i-switch_gl)*floor_hei-step_num_up*step_riser+landing_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+			put (step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2/2+_phor_r[phor_num]
+			put step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]
+			put (i-switch_gl)*floor_hei-step_num_up*step_riser+landing_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+			put (step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2/2+_phor_r[phor_num]
+			put step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]-phor_overlap_len
+			put (i-switch_gl)*floor_hei-step_num_up*step_riser+landing_hr_hei-pp_top_cover-_phor_r[phor_num]
+		endif
+
+		for j=1 to _phor_point[phor_num]*3
+			_phor_pos[phor_num][j]=get(1)
+		next j
+	next i
+
+	!中間
+	phor_down_pos=0
+	phor_top_pos=step_num_up*step_riser+floor_hr_hei-pp_top_cover-3*dr_list[phor_steel]
+	phor_z_num=int((phor_top_pos-phor_down_pos)/phor_pitch)
+	
+	for i=1 to floor_num-1
+		for j=1 to phor_z_num
+			phor_z_pos=j*phor_pitch
+			
+			bent_start=0
+			bent_end=0
+
+			if phor_z_pos>=step_num_up*step_riser then
+				if switch_floor then
+					bent_start=1
+					phor_start_pos=min(standard_x,0)-floor_1-floor_dep+hr_wid2/2-dr_list[phor_steel]
+				else
+					phor_start_pos=min(standard_x,0)-floor_1+pp_side_cover
+				endif
+			else
+				phor_start_pos=standard_x-step_tread-step_thi/sin(step_angle)+floor_thi/tan(step_angle)+(step_num_up*step_riser-floor_thi-phor_z_pos)/tan(step_angle)+pp_side_cover/sin(step_angle)
+			endif
+	
+			if phor_z_pos<=landing_hr_hei-pp_top_cover-3*dr_list[phor_steel] then
+				bent_end=1
+				phor_end_pos=(step_num_down-1)*step_tread+landing_1+landing_dep-hr_wid2/2+dr_list[phor_steel]
+			else
+				phor_end_pos=step_num_down*step_tread+landing_1-landing_2-(landing_hr_hei-hr_hei)/tan(step_angle)-(phor_z_pos-landing_hr_hei)/tan(step_angle)-pp_side_cover/sin(step_angle)
+			endif
+
+			phor_num=phor_num+1
+			_phor_point[phor_num]=2
+
+			gosub "set_phor_parameters_1"
+
+			if bent_start=1 then
+				_phor_point[phor_num]=_phor_point[phor_num]+1
+			
+				put phor_start_pos
+				put step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]-phor_overlap_len
+				put (i-1)*floor_hei+step_num_down*step_riser+phor_z_pos
+			endif
+
+			put phor_start_pos
+			put step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]
+			put (i-1)*floor_hei+step_num_down*step_riser+phor_z_pos
+
+			put phor_end_pos
+			put step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]
+			put (i-1)*floor_hei+step_num_down*step_riser+phor_z_pos
+
+			if bent_end=1 then
+				_phor_point[phor_num]=_phor_point[phor_num]+1
+
+				put phor_end_pos
+				put step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]-phor_overlap_len
+				put (i-1)*floor_hei+step_num_down*step_riser+phor_z_pos
+			endif
+
+			for n=1 to _phor_point[phor_num]*3
+				_phor_pos[phor_num][n]=get(1)
+			next n
+		next j
+	next i
+
+	if switch_gl then
+		phor_down_pos=0
+		phor_top_pos=gl_num*step_riser+floor_hr_hei-pp_top_cover-3*dr_list[phor_steel]
+		phor_z_num=int((phor_top_pos-phor_down_pos)/phor_pitch)
+
+		for j=1 to phor_z_num
+			phor_z_pos=j*phor_pitch
+
+			bent_start=0
+
+			if phor_z_pos>=gl_num*step_riser then
+				if switch_floor then
+					bent_start=1
+					phor_start_pos=min(standard_x,0)-floor_1-floor_dep+hr_wid2/2-dr_list[phor_top_steel]
+				else
+					phor_start_pos=min(standard_x,0)-floor_1+pp_side_cover
+				endif
+			else
+				phor_start_pos=standard_x+(gl_num-1)*step_tread-step_thi/sin(step_angle)-phor_z_pos/tan(step_angle)+pp_side_cover/sin(step_angle)
+			endif
+	
+			if phor_z_pos<=hr_hei then
+				phor_end_pos=standard_x+gl_num*step_tread-pp_side_cover
+			else
+				phor_end_pos=standard_x+gl_num*step_tread-(phor_z_pos-hr_hei)/tan(step_angle)-pp_side_cover/sin(step_angle)
+			endif
+
+			phor_num=phor_num+1
+			_phor_point[phor_num]=2
+
+			gosub "set_phor_parameters_1"
+
+			if bent_start=1 then
+				_phor_point[phor_num]=_phor_point[phor_num]+1
+			
+				put phor_start_pos
+				put step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]-phor_overlap_len
+				put -gl_num*step_riser+phor_z_pos
+			endif
+
+			put phor_start_pos
+			put step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]
+			put -gl_num*step_riser+phor_z_pos
+
+			put phor_end_pos
+			put step_wid1+handrail_wid+step_wid2-hr_wid/2+_phor_r[phor_num]
+			put -gl_num*step_riser+phor_z_pos
+
+			for n=1 to _phor_point[phor_num]*3
+				_phor_pos[phor_num][n]=get(1)
+			next n
+		next j
+	endif
+
+	!下端
+	down_offset[1]=up_b+(ngs_r+2*inzm_r+2*dose_r+_phor_r[phor_num])/cos(step_angle)
+	down_offset[2]=up_b+(step_thi-ngs_down_cover-ngs_r)/cos(step_angle)+step_riser-step_rat-inzm_tread_cover-(inzm_r*2+2*dbn_r+_phor_r[phor_num])-(-step_nosing+inzm_tread_cover+2*inzm_r+2*dbn_r)*tan(step_angle)
+
+	down_y[1]=(step_wid1+handrail_wid+step_wid2)-(dbn_side_cover+2*dbn_r+_phor_r[phor_num])
+	down_y[2]=(step_wid1+handrail_wid)+(dbn_side_cover+2*dbn_r+_phor_r[phor_num])
+
+	for m=1 to down_index
+		for i=1 to floor_num-1
+			for j=1 to 2
+				phor_num=phor_num+1
+				_phor_point[phor_num]=4
+	
+				_phor_r[phor_num]=dr_list[phor_down_steel]
+				_phor_nd[phor_num]=nd_list[phor_down_steel]
+				_phor_mat[phor_num]=SDmat[scode_list[phor_down_steel]]
+				_phor_pen[phor_num]=SDpen[scode_list[phor_down_steel]]
+	
+				put (floor_hei+floor_z[j]-down_offset[j])/up_k-phor_down_anc_len
+				put down_y[m]
+				put floor_hei+floor_z[j]+(i-1)*floor_hei
+	
+				put (floor_hei+floor_z[j]-down_offset[j])/up_k
+				put down_y[m]
+				put floor_hei+floor_z[j]+(i-1)*floor_hei
+	
+				put ((step_num_down*step_riser+landing_z[j])-down_offset[j])/up_k
+				put down_y[m]
+				put step_num_down*step_riser+landing_z[j]+(i-1)*floor_hei
+	
+				put ((step_num_down*step_riser+landing_z[j])-down_offset[j])/up_k+phor_down_anc_len
+				put down_y[m]
+				put step_num_down*step_riser+landing_z[j]+(i-1)*floor_hei
+	
+				for n=1 to 3*_phor_point[phor_num]
+					_phor_pos[phor_num][n]=get(1)
+				next n
+			next j
+		next i
+	
+		if switch_gl then
+			for j=1 to 2
+				phor_num=phor_num+1
+				_phor_point[phor_num]=4
+	
+				_phor_r[phor_num]=dr_list[phor_down_steel]
+				_phor_nd[phor_num]=nd_list[phor_down_steel]
+				_phor_mat[phor_num]=SDmat[scode_list[phor_down_steel]]
+				_phor_pen[phor_num]=SDpen[scode_list[phor_down_steel]]
+	
+				put (floor_z[j]+floor_hei-down_offset[j])/up_k-phor_down_anc_len
+				put down_y[m]
+				put floor_z[j]
+	
+				put (floor_z[j]+floor_hei-down_offset[j])/up_k
+				put down_y[m]
+				put floor_z[j]
+	
+				put ((-gl_num*step_riser+landing_z[j]+floor_hei)-down_offset[j])/up_k
+				put down_y[m]
+				put -gl_num*step_riser+landing_z[j]
+	
+				put ((-gl_num*step_riser+landing_z[j]+floor_hei)-down_offset[j])/up_k+phor_down_anc_len
+				put down_y[m]
+				put -gl_num*step_riser+landing_z[j]
+	
+				for n=1 to 3*_phor_point[phor_num]
+					_phor_pos[phor_num][n]=get(1)
+				next n
+			next j
+		endif
+	next m
+
+	!下端受筋
+	if switch_down_sup then
+		for i=1 to floor_num-1+switch_gl
+			for j=1 to 2
+				phor_num=phor_num+1
+				_phor_point[phor_num]=2
+		
+				_phor_r[phor_num]=dr_list[down_sup_steel]
+				_phor_nd[phor_num]=nd_list[down_sup_steel]
+				_phor_mat[phor_num]=SDmat[scode_list[down_sup_steel]]
+				_phor_pen[phor_num]=SDpen[scode_list[down_sup_steel]]
+		
+				put (floor_hei+floor_z[j]-down_offset[j])/up_k-_phor_r[phor_num]
+				put step_wid1+handrail_wid+(dbn_side_cover+2*dbn_r)
+				put floor_hei+floor_z[j]+(i-1-switch_gl)*floor_hei-dr_list[phor_down_steel]-_phor_r[phor_num]
+				
+				put (floor_hei+floor_z[j]-down_offset[j])/up_k-_phor_r[phor_num]
+				put step_wid1+handrail_wid+step_wid2-(dbn_side_cover+2*dbn_r)
+				put floor_hei+floor_z[j]+(i-1-switch_gl)*floor_hei-dr_list[phor_down_steel]-_phor_r[phor_num]
+		
+				for n=1 to 3*_phor_point[phor_num]
+					_phor_pos[phor_num][n]=get(1)
+				next n
+		
+				if i>switch_gl then
+					phor_num=phor_num+1
+					_phor_point[phor_num]=2
+			
+					_phor_r[phor_num]=dr_list[down_sup_steel]
+					_phor_nd[phor_num]=nd_list[down_sup_steel]
+					_phor_mat[phor_num]=SDmat[scode_list[down_sup_steel]]
+					_phor_pen[phor_num]=SDpen[scode_list[down_sup_steel]]
+			
+					put ((step_num_down*step_riser+landing_z[j])-down_offset[j])/up_k+_phor_r[phor_num]
+					put step_wid1+handrail_wid+(dbn_side_cover+2*dbn_r)
+					put step_num_down*step_riser+landing_z[j]+(i-1-switch_gl)*floor_hei-dr_list[phor_down_steel]-_phor_r[phor_num]
+					
+					put ((step_num_down*step_riser+landing_z[j])-down_offset[j])/up_k+_phor_r[phor_num]
+					put step_wid1+handrail_wid+step_wid2-(dbn_side_cover+2*dbn_r)
+					put step_num_down*step_riser+landing_z[j]+(i-1-switch_gl)*floor_hei-dr_list[phor_down_steel]-_phor_r[phor_num]
+			
+					for n=1 to 3*_phor_point[phor_num]
+						_phor_pos[phor_num][n]=get(1)
+					next n
+				endif
+			next j
+		next i
+	endif
+endif
+
+!最上階外側立上り
+if switch_hr1_top then
+	phor_z_num=ceil((floor_hr_hei-pp_top_cover-3*dr_list[phor_steel])/phor_pitch)
+
+	for i=1 to phor_z_num
+		if i=phor_z_num then
+			phor_z_pos=floor_hr_hei-pp_top_cover-dr_list[phor_top_steel]
+		else
+			phor_z_pos=i*phor_pitch
+		endif
+
+		bent_start=0
+		bent_end=0
+
+		if switch_floor then
+			bent_start=1
+			phor_start_pos=hr_wid/2-dr_list[phor_steel]
+		else
+			phor_start_pos=pp_side_cover
+		endif
+
+		if switch_hr2 then
+			bent_end=1
+			if hr2_type=1 then
+				phor_end_pos=step_wid1+handrail_wid+hr2_wid/2-dr_list[phor_steel]
+			else
+				phor_end_pos=step_wid1+handrail_wid/2-dr_list[phor_steel]
+			endif
+		else
+			if hr2_type=1 then
+				phor_end_pos=step_wid1+handrail_wid+hr2_wid-pp_side_cover
+			else
+				phor_end_pos=step_wid1+handrail_wid-pp_side_cover
+			endif
+		endif
+
+		phor_num=phor_num+1
+		_phor_point[phor_num]=2
+
+		if i=phor_z_num then
+			gosub "set_phor_parameters_2"
+		else
+			gosub "set_phor_parameters_1"
+		endif
+
+		if bent_start=1 then
+			_phor_point[phor_num]=_phor_point[phor_num]+1
+
+			put min(standard_x,0)-floor_1+hr_wid/2+_phor_r[phor_num]-phor_overlap_len
+			put phor_start_pos
+			put (floor_num-1)*floor_hei+phor_z_pos-2*_phor_r[phor_num]
+		endif
+
+		put min(standard_x,0)-floor_1+hr_wid/2+_phor_r[phor_num]
+		put phor_start_pos
+		put (floor_num-1)*floor_hei+phor_z_pos-2*_phor_r[phor_num]
+
+		put min(standard_x,0)-floor_1+hr_wid/2+_phor_r[phor_num]
+		put phor_end_pos
+		put (floor_num-1)*floor_hei+phor_z_pos-2*_phor_r[phor_num]
+
+		if bent_end=1 then
+			_phor_point[phor_num]=_phor_point[phor_num]+1
+
+			put min(standard_x,0)-floor_1+hr_wid/2+_phor_r[phor_num]+phor_overlap_len
+			put phor_end_pos
+			put (floor_num-1)*floor_hei+phor_z_pos-2*_phor_r[phor_num]
+		endif
+
+		for j=1 to _phor_point[phor_num]*3
+			_phor_pos[phor_num][j]=get(1)
+		next j
+	next i
+endif
+
+
+!=======================================内側立上り
+if switch_hr2 then
+	if hr2_type=1 then !手すり
+		!下部階段
+		for i=1 to floor_num-1
+			if i=1 and switch_gl=0 then
+				phor_num=phor_num+1
+				_phor_point[phor_num]=3
+
+				gosub "set_phor_parameters_2"
+
+				_phor_pos[phor_num][1]=max(-step_tread,min(standard_x,0)-floor_1-hr2_wid)+pp_side_cover
+				_phor_pos[phor_num][2]=step_wid1-hr2_wid/2+_phor_r[phor_num]
+				_phor_pos[phor_num][3]=(i-1)*floor_hei+tan(step_angle)*(max(-step_tread,min(standard_x,0)-floor_1-hr2_wid))+step_riser+hr2_hei-pp_top_cover+pp_side_cover*tan(step_angle)-_phor_r[phor_num]
+
+				_phor_pos[phor_num][4]=(step_num_down-1)*step_tread
+				_phor_pos[phor_num][5]=step_wid1-hr2_wid/2+_phor_r[phor_num]
+				_phor_pos[phor_num][6]=(i-1)*floor_hei+step_num_down*step_riser+hr2_hei-pp_top_cover-_phor_r[phor_num]
+
+				_phor_pos[phor_num][7]=(step_num_down-1)*step_tread+landing_1+hr2_wid-pp_side_cover
+				_phor_pos[phor_num][8]=step_wid1-hr2_wid/2+_phor_r[phor_num]
+				_phor_pos[phor_num][9]=(i-1)*floor_hei+step_num_down*step_riser+hr2_hei-pp_top_cover-_phor_r[phor_num]
+			else
+				phor_num=phor_num+1
+
+				gosub "set_phor_parameters_2"
+
+				if min(standard_x,0)-floor_1-hr2_wid<=-step_tread then
+					_phor_point[phor_num]=4
+
+					_phor_pos[phor_num][1]=min(standard_x,0)-floor_1-hr2_wid+pp_side_cover
+					_phor_pos[phor_num][2]=step_wid1-hr2_wid/2+_phor_r[phor_num]
+					_phor_pos[phor_num][3]=(i-1)*floor_hei+hr2_hei-pp_top_cover-_phor_r[phor_num]
+
+					_phor_pos[phor_num][4]=max(-step_tread,min(standard_x,0)-floor_1-hr2_wid)
+					_phor_pos[phor_num][5]=step_wid1-hr2_wid/2+_phor_r[phor_num]
+					_phor_pos[phor_num][6]=(i-1)*floor_hei+tan(step_angle)*(max(-step_tread,min(standard_x,0)-floor_1-hr2_wid))+step_riser+hr2_hei-pp_top_cover-_phor_r[phor_num]
+
+					_phor_pos[phor_num][7]=(step_num_down-1)*step_tread
+					_phor_pos[phor_num][8]=step_wid1-hr2_wid/2+_phor_r[phor_num]
+					_phor_pos[phor_num][9]=(i-1)*floor_hei+step_num_down*step_riser+hr2_hei-pp_top_cover-_phor_r[phor_num]
+
+					_phor_pos[phor_num][10]=(step_num_down-1)*step_tread+landing_1+hr2_wid-pp_side_cover
+					_phor_pos[phor_num][11]=step_wid1-hr2_wid/2+_phor_r[phor_num]
+					_phor_pos[phor_num][12]=(i-1)*floor_hei+step_num_down*step_riser+hr2_hei-pp_top_cover-_phor_r[phor_num]
+				else
+					_phor_point[phor_num]=3
+
+					_phor_pos[phor_num][1]=max(-step_tread,min(standard_x,0)-floor_1-hr2_wid)+pp_side_cover
+					_phor_pos[phor_num][2]=step_wid1-hr2_wid/2+_phor_r[phor_num]
+					_phor_pos[phor_num][3]=(i-1)*floor_hei+tan(step_angle)*(max(-step_tread,min(standard_x,0)-floor_1-hr2_wid))+step_riser+hr2_hei-pp_top_cover+pp_side_cover*tan(step_angle)-_phor_r[phor_num]
+
+					_phor_pos[phor_num][4]=(step_num_down-1)*step_tread
+					_phor_pos[phor_num][5]=step_wid1-hr2_wid/2+_phor_r[phor_num]
+					_phor_pos[phor_num][6]=(i-1)*floor_hei+step_num_down*step_riser+hr2_hei-pp_top_cover-_phor_r[phor_num]
+
+					_phor_pos[phor_num][7]=(step_num_down-1)*step_tread+landing_1+hr2_wid-pp_side_cover
+					_phor_pos[phor_num][8]=step_wid1-hr2_wid/2+_phor_r[phor_num]
+					_phor_pos[phor_num][9]=(i-1)*floor_hei+step_num_down*step_riser+hr2_hei-pp_top_cover-_phor_r[phor_num]
+				endif
+			endif
+		next i
+
+		phor_down_pos=0
+		phor_top_pos=step_num_down*step_riser+hr2_hei-pp_top_cover-3*dr_list[phor_steel]
+		phor_z_num=int((phor_top_pos-phor_down_pos)/phor_pitch)
+
+		for i=1 to floor_num-1
+			for j=1 to phor_z_num
+				phor_z_pos=j*phor_pitch
+				
+				if i=1 and switch_gl=0 then
+					if phor_z_pos<=tan(step_angle)*(max(-step_tread,min(standard_x,0)-floor_1-hr2_wid))+step_riser+hr2_hei then
+						phor_start_pos=max(-step_tread,min(standard_x,0)-floor_1-hr2_wid)+pp_side_cover
+					else
+						phor_start_pos=-step_tread+(phor_z_pos-hr2_hei)/tan(step_angle)+pp_side_cover/sin(step_angle)
+					endif
+				else
+					if phor_z_pos<=tan(step_angle)*(max(-step_tread,min(standard_x,0)-floor_1-hr2_wid))+step_riser+hr2_hei then
+						phor_start_pos=min(standard_x,0)-floor_1-hr2_wid+pp_side_cover
+					else
+						phor_start_pos=-step_tread+(phor_z_pos-hr2_hei)/tan(step_angle)+pp_side_cover/sin(step_angle)
+					endif
+				endif
+
+				if phor_z_pos<=step_num_down*step_riser then
+					phor_end_pos=(phor_z_pos-down_b+(ngs_down_cover+ngs_r-pp_side_cover)/cos(step_angle))/down_k
+				else
+					phor_end_pos=(step_num_down-1)*step_tread+landing_1+hr2_wid-pp_side_cover
+				endif
+
+				phor_num=phor_num+1
+				_phor_point[phor_num]=2
+
+				gosub "set_phor_parameters_1"
+
+				_phor_pos[phor_num][1]=phor_start_pos
+				_phor_pos[phor_num][2]=step_wid1-hr2_wid/2+_phor_r[phor_num]
+				_phor_pos[phor_num][3]=(i-1)*floor_hei+phor_z_pos
+
+				_phor_pos[phor_num][4]=phor_end_pos
+				_phor_pos[phor_num][5]=step_wid1-hr2_wid/2+_phor_r[phor_num]
+				_phor_pos[phor_num][6]=(i-1)*floor_hei+phor_z_pos
+			next j
+		next i
+
+
+		!上部階段
+		for i=1 to floor_num-1
+			phor_num=phor_num+1
+
+			gosub "set_phor_parameters_2"
+
+			if i<floor_num-1 then
+				_phor_point[phor_num]=4
+
+				_phor_pos[phor_num][1]=min(standard_x,0)-floor_1-hr2_wid+pp_side_cover
+				_phor_pos[phor_num][2]=step_wid1+handrail_wid+hr2_wid/2-_phor_r[phor_num]
+				_phor_pos[phor_num][3]=i*floor_hei+hr2_hei-pp_top_cover-_phor_r[phor_num]
+
+				_phor_pos[phor_num][4]=standard_x
+				_phor_pos[phor_num][5]=step_wid1+handrail_wid+hr2_wid/2-_phor_r[phor_num]
+				_phor_pos[phor_num][6]=i*floor_hei+hr2_hei-pp_top_cover-_phor_r[phor_num]
+
+				_phor_pos[phor_num][7]=standard_x+step_num_up*step_tread
+				_phor_pos[phor_num][8]=step_wid1+handrail_wid+hr2_wid/2-_phor_r[phor_num]
+				_phor_pos[phor_num][9]=i*floor_hei-step_num_up*step_riser+hr2_hei-pp_top_cover-_phor_r[phor_num]
+
+				_phor_pos[phor_num][10]=(step_num_down-1)*step_tread+landing_1+hr2_wid-pp_side_cover
+				_phor_pos[phor_num][11]=step_wid1+handrail_wid+hr2_wid/2-_phor_r[phor_num]
+				_phor_pos[phor_num][12]=i*floor_hei-step_num_up*step_riser+hr2_hei-pp_top_cover-_phor_r[phor_num]
+			else
+				temporary_x=max(standard_x-(floor_hr_hei-hr2_hei)/tan(step_angle),min(standard_x,0)-floor_1)
+
+				if min(standard_x,0)-floor_1+pp_side_cover>=standard_x-(floor_hr_hei-hr2_hei)/tan(step_angle) then
+					_phor_point[phor_num]=3
+
+					_phor_pos[phor_num][1]=temporary_x+pp_side_cover
+					_phor_pos[phor_num][2]=step_wid1+handrail_wid+hr2_wid/2-_phor_r[phor_num]
+					_phor_pos[phor_num][3]=i*floor_hei+hr2_hei+(standard_x-temporary_x-pp_side_cover)*tan(step_angle)-pp_top_cover-_phor_r[phor_num]
+
+					_phor_pos[phor_num][4]=standard_x+step_num_up*step_tread
+					_phor_pos[phor_num][5]=step_wid1+handrail_wid+hr2_wid/2-_phor_r[phor_num]
+					_phor_pos[phor_num][6]=i*floor_hei-step_num_up*step_riser+hr2_hei-pp_top_cover-_phor_r[phor_num]
+
+					_phor_pos[phor_num][7]=(step_num_down-1)*step_tread+landing_1+hr2_wid-pp_side_cover
+					_phor_pos[phor_num][8]=step_wid1+handrail_wid+hr2_wid/2-_phor_r[phor_num]
+					_phor_pos[phor_num][9]=i*floor_hei-step_num_up*step_riser+hr2_hei-pp_top_cover-_phor_r[phor_num]
+				else
+					_phor_point[phor_num]=4
+
+					_phor_pos[phor_num][1]=min(standard_x,0)-floor_1+pp_side_cover
+					_phor_pos[phor_num][2]=step_wid1+handrail_wid+hr2_wid/2-_phor_r[phor_num]
+					_phor_pos[phor_num][3]=i*floor_hei+floor_hr_hei-pp_top_cover-_phor_r[phor_num]
+
+					_phor_pos[phor_num][4]=temporary_x
+					_phor_pos[phor_num][5]=step_wid1+handrail_wid+hr2_wid/2-_phor_r[phor_num]
+					_phor_pos[phor_num][6]=i*floor_hei+hr2_hei+(standard_x-temporary_x)*tan(step_angle)-pp_top_cover-_phor_r[phor_num]
+
+					_phor_pos[phor_num][7]=standard_x+step_num_up*step_tread
+					_phor_pos[phor_num][8]=step_wid1+handrail_wid+hr2_wid/2-_phor_r[phor_num]
+					_phor_pos[phor_num][9]=i*floor_hei-step_num_up*step_riser+hr2_hei-pp_top_cover-_phor_r[phor_num]
+
+					_phor_pos[phor_num][10]=(step_num_down-1)*step_tread+landing_1+hr2_wid-pp_side_cover
+					_phor_pos[phor_num][11]=step_wid1+handrail_wid+hr2_wid/2-_phor_r[phor_num]
+					_phor_pos[phor_num][12]=i*floor_hei-step_num_up*step_riser+hr2_hei-pp_top_cover-_phor_r[phor_num]
+				endif
+			endif
+		next i
+	
+		phor_down_pos=0
+		phor_top_pos=step_num_up*step_riser+hr2_hei-pp_top_cover-3*dr_list[phor_steel]
+		phor_z_num=int((phor_top_pos-phor_down_pos)/phor_pitch)
+
+		for i=1 to floor_num-1
+			for j=1 to phor_z_num
+				phor_z_pos=j*phor_pitch
+	
+				if phor_z_pos>=step_num_up*step_riser then
+					if i=floor_num-1 then
+						phor_start_pos=min(standard_x,0)-floor_1+pp_side_cover
+					else
+						phor_start_pos=min(standard_x,0)-floor_1-hr2_wid+pp_side_cover
+					endif
+				else
+					phor_start_pos=standard_x-step_tread-step_thi/sin(step_angle)+floor_thi/tan(step_angle)+(step_num_up*step_riser-floor_thi-phor_z_pos)/tan(step_angle)+pp_side_cover/sin(step_angle)
+				endif
+		
+				if phor_z_pos<=hr2_hei-pp_top_cover-3*dr_list[phor_steel] then
+					phor_end_pos=(step_num_down-1)*step_tread+landing_1+hr2_wid-pp_side_cover
+				else
+					phor_end_pos=step_num_down*step_tread+landing_1-landing_2-(phor_z_pos-hr2_hei)/tan(step_angle)-pp_side_cover/sin(step_angle)
+				endif
+	
+				phor_num=phor_num+1
+				_phor_point[phor_num]=2
+
+				gosub "set_phor_parameters_1"
+
+				_phor_pos[phor_num][1]=phor_start_pos
+				_phor_pos[phor_num][2]=step_wid1+handrail_wid+hr2_wid/2-_phor_r[phor_num]
+				_phor_pos[phor_num][3]=(i-1)*floor_hei+step_num_down*step_riser+phor_z_pos
+
+				_phor_pos[phor_num][4]=phor_end_pos
+				_phor_pos[phor_num][5]=step_wid1+handrail_wid+hr2_wid/2-_phor_r[phor_num]
+				_phor_pos[phor_num][6]=(i-1)*floor_hei+step_num_down*step_riser+phor_z_pos
+			next j
+		next i
+
+
+		if switch_gl then
+			phor_num=phor_num+1
+			_phor_point[phor_num]=3
+
+			gosub "set_phor_parameters_2"
+
+			_phor_pos[phor_num][1]=min(standard_x,0)-floor_1-hr2_wid+pp_side_cover
+			_phor_pos[phor_num][2]=step_wid1+handrail_wid+hr2_wid/2-_phor_r[phor_num]
+			_phor_pos[phor_num][3]=hr2_hei-pp_top_cover
+
+			_phor_pos[phor_num][4]=standard_x
+			_phor_pos[phor_num][5]=step_wid1+handrail_wid+hr2_wid/2-_phor_r[phor_num]
+			_phor_pos[phor_num][6]=hr2_hei-pp_top_cover
+
+			_phor_pos[phor_num][7]=standard_x+gl_num*step_tread-pp_side_cover
+			_phor_pos[phor_num][8]=step_wid1+handrail_wid+hr2_wid/2-_phor_r[phor_num]
+			_phor_pos[phor_num][9]=-gl_num*step_riser+hr2_hei+pp_side_cover*tan(step_angle)-pp_top_cover
+
+			phor_down_pos=0
+			phor_top_pos=gl_num*step_riser+hr2_hei-pp_top_cover-3*dr_list[phor_steel]
+			phor_z_num=int((phor_top_pos-phor_down_pos)/phor_pitch)
+
+			for j=1 to phor_z_num
+				phor_z_pos=j*phor_pitch
+	
+				if phor_z_pos>=gl_num*step_riser then
+					phor_start_pos=min(standard_x,0)-floor_1-hr2_wid+pp_side_cover
+				else
+					phor_start_pos=standard_x+(gl_num-1)*step_tread-step_thi/sin(step_angle)-phor_z_pos/tan(step_angle)+pp_side_cover/sin(step_angle)
+				endif
+		
+				if phor_z_pos<=hr2_hei then
+					phor_end_pos=standard_x+gl_num*step_tread-pp_side_cover
+				else
+					phor_end_pos=standard_x+gl_num*step_tread-(phor_z_pos-hr2_hei)/tan(step_angle)-pp_side_cover/sin(step_angle)
+				endif
+	
+				phor_num=phor_num+1
+				_phor_point[phor_num]=2
+
+				gosub "set_phor_parameters_1"
+
+				_phor_pos[phor_num][1]=phor_start_pos
+				_phor_pos[phor_num][2]=step_wid1+handrail_wid+hr2_wid/2-_phor_r[phor_num]
+				_phor_pos[phor_num][3]=-gl_num*step_riser+phor_z_pos
+
+				_phor_pos[phor_num][4]=phor_end_pos
+				_phor_pos[phor_num][5]=step_wid1+handrail_wid+hr2_wid/2-_phor_r[phor_num]
+				_phor_pos[phor_num][6]=-gl_num*step_riser+phor_z_pos
+			next j
+		endif
+
+		!踊り場側
+		phor_z_num=ceil((hr2_hei-pp_top_cover-3*dr_list[phor_steel])/phor_pitch)
+
+		for i=1 to floor_num-1
+			for j=1 to phor_z_num
+				if j<phor_z_num then
+					phor_z_pos=j*phor_pitch
+				else
+					phor_z_pos=hr2_hei-pp_top_cover-dr_list[phor_top_steel]
+				endif
+
+				phor_num=phor_num+1
+				_phor_point[phor_num]=2
+
+				if j<phor_z_num then
+					gosub "set_phor_parameters_1"
+				else
+					gosub "set_phor_parameters_2"
+				endif
+
+				_phor_pos[phor_num][1]=(step_num_down-1)*step_tread+landing_1+hr2_wid/2-_phor_r[phor_num]
+				_phor_pos[phor_num][2]=step_wid1-hr2_wid+pp_side_cover
+				_phor_pos[phor_num][3]=(i-1)*floor_hei+step_num_down*step_riser+phor_z_pos-2*_phor_r[phor_num]
+
+				_phor_pos[phor_num][4]=(step_num_down-1)*step_tread+landing_1+hr2_wid/2-_phor_r[phor_num]
+				_phor_pos[phor_num][5]=step_wid1+handrail_wid+hr2_wid-pp_side_cover
+				_phor_pos[phor_num][6]=(i-1)*floor_hei+step_num_down*step_riser+phor_z_pos-2*_phor_r[phor_num]
+			next j
+		next i
+
+		for i=1 to floor_num-2+switch_gl
+			for j=1 to phor_z_num
+				if j<phor_z_num then
+					phor_z_pos=j*phor_pitch
+				else
+					phor_z_pos=hr2_hei-pp_top_cover-dr_list[phor_top_steel]
+				endif
+
+				phor_num=phor_num+1
+				_phor_point[phor_num]=2
+
+				if j<phor_z_num then
+					gosub "set_phor_parameters_1"
+				else
+					gosub "set_phor_parameters_2"
+				endif
+
+				_phor_pos[phor_num][1]=min(standard_x,0)-floor_1-hr2_wid/2+_phor_r[phor_num]
+				_phor_pos[phor_num][2]=step_wid1-hr2_wid+pp_side_cover
+				_phor_pos[phor_num][3]=(i-switch_gl)*floor_hei+phor_z_pos-2*_phor_r[phor_num]
+
+				_phor_pos[phor_num][4]=min(standard_x,0)-floor_1-hr2_wid/2+_phor_r[phor_num]
+				_phor_pos[phor_num][5]=step_wid1+handrail_wid+hr2_wid-pp_side_cover
+				_phor_pos[phor_num][6]=(i-switch_gl)*floor_hei+phor_z_pos-2*_phor_r[phor_num]
+			next j
+		next i
+	endif
+endif
+
+
+if phor_num=0 then
+	_phor_r[1]=0
+	_phor_nd[1]=0
+	_phor_mat[1]=0
+	_phor_pen[1]=0
+	_phor_point[1]=0
+	_phor_pos[1][1]=0
+endif
+
+parameters phor_r=_phor_r,
+	phor_nd=_phor_nd,
+	phor_mat=_phor_mat,
+	phor_pen=_phor_pen,
+	phor_num=phor_num,
+	phor_point=_phor_point,
+	phor_pos=_phor_pos
+
+lock "phor_r","phor_nd","phor_mat","phor_pen","phor_num","phor_point","phor_pos"
+
+
+
+!==============================================================================中心壁配筋
+if switch_hr2=0 or hr2_type<>2 then hideparameter "wall_bar"
+
+values{2} "wb_pattern" 1,"シングル",2,"ダブル"
+values{2} "wb_position" 1,"縦筋が外側",2,"横筋が外側"
+if wb_pattern<>2 then hideparameter "wb_position"
+values{2} "wb_down_anc" 0,"定着なし",1,"直線定着",2,"折り曲げ定着"
+if wb_pattern<>1 or wb_down_anc<>2 then hideparameter "turn_anchor" 
+
+values "wb_side_cover" range[0,]
+values "wver_top_cover" range[0,]
+values "whor_edge_cover" range[0,]
+values "wver_start_pos" range[0,]
+values "whor_start_pos" range[0,]
+
+values{2} "wver_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+wver_r=dr_list[wver_steel]
+wver_nd=nd_list[wver_steel]
+wver_mat=SDmat[scode_list[wver_steel]]
+wver_pen=SDpen[scode_list[wver_steel]]
+values "wver_pitch" range[0.1,]
+
+parameters wver_r= wver_r,
+	wver_nd= wver_nd,
+	wver_mat= wver_mat,
+	wver_pen= wver_pen
+
+values{2} "whor_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+values{2} "whor_top_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+values{2} "whor_ref_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+dim _whor_r[]
+dim _whor_nd[]
+dim _whor_mat[]
+dim _whor_pen[]
+values "whor_pitch" range[0.1,]
+
+
+!=======================================縦筋
+wver_num=0
+dim _wver_point[]
+dim _wver_pos[][]
+
+if switch_hr2 and hr2_type=2 then
+	start_pos=min(standard_x,0)-floor_1
+	end_pos=(step_num_down-1)*step_tread+landing_1
+	wver_x_num=int((end_pos-start_pos-wver_start_pos-wver_r)/wver_pitch)+1
+
+	!列数とy座標
+	dim wver_y_pos[]
+
+	if wb_pattern=1 then
+		j_loop=1
+		wver_y_pos[1]=step_wid1+handrail_wid/2+wver_r
+	endif
+
+	if wb_pattern=2 then
+		j_loop=2
+		if wb_position=1 then
+			wver_y_pos[1]=step_wid1+wb_side_cover+wver_r
+			wver_y_pos[2]=step_wid1+handrail_wid-wb_side_cover-wver_r
+		else
+			wver_y_pos[1]=step_wid1+wb_side_cover+2*dr_list[whor_steel]+wver_r
+			wver_y_pos[2]=step_wid1+handrail_wid-wb_side_cover-2*dr_list[whor_steel]-wver_r
+		endif
+	endif
+
+	for i=1 to wver_x_num
+		!x座標
+		wver_x_pos=start_pos+wver_start_pos+(i-1)*wver_pitch
+
+		!上端z座標
+		z_top_pos=(floor_num-1)*floor_hei+floor_hr_hei-wver_top_cover
+
+		if wver_x_pos<=max(standard_x-(floor_hr_hei-hr2_hei)/tan(step_angle),min(standard_x,0)-floor_1) then
+			z_top_pos=(floor_num-1)*floor_hei+floor_hr_hei-wver_top_cover
+		endif
+		
+		if wver_x_pos>max(standard_x-(floor_hr_hei-hr2_hei)/tan(step_angle),min(standard_x,0)-floor_1) and wver_x_pos<min(standard_x+step_num_up*step_tread,(step_num_down-1)*step_tread+landing_1) then
+			z_top_pos=(floor_num-2)*floor_hei+up_k*wver_x_pos+up_b+(step_thi-ngs_down_cover-ngs_r)/cos(step_angle)+step_riser+hr2_hei-wver_top_cover
+		endif
+		
+		if wver_x_pos>=min(standard_x+step_num_up*step_tread,(step_num_down-1)*step_tread+landing_1) then
+			z_top_pos=(floor_num-1)*floor_hei-step_num_up*step_riser+hr2_hei-wver_top_cover
+		endif
+
+		!下端z座標
+		if wb_down_anc=0 then z_down_pos=-switch_gl*gl_num*step_riser
+		if wb_down_anc=1 then z_down_pos=-switch_gl*gl_num*step_riser-l2*wver_nd
+		if wb_down_anc=2 then z_down_pos=-switch_gl*gl_num*step_riser-l2h*wver_nd
+
+		for j=1 to j_loop
+			wver_num=wver_num+1
+			_wver_point[wver_num]=2
+		
+			put wver_x_pos
+			put wver_y_pos[j]
+			put z_top_pos
+			put wver_x_pos
+			put wver_y_pos[j]
+			put z_down_pos
+
+			if wb_down_anc=2 then
+				_wver_point[wver_num]=_wver_point[wver_num]+1
+
+				put wver_x_pos
+				if wb_pattern=1 then
+					put wver_y_pos[j]-(1-2*turn_anchor)*max(8*wver_nd,0.15)
+				else
+					if j=1 then
+						put wver_y_pos[j]-max(8*wver_nd,0.15)
+					else
+						put wver_y_pos[j]+max(8*wver_nd,0.15)
+					endif
+				endif
+				put z_down_pos
+			endif
+		
+			for n=1 to _wver_point[wver_num]*3
+				_wver_pos[wver_num][n]=get(1)
+			next n
+		next j
+	next i
+else
+	_wver_point[1]=0
+	_wver_pos[1][1]=0
+endif
+
+parameters wver_num=wver_num,
+	wver_point=_wver_point,
+	wver_pos=_wver_pos
+
+lock "wver_r","wver_nd","wver_mat","wver_pen","wver_num","wver_point","wver_pos"
+
+
+!=======================================横筋
+whor_num=0
+dim _whor_point[]
+dim _whor_pos[][]
+
+if switch_hr2 and hr2_type=2 then
+	start_pos=-gl_num*step_riser*switch_gl
+	end_pos=(floor_num-1)*floor_hei+floor_hr_hei
+	whor_z_num=int((end_pos-start_pos-whor_start_pos-wver_top_cover-dr_list[whor_steel])/whor_pitch)+1
+
+	temporary_x1=min(standard_x+step_num_up*step_tread,(step_num_down-1)*step_tread+landing_1)
+	temporary_x2=max(standard_x-(floor_hr_hei-hr2_hei)/tan(step_angle),min(standard_x,0)-floor_1)
+
+	!列数とy座標
+	dim whor_y_pos[]
+
+	if wb_pattern=1 then
+		j_loop=1
+		whor_y_pos[1]=step_wid1+handrail_wid/2-dr_list[whor_steel]
+	endif
+
+	if wb_pattern=2 then
+		j_loop=2
+		if wb_position=1 then
+			whor_y_pos[1]=step_wid1+wb_side_cover+2*wver_r+dr_list[whor_steel]
+			whor_y_pos[2]=step_wid1+handrail_wid-wb_side_cover-2*wver_r-dr_list[whor_steel]
+		else
+			whor_y_pos[1]=step_wid1+wb_side_cover+dr_list[whor_steel]
+			whor_y_pos[2]=step_wid1+handrail_wid-wb_side_cover-dr_list[whor_steel]
+		endif
+	endif
+
+	!天端
+	for j=1 to j_loop
+		whor_num=whor_num+1
+		_whor_point[whor_num]=2
+
+		_whor_r[whor_num]=dr_list[whor_top_steel]
+		_whor_nd[whor_num]=nd_list[whor_top_steel]
+		_whor_mat[whor_num]=SDmat[scode_list[whor_top_steel]]
+		_whor_pen[whor_num]=SDpen[scode_list[whor_top_steel]]
+
+		if temporary_x2-(min(standard_x,0)-floor_1)>whor_edge_cover then
+			_whor_point[whor_num]=_whor_point[whor_num]+1
+		
+			put min(standard_x,0)-floor_1+whor_edge_cover
+			put whor_y_pos[j]
+			put (floor_num-1)*floor_hei+hr2_hei-(temporary_x2-standard_x)*tan(step_angle)-(wver_top_cover+_whor_r[whor_num])
+		endif
+
+		put temporary_x2
+		put whor_y_pos[j]
+		put (floor_num-1)*floor_hei+hr2_hei-(temporary_x2-standard_x)*tan(step_angle)-(wver_top_cover+_whor_r[whor_num])
+
+		put temporary_x1
+		put whor_y_pos[j]
+		put (floor_num-1)*floor_hei+hr2_hei-(temporary_x1-standard_x)*tan(step_angle)-(wver_top_cover+_whor_r[whor_num])
+
+		if ((step_num_down-1)*step_tread+landing_1)-temporary_x1>whor_edge_cover then
+			_whor_point[whor_num]=_whor_point[whor_num]+1
+		
+			put (step_num_down-1)*step_tread+landing_1-whor_edge_cover
+			put whor_y_pos[j]
+			put (floor_num-1)*floor_hei+hr2_hei-step_num_up*step_riser-(wver_top_cover+_whor_r[whor_num])
+		endif
+
+		for n=1 to _whor_point[whor_num]*3
+			_whor_pos[whor_num][n]=get(1)
+		next n
+	next j
+
+	!一般
+	for i=1 to whor_z_num
+		!z座標
+		whor_z_pos=start_pos+whor_start_pos+(i-1)*whor_pitch
+	
+		!左端x座標
+		whor_left_pos=min(standard_x,0)-floor_1+whor_edge_cover
+
+		!右端x座標
+		if whor_z_pos<=max((floor_num-1)*floor_hei+hr2_hei-step_num_up*step_riser,(floor_num-1)*floor_hei+hr2_hei-(temporary_x1-standard_x)*tan(step_angle))-wver_top_cover-_whor_r[whor_num] then
+			whor_right_pos=(step_num_down-1)*step_tread+landing_1-whor_edge_cover
+		else
+			whor_right_pos=temporary_x1-(whor_z_pos-max((floor_num-1)*floor_hei+hr2_hei-step_num_up*step_riser,(floor_num-1)*floor_hei+hr2_hei-(temporary_x1-standard_x)*tan(step_angle)))/tan(step_angle)-whor_edge_cover/sin(step_angle)
+		endif
+
+		for j=1 to j_loop
+			if abs(whor_right_pos-whor_left_pos)>=steel_min_limit then
+				whor_num=whor_num+1
+				_whor_point[whor_num]=2
+
+				_whor_r[whor_num]=dr_list[whor_steel]
+				_whor_nd[whor_num]=nd_list[whor_steel]
+				_whor_mat[whor_num]=SDmat[scode_list[whor_steel]]
+				_whor_pen[whor_num]=SDpen[scode_list[whor_steel]]
+			
+				put whor_left_pos
+				put whor_y_pos[j]
+				put whor_z_pos
+
+				put whor_right_pos
+				put whor_y_pos[j]
+				put whor_z_pos
+			
+				for n=1 to _whor_point[whor_num]*3
+					_whor_pos[whor_num][n]=get(1)
+				next n
+			endif
+		next j
+	next i
+
+	!補強
+	if switch_whor_ref then
+		for i=1 to floor_num-1
+			!下部階段
+			for j=1 to step_num_down
+				whor_num=whor_num+1
+				_whor_point[whor_num]=2
+				
+				_whor_r[whor_num]=dr_list[whor_ref_steel]
+				_whor_nd[whor_num]=nd_list[whor_ref_steel]
+				_whor_mat[whor_num]=SDmat[scode_list[whor_ref_steel]]
+				_whor_pen[whor_num]=SDpen[scode_list[whor_ref_steel]]
+
+				whor_z_pos=j*step_riser-step_rat-inzm_tread_cover-(2*inzm_r+2*dbn_r+_whor_r[whor_num])+(i-1)*floor_hei
+		
+				if whor_z_pos<=max((floor_num-1)*floor_hei+hr2_hei-step_num_up*step_riser,(floor_num-1)*floor_hei+hr2_hei-(temporary_x1-standard_x)*tan(step_angle))-wver_top_cover-_whor_r[whor_num] then
+					whor_right_pos=(step_num_down-1)*step_tread+landing_1-whor_edge_cover
+				else
+					whor_right_pos=temporary_x1-(whor_z_pos-max((floor_num-1)*floor_hei+hr2_hei-step_num_up*step_riser,(floor_num-1)*floor_hei+hr2_hei-(temporary_x1-standard_x)*tan(step_angle)))/tan(step_angle)-whor_edge_cover/sin(step_angle)
+				endif
+
+				if wb_position=1 then
+					whor_y_pos[1]=step_wid1+wb_side_cover+2*wver_r+_whor_r[whor_num]
+				else
+					whor_y_pos[1]=step_wid1+wb_side_cover+2*dr_list[whor_steel]-_whor_r[whor_num]
+				endif
+
+				put whor_left_pos
+				put whor_y_pos[1]
+				put whor_z_pos
+
+				put whor_right_pos
+				put whor_y_pos[1]
+				put whor_z_pos
+
+				for n=1 to 3*_whor_point[whor_num]
+					_whor_pos[whor_num][n]=get(1)
+				next n
+			next j
+
+			!上部階段
+			for j=1 to step_num_up
+				whor_num=whor_num+1
+				_whor_point[whor_num]=2
+
+				_whor_r[whor_num]=dr_list[whor_ref_steel]
+				_whor_nd[whor_num]=nd_list[whor_ref_steel]
+				_whor_mat[whor_num]=SDmat[scode_list[whor_ref_steel]]
+				_whor_pen[whor_num]=SDpen[scode_list[whor_ref_steel]]
+
+				whor_z_pos=(step_num_down+j)*step_riser-step_rat-inzm_tread_cover-(2*inzm_r+2*dbn_r+_whor_r[whor_num])+(i-1)*floor_hei
+
+				if whor_z_pos<=max((floor_num-1)*floor_hei+hr2_hei-step_num_up*step_riser,(floor_num-1)*floor_hei+hr2_hei-(temporary_x1-standard_x)*tan(step_angle))-wver_top_cover-_whor_r[whor_num] then
+					whor_right_pos=(step_num_down-1)*step_tread+landing_1-whor_edge_cover
+				else
+					whor_right_pos=temporary_x1-(whor_z_pos-max((floor_num-1)*floor_hei+hr2_hei-step_num_up*step_riser,(floor_num-1)*floor_hei+hr2_hei-(temporary_x1-standard_x)*tan(step_angle)))/tan(step_angle)-whor_edge_cover/sin(step_angle)
+				endif
+
+				if wb_position=1 then
+					whor_y_pos[1]=step_wid1+handrail_wid-(wb_side_cover+2*wver_r+_whor_r[whor_num])
+				else
+					whor_y_pos[1]=step_wid1+handrail_wid-(wb_side_cover+2*dr_list[whor_steel]-_whor_r[whor_num])
+				endif
+
+				put whor_left_pos
+				put whor_y_pos[1]
+				put whor_z_pos
+
+				put whor_right_pos
+				put whor_y_pos[1]
+				put whor_z_pos
+
+				for n=1 to 3*_whor_point[whor_num]
+					_whor_pos[whor_num][n]=get(1)
+				next n
+			next j
+		next i
+
+		!1階下がり
+		if switch_gl then
+			for j=1 to gl_num
+				whor_num=whor_num+1
+				_whor_point[whor_num]=2
+
+				_whor_r[whor_num]=dr_list[whor_ref_steel]
+				_whor_nd[whor_num]=nd_list[whor_ref_steel]
+				_whor_mat[whor_num]=SDmat[scode_list[whor_ref_steel]]
+				_whor_pen[whor_num]=SDpen[scode_list[whor_ref_steel]]
+
+				whor_z_pos=-(j-1)*step_riser-step_rat-inzm_tread_cover-(inzm_r*2+dbn_r)
+
+				if whor_z_pos<=max((floor_num-1)*floor_hei+hr2_hei-step_num_up*step_riser,(floor_num-1)*floor_hei+hr2_hei-(temporary_x1-standard_x)*tan(step_angle))-wver_top_cover-_whor_r[whor_num] then
+					whor_right_pos=(step_num_down-1)*step_tread+landing_1-whor_edge_cover
+				else
+					whor_right_pos=temporary_x1-(whor_z_pos-max((floor_num-1)*floor_hei+hr2_hei-step_num_up*step_riser,(floor_num-1)*floor_hei+hr2_hei-(temporary_x1-standard_x)*tan(step_angle)))/tan(step_angle)-whor_edge_cover/sin(step_angle)
+				endif
+
+				if wb_position=1 then
+					whor_y_pos[1]=step_wid1+handrail_wid-(wb_side_cover+2*wver_r+_whor_r[whor_num])
+				else
+					whor_y_pos[1]=step_wid1+handrail_wid-(wb_side_cover+2*dr_list[whor_steel]-_whor_r[whor_num])
+				endif
+
+				put whor_left_pos
+				put whor_y_pos[1]
+				put whor_z_pos
+
+				put whor_right_pos
+				put whor_y_pos[1]
+				put whor_z_pos
+
+				for n=1 to 3*_whor_point[whor_num]
+					_whor_pos[whor_num][n]=get(1)
+				next n
+			next j
+		endif
+	endif
+else
+	_whor_r[1]=dr_list[whor_steel]
+	_whor_nd[1]=nd_list[whor_steel]
+	_whor_mat[1]=SDmat[scode_list[whor_steel]]
+	_whor_pen[1]=SDpen[scode_list[whor_steel]]
+	_whor_point[1]=0
+	_whor_pos[1][1]=0
+endif
+
+parameters whor_r=_whor_r,
+	whor_nd=_whor_nd,
+	whor_mat=_whor_mat,
+	whor_pen=_whor_pen,
+	whor_num=whor_num,
+	whor_point=_whor_point,
+	whor_pos=_whor_pos
+
+lock "whor_r","whor_nd","whor_mat","whor_pen","whor_num","whor_point","whor_pos"
+
+
+
+end
+
+"set_phor_parameters_1":
+	_phor_r[phor_num]=dr_list[phor_steel]
+	_phor_nd[phor_num]=nd_list[phor_steel]
+	_phor_mat[phor_num]=SDmat[scode_list[phor_steel]]
+	_phor_pen[phor_num]=SDpen[scode_list[phor_steel]]
+return
+
+
+"set_phor_parameters_2":
+	_phor_r[phor_num]=dr_list[phor_top_steel]
+	_phor_nd[phor_num]=nd_list[phor_top_steel]
+	_phor_mat[phor_num]=SDmat[scode_list[phor_top_steel]]
+	_phor_pen[phor_num]=SDpen[scode_list[phor_top_steel]]
+return
+
+
+
+
+
+
+

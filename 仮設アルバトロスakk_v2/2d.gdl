@@ -1,0 +1,269 @@
+!-------------------------------------------------------------------------------------------------------------------------main
+pen gs_cont_pen
+fill gs_fill_type
+
+
+gosub "2D_hotspot"
+
+if app2d then
+	PROJECT2{2} 3, 270, 3+32, gs_back_pen
+else
+	if app2d_type=1 then
+		if board_2D then
+			gosub "2D_board"
+		else
+			gosub "2D_standard"
+		endif
+	endif
+	if app2d_type=2 then gosub "2D_step"
+	if app2d_type=3 then gosub "2D_beam"
+
+	if app2d_column then gosub "2D_column"
+endif
+
+if GLOB_PREVIEW_MODE=1 then gosub "preview_num"
+
+
+END
+
+
+
+!-------------------------------------------------------------------------------------------------------------------------sub
+!------------------------------------------------------------------ ホットスポット
+"2D_hotspot":
+	hotspot2 0, 0, unID_2D : unID_2D=unID_2D+1
+	hotspot2 a, 0, unID_2D : unID_2D=unID_2D+1
+	hotspot2 0, b, unID_2D : unID_2D=unID_2D+1
+	hotspot2 a, b, unID_2D : unID_2D=unID_2D+1
+return
+
+
+!------------------------------------------------------------------ 通常
+"2D_standard":
+	if led1_2D then 
+		line2 0, 0, a, 0
+		hotline2 0, 0, a, 0, unID_2D : unID_2D=unID_2D+1
+	endif
+
+	if led2_2D then
+		line2 0, b, a, b
+		hotline2 0, b, a, b, unID_2D : unID_2D=unID_2D+1
+	endif
+
+	if led3_2D then
+		line2 0, 0, 0, b
+		hotline2 0, 0, 0, b, unID_2D : unID_2D=unID_2D+1
+	endif
+return
+
+
+!------------------------------------------------------------------ 布板
+"2D_board":
+	if B>unitSize_values[5]+EPS and B<unitSize_values[4]+EPS and (switch_board1=0 or switch_board2=0) then
+		if switch_board1=1 then
+			if board_exchange=0 then
+				line2 0, b*2/3, a, 0
+
+				poly2_b 4, 7, gs_fill_pen, gs_back_pen,
+				0, 0, 1,
+				0, b*2/3, 1,
+				a, b*2/3, 1,
+				a, 0, 1
+			else
+				line2 0, b*1/3, a, 0
+
+				poly2_b 4, 7, gs_fill_pen, gs_back_pen,
+				0, 0, 1,
+				0, b*1/3, 1,
+				a, b*1/3, 1,
+				a, 0, 1
+			endif
+		endif
+
+		if switch_board2=1 then
+			if board_exchange=0 then
+				line2 0, b, a, b*2/3
+
+				poly2_b 4, 7, gs_fill_pen, gs_back_pen,
+				0, b*2/3, 1,
+				0, b, 1,
+				a, b, 1,
+				a, b*2/3, 1
+			else
+				line2 0, b, a, b*1/3
+
+				poly2_b 4, 7, gs_fill_pen, gs_back_pen,
+				0, b*1/3, 1,
+				0, b, 1,
+				a, b, 1,
+				a, b*1/3, 1
+			endif
+		endif
+	else
+		gosub "fn_rectangle"
+		line2 0, b, a, 0
+	endif
+return
+
+
+!------------------------------------------------------------------ 階段
+"2D_step":
+	gosub "fn_rectangle"
+
+	if  board_sreverse_2D then
+		add2 unitSize_values[1], 0
+		mul2 -1, 1
+	endif
+
+	if  board_spos_2D then
+		add2 0, b
+		mul2 1, -1
+	endif
+
+	add2 0, -orgpos_y2+(board_d1-stair_d)/2+board_pich
+	mul2 1, -1
+        gosub "fn_step"
+	del 2
+
+	del board_sreverse_2D*2+board_spos_2D*2
+return
+
+
+!------------------------------------------------------------------ 梁枠
+"2D_beam":
+	gosub "fn_rectangle"
+
+	beamLen=beamLength-a
+
+	add2 a, 0
+	poly2_b 4, 7, gs_fill_pen, gs_back_pen,
+		0      , 0, 1,
+		0      , b, 1,
+		beamLen, b, 1,
+		beamLen, 0, 1
+	del 1
+
+	if 	bBeam1 or bBeam2 then
+		_dd=b/3
+		for j=1 to 2
+			poly2_ 4, 1,
+				0              , 0  , 1,
+				_dd            , _dd, 1,
+				beamLength -_dd, _dd, 1,
+				beamLength     , 0  , 1
+			add2 0, b
+			mul2 1, -1
+		next j
+	endif
+
+	hotspot2 beamLength, 0, unID_2D : unID_2D=unID_2D+1
+	hotspot2 beamLength, b, unID_2D : unID_2D=unID_2D+1
+
+	spanWidth=unitSize_values[1]
+return
+
+	
+!------------------------------------------------------------------ 支柱
+"2D_column":
+	pen app2d_column_pen
+	_dia=0.054
+	if prop1 then circle2 0, 0, _dia/2
+	if prop2 then circle2 0, b, _dia/2
+	if prop3 then circle2 a, b, _dia/2
+	if prop4 then circle2 a, 0, _dia/2
+return
+
+
+
+
+!------------------------------------------------------------------------------------------------------------------------- sub-sub
+"fn_rectangle":
+	poly2_b 4, 7, gs_fill_pen, gs_back_pen,
+		0, 0, 1,
+		0, b, 1,
+		a, b, 1,
+		a, 0, 1
+return
+
+
+"fn_step":
+	pen gs_cont_pen
+	fill gs_fill_type
+
+	if not(bCalledSetObject) then
+		hotspot2 0         , 0                            , unID_2D : unID_2D=unID_2D+1
+		hotspot2 0         , -orgpos_y-scaffold_b-orgpos_y, unID_2D : unID_2D=unID_2D+1
+		hotspot2 scaffold_a, 0                            , unID_2D : unID_2D=unID_2D+1
+		hotspot2 scaffold_a, -orgpos_y-scaffold_b-orgpos_y, unID_2D : unID_2D=unID_2D+1
+	endif
+
+	add2 0, -orgpos_y
+		hotspot2 0         , 0          , unID_2D : unID_2D=unID_2D+1
+		hotspot2 0         , -scaffold_b, unID_2D : unID_2D=unID_2D+1
+		hotspot2 scaffold_a, 0          , unID_2D : unID_2D=unID_2D+1
+		hotspot2 scaffold_a, -scaffold_b, unID_2D : unID_2D=unID_2D+1
+
+		if details_2d then					!---複線
+			gosub "frame" !フレーム
+			add2 0, -scaffold_b
+				gosub "frame" !フレーム
+			del 1
+
+			for i=1 to scaffold_dan
+				line2 scaffold_dan_x*i, -frame_w/2, scaffold_dan_x*i, -scaffold_b+frame_w/2
+			next i
+		else						!---単線
+			line2 0, 0          , scaffold_a, 0
+			line2 0, -scaffold_b, scaffold_a, -scaffold_b
+            
+			for i=1 to scaffold_dan
+				line2 scaffold_dan_x*i, 0, scaffold_dan_x*i, -scaffold_b
+			next i
+
+			!------- 矢印
+			line2   scaffold_dan_x, -scaffold_b/2, scaffold_a, -scaffold_b/2
+			circle2 scaffold_dan_x, -scaffold_b/2, 0.02
+
+			add2 scaffold_a, -scaffold_b/2
+				poly2_ 3, 1,
+					-0.05, 0.03 , 1,
+					0    , 0    , 1,
+					-0.05, -0.03, 1
+			del 1 
+		endif
+	del 1
+return
+
+
+"preview_num":
+	pen 1
+	style "preview_2D"
+
+	text2 0-0.3, -0.3 , "1"
+	text2 0-0.3, b+0.3, "2"
+	text2 a+0.3, b+0.3, "3"
+	text2 a+0.3, -0.3 , "4"
+return
+
+
+!------------------------------------------------------------------------------------------------------------------------- sub-sub-sub
+!------------------------------------------------------------------階段フレーム片側
+"frame":
+	poly2_b 4, 7, gs_fill_pen, gs_back_pen,
+		0.02           , frame_w/2 , 1,
+		0.02           , -frame_w/2, 1,
+		scaffold_a-0.02, -frame_w/2, 1,
+		scaffold_a-0.02, frame_w/2 , 1
+	
+	poly2_b 4, 7, gs_fill_pen, gs_back_pen,
+		0.02      , 0.006/2 , 1,
+		0.02      , -0.006/2, 1,
+		-ladder_ex, -0.006/2, 1,
+		-ladder_ex, 0.006/2 , 1
+	
+	poly2_b 4, 7, gs_fill_pen, gs_back_pen,
+		scaffold_a-0.02     , 0.006/2 , 1,
+		scaffold_a-0.02     , -0.006/2, 1,
+		scaffold_a+ladder_ex, -0.006/2, 1,
+		scaffold_a+ladder_ex, 0.006/2 , 1
+return

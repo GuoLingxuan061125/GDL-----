@@ -1,0 +1,209 @@
+fontSize=0.1
+define style "moji" fontType,fontSize*1000/GLOB_SCALE,5,0
+style "moji"
+
+project2{3} 3,270,1,1+2+4+8,parameters columnSize=0,boardThi=0,stairNosing=0,stairThi2=0
+
+hotspot2 0,0
+
+!===================================上り方向
+!始点
+circle2 0,0,0.03
+
+if startDir=1 then add2 0,-1.5*fontSize
+if startDir=2 then add2 0,1.5*fontSize
+if startDir=3 then add2 1.5*fontSize,0
+if startDir=4 then add2 -1.5*fontSize,0
+    text2 0,0,"UP"
+del 1
+
+
+!ルート
+if winderDir=2 then mul2 -1,1
+
+if winderDir=1 then
+    if startDir=1 then rot2 0
+    if startDir=2 then rot2 180
+    if startDir=3 then rot2 90
+    if startDir=4 then rot2 -90
+else
+    if startDir=1 then rot2 0
+    if startDir=2 then rot2 180
+    if startDir=3 then rot2 -90
+    if startDir=4 then rot2 90
+endif
+
+!start_part
+if _partFlag[1]=1 then !直線部
+    line2 0,0,0,_partStairNum[1]*stairTread
+
+    add2 0,_partStairNum[1]*stairTread
+endif
+
+if _partFlag[1]=2 then !回り部
+    if _partStairNum[1]=6 then
+        line2 0,0,0,centerLineSpan/2
+        line2 0,centerLineSpan/2,centerLineSpan,centerLineSpan/2
+        line2 centerLineSpan,centerLineSpan/2,centerLineSpan,0
+
+        add2 centerLineSpan,0
+        rot2 180
+    endif
+
+    if _partStairNum[1]=5 then
+        line2 0,0,0,centerLineSpan/2-centerLineSpan/2/sqr(3)
+        line2 0,centerLineSpan/2-centerLineSpan/2/sqr(3),centerLineSpan,centerLineSpan/2-centerLineSpan/2/sqr(3)
+        line2 centerLineSpan,centerLineSpan/2-centerLineSpan/2/sqr(3),centerLineSpan,-centerLineSpan/2/sqr(3)
+
+        add2 centerLineSpan,-centerLineSpan/2/sqr(3)
+        rot2 180
+    endif
+
+    if _partStairNum[1]=4 then
+        line2 0,0,0,centerLineSpan/2/sqr(3)+centerLineSpan/2
+        line2 0,centerLineSpan/2/sqr(3)+centerLineSpan/2,centerLineSpan/2,centerLineSpan/2/sqr(3)+centerLineSpan/2
+
+        add2 centerLineSpan/2,centerLineSpan/2/sqr(3)+centerLineSpan/2
+        rot2 -90
+    endif
+
+    if _partStairNum[1]=3 then
+        line2 0,0,0,centerLineSpan/2
+        line2 0,centerLineSpan/2,centerLineSpan/2,centerLineSpan/2
+
+        add2 centerLineSpan/2,centerLineSpan/2
+        rot2 -90
+    endif
+
+    if _partStairNum[1]=2 then
+        line2 0,0,0,centerLineSpan/2-centerLineSpan/2/sqr(3)
+        line2 0,centerLineSpan/2-centerLineSpan/2/sqr(3),centerLineSpan/2,centerLineSpan/2-centerLineSpan/2/sqr(3)
+
+        add2 centerLineSpan/2,centerLineSpan/2-centerLineSpan/2/sqr(3)
+        rot2 -90
+    endif
+
+    if _partStairNum[1]=1 then
+        line2 0,0,0,centerLineSpan/2/sqr(3)
+
+        add2 0,centerLineSpan/2/sqr(3)
+    endif 
+endif
+
+!following_part
+for i=2 to partNum-1
+    if _partFlag[i]=1 then !直線部
+        line2 0,0,0,_partStairNum[i]*stairTread
+        add2 0,_partStairNum[i]*stairTread
+    endif
+
+    if _partFlag[i]=2 then !回り部
+        if _partStairNum[i]=3 then !90°回り
+            line2 0,0,0,centerLineSpan/2
+            line2 0,centerLineSpan/2,centerLineSpan/2,centerLineSpan/2
+
+            add2 centerLineSpan/2,centerLineSpan/2
+            rot2 -90
+        endif
+
+        if _partStairNum[i]=6 then !180°回り
+            line2 0,0,0,centerLineSpan/2
+            line2 0,centerLineSpan/2,centerLineSpan,centerLineSpan/2
+            line2 centerLineSpan,centerLineSpan/2,centerLineSpan,0
+
+            add2 centerLineSpan,0
+            rot2 180
+        endif
+    endif
+next i
+
+!end_part
+if _partFlag[partNum]=1 then
+    line2 0,0,0,_partStairNum[partNum]*stairTread
+
+    add2 0,_partStairNum[partNum]*stairTread
+endif
+
+if _partFlag[partNum]=2 then
+    if _partStairNum[partNum]=1 then
+        line2 0,0,0,centerLineSpan/2/sqr(3)
+
+        add2 0,centerLineSpan/2/sqr(3)
+    endif
+
+    if _partStairNum[partNum]=2 then
+        line2 0,0,0,centerLineSpan/2
+        line2 0,centerLineSpan/2,centerLineSpan/2-centerLineSpan/2/sqr(3),centerLineSpan/2
+
+        add2 centerLineSpan/2-centerLineSpan/2/sqr(3),centerLineSpan/2
+        rot2 -90
+    endif
+
+    if _partStairNum[partNum]=3 then
+        line2 0,0,0,centerLineSpan/2
+        line2 0,centerLineSpan/2,centerLineSpan/2,centerLineSpan/2
+
+        add2 centerLineSpan/2,centerLineSpan/2
+        rot2 -90
+    endif
+
+    if _partStairNum[partNum]=4 then
+        line2 0,0,0,centerLineSpan/2
+        line2 0,centerLineSpan/2,centerLineSpan/2+centerLineSpan/2/sqr(3),centerLineSpan/2
+
+        add2 centerLineSpan/2+centerLineSpan/2/sqr(3),centerLineSpan/2
+        rot2 -90
+    endif
+
+    if _partStairNum[partNum]=5 then
+        line2 0,0,0,centerLineSpan/2
+        line2 0,centerLineSpan/2,centerLineSpan,centerLineSpan/2
+        line2 centerLineSpan,centerLineSpan/2,centerLineSpan,centerLineSpan/2/sqr(3)
+
+        add2 centerLineSpan,centerLineSpan/2/sqr(3)
+        rot2 180
+    endif
+
+    if _partStairNum[partNum]=6 then
+        line2 0,0,0,centerLineSpan/2
+        line2 0,centerLineSpan/2,centerLineSpan,centerLineSpan/2
+        line2 centerLineSpan,centerLineSpan/2,centerLineSpan,0
+
+        add2 centerLineSpan,0
+        rot2 180
+    endif
+endif
+
+!終点矢印
+line2 0,0,-0.03,-0.05
+line2 0,0,0.03,-0.05
+hotspot2 0,0
+
+
+del top
+
+
+!外ライン
+pen outLinePen
+
+for i=1 to outLineNum
+    hotspot2 outLinePos[i][1],outLinePos[i][2]
+next i
+
+for i=1 to outLineNum-1
+    line2 outLinePos[i][1],outLinePos[i][2],outLinePos[i+1][1],outLinePos[i+1][2]
+next i
+
+
+!内ライン
+pen inLinePen
+
+for i=1 to inLineNum
+    hotspot2 inLinePos[i][1],inLinePos[i][2]
+next i
+
+for i=1 to inLineNum-1
+    line2 inLinePos[i][1],inLinePos[i][2],inLinePos[i+1][1],inLinePos[i+1][2]
+next i
+
+

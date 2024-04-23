@@ -1,0 +1,348 @@
+define style "num_font" fonttype,num_font_size*10/glob_scale,5,0
+define style "moji_font" fonttype,moji_font_size*10/glob_scale,5,0
+define style "moji_font2" fonttype,moji_font_size*10/glob_scale,4,0
+moji_font_size2=1.5*moji_font_size
+
+hotspot2 0,0
+!=================================================ゾーン
+set line_type dashed_line
+
+for i=1 to zone_num
+    if i<zone_num then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    if dis_zone then
+        !ホットスポット
+        hotspot2 zone_pos[i][1],zone_pos[i][2]
+
+        if switch_hotspot=1 then
+            hotspot2 0             ,zone_pos[i][2],code,zone_pos[i][1],1+128:code=code+1
+            hotspot2 zone_pos[i][1],zone_pos[i][2],code,zone_pos[i][1],2    :code=code+1
+            hotspot2 -1            ,zone_pos[i][2],code,zone_pos[i][1],3    :code=code+1
+
+            hotspot2 zone_pos[i][1],0             ,code,zone_pos[i][2],1+128:code=code+1
+            hotspot2 zone_pos[i][1],zone_pos[i][2],code,zone_pos[i][2],2    :code=code+1
+            hotspot2 zone_pos[i][1],-1            ,code,zone_pos[i][2],3    :code=code+1
+        endif
+
+        !輪郭線
+        line2 zone_pos[i][1],zone_pos[i][2],zone_pos[i2][1],zone_pos[i2][2]
+    endif
+next i
+
+
+!=========================================================矢印
+style "moji_font"
+
+board_type_moji_wid=0
+put stw("タイプ")/1000*GLOB_SCALE
+for i=1 to board_type_totnum
+    put stw(board_type_totmoji[i][1])/1000*GLOB_SCALE
+next i
+board_type_moji_wid=max(get(nsp))
+
+board_thi_moji_wid=0
+put stw("厚み")/1000*GLOB_SCALE
+for i=1 to board_type_totnum
+    put stw(board_type_totmoji[i][2])/1000*GLOB_SCALE
+next i
+board_thi_moji_wid=max(get(nsp))
+
+board_size_moji_wid=0
+put stw("サイズ")/1000*GLOB_SCALE
+for i=1 to board_type_totnum
+    put stw(board_type_totmoji[i][3])/1000*GLOB_SCALE
+next i
+board_size_moji_wid=max(get(nsp))
+
+board_num_moji_wid=0
+put stw("枚数")/1000*GLOB_SCALE
+for i=1 to board_type_totnum
+    if board_num_ceil=0 then
+        put stw(str(board_num_totlist[i],3,2)+"枚")/1000*GLOB_SCALE
+    else
+        put stw(str(board_num_totlist[i],1,0)+"枚")/1000*GLOB_SCALE
+    endif
+next i
+board_num_moji_wid=max(get(nsp))
+
+board_area_moji_wid=0
+put stw("面積")/1000*GLOB_SCALE
+for i=1 to board_type_totnum
+    put stw(str(board_area_totlist[i],3,2)+"㎡")/1000*GLOB_SCALE
+next i
+board_area_moji_wid=max(get(nsp))
+
+!フォームサイズ
+form_x=moji_font_size/100+board_type_moji_wid+stw("  ")/1000*GLOB_SCALE+board_thi_moji_wid+stw("  ")/1000*GLOB_SCALE+\
+       board_size_moji_wid+stw("  ")/1000*GLOB_SCALE+board_num_moji_wid+(stw("  ")/1000*GLOB_SCALE+board_area_moji_wid)*dis_board_detail*dis_board_area_detail
+form_y=(dis_room_name+0.5*dis_room_name*dis_board_detail+(board_type_totnum+1)*dis_board_detail)*moji_font_size2/100
+form_x=max(form_x,stw(room_name)/1000*GLOB_SCALE+moji_font_size/100)
+
+!フォーム頂点座標・方程式
+center_x=(minx+maxx)/2+form_offset[1][1]
+center_y=(miny+maxy)/2+form_offset[1][2]
+
+dim _form_pos[][]
+_form_pos[1][1]=center_x-form_x/2
+_form_pos[1][2]=center_y-form_y/2
+_form_pos[2][1]=center_x+form_x/2
+_form_pos[2][2]=center_y-form_y/2
+_form_pos[3][1]=center_x+form_x/2
+_form_pos[3][2]=center_y+form_y/2
+_form_pos[4][1]=center_x-form_x/2
+_form_pos[4][2]=center_y+form_y/2
+
+dim _form_a[]
+dim _form_b[]
+dim _form_c[]
+
+_form_a[1]=0
+_form_b[1]=1
+_form_c[1]=-(center_y-form_y/2)
+
+_form_a[2]=1
+_form_b[2]=0
+_form_c[2]=-(center_x+form_x/2)
+
+_form_a[3]=0
+_form_b[3]=1
+_form_c[3]=-(center_y+form_y/2)
+
+_form_a[4]=1
+_form_b[4]=0
+_form_c[4]=-(center_x-form_x/2)
+
+!矢印とフォームの交点
+dim _inter_x[]
+dim _inter_y[]
+dim _inter_flag[]
+_inter_x[1]=0
+_inter_y[1]=0
+_inter_flag[1]=0
+
+dim _arrow_a[]
+dim _arrow_b[]
+dim _arrow_c[]
+_arrow_a[1]=0
+_arrow_b[1]=0
+_arrow_c[1]=0
+
+for i=1 to lgs_num
+    _arrow_a[i]=_arrow_y[i]-center_y
+    _arrow_b[i]=center_x-_arrow_x[i]
+    _arrow_c[i]=_arrow_x[i]*center_y-center_x*_arrow_y[i]
+
+    _inter_x[i]=0
+    _inter_y[i]=0
+    _inter_flag[i]=0
+
+    for j=1 to 4
+        if j<4 then
+            j2=j+1
+        else
+            j2=1
+        endif
+
+        if _arrow_a[i]*_form_b[j]<>_form_a[j]*_arrow_b[i] then
+            intersection_x=(_form_c[j]*_arrow_b[i]-_arrow_c[i]*_form_b[j])/(_arrow_a[i]*_form_b[j]-_form_a[j]*_arrow_b[i])
+            intersection_y=(_arrow_c[i]*_form_a[j]-_form_c[j]*_arrow_a[i])/(_arrow_a[i]*_form_b[j]-_form_a[j]*_arrow_b[i])
+
+            record_flag=0
+
+            if _arrow_b[i]<>0 then
+                if (intersection_x>=min(center_x,_arrow_x[i]) and intersection_x<max(center_x,_arrow_x[i])) or \
+                   (intersection_x>min(center_x,_arrow_x[i]) and intersection_x<=max(center_x,_arrow_x[i])) then
+                    record_flag=record_flag+1
+                endif
+            else
+                if (intersection_y>=min(center_y,_arrow_y[i]) and intersection_y<max(center_y,_arrow_y[i])) or \
+                   (intersection_y>min(center_y,_arrow_y[i]) and intersection_y<=max(center_y,_arrow_y[i])) then
+                    record_flag=record_flag+1
+                endif
+            endif
+
+            if _form_b[j]<>0 then
+                if (intersection_x>=min(_form_pos[j][1],_form_pos[j2][1]) and intersection_x<max(_form_pos[j][1],_form_pos[j2][1])) or \
+                   (intersection_x>min(_form_pos[j][1],_form_pos[j2][1]) and intersection_x<=max(_form_pos[j][1],_form_pos[j2][1])) then
+                    record_flag=record_flag+1
+                endif
+            else
+                if (intersection_y>=min(_form_pos[j][2],_form_pos[j2][2]) and intersection_y<max(_form_pos[j][2],_form_pos[j2][2])) or \
+                   (intersection_y>min(_form_pos[j][2],_form_pos[j2][2]) and intersection_y<=max(_form_pos[j][2],_form_pos[j2][2])) then
+                    record_flag=record_flag+1
+                endif
+            endif
+
+            if record_flag=2 then
+                _inter_flag[i]=1
+                _inter_x[i]=intersection_x
+                _inter_y[i]=intersection_y
+            endif
+        endif
+    next j
+next i
+
+
+!矢印回転角
+dim _arrow_rtz[]
+
+for i=1 to lgs_num
+    if _arrow_y[i]>center_y+eps then
+        _arrow_rtz[i]=acs((_arrow_x[i]-center_x)/(sqr((_arrow_x[i]-center_x)^2+(_arrow_y[i]-center_y)^2)+eps))
+    endif
+
+    if _arrow_y[i]<=center_y+eps and _arrow_y[i]>=center_y-eps then
+        if _arrow_x[i]>=center_x then
+            _arrow_rtz[i]=0
+        else
+            _arrow_rtz[i]=180
+        endif
+    endif
+
+    if _arrow_y[i]<center_y-eps then
+        _arrow_rtz[i]=360-acs((_arrow_x[i]-center_x)/(sqr((_arrow_x[i]-center_x)^2+(_arrow_y[i]-center_y)^2)+eps))
+    endif
+next i
+
+
+!=================================================ボード集計フォーム
+!ホットスポット
+add2 (minx+maxx)/2,(miny+maxy)/2
+    hotspot2 0                ,form_offset[1][2],code,form_offset[1][1],1+128:code=code+1
+    hotspot2 form_offset[1][1],form_offset[1][2],code,form_offset[1][1],2    :code=code+1
+    hotspot2 -1               ,form_offset[1][2],code,form_offset[1][1],3    :code=code+1
+
+    hotspot2 form_offset[1][1],0                ,code,form_offset[1][2],1+128:code=code+1
+    hotspot2 form_offset[1][1],form_offset[1][2],code,form_offset[1][2],2    :code=code+1
+    hotspot2 form_offset[1][1],-1               ,code,form_offset[1][2],3    :code=code+1
+del 1
+
+!フォーム
+set line_type solid_line
+
+if dis_form and (dis_room_name or dis_board_detail) then
+    add2 center_x-form_x/2,center_y-form_y/2
+        hotspot2 0     ,0
+        hotspot2 form_x,0
+        hotspot2 form_x,form_y
+        hotspot2 0     ,form_y
+
+        rect2 0,0,form_x,form_y
+    del 1
+endif
+
+!矢印
+if dis_arrow and (dis_room_name or dis_board_detail) then
+    for i=1 to lgs_num
+        if _inter_flag[i]=1 then
+            line2 _inter_x[i],_inter_y[i],_arrow_x[i],_arrow_y[i]
+
+            add2 _arrow_x[i],_arrow_y[i]
+            rot2 _arrow_rtz[i]
+                line2 0,0,0-0.1,0+0.05
+                line2 0,0,0-0.1,0-0.05
+            del 2
+        endif
+    next i
+endif
+
+!部屋名
+style "moji_font"
+
+if dis_room_name then
+    add2 center_x,center_y+form_y/2-moji_font_size2/100/2
+        text2 0,0,room_name
+    del 1
+endif
+
+style "moji_font2"
+
+if dis_board_detail then
+    add2 center_x,center_y+form_y/2-moji_font_size2/100*3/2*dis_room_name-moji_font_size2/100/2
+        if board_type_totnum>0 then
+            text2 -form_x/2+moji_font_size/100/2,0,"タイプ"
+            text2 -form_x/2+moji_font_size/100/2+board_type_moji_wid+stw("  ")/1000*GLOB_SCALE,0,"厚み"
+            text2 -form_x/2+moji_font_size/100/2+board_type_moji_wid+stw("  ")/1000*GLOB_SCALE+board_thi_moji_wid+stw("  ")/1000*GLOB_SCALE,0,"サイズ"
+            text2 -form_x/2+moji_font_size/100/2+board_type_moji_wid+stw("  ")/1000*GLOB_SCALE+board_thi_moji_wid+stw("  ")/1000*GLOB_SCALE+board_size_moji_wid+stw("  ")/1000*GLOB_SCALE,0,"枚数"
+            if dis_board_area_detail then
+                text2 -form_x/2+moji_font_size/100/2+board_type_moji_wid+stw("  ")/1000*GLOB_SCALE+board_thi_moji_wid+stw("  ")/1000*GLOB_SCALE+\
+                      board_size_moji_wid+stw("  ")/1000*GLOB_SCALE+board_num_moji_wid+stw("  ")/1000*GLOB_SCALE,0,"面積"
+            endif
+        endif
+
+        for i=1 to board_type_totnum
+            add2 0,-moji_font_size2/100
+            text2 -form_x/2+moji_font_size/100/2,0,board_type_totmoji[i][1]
+            text2 -form_x/2+moji_font_size/100/2+board_type_moji_wid+stw("  ")/1000*GLOB_SCALE,0,board_type_totmoji[i][2]
+            text2 -form_x/2+moji_font_size/100/2+board_type_moji_wid+stw("  ")/1000*GLOB_SCALE+board_thi_moji_wid+stw("  ")/1000*GLOB_SCALE,0,board_type_totmoji[i][3]
+            if board_num_ceil=0 then
+                text2 -form_x/2+moji_font_size/100/2+board_type_moji_wid+stw("  ")/1000*GLOB_SCALE+board_thi_moji_wid+stw("  ")/1000*GLOB_SCALE+board_size_moji_wid+stw("  ")/1000*GLOB_SCALE,0,str(board_num_totlist[i],3,2)+"枚"
+            else
+                text2 -form_x/2+moji_font_size/100/2+board_type_moji_wid+stw("  ")/1000*GLOB_SCALE+board_thi_moji_wid+stw("  ")/1000*GLOB_SCALE+board_size_moji_wid+stw("  ")/1000*GLOB_SCALE,0,str(board_num_totlist[i],1,0)+"枚"
+            endif
+            if dis_board_area_detail then
+                text2 -form_x/2+moji_font_size/100/2+board_type_moji_wid+stw("  ")/1000*GLOB_SCALE+board_thi_moji_wid+stw("  ")/1000*GLOB_SCALE+\
+                      board_size_moji_wid+stw("  ")/1000*GLOB_SCALE+board_num_moji_wid+stw("  ")/1000*GLOB_SCALE,0,str(board_area_totlist[i],3,2)+"㎡"
+            endif
+        next i
+        del board_type_totnum
+    del 1
+endif
+
+
+!=================================================LGS
+set line_type solid_line
+pen lgs_pen
+style "num_font"
+lgs_wid=0.05
+
+if dis_lgs then
+    for i=1 to lgs_num
+        !枠線
+        add2 _lgs_start_pos[i][1],_lgs_start_pos[i][2]
+        rot2 _lgs_rtz[i]
+            rect2 0,-lgs_wid/2,_lgs_len[i],lgs_wid/2
+        del 2
+
+        !ホットスポット
+        hotspot2 lgs_start_pos[i][1],lgs_start_pos[i][2]
+        hotspot2 lgs_end_pos[i][1],lgs_end_pos[i][2]
+
+        if switch_hotspot=2 then
+            hotspot2 0,lgs_start_pos[i][2],code,lgs_start_pos[i][1],1+128:code=code+1
+            hotspot2 lgs_start_pos[i][1],lgs_start_pos[i][2],code,lgs_start_pos[i][1],2:code=code+1
+            hotspot2 -1,lgs_start_pos[i][2],code,lgs_start_pos[i][1],3:code=code+1
+
+            hotspot2 lgs_start_pos[i][1],0,code,lgs_start_pos[i][2],1+128:code=code+1
+            hotspot2 lgs_start_pos[i][1],lgs_start_pos[i][2],code,lgs_start_pos[i][2],2:code=code+1
+            hotspot2 lgs_start_pos[i][1],-1,code,lgs_start_pos[i][2],3:code=code+1
+
+            hotspot2 0,lgs_end_pos[i][2],code,lgs_end_pos[i][1],1+128:code=code+1
+            hotspot2 lgs_end_pos[i][1],lgs_end_pos[i][2],code,lgs_end_pos[i][1],2:code=code+1
+            hotspot2 -1,lgs_end_pos[i][2],code,lgs_end_pos[i][1],3:code=code+1
+
+            hotspot2 lgs_end_pos[i][1],0,code,lgs_end_pos[i][2],1+128:code=code+1
+            hotspot2 lgs_end_pos[i][1],lgs_end_pos[i][2],code,lgs_end_pos[i][2],2:code=code+1
+            hotspot2 lgs_end_pos[i][1],-1,code,lgs_end_pos[i][2],3:code=code+1
+        endif
+
+        !LGS番号
+        if dis_lgs_num then
+            text2 _arrow_x[i],_arrow_y[i],i
+        endif
+    next i
+endif
+
+values{2} "switch_hotspot" 1,"ゾーンの頂点",2,"LGSの頂点"
+
+
+
+
+
+
+
+

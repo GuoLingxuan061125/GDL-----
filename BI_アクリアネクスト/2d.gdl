@@ -1,0 +1,20 @@
+hotspot2 0,0
+hotspot2 sizeWid,0
+
+for i=1 to vertexNum
+    put vertexPos[i][1]
+next i
+startPos=min(use(nsp))
+endPos=max(get(nsp))
+
+hotspot2 startPos,-sizeThi/2
+hotspot2 endPos,-sizeThi/2
+hotspot2 startPos,sizeThi/2
+hotspot2 endPos,sizeThi/2
+
+fill boardFill
+poly2 4,1+2+4,
+startPos,-sizeThi/2,
+endPos,-sizeThi/2,
+endPos,sizeThi/2,
+startPos,sizeThi/2

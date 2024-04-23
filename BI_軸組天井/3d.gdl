@@ -1,0 +1,494 @@
+!========================================================================屋根基準線
+pen baseLinePen
+
+if dis_base then
+	for i=1 to 2
+		hotspot 0,base_pos[i][2],0,code,base_pos[i][1],1+128:code=code+1
+		hotspot base_pos[i][1],base_pos[i][2],0,code,base_pos[i][1],2:code=code+1
+		hotspot -1,base_pos[i][2],0,code,base_pos[i][1],3:code=code+1
+	
+		hotspot base_pos[i][1],0,0,code,base_pos[i][2],1+128:code=code+1
+		hotspot base_pos[i][1],base_pos[i][2],0,code,base_pos[i][2],2:code=code+1
+		hotspot base_pos[i][1],-1,0,code,base_pos[i][2],3:code=code+1
+	next i
+
+	lin_ base_pos[1][1],base_pos[1][2],0,base_pos[2][1],base_pos[2][2],0
+
+	add (base_pos[1][1]+base_pos[2][1])/2,(base_pos[1][2]+base_pos[2][2])/2,0
+	rotz base_rtz
+		lin_ 0,0,0,0,-0.2*base_dir,0
+		hotspot 0,0,0,code,base_dir,1+128:code=code+1
+		hotspot 0,-0.2*base_dir,0,code,base_dir,2:code=code+1
+		hotspot 0,1,0,code,base_dir,3:code=code+1
+	del 2
+endif
+
+
+!========================================================================スラブ
+pen normalPen
+
+for i=1 to slabVertexNum
+    if disHotspot=1 then
+        hotspot 0                   ,slabVertexPos[i][y] ,_slabVertexZ[i] ,code ,slabVertexPos[i][x] ,1+128 :code=code+1
+        hotspot slabVertexPos[i][x] ,slabVertexPos[i][y] ,_slabVertexZ[i] ,code ,slabVertexPos[i][x] ,2     :code=code+1
+        hotspot -1                  ,slabVertexPos[i][y] ,_slabVertexZ[i] ,code ,slabVertexPos[i][x] ,3     :code=code+1
+
+        hotspot slabVertexPos[i][x] ,0                   ,_slabVertexZ[i] ,code ,slabVertexPos[i][y] ,1+128 :code=code+1
+        hotspot slabVertexPos[i][x] ,slabVertexPos[i][y] ,_slabVertexZ[i] ,code ,slabVertexPos[i][y] ,2     :code=code+1
+        hotspot slabVertexPos[i][x] ,-1                  ,_slabVertexZ[i] ,code ,slabVertexPos[i][y] ,3     :code=code+1
+    else  
+        hotspot slabVertexPos[i][x] ,slabVertexPos[i][y] ,_slabVertexZ[i]
+    endif
+
+    if i<slabVertexNum then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    lin_ slabVertexPos[i][x] ,slabVertexPos[i][y] ,_slabVertexZ[i] ,slabVertexPos[i2][x] ,slabVertexPos[i2][y] ,_slabVertexZ[i2]
+next i
+
+
+!========================================================================開口
+for i=1 to opNum
+    for j=1 to opVertexNum[i]
+        if disHotspot=2 then
+            hotspot 0                     ,opVertexPos[i][2*j] ,_opVertexZ[i][j] ,code ,opVertexPos[i][2*j-1] ,1+128 :code=code+1
+            hotspot opVertexPos[i][2*j-1] ,opVertexPos[i][2*j] ,_opVertexZ[i][j] ,code ,opVertexPos[i][2*j-1] ,2     :code=code+1
+            hotspot -1                    ,opVertexPos[i][2*j] ,_opVertexZ[i][j] ,code ,opVertexPos[i][2*j-1] ,3     :code=code+1
+
+            hotspot opVertexPos[i][2*j-1] ,0                   ,_opVertexZ[i][j] ,code ,opVertexPos[i][2*j] ,1+128 :code=code+1
+            hotspot opVertexPos[i][2*j-1] ,opVertexPos[i][2*j] ,_opVertexZ[i][j] ,code ,opVertexPos[i][2*j] ,2     :code=code+1
+            hotspot opVertexPos[i][2*j-1] ,-1                  ,_opVertexZ[i][j] ,code ,opVertexPos[i][2*j] ,3     :code=code+1
+        else
+            hotspot opVertexPos[i][2*j-1] ,opVertexPos[i][2*j] ,_opVertexZ[i][j]
+        endif
+
+        if j<opVertexNum[i] then
+            j2=j+1
+        else
+            j2=1
+        endif
+
+        lin_ opVertexPos[i][2*j-1] ,opVertexPos[i][2*j] ,_opVertexZ[i][j] ,opVertexPos[i][2*j2-1] ,opVertexPos[i][2*j2] ,_opVertexZ[i][j2]
+    next j
+next i
+
+
+!========================================================================段差
+if switchStep then
+    for i=1 to stepVertexNum
+        if disHotspot=4 then
+            hotspot 0                   ,stepVertexPos[i][y] ,_stepVertexZ[i]+stepHei ,code ,stepVertexPos[i][x] ,1+128 :code=code+1
+            hotspot stepVertexPos[i][x] ,stepVertexPos[i][y] ,_stepVertexZ[i]+stepHei ,code ,stepVertexPos[i][x] ,2     :code=code+1
+            hotspot -1                  ,stepVertexPos[i][y] ,_stepVertexZ[i]+stepHei ,code ,stepVertexPos[i][x] ,3     :code=code+1
+
+            hotspot stepVertexPos[i][x] ,0                   ,_stepVertexZ[i]+stepHei ,code ,stepVertexPos[i][y] ,1+128 :code=code+1
+            hotspot stepVertexPos[i][x] ,stepVertexPos[i][y] ,_stepVertexZ[i]+stepHei ,code ,stepVertexPos[i][y] ,2     :code=code+1
+            hotspot stepVertexPos[i][x] ,-1                  ,_stepVertexZ[i]+stepHei ,code ,stepVertexPos[i][y] ,3     :code=code+1
+        else
+            hotspot stepVertexPos[i][x] ,stepVertexPos[i][y] ,_stepVertexZ[i]+stepHei
+        endif
+
+        if i<stepVertexNum then
+            i2=i+1
+        else
+            i2=1
+        endif
+
+        lin_ stepVertexPos[i][x] ,stepVertexPos[i][y] ,_stepVertexZ[i]+stepHei ,stepVertexPos[i2][x] ,stepVertexPos[i2][y] ,_stepVertexZ[i2]+stepHei
+    next i
+endif
+
+
+!========================================================================ボード
+group "boardBaseFrame"
+    material boardMat
+
+    for i=1 to slabVertexNum
+        put _slabNewPos[i][x] ,_slabNewPos[i][y] ,0 ,0
+    next i
+
+    for i=1 to slabVertexNum
+        put _slabNewPos[i][x] ,_slabNewPos[i][y] ,boardThi
+    next i
+
+    ruledsegmented slabVertexNum,1+2+4+8+16+32,
+    get(nsp)
+endgroup
+
+
+group "boardOp"
+    material boardMat
+
+    for i=1 to opNum
+        for j=1 to opVertexNum[i]
+            put _opNewPos[i][2*j-1] ,_opNewPos[i][2*j] ,0 ,0
+        next j
+
+        for j=1 to opVertexNum[i]
+            put _opNewPos[i][2*j-1] ,_opNewPos[i][2*j] ,boardThi
+        next j
+
+        ruledsegmented opVertexNum[i],1+2+4+8+16+32,
+        get(nsp)
+    next i
+endgroup
+
+
+group "stepBaseFrame"
+    material boardMat
+
+    if switchStep then
+        for i=1 to stepVertexNum
+            put _stepNewPos[i][x] ,_stepNewPos[i][y] ,0 ,0
+        next i
+
+        for i=1 to stepVertexNum
+            put _stepNewPos[i][x] ,_stepNewPos[i][y] ,boardThi
+        next i
+
+        ruledsegmented stepVertexNum,1+2+4+8+16+32,
+        get(nsp)
+    endif
+endgroup
+
+boardFrame1=subgroup("boardBaseFrame","boardOp")
+boardFrame2=subgroup(boardFrame1,"stepBaseFrame")
+
+
+!========================================================================割り付け芯
+if disCenter then
+    for i=1 to 2
+        !ホットスポット
+        if disHotspot=3 then
+            hotspot 0       ,centerY ,0 ,code ,centerX ,1+128 :code=code+1
+            hotspot centerX ,centerY ,0 ,code ,centerX ,2     :code=code+1
+            hotspot -1      ,centerY ,0 ,code ,centerX ,3     :code=code+1
+
+            hotspot centerX ,0       ,0 ,code ,centerY ,1+128 :code=code+1
+            hotspot centerX ,centerY ,0 ,code ,centerY ,2     :code=code+1
+            hotspot centerX ,-1      ,0 ,code ,centerY ,3     :code=code+1
+        else
+            hotspot centerX ,centerY ,0
+        endif
+
+        if disHotspot=3 then
+            hotspot centerX+0.2                ,centerY                    ,0 ,code ,centerRtz ,4+128 :code=code+1
+            hotspot centerX+0.2*cos(centerRtz) ,centerY+0.2*sin(centerRtz) ,0 ,code ,centerRtz ,5     :code=code+1
+            hotspot centerX                    ,centerY                    ,0 ,code ,centerRtz ,6     :code=code+1
+            hotspot centerX+0.2*cos(-1)        ,centerY+0.2*sin(-1)        ,0 ,code ,centerRtz ,7     :code=code+1
+        endif
+
+        !矢印
+        add centerX ,centerY ,0
+        rotz centerRtz
+            lin_ -0.2 ,0    ,0 ,0.2       ,0         ,0
+            lin_ 0    ,-0.2 ,0 ,0         ,0.2       ,0
+            lin_ -0.2 ,0    ,0 ,-0.2+0.05 ,0.05      ,0
+            lin_ -0.2 ,0    ,0 ,-0.2+0.05 ,-0.05     ,0
+            lin_ 0.2  ,0    ,0 ,0.2-0.05  ,0.05      ,0
+            lin_ 0.2  ,0    ,0 ,0.2-0.05  ,-0.05     ,0
+            lin_ 0    ,-0.2 ,0 ,0.05      ,-0.2+0.05 ,0
+            lin_ 0    ,-0.2 ,0 ,-0.05     ,-0.2+0.05 ,0
+            lin_ 0    ,0.2  ,0 ,0.05      ,0.2-0.05  ,0
+            lin_ 0    ,0.2  ,0 ,-0.05     ,0.2-0.05  ,0
+        del 2
+    addz boardThi
+    next i
+    del 2
+endif
+
+
+!========================================================================ボード
+group "boardMax"
+    material boardMat
+
+    add centerX ,centerY ,0
+    rotz centerRtz
+        gosub 100+pattern
+    del 2
+endgroup
+
+board=isectgroup("boardMax",boardFrame2)
+
+
+
+if switchStep and stepHei<>0 then
+    group "stepPlusBoardBaseFrame"
+        material boardMat
+
+        for i=1 to slabVertexNum
+            put _slabNewPos[i][x] ,_slabNewPos[i][y] ,-abs(stepHei) ,0
+        next i
+
+        for i=1 to slabVertexNum
+            put _slabNewPos[i][x] ,_slabNewPos[i][y] ,boardThi+abs(stepHei)
+        next i
+
+        ruledsegmented slabVertexNum,1+2+4+8+16+32,
+        get(nsp)
+    endgroup
+
+
+    group "stepPlusBoard"
+        material boardMat
+
+        put _stepNewPos[stepVertexNum][x],_stepNewPos[stepVertexNum][y],0,0
+        for i=1 to stepVertexNum
+            put _stepNewPos[i][x],_stepNewPos[i][y],0,0
+        next i
+        put _stepNewPos[1][x],_stepNewPos[1][y],0,0
+        put _stepNewPos[2][x],_stepNewPos[2][y],0,0
+
+        if stepHei>0 then addz boardThi
+            tube 4,stepVertexNum+3,1+2+4+8+16+32,
+            0,0,0,
+            -boardThi,0,0,
+            -boardThi,stepHei,0,
+            0,stepHei,0,
+            get((stepVertexNum+3)*4)
+        if stepHei>0 then del 1
+    endgroup
+
+    stepPlusBoard=isectgroup("stepPlusBoard","stepPlusBoardBaseFrame")
+    stepBoard=isectgroup("boardMax","stepBaseFrame")
+endif
+
+
+!========================================================================木軸
+material furringMat
+
+add base_pos[1][1],base_pos[1][2],0
+rotz base_rtz
+rotx -rat*base_dir
+rotz -base_rtz
+add -base_pos[1][1],-base_pos[1][2],0
+
+placegroup board
+
+if switchStep and stepHei<>0 then
+    placegroup stepPlusBoard
+    addz stepHei
+        placegroup stepBoard
+    del 1
+endif
+
+!胴縁
+for i=1 to furringNum
+    tube 4,4,1+2+4+8+16+32,
+    -furringWid/2,0,0,
+    furringWid/2,0,0,
+    furringWid/2,furringHei,0,
+    -furringWid/2,furringHei,0,
+    2*_furringPos[i][1]-_furringPos[i][4],2*_furringPos[i][2]-_furringPos[i][5],2*_furringPos[i][3]-_furringPos[i][6],0,
+    _furringPos[i][1],_furringPos[i][2],_furringPos[i][3],0,
+    _furringPos[i][4],_furringPos[i][5],_furringPos[i][6],0,
+    2*_furringPos[i][4]-_furringPos[i][1],2*_furringPos[i][5]-_furringPos[i][2],2*_furringPos[i][6]-_furringPos[i][3],0
+next i
+
+
+!胴縁受け
+for i=1 to furringRecNum
+    tube 4,4,1+2+4+8+16+32,
+    -furringRecWid/2,0,0,
+    furringRecWid/2,0,0,
+    furringRecWid/2,furringRecHei,0,
+    -furringRecWid/2,furringRecHei,0,
+    2*_furringRecPos[i][1]-_furringRecPos[i][4],2*_furringRecPos[i][2]-_furringRecPos[i][5],2*_furringRecPos[i][3]-_furringRecPos[i][6],0,
+    _furringRecPos[i][1],_furringRecPos[i][2],_furringRecPos[i][3],0,
+    _furringRecPos[i][4],_furringRecPos[i][5],_furringRecPos[i][6],0,
+    2*_furringRecPos[i][4]-_furringRecPos[i][1],2*_furringRecPos[i][5]-_furringRecPos[i][2],2*_furringRecPos[i][6]-_furringRecPos[i][3],0
+next i
+
+
+!吊り木
+for i=1 to hangingNum
+    add _hangingPos[i][x],_hangingPos[i][y],_hangingPos[i][z]
+        add -hangingSize/2,-hangingSize/2,0
+            block hangingSize,hangingSize,_hangingHei[i]
+        del 1
+    del 1
+next i
+
+
+!段差補強木
+for i=1 to stepRefWoodNum
+    add _stepRefWoodPos[i][x],_stepRefWoodPos[i][y],_stepRefWoodPos[i][z]
+        extrude 5,0,0,-stepHei,1+2+4+8+16+32,
+        -_stepRefWoodWid[i]/2,-_stepRefWoodWid[i]/2,0,
+        _stepRefWoodWid[i]/2 ,-_stepRefWoodWid[i]/2,0,
+        _stepRefWoodWid[i]/2 ,_stepRefWoodWid[i]/2 ,0,
+        -_stepRefWoodWid[i]/2,_stepRefWoodWid[i]/2 ,0,
+        -_stepRefWoodWid[i]/2,-_stepRefWoodWid[i]/2,-1
+    del 1
+next i
+
+del 5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+end
+
+
+!通し目地
+101:
+
+for n=1 to 2
+    for m=1 to 2
+        for j=1 to boardLoopY
+            for i=1 to boardLoopX
+                if disBoard3D then
+                    block boardSize1 ,boardSize2 ,boardThi
+                endif
+
+                for p=1 to 2
+                    if (p=1 and disLine3D1) or (p=2 and disLine3D2) then
+                        lin_ 0 ,0 ,0 ,boardSize1 ,0 ,0
+                        lin_ boardSize1 ,0 ,0 ,boardSize1 ,boardSize2 ,0
+                    endif
+                addz boardThi
+                next p
+                del 2
+            addx boardSize1
+            next i
+            del boardLoopX
+        addy boardSize2
+        next j
+        del boardLoopY
+    addx -boardSize1*boardLoopX
+    next m
+    del 2
+addy -boardSize2*boardLoopY
+next n
+del 2
+
+return
+
+!縦通し目地
+102:
+
+for n=1 to 2
+    for m=1 to 2
+        for j=1 to boardLoopY
+            for i=1 to boardLoopX
+                if disBoard3D=1 then
+                    block boardSize2 ,boardSize1 ,boardThi
+                endif
+
+                for p=1 to 2
+                    if (p=1 and disLine3D1) or (p=2 and disLine3D2) then
+                        lin_ 0 ,0 ,0 ,boardSize2 ,0 ,0
+                        lin_ boardSize2 ,0 ,0 ,boardSize2 ,boardSize1 ,0
+                    endif
+                addz boardThi
+                next p
+                del 2
+            addx boardSize2
+            next i
+            del boardLoopX
+        addy boardSize1
+        next j
+        del boardLoopY
+    addx -boardSize2*boardLoopX
+    next m
+    del 2
+addy -boardSize1*boardLoopY
+next n
+del 2
+
+return
+
+!馬踏み目地
+103:
+
+for n=1 to 2
+    for m=1 to 2
+        for q=1 to 2
+            for j=1 to boardLoopY/2
+                for i=1 to boardLoopX
+                    if disBoard3D=1 then
+                        block boardSize1 ,boardSize2 ,boardThi
+                    endif
+
+                    for p=1 to 2
+                        if (p=1 and disLine3D1) or (p=2 and disLine3D2) then
+                            lin_ 0 ,0 ,0 ,boardSize1 ,0 ,0
+                            lin_ boardSize1 ,0 ,0 ,boardSize1 ,boardSize2 ,0
+                        endif
+                    addz boardThi
+                    next p
+                    del 2
+                addx boardSize1
+                next i
+                del boardLoopX
+            addy boardSize2*2
+            next j
+            del boardLoopY/2
+        add -boardSize1/2,boardSize2,0
+        next q
+        del 2
+    addx -boardSize1*boardLoopX
+    next m
+    del 2
+addy -boardSize2*boardLoopY
+next n
+del 2
+
+return
+
+!縦馬踏み目地
+104:
+
+for n=1 to 2
+    for m=1 to 2
+        for q=1 to 2
+            for j=1 to boardLoopY/2
+                for i=1 to boardLoopX
+                    if disBoard3D=1 then
+                        block boardSize2 ,boardSize1 ,boardThi
+                    endif
+
+                    for p=1 to 2
+                        if (p=1 and disLine3D1) or (p=2 and disLine3D2) then
+                            lin_ 0 ,0 ,0 ,boardSize2 ,0 ,0
+                            lin_ boardSize2 ,0 ,0 ,boardSize2 ,boardSize1 ,0
+                        endif
+                    addz boardThi
+                    next p
+                    del 2
+                addx boardSize2
+                next i
+                del boardLoopX
+            addy boardSize1*2
+            next j
+            del boardLoopY/2
+        add -boardSize2/2,boardSize1,0
+        next q
+        del 2
+    addx -boardSize2*boardLoopX
+    next m
+    del 2
+addy -boardSize1*boardLoopY
+next n
+del 2
+
+return

@@ -1,0 +1,1593 @@
+addz beam_level
+	hotspot 0,line_pos[1][2],line_pos[1][3],code,line_pos[1][1],1+128:code=code+1
+	hotspot line_pos[1][1],line_pos[1][2],line_pos[1][3],code,line_pos[1][1],2:code=code+1
+	hotspot -1,line_pos[1][2],line_pos[1][3],code,line_pos[1][1],3:code=code+1
+
+	hotspot line_pos[1][1],0,line_pos[1][3],code,line_pos[1][2],1+128:code=code+1
+	hotspot line_pos[1][1],line_pos[1][2],line_pos[1][3],code,line_pos[1][2],2:code=code+1
+	hotspot line_pos[1][1],-1,line_pos[1][3],code,line_pos[1][2],3:code=code+1
+
+	hotspot line_pos[1][1],line_pos[1][2],0,code,line_pos[1][3],1+128:code=code+1
+	hotspot line_pos[1][1],line_pos[1][2],line_pos[1][3],code,line_pos[1][3],2:code=code+1
+	hotspot line_pos[1][1],line_pos[1][2],-1,code,line_pos[1][3],3:code=code+1
+
+	hotspot 0,line_pos[2][2],line_pos[2][3],code,line_pos[2][1],1+128:code=code+1
+	hotspot line_pos[2][1],line_pos[2][2],line_pos[2][3],code,line_pos[2][1],2:code=code+1
+	hotspot -1,line_pos[2][2],line_pos[2][3],code,line_pos[2][1],3:code=code+1
+
+	hotspot line_pos[2][1],0,line_pos[2][3],code,line_pos[2][2],1+128:code=code+1
+	hotspot line_pos[2][1],line_pos[2][2],line_pos[2][3],code,line_pos[2][2],2:code=code+1
+	hotspot line_pos[2][1],-1,line_pos[2][3],code,line_pos[2][2],3:code=code+1
+
+	hotspot line_pos[2][1],line_pos[2][2],0,code,line_pos[2][3],1+128:code=code+1
+	hotspot line_pos[2][1],line_pos[2][2],line_pos[2][3],code,line_pos[2][3],2:code=code+1
+	hotspot line_pos[2][1],line_pos[2][2],-1,code,line_pos[2][3],3:code=code+1
+
+	lin_ line_pos[1][1],line_pos[1][2],line_pos[1][3],line_pos[2][1],line_pos[2][2],line_pos[2][3]
+del 1
+
+add line_pos[1][1],line_pos[1][2],beam_level
+rotz beam_rtz
+
+
+!=====================================================梁躯体
+!基礎
+group "foundation"
+	material m_beam
+
+	if switch_foun[1] then
+		add -foun_x[1]/2,-foun_y[1]/2,line_pos[1][3]-beam_hei-beam_down_thi-form_thi-haunch_z[1]*switch_haunch[1]
+			block foun_x[1],foun_y[1],foun_z[1]+form_thi
+		del 1
+	endif
+	
+	if switch_foun[2] then
+		add beam_len-foun_x[2]/2,-foun_y[2]/2,line_pos[2][3]-beam_hei-beam_down_thi-form_thi-haunch_z[2]*switch_haunch[2]
+			block foun_x[2],foun_y[2],foun_z[2]+form_thi
+		del 1
+	endif
+endgroup
+
+if dis_adjacent then
+	placegroup "foundation"
+endif
+
+
+!柱
+group "column"
+	material m_beam
+
+	if switch_column[1] then
+		add -column_x[1]/2,-column_y[1]/2,line_pos[1][3]-beam_hei-beam_down_thi-form_thi-max(column_x[1],column_y[1])/2/beam_len*abs(line_pos[2][3]-line_pos[1][3])-haunch_z[1]*switch_haunch[1]
+			block column_x[1],column_y[1],beam_hei+beam_down_thi+beam_top_thi+2*form_thi+2*max(column_x[1],column_y[1])/2/beam_len*abs(line_pos[2][3]-line_pos[1][3])
+		del 1
+	endif
+	
+	if switch_column[2] then
+		add beam_len-column_x[2]/2,-column_y[2]/2,line_pos[2][3]-beam_hei-beam_down_thi-form_thi-max(column_x[2],column_y[2])/2/beam_len*abs(line_pos[2][3]-line_pos[1][3])-haunch_z[2]*switch_haunch[2]
+			block column_x[2],column_y[2],beam_hei+beam_down_thi+beam_top_thi+2*form_thi+2*max(column_x[2],column_y[2])/2/beam_len*abs(line_pos[2][3]-line_pos[1][3])
+		del 1
+	endif
+endgroup
+
+if dis_adjacent then
+	placegroup "column"
+endif
+
+
+!梁
+group "beam"
+	material m_beam
+	
+	ruledsegmented 7,1+2+4+8+16+32,
+	0,-beam_wid/2-beam_out_thi,line_pos[1][3]+beam_top_thi,0,
+	beam_len,-beam_wid/2-beam_out_thi,line_pos[2][3]+beam_top_thi,0,
+	beam_len,-beam_wid/2-beam_out_thi,line_pos[2][3]-beam_hei-beam_down_thi-haunch_z[2]*switch_haunch[2],0,
+	beam_len-haunch_x[2],-beam_wid/2-beam_out_thi,line_pos[2][3]-beam_hei-beam_down_thi+haunch_x[2]/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+	haunch_x[1],-beam_wid/2-beam_out_thi,line_pos[1][3]-beam_hei-beam_down_thi+haunch_x[1]/beam_len*(line_pos[2][3]-line_pos[1][3]),0,
+	0,-beam_wid/2-beam_out_thi,line_pos[1][3]-beam_hei-beam_down_thi-haunch_z[1]*switch_haunch[1],0,
+	0,-beam_wid/2-beam_out_thi,line_pos[1][3]+beam_top_thi,0,
+	0,beam_wid/2+beam_in_thi,line_pos[1][3]+beam_top_thi,
+	beam_len,beam_wid/2+beam_in_thi,line_pos[2][3]+beam_top_thi,
+	beam_len,beam_wid/2+beam_in_thi,line_pos[2][3]-beam_hei-beam_down_thi-haunch_z[2]*switch_haunch[2],
+	beam_len-haunch_x[2],beam_wid/2+beam_in_thi,line_pos[2][3]-beam_hei-beam_down_thi+haunch_x[2]/beam_len*(line_pos[1][3]-line_pos[2][3]),
+	haunch_x[1],beam_wid/2+beam_in_thi,line_pos[1][3]-beam_hei-beam_down_thi+haunch_x[1]/beam_len*(line_pos[2][3]-line_pos[1][3]),
+	0,beam_wid/2+beam_in_thi,line_pos[1][3]-beam_hei-beam_down_thi-haunch_z[1]*switch_haunch[1],
+	0,beam_wid/2+beam_in_thi,line_pos[1][3]+beam_top_thi
+
+	hotspot 0,-beam_wid/2-beam_out_thi,line_pos[1][3]+beam_top_thi
+	hotspot beam_len,-beam_wid/2-beam_out_thi,line_pos[2][3]+beam_top_thi
+	hotspot 0,beam_wid/2+beam_in_thi,line_pos[1][3]+beam_top_thi
+	hotspot beam_len,beam_wid/2+beam_in_thi,line_pos[2][3]+beam_top_thi
+	
+	hotspot 0,-beam_wid/2-beam_out_thi,line_pos[1][3]-beam_hei-beam_down_thi-haunch_z[1]*switch_haunch[1]
+	hotspot beam_len,-beam_wid/2-beam_out_thi,line_pos[2][3]-beam_hei-beam_down_thi-haunch_z[2]*switch_haunch[2]
+	hotspot 0,beam_wid/2+beam_in_thi,line_pos[1][3]-beam_hei-beam_down_thi-haunch_z[1]*switch_haunch[1]
+	hotspot beam_len,beam_wid/2+beam_in_thi,line_pos[2][3]-beam_hei-beam_down_thi-haunch_z[2]*switch_haunch[2]
+endgroup
+
+beam_1=subgroup("beam","column")
+
+if dis_beam then
+	placegroup beam_1
+endif
+
+
+!壁
+group "wall"
+	material m_beam
+
+	if switch_wall[1] then
+		tube 5,4,1+2+4+8+16+32,
+		wall_offset[1]-wall_thi[1]/2,0,0,
+		wall_offset[1]-wall_thi[1]/2,-form_thi,0,
+		wall_offset[1]+wall_thi[1]/2,-form_thi,0,
+		wall_offset[1]+wall_thi[1]/2,0,0,
+		wall_offset[1]-wall_thi[1]/2,0,-1,
+		-form_down_start_offset-edgeBeam_wid[1]/2-1      ,0,line_pos[1][3]-beam_hei-beam_down_thi+(form_down_start_offset+edgeBeam_wid[1]/2)/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+		-form_down_start_offset-edgeBeam_wid[1]/2        ,0,line_pos[1][3]-beam_hei-beam_down_thi+(form_down_start_offset+edgeBeam_wid[1]/2)/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+		beam_len+form_down_end_offset+edgeBeam_wid[2]/2  ,0,line_pos[2][3]-beam_hei-beam_down_thi+(form_down_end_offset+edgeBeam_wid[2]/2)/beam_len*(line_pos[2][3]-line_pos[1][3]),0,
+		beam_len+form_down_end_offset+edgeBeam_wid[2]/2+1,0,line_pos[2][3]-beam_hei-beam_down_thi+(form_down_end_offset+edgeBeam_wid[2]/2)/beam_len*(line_pos[2][3]-line_pos[1][3]),0
+	endif
+
+	if switch_wall[2] then
+		tube 5,4,1+2+4+8+16+32,
+		wall_offset[2]-wall_thi[2]/2,0,0,
+		wall_offset[2]-wall_thi[2]/2,form_thi,0,
+		wall_offset[2]+wall_thi[2]/2,form_thi,0,
+		wall_offset[2]+wall_thi[2]/2,0,0,
+		wall_offset[2]-wall_thi[2]/2,0,-1,
+		-form_down_start_offset-edgeBeam_wid[1]/2-1      ,0,line_pos[1][3]+beam_top_thi+(form_down_start_offset+edgeBeam_wid[1]/2)/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+		-form_down_start_offset-edgeBeam_wid[1]/2        ,0,line_pos[1][3]+beam_top_thi+(form_down_start_offset+edgeBeam_wid[1]/2)/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+		beam_len+form_down_end_offset+edgeBeam_wid[2]/2  ,0,line_pos[2][3]+beam_top_thi+(form_down_end_offset+edgeBeam_wid[2]/2)/beam_len*(line_pos[2][3]-line_pos[1][3]),0,
+		beam_len+form_down_end_offset+edgeBeam_wid[2]/2+1,0,line_pos[2][3]+beam_top_thi+(form_down_end_offset+edgeBeam_wid[2]/2)/beam_len*(line_pos[2][3]-line_pos[1][3]),0
+	endif
+endgroup
+
+wall_1=subgroup("wall","column")
+
+if dis_adjacent then
+	placegroup wall_1
+endif
+
+group "wall_minus"
+	if switch_wall_form_offset then
+		form_offset=form_thi
+	else
+		form_offset=0
+	endif
+
+	if switch_wall[1] then
+		material m_form_list[form_down_type]
+
+		tube 5,4,1+2+4+8+16+32,
+		wall_offset[1]-wall_thi[1]/2-form_offset,0,0,
+		wall_offset[1]-wall_thi[1]/2-form_offset,-form_thi,0,
+		wall_offset[1]+wall_thi[1]/2+form_offset,-form_thi,0,
+		wall_offset[1]+wall_thi[1]/2+form_offset,0,0,
+		wall_offset[1]-wall_thi[1]/2-form_offset,0,-1,
+		-form_down_start_offset-edgeBeam_wid[1]/2-1      ,0,line_pos[1][3]-beam_hei-beam_down_thi+(form_down_start_offset+edgeBeam_wid[1]/2)/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+		-form_down_start_offset-edgeBeam_wid[1]/2        ,0,line_pos[1][3]-beam_hei-beam_down_thi+(form_down_start_offset+edgeBeam_wid[1]/2)/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+		beam_len+form_down_end_offset+edgeBeam_wid[2]/2  ,0,line_pos[2][3]-beam_hei-beam_down_thi+(form_down_end_offset+edgeBeam_wid[2]/2)/beam_len*(line_pos[2][3]-line_pos[1][3]),0,
+		beam_len+form_down_end_offset+edgeBeam_wid[2]/2+1,0,line_pos[2][3]-beam_hei-beam_down_thi+(form_down_end_offset+edgeBeam_wid[2]/2)/beam_len*(line_pos[2][3]-line_pos[1][3]),0
+	endif
+
+	if switch_wall[2] then
+		material m_form_list[form_top_type]
+
+		tube 5,4,1+2+4+8+16+32,
+		wall_offset[2]-wall_thi[2]/2-form_offset,0,0,
+		wall_offset[2]-wall_thi[2]/2-form_offset,form_thi,0,
+		wall_offset[2]+wall_thi[2]/2+form_offset,form_thi,0,
+		wall_offset[2]+wall_thi[2]/2+form_offset,0,0,
+		wall_offset[2]-wall_thi[2]/2-form_offset,0,-1,
+		-form_down_start_offset-edgeBeam_wid[1]/2-1      ,0,line_pos[1][3]+beam_top_thi+(form_down_start_offset+edgeBeam_wid[1]/2)/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+		-form_down_start_offset-edgeBeam_wid[1]/2        ,0,line_pos[1][3]+beam_top_thi+(form_down_start_offset+edgeBeam_wid[1]/2)/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+		beam_len+form_down_end_offset+edgeBeam_wid[2]/2  ,0,line_pos[2][3]+beam_top_thi+(form_down_end_offset+edgeBeam_wid[2]/2)/beam_len*(line_pos[2][3]-line_pos[1][3]),0,
+		beam_len+form_down_end_offset+edgeBeam_wid[2]/2+1,0,line_pos[2][3]+beam_top_thi+(form_down_end_offset+edgeBeam_wid[2]/2)/beam_len*(line_pos[2][3]-line_pos[1][3]),0
+	endif
+endgroup
+
+
+!スラブ
+form_thi=form_thi/cos(rat)
+
+group "slab"
+	material m_beam
+
+	if switch_slab[1] then
+		addz slab_offset[1]+beam_top_thi
+			ruledsegmented 5,1+2+4+8+16+32,
+			-form_out_start_offset,-beam_wid/2-beam_out_thi,line_pos[1][3]+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			-form_out_start_offset,-beam_wid/2-beam_out_thi-form_thi,line_pos[1][3]+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			-form_out_start_offset,-beam_wid/2-beam_out_thi-form_thi,line_pos[1][3]-slab_thi[1]+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			-form_out_start_offset,-beam_wid/2-beam_out_thi,line_pos[1][3]-slab_thi[1]+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			-form_out_start_offset,-beam_wid/2-beam_out_thi,line_pos[1][3]+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			beam_len+form_out_end_offset,-beam_wid/2-beam_out_thi,line_pos[2][3]+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+			beam_len+form_out_end_offset,-beam_wid/2-beam_out_thi-form_thi,line_pos[2][3]+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+			beam_len+form_out_end_offset,-beam_wid/2-beam_out_thi-form_thi,line_pos[2][3]-slab_thi[1]+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+			beam_len+form_out_end_offset,-beam_wid/2-beam_out_thi,line_pos[2][3]-slab_thi[1]+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+			beam_len+form_out_end_offset,-beam_wid/2-beam_out_thi,line_pos[2][3]+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])
+		del 1
+	endif
+
+	if switch_slab[2] then
+		addz slab_offset[2]+beam_top_thi
+			ruledsegmented 5,1+2+4+8+16+32,
+			-form_in_start_offset,beam_wid/2+beam_in_thi,line_pos[1][3]+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			-form_in_start_offset,beam_wid/2+beam_in_thi+form_thi,line_pos[1][3]+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			-form_in_start_offset,beam_wid/2+beam_in_thi+form_thi,line_pos[1][3]-slab_thi[2]+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			-form_in_start_offset,beam_wid/2+beam_in_thi,line_pos[1][3]-slab_thi[2]+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			-form_in_start_offset,beam_wid/2+beam_in_thi,line_pos[1][3]+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			beam_len+form_in_end_offset,beam_wid/2+beam_in_thi,line_pos[2][3]+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+			beam_len+form_in_end_offset,beam_wid/2+beam_in_thi+form_thi,line_pos[2][3]+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+			beam_len+form_in_end_offset,beam_wid/2+beam_in_thi+form_thi,line_pos[2][3]-slab_thi[2]+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+			beam_len+form_in_end_offset,beam_wid/2+beam_in_thi,line_pos[2][3]-slab_thi[2]+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+			beam_len+form_in_end_offset,beam_wid/2+beam_in_thi,line_pos[2][3]+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])
+		del 1
+	endif
+endgroup
+
+slab_1=subgroup("slab","beam")
+slab_2=subgroup(slab_1,"column")
+
+if dis_adjacent then
+	placegroup slab_2
+endif
+
+group "slab_minus"
+	if switch_slab_form_offset then
+		form_offset=form_thi
+	else
+		form_offset=0
+	endif
+
+	if switch_slab[1] then
+		material m_form_list[form_out_type]
+
+		addz slab_offset[1]+beam_top_thi
+			ruledsegmented 5,1+2+4+8+16+32,
+			-form_out_start_offset,-beam_wid/2-beam_out_thi               ,line_pos[1][3]+form_offset+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			-form_out_start_offset,-beam_wid/2-beam_out_thi-form_thi-0.001,line_pos[1][3]+form_offset+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			-form_out_start_offset,-beam_wid/2-beam_out_thi-form_thi-0.001,line_pos[1][3]-slab_thi[1]-form_offset+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			-form_out_start_offset,-beam_wid/2-beam_out_thi               ,line_pos[1][3]-slab_thi[1]-form_offset+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			-form_out_start_offset,-beam_wid/2-beam_out_thi               ,line_pos[1][3]+form_offset+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			beam_len+form_out_end_offset,-beam_wid/2-beam_out_thi               ,line_pos[2][3]+form_offset+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+			beam_len+form_out_end_offset,-beam_wid/2-beam_out_thi-form_thi-0.001,line_pos[2][3]+form_offset+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+			beam_len+form_out_end_offset,-beam_wid/2-beam_out_thi-form_thi-0.001,line_pos[2][3]-slab_thi[1]-form_offset+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+			beam_len+form_out_end_offset,-beam_wid/2-beam_out_thi               ,line_pos[2][3]-slab_thi[1]-form_offset+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+			beam_len+form_out_end_offset,-beam_wid/2-beam_out_thi               ,line_pos[2][3]+form_offset+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])
+		del 1
+	endif
+
+	if switch_slab[2] then
+		material m_form_list[form_in_type]
+
+		addz slab_offset[2]+beam_top_thi
+			ruledsegmented 5,1+2+4+8+16+32,
+			-form_in_start_offset,beam_wid/2+beam_in_thi               ,line_pos[1][3]+form_offset+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			-form_in_start_offset,beam_wid/2+beam_in_thi+form_thi+0.001,line_pos[1][3]+form_offset+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			-form_in_start_offset,beam_wid/2+beam_in_thi+form_thi+0.001,line_pos[1][3]-slab_thi[2]-form_offset+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			-form_in_start_offset,beam_wid/2+beam_in_thi               ,line_pos[1][3]-slab_thi[2]-form_offset+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			-form_in_start_offset,beam_wid/2+beam_in_thi               ,line_pos[1][3]+form_offset+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+			beam_len+form_in_end_offset,beam_wid/2+beam_in_thi               ,line_pos[2][3]+form_offset+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+			beam_len+form_in_end_offset,beam_wid/2+beam_in_thi+form_thi+0.001,line_pos[2][3]+form_offset+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+			beam_len+form_in_end_offset,beam_wid/2+beam_in_thi+form_thi+0.001,line_pos[2][3]-slab_thi[2]-form_offset+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+			beam_len+form_in_end_offset,beam_wid/2+beam_in_thi               ,line_pos[2][3]-slab_thi[2]-form_offset+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+			beam_len+form_in_end_offset,beam_wid/2+beam_in_thi               ,line_pos[2][3]+form_offset+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])
+		del 1
+	endif
+endgroup
+
+form_thi=form_thi*cos(rat)
+
+
+!小梁
+group "small_beam"
+	material m_beam
+	
+	!外側小梁
+	if sbeam_out_num>0 then
+		for i=1 to sbeam_out_num
+			add 0,-beam_wid/2-beam_out_thi-form_thi,sbeam_out_offset[i]+beam_top_thi
+!				ruledsegmented 5,1+2+4+8+16+32,
+!				sbeam_out_pos[i]-sbeam_out_wid[i]/2,0,line_pos[1][3]+(sbeam_out_pos[i]-sbeam_out_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3]),0,
+!				sbeam_out_pos[i]-sbeam_out_wid[i]/2,0,line_pos[1][3]+(sbeam_out_pos[i]-sbeam_out_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3])-sbeam_out_hei[i],0,
+!				sbeam_out_pos[i]+sbeam_out_wid[i]/2,0,line_pos[1][3]+(sbeam_out_pos[i]+sbeam_out_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3])-sbeam_out_hei[i],0,
+!				sbeam_out_pos[i]+sbeam_out_wid[i]/2,0,line_pos[1][3]+(sbeam_out_pos[i]+sbeam_out_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3]),0,
+!				sbeam_out_pos[i]-sbeam_out_wid[i]/2,0,line_pos[1][3]+(sbeam_out_pos[i]-sbeam_out_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3]),0,
+!				sbeam_out_pos[i]-sbeam_out_wid[i]/2,form_thi,line_pos[1][3]+(sbeam_out_pos[i]-sbeam_out_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3]),
+!				sbeam_out_pos[i]-sbeam_out_wid[i]/2,form_thi,line_pos[1][3]+(sbeam_out_pos[i]-sbeam_out_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3])-sbeam_out_hei[i],
+!				sbeam_out_pos[i]+sbeam_out_wid[i]/2,form_thi,line_pos[1][3]+(sbeam_out_pos[i]+sbeam_out_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3])-sbeam_out_hei[i],
+!				sbeam_out_pos[i]+sbeam_out_wid[i]/2,form_thi,line_pos[1][3]+(sbeam_out_pos[i]+sbeam_out_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3]),
+!				sbeam_out_pos[i]-sbeam_out_wid[i]/2,form_thi,line_pos[1][3]+(sbeam_out_pos[i]-sbeam_out_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3])
+
+				add sbeam_out_pos[i]-sbeam_out_wid[i]/2,0,line_pos[1][3]-sbeam_out_hei[i]+sbeam_out_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])
+					block sbeam_out_wid[i],form_thi,sbeam_out_hei[i]
+				del 1
+			del 1
+		next i
+	endif
+	
+	!内側小梁
+	if sbeam_in_num>0 then
+		for i=1 to sbeam_in_num
+			add 0,beam_wid/2+beam_in_thi,sbeam_in_offset[i]+beam_top_thi
+!				ruledsegmented 5,1+2+4+8+16+32,
+!				sbeam_in_pos[i]-sbeam_in_wid[i]/2,0,line_pos[1][3]+(sbeam_in_pos[i]-sbeam_in_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3]),0,
+!				sbeam_in_pos[i]-sbeam_in_wid[i]/2,0,line_pos[1][3]+(sbeam_in_pos[i]-sbeam_in_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3])-sbeam_in_hei[i],0,
+!				sbeam_in_pos[i]+sbeam_in_wid[i]/2,0,line_pos[1][3]+(sbeam_in_pos[i]+sbeam_in_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3])-sbeam_in_hei[i],0,
+!				sbeam_in_pos[i]+sbeam_in_wid[i]/2,0,line_pos[1][3]+(sbeam_in_pos[i]+sbeam_in_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3]),0,
+!				sbeam_in_pos[i]-sbeam_in_wid[i]/2,0,line_pos[1][3]+(sbeam_in_pos[i]-sbeam_in_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3]),0,
+!				sbeam_in_pos[i]-sbeam_in_wid[i]/2,form_thi,line_pos[1][3]+(sbeam_in_pos[i]-sbeam_in_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3]),
+!				sbeam_in_pos[i]-sbeam_in_wid[i]/2,form_thi,line_pos[1][3]+(sbeam_in_pos[i]-sbeam_in_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3])-sbeam_in_hei[i],
+!				sbeam_in_pos[i]+sbeam_in_wid[i]/2,form_thi,line_pos[1][3]+(sbeam_in_pos[i]+sbeam_in_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3])-sbeam_in_hei[i],
+!				sbeam_in_pos[i]+sbeam_in_wid[i]/2,form_thi,line_pos[1][3]+(sbeam_in_pos[i]+sbeam_in_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3]),
+!				sbeam_in_pos[i]-sbeam_in_wid[i]/2,form_thi,line_pos[1][3]+(sbeam_in_pos[i]-sbeam_in_wid[i]/2)/beam_len*(line_pos[2][3]-line_pos[1][3])
+
+				add sbeam_in_pos[i]-sbeam_in_wid[i]/2,0,line_pos[1][3]-sbeam_in_hei[i]+sbeam_in_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])
+					block sbeam_in_wid[i],form_thi,sbeam_in_hei[i]
+				del 1
+			del 1
+		next i
+	endif
+endgroup
+
+if dis_adjacent then
+	placegroup "small_beam"
+endif
+
+group "small_beam_minus"
+	if switch_sbeam_form_offset then
+		form_offset=form_thi
+	else
+		form_offset=0
+	endif
+
+	!外側小梁
+	if sbeam_out_num>0 then
+		material m_form_list[form_out_type]
+
+		for i=1 to sbeam_out_num
+			add 0,-beam_wid/2-beam_out_thi-form_thi-0.001,sbeam_out_offset[i]+beam_top_thi
+!				ruledsegmented 5,1+2+4+8+16+32,
+!				sbeam_out_pos[i]-sbeam_out_wid[i]/2-form_offset,0,line_pos[1][3]+(sbeam_out_pos[i]-sbeam_out_wid[i]/2-form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])+form_offset,0,
+!				sbeam_out_pos[i]-sbeam_out_wid[i]/2-form_offset,0,line_pos[1][3]+(sbeam_out_pos[i]-sbeam_out_wid[i]/2-form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])-sbeam_out_hei[i]-form_offset,0,
+!				sbeam_out_pos[i]+sbeam_out_wid[i]/2+form_offset,0,line_pos[1][3]+(sbeam_out_pos[i]+sbeam_out_wid[i]/2+form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])-sbeam_out_hei[i]-form_offset,0,
+!				sbeam_out_pos[i]+sbeam_out_wid[i]/2+form_offset,0,line_pos[1][3]+(sbeam_out_pos[i]+sbeam_out_wid[i]/2+form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])+form_offset,0,
+!				sbeam_out_pos[i]-sbeam_out_wid[i]/2-form_offset,0,line_pos[1][3]+(sbeam_out_pos[i]-sbeam_out_wid[i]/2-form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])+form_offset,0,
+!				sbeam_out_pos[i]-sbeam_out_wid[i]/2-form_offset,form_thi+0.001,line_pos[1][3]+(sbeam_out_pos[i]-sbeam_out_wid[i]/2-form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])+form_offset,
+!				sbeam_out_pos[i]-sbeam_out_wid[i]/2-form_offset,form_thi+0.001,line_pos[1][3]+(sbeam_out_pos[i]-sbeam_out_wid[i]/2-form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])-sbeam_out_hei[i]-form_offset,
+!				sbeam_out_pos[i]+sbeam_out_wid[i]/2+form_offset,form_thi+0.001,line_pos[1][3]+(sbeam_out_pos[i]+sbeam_out_wid[i]/2+form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])-sbeam_out_hei[i]-form_offset,
+!				sbeam_out_pos[i]+sbeam_out_wid[i]/2+form_offset,form_thi+0.001,line_pos[1][3]+(sbeam_out_pos[i]+sbeam_out_wid[i]/2+form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])+form_offset,
+!				sbeam_out_pos[i]-sbeam_out_wid[i]/2-form_offset,form_thi+0.001,line_pos[1][3]+(sbeam_out_pos[i]-sbeam_out_wid[i]/2-form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])+form_offset
+
+				add sbeam_out_pos[i]-sbeam_out_wid[i]/2-form_offset,0,line_pos[1][3]-sbeam_out_hei[i]+sbeam_out_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])-form_offset
+					block sbeam_out_wid[i]+2*form_offset,form_thi+0.001,sbeam_out_hei[i]+form_offset
+				del 1
+			del 1
+		next i
+	endif
+	
+	!内側小梁
+	if sbeam_in_num>0 then
+		material m_form_list[form_in_type]
+
+		for i=1 to sbeam_in_num
+			add 0,beam_wid/2+beam_in_thi,sbeam_in_offset[i]+beam_top_thi
+!				ruledsegmented 5,1+2+4+8+16+32,
+!				sbeam_in_pos[i]-sbeam_in_wid[i]/2-form_offset,0,line_pos[1][3]+(sbeam_in_pos[i]-sbeam_in_wid[i]/2-form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])+form_offset,0,
+!				sbeam_in_pos[i]-sbeam_in_wid[i]/2-form_offset,0,line_pos[1][3]+(sbeam_in_pos[i]-sbeam_in_wid[i]/2-form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])-sbeam_in_hei[i]-form_offset,0,
+!				sbeam_in_pos[i]+sbeam_in_wid[i]/2+form_offset,0,line_pos[1][3]+(sbeam_in_pos[i]+sbeam_in_wid[i]/2+form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])-sbeam_in_hei[i]-form_offset,0,
+!				sbeam_in_pos[i]+sbeam_in_wid[i]/2+form_offset,0,line_pos[1][3]+(sbeam_in_pos[i]+sbeam_in_wid[i]/2+form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])+form_offset,0,
+!				sbeam_in_pos[i]-sbeam_in_wid[i]/2-form_offset,0,line_pos[1][3]+(sbeam_in_pos[i]-sbeam_in_wid[i]/2-form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])+form_offset,0,
+!				sbeam_in_pos[i]-sbeam_in_wid[i]/2-form_offset,form_thi+0.001,line_pos[1][3]+(sbeam_in_pos[i]-sbeam_in_wid[i]/2-form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])+form_offset,
+!				sbeam_in_pos[i]-sbeam_in_wid[i]/2-form_offset,form_thi+0.001,line_pos[1][3]+(sbeam_in_pos[i]-sbeam_in_wid[i]/2-form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])-sbeam_in_hei[i]-form_offset,
+!				sbeam_in_pos[i]+sbeam_in_wid[i]/2+form_offset,form_thi+0.001,line_pos[1][3]+(sbeam_in_pos[i]+sbeam_in_wid[i]/2+form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])-sbeam_in_hei[i]-form_offset,
+!				sbeam_in_pos[i]+sbeam_in_wid[i]/2+form_offset,form_thi+0.001,line_pos[1][3]+(sbeam_in_pos[i]+sbeam_in_wid[i]/2+form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])+form_offset,
+!				sbeam_in_pos[i]-sbeam_in_wid[i]/2-form_offset,form_thi+0.001,line_pos[1][3]+(sbeam_in_pos[i]-sbeam_in_wid[i]/2-form_offset)/beam_len*(line_pos[2][3]-line_pos[1][3])+form_offset
+
+				add sbeam_in_pos[i]-sbeam_in_wid[i]/2-form_offset,0,line_pos[1][3]-sbeam_in_hei[i]+sbeam_in_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])-form_offset
+					block sbeam_in_wid[i]+2*form_offset,form_thi+0.001,sbeam_in_hei[i]+form_offset
+				del 1
+			del 1
+		next i
+	endif
+endgroup
+
+
+!直交壁
+group "orthwall"
+	material m_beam
+
+	for i=1 to orthwall_out_num
+		add orthwall_out_pos[i]-orthwall_out_thi[i]/2,-beam_wid/2-beam_out_thi-form_thi-0.001,line_pos[1][3]+orthwall_out_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])-beam_hei-beam_down_thi+orthwall_out_down_offset[i]
+			block orthwall_out_thi[i],form_thi+0.001,beam_hei+beam_top_thi+beam_down_thi+orthwall_out_top_offset[i]-orthwall_out_down_offset[i]
+		del 1
+	next i
+
+	for i=1 to orthwall_in_num
+		add orthwall_in_pos[i]-orthwall_in_thi[i]/2,beam_wid/2+beam_in_thi,line_pos[1][3]+orthwall_in_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])-beam_hei-beam_down_thi+orthwall_in_down_offset[i]
+			block orthwall_in_thi[i],form_thi+0.001,beam_hei+beam_top_thi+beam_down_thi+orthwall_in_top_offset[i]-orthwall_in_down_offset[i]
+		del 1
+	next i
+endgroup
+
+if dis_adjacent then
+	placegroup "orthwall"
+endif
+
+
+
+
+resol 6
+!===========================================ピーコン穴
+group "pcon"
+	if dis_pcon then
+		if switch_pcon_z1 then
+			for i=1 to pcon_x_num
+				_flag=1
+				if sbeam_out_num>0 then
+					for j=1 to sbeam_out_num
+						if pcon_x_pos[i]>=sbeam_out_pos[j]-sbeam_out_wid[j]/2 and pcon_x_pos[i]<=sbeam_out_pos[j]+sbeam_out_wid[j]/2 then
+							if -beam_hei-beam_down_thi+pcon_z_offset>=sbeam_out_offset[j]-sbeam_out_hei[j]-form_thi*switch_sbeam_form_offset then
+								_flag=0
+							endif
+						endif
+					next j
+				endif
+				
+				if sbeam_in_num>0 then
+					for j=1 to sbeam_in_num
+						if pcon_x_pos[i]>=sbeam_in_pos[j]-sbeam_in_wid[j]/2 and pcon_x_pos[i]<=sbeam_in_pos[j]+sbeam_in_wid[j]/2 then
+							if -beam_hei-beam_down_thi+pcon_z_offset>=sbeam_in_offset[j]-sbeam_in_hei[j]-form_thi*switch_sbeam_form_offset then
+								_flag=0
+							endif
+						endif
+					next j
+				endif
+
+				if orthwall_out_num>0 then
+					for j=1 to orthwall_out_num
+						if pcon_x_pos[i]>=orthwall_out_pos[j]-orthwall_out_thi[j]/2 and pcon_x_pos[i]<=orthwall_out_pos[j]+orthwall_out_thi[j]/2 then
+							_flag=0
+						endif
+					next j
+				endif
+		
+				if orthwall_in_num>0 then
+					for j=1 to orthwall_in_num
+						if pcon_x_pos[i]>=orthwall_in_pos[j]-orthwall_in_thi[j]/2 and pcon_x_pos[i]<=orthwall_in_pos[j]+orthwall_in_thi[j]/2 then
+							_flag=0
+						endif
+					next j
+				endif
+
+				if _flag=1 then
+					add pcon_x_pos[i],0,line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])-beam_hei-beam_down_thi+pcon_z_offset
+					rotx -90
+					addz -beam_wid/2-beam_out_thi-form_thi
+						cylind beam_wid+beam_out_thi+beam_in_thi+2*form_thi,separator_r
+					del 3
+				endif
+			next i
+		endif
+
+		for i=1 to pcon_x_num
+			_flag=1
+			if sbeam_out_num>0 then
+				for j=1 to sbeam_out_num
+					if pcon_x_pos[i]>=sbeam_out_pos[j]-sbeam_out_wid[j]/2 and pcon_x_pos[i]<=sbeam_out_pos[j]+sbeam_out_wid[j]/2 then
+						_flag=0
+					endif
+				next j
+			endif
+			
+			if sbeam_in_num>0 then
+				for j=1 to sbeam_in_num
+					if pcon_x_pos[i]>=sbeam_in_pos[j]-sbeam_in_wid[j]/2 and pcon_x_pos[i]<=sbeam_in_pos[j]+sbeam_in_wid[j]/2 then
+						_flag=0
+					endif
+				next j
+			endif
+
+			if orthwall_out_num>0 then
+				for j=1 to orthwall_out_num
+					if pcon_x_pos[i]>=orthwall_out_pos[j]-orthwall_out_thi[j]/2 and pcon_x_pos[i]<=orthwall_out_pos[j]+orthwall_out_thi[j]/2 then
+						_flag=0
+					endif
+				next j
+			endif
+	
+			if orthwall_in_num>0 then
+				for j=1 to orthwall_in_num
+					if pcon_x_pos[i]>=orthwall_in_pos[j]-orthwall_in_thi[j]/2 and pcon_x_pos[i]<=orthwall_in_pos[j]+orthwall_in_thi[j]/2 then
+						_flag=0
+					endif
+				next j
+			endif
+
+			if _flag=1 then
+				!上端ピーコン
+				if switch_pcon_z2 then
+					add pcon_x_pos[i],0,line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])-pcon_z2
+					rotx -90
+					addz -beam_wid/2-beam_out_thi-form_thi
+						cylind beam_wid+beam_out_thi+beam_in_thi+2*form_thi,separator_r
+					del 3
+				endif
+
+				!スラブ引き
+				if switch_link then
+					add pcon_x_pos[i],0,line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])+link_z
+					rotx -90
+					addz -beam_wid/2-beam_out_thi-form_thi
+						cylind beam_wid+beam_out_thi+beam_in_thi+2*form_thi,separator_r
+					del 3
+				endif
+			endif
+		next i
+	endif
+endgroup
+
+
+!=====================================================セパレーター
+group "separator"
+	if dis_pcon then
+		if switch_pcon_z1 then
+			for i=1 to pcon_x_num
+				_flag=1
+				if sbeam_out_num>0 then
+					for j=1 to sbeam_out_num
+						if pcon_x_pos[i]>=sbeam_out_pos[j]-sbeam_out_wid[j]/2 and pcon_x_pos[i]<=sbeam_out_pos[j]+sbeam_out_wid[j]/2 then
+							if -beam_hei-beam_down_thi+pcon_z_offset>=sbeam_out_offset[j]-sbeam_out_hei[j]-form_thi*switch_sbeam_form_offset then
+								_flag=0
+							endif
+						endif
+					next j
+				endif
+				
+				if sbeam_in_num>0 then
+					for j=1 to sbeam_in_num
+						if pcon_x_pos[i]>=sbeam_in_pos[j]-sbeam_in_wid[j]/2 and pcon_x_pos[i]<=sbeam_in_pos[j]+sbeam_in_wid[j]/2 then
+							if -beam_hei-beam_down_thi+pcon_z_offset>=sbeam_in_offset[j]-sbeam_in_hei[j]-form_thi*switch_sbeam_form_offset then
+								_flag=0
+							endif
+						endif
+					next j
+				endif
+
+				if orthwall_out_num>0 then
+					for j=1 to orthwall_out_num
+						if pcon_x_pos[i]>=orthwall_out_pos[j]-orthwall_out_thi[j]/2 and pcon_x_pos[i]<=orthwall_out_pos[j]+orthwall_out_thi[j]/2 then
+							_flag=0
+						endif
+					next j
+				endif
+		
+				if orthwall_in_num>0 then
+					for j=1 to orthwall_in_num
+						if pcon_x_pos[i]>=orthwall_in_pos[j]-orthwall_in_thi[j]/2 and pcon_x_pos[i]<=orthwall_in_pos[j]+orthwall_in_thi[j]/2 then
+							_flag=0
+						endif
+					next j
+				endif
+
+				if _flag=1 then
+					pcon_len=beam_wid
+					pcon_len1=beam_out_thi
+					pcon_len2=beam_in_thi
+					add pcon_x_pos[i],0,line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])-beam_hei-beam_down_thi+pcon_z_offset
+						gosub "pcon_set"
+					del 1
+				endif
+			next i
+		endif
+
+		for i=1 to pcon_x_num
+			_flag=1
+			if sbeam_out_num>0 then
+				for j=1 to sbeam_out_num
+					if pcon_x_pos[i]>=sbeam_out_pos[j]-sbeam_out_wid[j]/2 and pcon_x_pos[i]<=sbeam_out_pos[j]+sbeam_out_wid[j]/2 then
+						_flag=0
+					endif
+				next j
+			endif
+			
+			if sbeam_in_num>0 then
+				for j=1 to sbeam_in_num
+					if pcon_x_pos[i]>=sbeam_in_pos[j]-sbeam_in_wid[j]/2 and pcon_x_pos[i]<=sbeam_in_pos[j]+sbeam_in_wid[j]/2 then
+						_flag=0
+					endif
+				next j
+			endif
+
+			if orthwall_out_num>0 then
+				for j=1 to orthwall_out_num
+					if pcon_x_pos[i]>=orthwall_out_pos[j]-orthwall_out_thi[j]/2 and pcon_x_pos[i]<=orthwall_out_pos[j]+orthwall_out_thi[j]/2 then
+						_flag=0
+					endif
+				next j
+			endif
+	
+			if orthwall_in_num>0 then
+				for j=1 to orthwall_in_num
+					if pcon_x_pos[i]>=orthwall_in_pos[j]-orthwall_in_thi[j]/2 and pcon_x_pos[i]<=orthwall_in_pos[j]+orthwall_in_thi[j]/2 then
+						_flag=0
+					endif
+				next j
+			endif
+
+			if _flag=1 then
+				if switch_pcon_z2 then
+					pcon_len=beam_wid
+					pcon_len1=beam_out_thi
+					pcon_len2=beam_in_thi
+					add pcon_x_pos[i],0,line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])-pcon_z2
+						gosub "pcon_set"
+					del 1
+				endif
+
+				if switch_link then
+					if link_rtz=0 then
+						pcon_len=beam_wid
+						pcon_len1=beam_out_thi
+						pcon_len2=beam_in_thi
+						add pcon_x_pos[i],0,line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])+link_z
+							gosub "link_set"
+						del 1
+					else
+						pcon_len=beam_wid
+						pcon_len1=beam_in_thi
+						pcon_len2=beam_out_thi
+						add pcon_x_pos[i],0,line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])+link_z
+						rotz 180
+							gosub "link_set"
+						del 2
+					endif
+				endif
+			endif
+		next i
+	endif
+endgroup
+
+if dis_separator then
+	placegroup "separator"
+endif
+
+
+!=====================================================ホットスポット
+if dis_pcon or dis_separator then
+	if switch_pcon_z1 then
+		for i=1 to pcon_x_num
+			hotspot pcon_x_pos[i],-beam_wid/2-beam_out_thi-form_thi,line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])-beam_hei-beam_down_thi+pcon_z_offset
+			hotspot pcon_x_pos[i],beam_wid/2+beam_in_thi+form_thi,line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])-beam_hei-beam_down_thi+pcon_z_offset
+		next i
+	endif
+
+	if switch_pcon_z2 then
+		for i=1 to pcon_x_num
+			hotspot pcon_x_pos[i],-beam_wid/2-beam_out_thi-form_thi,line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])-pcon_z2
+			hotspot pcon_x_pos[i],beam_wid/2+beam_in_thi+form_thi,line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])-pcon_z2
+		next i
+	endif
+
+	if switch_link then
+		for i=1 to pcon_x_num
+			if link_rtz=0 then
+				hotspot pcon_x_pos[i],-beam_wid/2-beam_out_thi-form_thi,line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])+link_z
+				hotspot pcon_x_pos[i],-beam_wid/2-beam_out_thi-form_thi+link_h*(beam_wid+beam_in_thi+beam_out_thi),line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])+link_z
+			else
+				hotspot pcon_x_pos[i],beam_wid/2+beam_in_thi+form_thi,line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])+link_z
+				hotspot pcon_x_pos[i],beam_wid/2+beam_in_thi+form_thi-link_h*(beam_wid+beam_in_thi+beam_out_thi),line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])+link_z
+			endif
+		next i
+	endif
+
+	if auto_pcon=0 and dis_pcon_hotspot then
+		if switch_pcon_z1 then
+			for i=1 to pcon_x_num
+				hotspot 0,-beam_wid/2-beam_out_thi-form_thi,line_pos[1][3]-beam_hei-beam_down_thi+pcon_z_offset,code,pcon_x_pos[i],1+128:code=code+1
+				hotspot pcon_x_pos[i],-beam_wid/2-beam_out_thi-form_thi,line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])-beam_hei-beam_down_thi+pcon_z_offset,code,pcon_x_pos[i],2:code=code+1
+				hotspot -1,-beam_wid/2-beam_out_thi-form_thi,line_pos[1][3]-1/beam_len*(line_pos[2][3]-line_pos[1][3])-beam_hei-beam_down_thi+pcon_z_offset,code,pcon_x_pos[i],3:code=code+1
+
+				hotspot 0,beam_wid/2+beam_in_thi+form_thi,line_pos[1][3]-beam_hei-beam_down_thi+pcon_z_offset,code,pcon_x_pos[i],1+128:code=code+1
+				hotspot pcon_x_pos[i],beam_wid/2+beam_in_thi+form_thi,line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])-beam_hei-beam_down_thi+pcon_z_offset,code,pcon_x_pos[i],2:code=code+1
+				hotspot -1,beam_wid/2+beam_in_thi+form_thi,line_pos[1][3]-1/beam_len*(line_pos[2][3]-line_pos[1][3])-beam_hei-beam_down_thi+pcon_z_offset,code,pcon_x_pos[i],3:code=code+1
+			next i
+		endif
+	
+		if switch_pcon_z2 then
+			for i=1 to pcon_x_num
+				hotspot 0,-beam_wid/2-beam_out_thi-form_thi,line_pos[1][3]-pcon_z2,code,pcon_x_pos[i],1+128:code=code+1
+				hotspot pcon_x_pos[i],-beam_wid/2-beam_out_thi-form_thi,line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])-pcon_z2,code,pcon_x_pos[i],2:code=code+1
+				hotspot -1,-beam_wid/2-beam_out_thi-form_thi,line_pos[1][3]-1/beam_len*(line_pos[2][3]-line_pos[1][3])-pcon_z2,code,pcon_x_pos[i],3:code=code+1
+
+				hotspot 0,beam_wid/2+beam_in_thi+form_thi,line_pos[1][3]-pcon_z2,code,pcon_x_pos[i],1+128:code=code+1
+				hotspot pcon_x_pos[i],beam_wid/2+beam_in_thi+form_thi,line_pos[1][3]+pcon_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])-pcon_z2,code,pcon_x_pos[i],2:code=code+1
+				hotspot -1,beam_wid/2+beam_in_thi+form_thi,line_pos[1][3]-1/beam_len*(line_pos[2][3]-line_pos[1][3])-pcon_z2,code,pcon_x_pos[i],3:code=code+1
+			next i
+		endif
+	endif
+endif
+
+
+!=====================================================型枠
+group "form"
+	material m_rath_form
+
+	group "rath_1"
+		pen pen_rath_mesh
+
+		!下端
+		if switch_form_down and form_down_type=3 then
+			add 0,0,line_pos[1][3]-beam_hei-beam_down_thi
+			roty -asn((line_pos[2][3]-line_pos[1][3])/sqr((line_pos[2][1]-line_pos[1][1])^2+(line_pos[2][2]-line_pos[1][2])^2+(line_pos[2][3]-line_pos[1][3])^2))
+			addx -form_down_start_offset
+				rath_loop_num=ceil((beam_len_xyz+form_down_start_offset+form_down_end_offset+(beam_wid+beam_out_thi+beam_in_thi)/2)/0.025)+1
+
+				for i=1 to rath_loop_num
+					lin_ -(beam_wid+beam_out_thi+beam_in_thi)/2,-(beam_wid/2+beam_out_thi),0,0,beam_wid/2+beam_in_thi,0
+					lin_ -(beam_wid+beam_out_thi+beam_in_thi)/2,beam_wid/2+beam_in_thi,0,0,-(beam_wid/2+beam_out_thi),0
+				addx 0.025
+				next i
+				del rath_loop_num
+			del 3
+		endif
+
+		!上端
+		if switch_form_top and form_top_type=3 then
+			add 0,0,line_pos[1][3]+beam_top_thi
+			roty -asn((line_pos[2][3]-line_pos[1][3])/sqr((line_pos[2][1]-line_pos[1][1])^2+(line_pos[2][2]-line_pos[1][2])^2+(line_pos[2][3]-line_pos[1][3])^2))
+			addx -form_top_start_offset
+				rath_loop_num=ceil((beam_len_xyz+form_top_start_offset+form_top_end_offset+(beam_wid+beam_out_thi+beam_in_thi)/2)/0.025)+1
+
+				for i=1 to rath_loop_num
+					lin_ -(beam_wid+beam_out_thi+beam_in_thi)/2,-(beam_wid/2+beam_out_thi),0,0,beam_wid/2+beam_in_thi,0
+					lin_ -(beam_wid+beam_out_thi+beam_in_thi)/2,beam_wid/2+beam_in_thi,0,0,-(beam_wid/2+beam_out_thi),0
+				addx 0.025
+				next i
+				del rath_loop_num
+			del 3
+		endif
+
+		!外面
+		if switch_form_out and form_out_type=3 then
+			add 0,0,line_pos[1][3]
+			roty -asn((line_pos[2][3]-line_pos[1][3])/sqr((line_pos[2][1]-line_pos[1][1])^2+(line_pos[2][2]-line_pos[1][2])^2+(line_pos[2][3]-line_pos[1][3])^2))
+			add -form_out_start_offset,-beam_wid/2-beam_out_thi,0
+				rath_loop_num=ceil((beam_len_xyz+form_out_start_offset+form_out_end_offset+(beam_hei+beam_down_thi+beam_top_thi)/2)/0.025)+1
+
+				for i=1 to rath_loop_num
+					lin_ -(beam_hei+beam_down_thi+beam_top_thi)/2,0,-(beam_hei+beam_down_thi),0,0,beam_top_thi
+					lin_ -(beam_hei+beam_down_thi+beam_top_thi)/2,0,beam_top_thi,0,0,-(beam_hei+beam_down_thi)
+				addx 0.025
+				next i
+				del rath_loop_num
+			del 3
+		endif
+
+		!内面
+		if switch_form_in and form_in_type=3 then
+			add 0,0,line_pos[1][3]
+			roty -asn((line_pos[2][3]-line_pos[1][3])/sqr((line_pos[2][1]-line_pos[1][1])^2+(line_pos[2][2]-line_pos[1][2])^2+(line_pos[2][3]-line_pos[1][3])^2))
+			add -form_in_start_offset,beam_wid/2+beam_in_thi,0
+				rath_loop_num=ceil((beam_len_xyz+form_in_start_offset+form_in_end_offset+(beam_hei+beam_down_thi+beam_top_thi)/2)/0.025)+1
+
+				for i=1 to rath_loop_num
+					lin_ -(beam_hei+beam_down_thi+beam_top_thi)/2,0,-(beam_hei+beam_down_thi),0,0,beam_top_thi
+					lin_ -(beam_hei+beam_down_thi+beam_top_thi)/2,0,beam_top_thi,0,0,-(beam_hei+beam_down_thi)
+				addx 0.025
+				next i
+				del rath_loop_num
+			del 3
+		endif
+	endgroup
+
+	group "rath_2"
+		!下端
+		if switch_form_down and form_down_type=3 then
+			addz -beam_hei-beam_down_thi
+				ruledsegmented 4,1+2+4+8+16+32,
+				-form_down_start_offset,-beam_wid/2-beam_out_thi,line_pos[1][3]-0.001+form_down_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+				-form_down_start_offset,-beam_wid/2-beam_out_thi,line_pos[1][3]+0.001+form_down_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+				-form_down_start_offset,beam_wid/2+beam_in_thi,line_pos[1][3]+0.001+form_down_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+				-form_down_start_offset,beam_wid/2+beam_in_thi,line_pos[1][3]-0.001+form_down_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+
+				beam_len+form_down_end_offset,-beam_wid/2-beam_out_thi,line_pos[2][3]-0.001+form_down_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+				beam_len+form_down_end_offset,-beam_wid/2-beam_out_thi,line_pos[2][3]+0.001+form_down_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+				beam_len+form_down_end_offset,beam_wid/2+beam_in_thi,line_pos[2][3]+0.001+form_down_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+				beam_len+form_down_end_offset,beam_wid/2+beam_in_thi,line_pos[2][3]-0.001+form_down_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])
+			del 1
+		endif
+
+		!上端
+		if switch_form_top and form_top_type=3 then
+			addz beam_top_thi
+				ruledsegmented 4,1+2+4+8+16+32,
+				-form_top_start_offset,-beam_wid/2-beam_out_thi-form_thi,line_pos[1][3]-0.001+form_top_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+				-form_top_start_offset,-beam_wid/2-beam_out_thi-form_thi,line_pos[1][3]+0.001+form_top_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+				-form_top_start_offset,beam_wid/2+beam_in_thi+form_thi,line_pos[1][3]+0.001+form_top_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+				-form_top_start_offset,beam_wid/2+beam_in_thi+form_thi,line_pos[1][3]-0.001+form_top_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+
+				beam_len+form_top_end_offset,-beam_wid/2-beam_out_thi-form_thi,line_pos[2][3]-0.001+form_top_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+				beam_len+form_top_end_offset,-beam_wid/2-beam_out_thi-form_thi,line_pos[2][3]+0.001+form_top_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+				beam_len+form_top_end_offset,beam_wid/2+beam_in_thi+form_thi,line_pos[2][3]+0.001+form_top_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+				beam_len+form_top_end_offset,beam_wid/2+beam_in_thi+form_thi,line_pos[2][3]-0.001+form_top_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])
+			del 1
+		endif
+
+		!外面
+		if switch_form_out and form_out_type=3 then
+			addy -beam_wid/2-beam_out_thi
+				ruledsegmented 4,1+2+4+8+16+32,
+				-form_out_start_offset,-0.001,line_pos[1][3]+beam_top_thi+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+				-form_out_start_offset,-0.001,line_pos[1][3]-beam_hei-beam_down_thi+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+				-form_out_start_offset,0.001,line_pos[1][3]-beam_hei-beam_down_thi+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+				-form_out_start_offset,0.001,line_pos[1][3]+beam_top_thi+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+
+				beam_len+form_out_end_offset,-0.001,line_pos[2][3]+beam_top_thi+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+				beam_len+form_out_end_offset,-0.001,line_pos[2][3]-beam_hei-beam_down_thi+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+				beam_len+form_out_end_offset,0.001,line_pos[2][3]-beam_hei-beam_down_thi+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+				beam_len+form_out_end_offset,0.001,line_pos[2][3]+beam_top_thi+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])
+			del 1
+		endif
+
+		!内面
+		if switch_form_in and form_in_type=3 then
+			addy beam_wid/2+beam_in_thi
+				ruledsegmented 4,1+2+4+8+16+32,
+				-form_in_start_offset,-0.001,line_pos[1][3]+beam_top_thi+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+				-form_in_start_offset,-0.001,line_pos[1][3]-beam_hei-beam_down_thi+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+				-form_in_start_offset,0.001,line_pos[1][3]-beam_hei-beam_down_thi+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+				-form_in_start_offset,0.001,line_pos[1][3]+beam_top_thi+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0,
+
+				beam_len+form_in_end_offset,-0.001,line_pos[2][3]+beam_top_thi+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+				beam_len+form_in_end_offset,-0.001,line_pos[2][3]-beam_hei-beam_down_thi+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+				beam_len+form_in_end_offset,0.001,line_pos[2][3]-beam_hei-beam_down_thi+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),
+				beam_len+form_in_end_offset,0.001,line_pos[2][3]+beam_top_thi+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])
+			del 1
+		endif
+	endgroup
+
+	placegroup isectgroup("rath_1","rath_2")
+
+	!下端
+	if switch_form_down and form_down_type<>3 then
+		material m_form_list[form_down_type]
+
+		if switch_haunch[1] then
+			vertex_start=6
+
+			put haunch_x[1]             ,-beam_wid/2-beam_out_thi-form_thi ,line_pos[1][3]+haunch_x[1]/beam_len*(line_pos[2][3]-line_pos[1][3])+form_thi                        ,0
+			put 0                       ,-beam_wid/2-beam_out_thi-form_thi ,line_pos[1][3]-haunch_z[1]+form_thi                                                                 ,0
+			put -form_down_start_offset ,-beam_wid/2-beam_out_thi-form_thi ,line_pos[1][3]+form_down_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3])-haunch_z[1]+form_thi ,0
+			put -form_down_start_offset ,-beam_wid/2-beam_out_thi-form_thi ,line_pos[1][3]+form_down_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3])-haunch_z[1]          ,0
+			put 0                       ,-beam_wid/2-beam_out_thi-form_thi ,line_pos[1][3]-haunch_z[1]                                                                          ,0
+			put haunch_x[1]             ,-beam_wid/2-beam_out_thi-form_thi ,line_pos[1][3]+haunch_x[1]/beam_len*(line_pos[2][3]-line_pos[1][3])                                 ,0
+		else
+			vertex_start=2
+
+			if switch_edgeBeam[1] then
+				if edgeBeam_dir[1]=1 then
+					offset_out=-edgeBeam_wid[1]/2-form_thi
+				else
+					offset_out=edgeBeam_wid[1]/2+form_thi
+				endif
+			else
+				offset_out=form_top_start_offset
+			endif
+
+			put -offset_out ,-beam_wid/2-beam_out_thi-form_thi ,line_pos[1][3]+offset_out/beam_len*(line_pos[1][3]-line_pos[2][3])+form_thi ,0
+			put -offset_out ,-beam_wid/2-beam_out_thi-form_thi ,line_pos[1][3]+offset_out/beam_len*(line_pos[1][3]-line_pos[2][3])          ,0
+		endif
+
+		if switch_haunch[2] then
+			vertex_end=6
+
+			put beam_len-haunch_x[2]          ,-beam_wid/2-beam_out_thi-form_thi ,line_pos[2][3]+haunch_x[2]/beam_len*(line_pos[1][3]-line_pos[2][3])                               ,0
+			put beam_len                      ,-beam_wid/2-beam_out_thi-form_thi ,line_pos[2][3]-haunch_z[2]                                                                        ,0
+			put beam_len+form_down_end_offset ,-beam_wid/2-beam_out_thi-form_thi ,line_pos[2][3]+form_down_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])-haunch_z[2]          ,0
+			put beam_len+form_down_end_offset ,-beam_wid/2-beam_out_thi-form_thi ,line_pos[2][3]+form_down_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])-haunch_z[2]+form_thi ,0
+			put beam_len                      ,-beam_wid/2-beam_out_thi-form_thi ,line_pos[2][3]-haunch_z[2]+form_thi                                                               ,0
+			put beam_len-haunch_x[2]          ,-beam_wid/2-beam_out_thi-form_thi ,line_pos[2][3]+haunch_x[2]/beam_len*(line_pos[1][3]-line_pos[2][3])+form_thi                      ,0
+		else
+			vertex_end=2
+
+			if switch_edgeBeam[2] then
+				if edgeBeam_dir[2]=1 then
+					offset_out=-edgeBeam_wid[2]/2-form_thi
+				else 
+					offset_out=edgeBeam_wid[2]/2+form_thi
+				endif
+			else
+				offset_out=form_top_end_offset
+			endif
+
+			put beam_len+offset_out ,-beam_wid/2-beam_out_thi-form_thi ,line_pos[2][3]+offset_out/beam_len*(line_pos[2][3]-line_pos[1][3])          ,0
+			put beam_len+offset_out ,-beam_wid/2-beam_out_thi-form_thi ,line_pos[2][3]+offset_out/beam_len*(line_pos[2][3]-line_pos[1][3])+form_thi ,0
+		endif
+
+		if switch_haunch[1] then
+			put haunch_x[1]             ,beam_wid/2+beam_in_thi+form_thi ,line_pos[1][3]+haunch_x[1]/beam_len*(line_pos[2][3]-line_pos[1][3])+form_thi
+			put 0                       ,beam_wid/2+beam_in_thi+form_thi ,line_pos[1][3]-haunch_z[1]+form_thi
+			put -form_down_start_offset ,beam_wid/2+beam_in_thi+form_thi ,line_pos[1][3]+form_down_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3])-haunch_z[1]+form_thi
+			put -form_down_start_offset ,beam_wid/2+beam_in_thi+form_thi ,line_pos[1][3]+form_down_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3])-haunch_z[1]
+			put 0                       ,beam_wid/2+beam_in_thi+form_thi ,line_pos[1][3]-haunch_z[1]
+			put haunch_x[1]             ,beam_wid/2+beam_in_thi+form_thi ,line_pos[1][3]+haunch_x[1]/beam_len*(line_pos[2][3]-line_pos[1][3])
+		else
+			if switch_edgeBeam[1] then
+				if edgeBeam_dir[1]=1 then
+					offset_in=edgeBeam_wid[1]/2+form_thi
+				else
+					offset_in=-edgeBeam_wid[1]/2-form_thi
+				endif
+			else
+				offset_in=form_top_start_offset
+			endif
+
+			put -offset_in ,beam_wid/2+beam_in_thi+form_thi ,line_pos[1][3]+offset_in/beam_len*(line_pos[1][3]-line_pos[2][3])+form_thi
+			put -offset_in ,beam_wid/2+beam_in_thi+form_thi ,line_pos[1][3]+offset_in/beam_len*(line_pos[1][3]-line_pos[2][3])
+		endif
+
+		if switch_haunch[2] then
+			put beam_len-haunch_x[2]          ,beam_wid/2+beam_in_thi+form_thi ,line_pos[2][3]+haunch_x[2]/beam_len*(line_pos[1][3]-line_pos[2][3])
+			put beam_len                      ,beam_wid/2+beam_in_thi+form_thi ,line_pos[2][3]-haunch_z[2]
+			put beam_len+form_down_end_offset ,beam_wid/2+beam_in_thi+form_thi ,line_pos[2][3]+form_down_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])-haunch_z[2]
+			put beam_len+form_down_end_offset ,beam_wid/2+beam_in_thi+form_thi ,line_pos[2][3]+form_down_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])-haunch_z[2]+form_thi
+			put beam_len                      ,beam_wid/2+beam_in_thi+form_thi ,line_pos[2][3]-haunch_z[2]+form_thi
+			put beam_len-haunch_x[2]          ,beam_wid/2+beam_in_thi+form_thi ,line_pos[2][3]+haunch_x[2]/beam_len*(line_pos[1][3]-line_pos[2][3])+form_thi
+		else
+			if switch_edgeBeam[2] then
+				if edgeBeam_dir[2]=1 then
+					offset_in=edgeBeam_wid[2]/2+form_thi
+				else 
+					offset_in=-edgeBeam_wid[2]/2-form_thi
+				endif
+			else
+				offset_in=form_top_end_offset
+			endif
+
+			put beam_len+offset_in ,beam_wid/2+beam_in_thi+form_thi ,line_pos[2][3]+offset_in/beam_len*(line_pos[2][3]-line_pos[1][3])
+			put beam_len+offset_in ,beam_wid/2+beam_in_thi+form_thi ,line_pos[2][3]+offset_in/beam_len*(line_pos[2][3]-line_pos[1][3])+form_thi
+		endif
+
+		addz -beam_hei-beam_down_thi-form_thi
+			ruledsegmented vertex_start+vertex_end,1+2+4+8+16+32,
+			get ((vertex_start+vertex_end)*4),
+			get ((vertex_start+vertex_end)*3)
+		del 1
+	endif
+
+	!上端
+	if switch_form_top and form_top_type<>3 then
+		material m_form_list[form_top_type]
+
+		if switch_edgeBeam[1] then
+			if edgeBeam_dir[1]=1 then
+				offset_in=edgeBeam_wid[1]/2+form_thi
+				offset_out=-edgeBeam_wid[1]/2-form_thi
+			else
+				offset_in=-edgeBeam_wid[1]/2-form_thi
+				offset_out=edgeBeam_wid[1]/2+form_thi
+			endif
+		else
+			offset_in=form_top_start_offset
+			offset_out=form_top_start_offset
+		endif
+		
+		put -offset_in,beam_wid/2+beam_in_thi+form_thi,line_pos[1][3]+offset_in/beam_len*(line_pos[1][3]-line_pos[2][3]),0
+		put -offset_out,-beam_wid/2-beam_out_thi-form_thi,line_pos[1][3]+offset_out/beam_len*(line_pos[1][3]-line_pos[2][3]),0
+		put -offset_out,-beam_wid/2-beam_out_thi-form_thi,line_pos[1][3]+form_thi+offset_out/beam_len*(line_pos[1][3]-line_pos[2][3]),0
+		put -offset_in,beam_wid/2+beam_in_thi+form_thi,line_pos[1][3]+form_thi+offset_in/beam_len*(line_pos[1][3]-line_pos[2][3]),0
+
+		if switch_edgeBeam[2] then
+			if edgeBeam_dir[2]=1 then
+				offset_in=edgeBeam_wid[2]/2+form_thi
+				offset_out=-edgeBeam_wid[2]/2-form_thi
+			else 
+				offset_in=-edgeBeam_wid[2]/2-form_thi
+				offset_out=edgeBeam_wid[2]/2+form_thi
+			endif
+		else
+			offset_in=form_top_end_offset
+			offset_out=form_top_end_offset
+		endif
+
+		put beam_len+offset_in,beam_wid/2+beam_in_thi+form_thi,line_pos[2][3]+offset_in/beam_len*(line_pos[2][3]-line_pos[1][3])
+		put beam_len+offset_out,-beam_wid/2-beam_out_thi-form_thi,line_pos[2][3]+offset_out/beam_len*(line_pos[2][3]-line_pos[1][3])
+		put beam_len+offset_out,-beam_wid/2-beam_out_thi-form_thi,line_pos[2][3]+form_thi+offset_out/beam_len*(line_pos[2][3]-line_pos[1][3])
+		put beam_len+offset_in,beam_wid/2+beam_in_thi+form_thi,line_pos[2][3]+form_thi+offset_in/beam_len*(line_pos[2][3]-line_pos[1][3])
+
+		addz beam_top_thi
+			ruledsegmented 4,1+2+4+8+16+32,
+			get(4*4+4*3)
+	endif
+
+	!外面
+	if switch_form_out and form_out_type<>3 then
+		material m_form_list[form_out_type]
+
+		if switch_haunch[1] then
+			vertex_start=4
+
+			put -form_out_start_offset,0,line_pos[1][3]+beam_top_thi+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0
+			put -form_out_start_offset,0,line_pos[1][3]-beam_hei-beam_down_thi+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3])-haunch_z[1],0
+			put 0,0,line_pos[1][3]-beam_hei-beam_down_thi-haunch_z[1],0
+			put haunch_x[1],0,line_pos[1][3]-beam_hei-beam_down_thi+haunch_x[1]/beam_len*(line_pos[2][3]-line_pos[1][3]),0
+		else
+			vertex_start=2
+
+			put -form_out_start_offset,0,line_pos[1][3]+beam_top_thi+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0
+			put -form_out_start_offset,0,line_pos[1][3]-beam_hei-beam_down_thi+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0
+		endif
+
+		if switch_haunch[2] then
+			vertex_end=4
+
+			put beam_len-haunch_x[2],0,line_pos[2][3]-beam_hei-beam_down_thi+haunch_x[2]/beam_len*(line_pos[1][3]-line_pos[2][3]),0
+			put beam_len,0,line_pos[2][3]-beam_hei-beam_down_thi-haunch_z[2],0
+			put beam_len+form_out_end_offset,0,line_pos[2][3]-beam_hei-beam_down_thi+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])-haunch_z[2],0
+			put beam_len+form_out_end_offset,0,line_pos[2][3]+beam_top_thi+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),0
+		else
+			vertex_end=2
+
+			put beam_len+form_out_end_offset,0,line_pos[2][3]-beam_hei-beam_down_thi+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),0
+			put beam_len+form_out_end_offset,0,line_pos[2][3]+beam_top_thi+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),0
+		endif		
+
+		if switch_haunch[1] then
+			put -form_out_start_offset,form_thi,line_pos[1][3]+beam_top_thi+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3])
+			put -form_out_start_offset,form_thi,line_pos[1][3]-beam_hei-beam_down_thi+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3])-haunch_z[1]
+			put 0,form_thi,line_pos[1][3]-beam_hei-beam_down_thi-haunch_z[1]
+			put haunch_x[1],form_thi,line_pos[1][3]-beam_hei-beam_down_thi+haunch_x[1]/beam_len*(line_pos[2][3]-line_pos[1][3])
+		else
+			put -form_out_start_offset,form_thi,line_pos[1][3]+beam_top_thi+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3])
+			put -form_out_start_offset,form_thi,line_pos[1][3]-beam_hei-beam_down_thi+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3])
+		endif
+
+		if switch_haunch[2] then
+			put beam_len-haunch_x[2],form_thi,line_pos[2][3]-beam_hei-beam_down_thi+haunch_x[2]/beam_len*(line_pos[1][3]-line_pos[2][3])
+			put beam_len,form_thi,line_pos[2][3]-beam_hei-beam_down_thi-haunch_z[2]
+			put beam_len+form_out_end_offset,form_thi,line_pos[2][3]-beam_hei-beam_down_thi+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])-haunch_z[2]
+			put beam_len+form_out_end_offset,form_thi,line_pos[2][3]+beam_top_thi+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])
+		else
+			put beam_len+form_out_end_offset,form_thi,line_pos[2][3]-beam_hei-beam_down_thi+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])
+			put beam_len+form_out_end_offset,form_thi,line_pos[2][3]+beam_top_thi+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])
+		endif		
+
+		addy -beam_wid/2-beam_out_thi-form_thi
+			ruledsegmented vertex_start+vertex_end,1+2+4+8+16+32,
+			get ((vertex_start+vertex_end)*4),
+			get ((vertex_start+vertex_end)*3)
+		del 1
+	endif
+
+	!内面
+	if switch_form_in and form_in_type<>3 then
+		material m_form_list[form_in_type]
+
+ 		if switch_haunch[1] then
+			vertex_start=4
+
+			put -form_in_start_offset,0,line_pos[1][3]+beam_top_thi+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0
+			put -form_in_start_offset,0,line_pos[1][3]-beam_hei-beam_down_thi+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3])-haunch_z[1],0
+			put 0,0,line_pos[1][3]-beam_hei-beam_down_thi-haunch_z[1],0
+			put haunch_x[1],0,line_pos[1][3]-beam_hei-beam_down_thi+haunch_x[1]/beam_len*(line_pos[2][3]-line_pos[1][3]),0
+		else
+			vertex_start=2
+
+			put -form_in_start_offset,0,line_pos[1][3]+beam_top_thi+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0
+			put -form_in_start_offset,0,line_pos[1][3]-beam_hei-beam_down_thi+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),0
+		endif
+
+		if switch_haunch[2] then
+			vertex_end=4
+
+			put beam_len-haunch_x[2],0,line_pos[2][3]-beam_hei-beam_down_thi+haunch_x[2]/beam_len*(line_pos[1][3]-line_pos[2][3]),0
+			put beam_len,0,line_pos[2][3]-beam_hei-beam_down_thi-haunch_z[2],0
+			put beam_len+form_in_end_offset,0,line_pos[2][3]-beam_hei-beam_down_thi+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])-haunch_z[2],0
+			put beam_len+form_in_end_offset,0,line_pos[2][3]+beam_top_thi+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),0
+		else
+			vertex_end=2
+
+			put beam_len+form_in_end_offset,0,line_pos[2][3]-beam_hei-beam_down_thi+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),0
+			put beam_len+form_in_end_offset,0,line_pos[2][3]+beam_top_thi+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),0
+		endif
+
+ 		if switch_haunch[1] then
+			put -form_in_start_offset,form_thi,line_pos[1][3]+beam_top_thi+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3])
+			put -form_in_start_offset,form_thi,line_pos[1][3]-beam_hei-beam_down_thi+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3])-haunch_z[1]
+			put 0,form_thi,line_pos[1][3]-beam_hei-beam_down_thi-haunch_z[1]
+			put haunch_x[1],form_thi,line_pos[1][3]-beam_hei-beam_down_thi+haunch_x[1]/beam_len*(line_pos[2][3]-line_pos[1][3])
+		else
+			put -form_in_start_offset,form_thi,line_pos[1][3]+beam_top_thi+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3])
+			put -form_in_start_offset,form_thi,line_pos[1][3]-beam_hei-beam_down_thi+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3])
+		endif
+
+		if switch_haunch[2] then
+			put beam_len-haunch_x[2],form_thi,line_pos[2][3]-beam_hei-beam_down_thi+haunch_x[2]/beam_len*(line_pos[1][3]-line_pos[2][3])
+			put beam_len,form_thi,line_pos[2][3]-beam_hei-beam_down_thi-haunch_z[2]
+			put beam_len+form_in_end_offset,form_thi,line_pos[2][3]-beam_hei-beam_down_thi+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])-haunch_z[2]
+			put beam_len+form_in_end_offset,form_thi,line_pos[2][3]+beam_top_thi+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])
+		else
+			put beam_len+form_in_end_offset,form_thi,line_pos[2][3]-beam_hei-beam_down_thi+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])
+			put beam_len+form_in_end_offset,form_thi,line_pos[2][3]+beam_top_thi+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3])
+		endif
+
+		addy beam_wid/2+beam_in_thi
+			ruledsegmented vertex_start+vertex_end,1+2+4+8+16+32,
+			get ((vertex_start+vertex_end)*4),
+			get ((vertex_start+vertex_end)*3)
+		del 1
+	endif
+
+	!始点側小口型枠
+	if switch_form_start then
+		material m_form_list[form_down_type]
+
+		add -form_thi,-beam_wid/2-beam_out_thi-switch_form_out*form_thi,-beam_hei-beam_down_thi-switch_form_down*form_thi+form_start_down_offset+line_pos[1][3]
+			block form_thi,beam_wid+beam_out_thi+beam_in_thi+(switch_form_out+switch_form_in)*form_thi,beam_hei+beam_down_thi+beam_top_thi+(switch_form_down+switch_form_top)*form_thi+form_start_top_offset-form_start_down_offset
+		del 1
+	endif
+	
+	!終点側小口型枠
+	if switch_form_end then
+		material m_form_list[form_down_type]
+
+		add beam_len,-beam_wid/2-beam_out_thi-switch_form_out*form_thi,-beam_hei-beam_down_thi-switch_form_down*form_thi+form_end_down_offset+line_pos[2][3]
+			block form_thi,beam_wid+beam_out_thi+beam_in_thi+(switch_form_out+switch_form_in)*form_thi,beam_hei+beam_down_thi+beam_top_thi+(switch_form_down+switch_form_top)*form_thi+form_end_top_offset-form_end_down_offset
+		del 1
+	endif
+endgroup
+
+form_1=subgroup("form","wall_minus")
+form_2=subgroup(form_1,"slab_minus")
+form_3=subgroup(form_2,"small_beam_minus")
+form_4=subgroup(form_3,"column")
+form_5=subgroup(form_4,"orthwall")
+form_6=subgroup(form_5,"foundation")
+form_7=subgroup(form_6,"pcon")
+
+if switch_form_down+switch_form_top+switch_form_out+switch_form_in>0 then
+	placegroup form_7
+endif
+
+if display_form_offset then
+	if switch_form_down then
+		addz -beam_hei-beam_down_thi-form_thi
+			if switch_edgeBeam[1]=0 then
+				hotspot 0,0,line_pos[1][3]-switch_haunch[1]*haunch_z[1],code,form_down_start_offset,1+128:code=code+1
+				hotspot -form_down_start_offset,0,line_pos[1][3]-switch_haunch[1]*haunch_z[1]+form_down_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),code,form_down_start_offset,2:code=code+1
+				hotspot 1,0,line_pos[1][3]-switch_haunch[1]*haunch_z[1]-1/beam_len*(line_pos[1][3]-line_pos[2][3]),code,form_down_start_offset,3:code=code+1
+			endif
+
+			if switch_edgeBeam[2]=0 then
+				hotspot beam_len,0,line_pos[2][3]-switch_haunch[2]*haunch_z[2],code,form_down_end_offset,1+128:code=code+1
+				hotspot beam_len+form_down_end_offset,0,line_pos[2][3]-switch_haunch[2]*haunch_z[2]+form_down_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),code,form_down_end_offset,2:code=code+1
+				hotspot beam_len-1,0,line_pos[2][3]-switch_haunch[2]*haunch_z[2]-1/beam_len*(line_pos[2][3]-line_pos[1][3]),code,form_down_end_offset,3:code=code+1
+			endif
+		del 1
+	endif
+
+	if switch_form_top then
+		addz beam_top_thi+form_thi
+			if switch_edgeBeam[1]=0 then
+				hotspot 0,0,line_pos[1][3],code,form_top_start_offset,1+128:code=code+1
+				hotspot -form_top_start_offset,0,line_pos[1][3]+form_top_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),code,form_top_start_offset,2:code=code+1
+				hotspot 1,0,line_pos[1][3]-1/beam_len*(line_pos[1][3]-line_pos[2][3]),code,form_top_start_offset,3:code=code+1
+			endif
+
+			if switch_edgeBeam[2]=0 then
+				hotspot beam_len,0,line_pos[2][3],code,form_top_end_offset,1+128:code=code+1
+				hotspot beam_len+form_top_end_offset,0,line_pos[2][3]+form_top_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),code,form_top_end_offset,2:code=code+1
+				hotspot beam_len-1,0,line_pos[2][3]-1/beam_len*(line_pos[2][3]-line_pos[1][3]),code,form_top_end_offset,3:code=code+1
+			endif
+		del 1
+	endif
+
+	if switch_form_out then
+		if switch_edgeBeam[1]=0 then
+			hotspot 0,-beam_wid/2-beam_out_thi-form_thi,line_pos[1][3]-beam_hei/2,code,form_out_start_offset,1+128:code=code+1
+			hotspot -form_out_start_offset,-beam_wid/2-beam_out_thi-form_thi,line_pos[1][3]-beam_hei/2+form_out_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),code,form_out_start_offset,2:code=code+1
+			hotspot 1,-beam_wid/2-beam_out_thi-form_thi,line_pos[1][3]-beam_hei/2-1/beam_len*(line_pos[1][3]-line_pos[2][3]),code,form_out_start_offset,3:code=code+1
+		endif
+
+		if switch_edgeBeam[2]=0 then
+			hotspot beam_len,-beam_wid/2-beam_out_thi-form_thi,line_pos[2][3]-beam_hei/2,code,form_out_end_offset,1+128:code=code+1
+			hotspot beam_len+form_out_end_offset,-beam_wid/2-beam_out_thi-form_thi,line_pos[2][3]-beam_hei/2+form_out_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),code,form_out_end_offset,2:code=code+1
+			hotspot beam_len-1,-beam_wid/2-beam_out_thi-form_thi,line_pos[2][3]-beam_hei/2-1/beam_len*(line_pos[2][3]-line_pos[1][3]),code,form_out_end_offset,3:code=code+1
+		endif
+	endif
+
+	if switch_form_in then
+		if switch_edgeBeam[1]=0 then
+			hotspot 0,beam_wid/2+beam_in_thi+form_thi,line_pos[1][3]-beam_hei/2,code,form_in_start_offset,1+128:code=code+1
+			hotspot -form_in_start_offset,beam_wid/2+beam_in_thi+form_thi,line_pos[1][3]-beam_hei/2+form_in_start_offset/beam_len*(line_pos[1][3]-line_pos[2][3]),code,form_in_start_offset,2:code=code+1
+			hotspot 1,beam_wid/2+beam_in_thi+form_thi,line_pos[1][3]-beam_hei/2-1/beam_len*(line_pos[1][3]-line_pos[2][3]),code,form_in_start_offset,3:code=code+1
+		endif
+
+		if switch_edgeBeam[2]=0 then
+			hotspot beam_len,beam_wid/2+beam_in_thi+form_thi,line_pos[2][3]-beam_hei/2,code,form_in_end_offset,1+128:code=code+1
+			hotspot beam_len+form_in_end_offset,beam_wid/2+beam_in_thi+form_thi,line_pos[2][3]-beam_hei/2+form_in_end_offset/beam_len*(line_pos[2][3]-line_pos[1][3]),code,form_in_end_offset,2:code=code+1
+			hotspot beam_len-1,beam_wid/2+beam_in_thi+form_thi,line_pos[2][3]-beam_hei/2-1/beam_len*(line_pos[2][3]-line_pos[1][3]),code,form_in_end_offset,3:code=code+1
+		endif
+	endif
+
+	if switch_form_start then
+		add -form_thi,0,-beam_hei-beam_down_thi-switch_form_down*form_thi+line_pos[1][3]
+			hotspot 0,0,0,code,form_start_down_offset,1+128:code=code+1
+			hotspot 0,0,form_start_down_offset,code,form_start_down_offset,2:code=code+1
+			hotspot 0,0,-1,code,form_start_down_offset,3:code=code+1
+		del 1
+
+		add -form_thi,0,beam_top_thi+switch_form_top*form_thi+line_pos[1][3]
+			hotspot 0,0,0,code,form_start_top_offset,1+128:code=code+1
+			hotspot 0,0,form_start_top_offset,code,form_start_top_offset,2:code=code+1
+			hotspot 0,0,-1,code,form_start_top_offset,3:code=code+1
+		del 1
+	endif
+
+	if switch_form_end then
+		add beam_len+form_thi,0,-beam_hei-beam_down_thi-switch_form_down*form_thi+line_pos[2][3]
+			hotspot 0,0,0,code,form_end_down_offset,1+128:code=code+1
+			hotspot 0,0,form_end_down_offset,code,form_end_down_offset,2:code=code+1
+			hotspot 0,0,-1,code,form_end_down_offset,3:code=code+1
+		del 1
+
+		add beam_len+form_thi,0,beam_top_thi+switch_form_top*form_thi+line_pos[2][3]
+			hotspot 0,0,0,code,form_end_top_offset,1+128:code=code+1
+			hotspot 0,0,form_end_top_offset,code,form_end_top_offset,2:code=code+1
+			hotspot 0,0,-1,code,form_end_top_offset,3:code=code+1
+		del 1
+	endif
+endif
+
+
+group "split"
+	material m_splitline
+
+	for i=1 to split_x_num
+		add split_x_pos[i]-0.0005,0,line_pos[1][3]+split_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3])
+			!下端
+			if switch_form_down and form_down_type<>3 then
+				add 0,-beam_wid/2-beam_out_thi-form_thi-0.001,-beam_hei-beam_down_thi-form_thi-0.001
+					block 0.001,beam_wid+beam_out_thi+beam_in_thi+2*form_thi+0.002,form_thi+0.001
+				del 1
+			endif
+		
+			!上端
+			if switch_form_top and form_top_type<>3 then
+				add 0,-beam_wid/2-beam_out_thi-form_thi-0.001,beam_top_thi
+					block 0.001,beam_wid+beam_out_thi+beam_in_thi+2*form_thi+0.002,form_thi
+				del 1
+			endif
+		
+			!外面
+			if switch_form_out and form_out_type<>3 then
+				add 0,-beam_wid/2-beam_out_thi-form_thi-0.001,-beam_hei-beam_down_thi
+					block 0.001,form_thi+0.00,beam_hei+beam_down_thi+beam_top_thi
+				del 1
+			endif
+		
+			!内面
+			if switch_form_in and form_in_type<>3 then
+				add 0,beam_wid/2+beam_in_thi,-beam_hei-beam_down_thi
+					block 0.001,form_thi+0.00,beam_hei+beam_down_thi+beam_top_thi
+				del 1
+			endif
+		del 1
+	next i
+
+	material m_rath_form
+
+	!横
+	!外面
+	add 0,-(beam_wid/2+beam_out_thi+form_thi),beam_top_thi
+		if (switch_form_out and form_out_type=3) or (switch_form_top and form_top_type=3) then
+			ruledsegmented 4,1+2+4+8+16+32+64,
+			0,0,line_pos[1][3],0,
+			0,0,form_thi+line_pos[1][3],0,
+			0,form_thi,form_thi+line_pos[1][3],0,
+			0,form_thi,line_pos[1][3],0,
+
+			beam_len,0,line_pos[2][3],
+			beam_len,0,form_thi+line_pos[2][3],
+			beam_len,form_thi,form_thi+line_pos[2][3],
+			beam_len,form_thi,line_pos[2][3]
+		endif
+
+		if (switch_form_out and form_out_type=3) or (switch_form_down and form_down_type=3) then
+			addz -(beam_hei+beam_down_thi+beam_top_thi+form_thi)
+				ruledsegmented 4,1+2+4+8+16+32+64,
+				0,0,line_pos[1][3],0,
+				0,0,form_thi+line_pos[1][3],0,
+				0,form_thi,form_thi+line_pos[1][3],0,
+				0,form_thi,line_pos[1][3],0,
+
+				beam_len,0,line_pos[2][3],
+				beam_len,0,form_thi+line_pos[2][3],
+				beam_len,form_thi,form_thi+line_pos[2][3],
+				beam_len,form_thi,line_pos[2][3]
+			del 1
+		endif
+	del 1
+	
+	!内面
+	add 0,(beam_wid/2+beam_in_thi),beam_top_thi
+		if (switch_form_in and form_in_type=3) or (switch_form_top and form_top_type=3) then
+			ruledsegmented 4,1+2+4+8+16+32+64,
+			0,0,line_pos[1][3],0,
+			0,0,form_thi+line_pos[1][3],0,
+			0,form_thi,form_thi+line_pos[1][3],0,
+			0,form_thi,line_pos[1][3],0,
+
+			beam_len,0,line_pos[2][3],
+			beam_len,0,form_thi+line_pos[2][3],
+			beam_len,form_thi,form_thi+line_pos[2][3],
+			beam_len,form_thi,line_pos[2][3]
+		endif
+
+		if (switch_form_in and form_in_type=3) or (switch_form_down and form_down_type=3) then
+			addz -(beam_hei+beam_down_thi+beam_top_thi+form_thi)
+				ruledsegmented 4,1+2+4+8+16+32+64,
+				0,0,line_pos[1][3],0,
+				0,0,form_thi+line_pos[1][3],0,
+				0,form_thi,form_thi+line_pos[1][3],0,
+				0,form_thi,line_pos[1][3],0,
+
+				beam_len,0,line_pos[2][3],
+				beam_len,0,form_thi+line_pos[2][3],
+				beam_len,form_thi,form_thi+line_pos[2][3],
+				beam_len,form_thi,line_pos[2][3]
+			del 1
+		endif
+	del 1
+
+	!縦
+	rath_wid=0.01
+	rath_loop_num=ceil((beam_len-rath_wid)/0.15)+1
+
+	!外面
+	if switch_form_out and form_out_type=3 then
+		for i=1 to rath_loop_num
+			add 0,-(beam_wid/2+beam_out_thi+form_thi),line_pos[1][3]
+				ruledsegmented 4,1+2+4+8+16+32+64,
+				0,0,beam_top_thi,0,
+				0,form_thi,beam_top_thi,0,
+				0,form_thi,-beam_hei-beam_down_thi,0,
+				0,0,-beam_hei-beam_down_thi,0,
+
+				rath_wid,0,beam_top_thi+(line_pos[2][3]-line_pos[1][3])*rath_wid/beam_len,
+				rath_wid,form_thi,beam_top_thi+(line_pos[2][3]-line_pos[1][3])*rath_wid/beam_len,
+				rath_wid,form_thi,-beam_hei-beam_down_thi+(line_pos[2][3]-line_pos[1][3])*rath_wid/beam_len,
+				rath_wid,0,-beam_hei-beam_down_thi+(line_pos[2][3]-line_pos[1][3])*rath_wid/beam_len
+			del 1
+		if i<rath_loop_num-1 then
+			add 0.15,0,(line_pos[2][3]-line_pos[1][3])*0.15/beam_len
+		else
+			add beam_len-rath_wid-(rath_loop_num-2)*0.15,0,(line_pos[2][3]-line_pos[1][3])*(beam_len-rath_wid-(rath_loop_num-2)*0.15)/beam_len
+		endif
+		next i
+		del rath_loop_num
+	endif
+
+	!内面
+	if switch_form_in and form_in_type=3 then
+		for i=1 to rath_loop_num
+			add 0,(beam_wid/2+beam_in_thi),line_pos[1][3]
+				ruledsegmented 4,1+2+4+8+16+32+64,
+				0,0,beam_top_thi,0,
+				0,form_thi,beam_top_thi,0,
+				0,form_thi,-beam_hei-beam_down_thi,0,
+				0,0,-beam_hei-beam_down_thi,0,
+
+				rath_wid,0,beam_top_thi+(line_pos[2][3]-line_pos[1][3])*rath_wid/beam_len,
+				rath_wid,form_thi,beam_top_thi+(line_pos[2][3]-line_pos[1][3])*rath_wid/beam_len,
+				rath_wid,form_thi,-beam_hei-beam_down_thi+(line_pos[2][3]-line_pos[1][3])*rath_wid/beam_len,
+				rath_wid,0,-beam_hei-beam_down_thi+(line_pos[2][3]-line_pos[1][3])*rath_wid/beam_len
+			del 1
+		if i<rath_loop_num-1 then
+			add 0.15,0,(line_pos[2][3]-line_pos[1][3])*0.15/beam_len
+		else
+			add beam_len-rath_wid-(rath_loop_num-2)*0.15,0,(line_pos[2][3]-line_pos[1][3])*(beam_len-rath_wid-(rath_loop_num-2)*0.15)/beam_len
+		endif
+		next i
+		del rath_loop_num
+	endif
+
+	!下端
+	if switch_form_down and form_down_type=3 then
+		for i=1 to rath_loop_num
+			add 0,-(beam_wid/2+beam_out_thi),line_pos[1][3]
+				ruledsegmented 4,1+2+4+8+16+32+64,
+				0,0,-beam_hei-beam_down_thi,0,
+				0,(beam_wid+beam_out_thi+beam_in_thi),-beam_hei-beam_down_thi,0,
+				0,(beam_wid+beam_out_thi+beam_in_thi),-beam_hei-beam_down_thi-form_thi,0,
+				0,0,-beam_hei-beam_down_thi-form_thi,0,
+
+				rath_wid,0,-beam_hei-beam_down_thi+(line_pos[2][3]-line_pos[1][3])*rath_wid/beam_len,
+				rath_wid,(beam_wid+beam_out_thi+beam_in_thi),-beam_hei-beam_down_thi+(line_pos[2][3]-line_pos[1][3])*rath_wid/beam_len,
+				rath_wid,(beam_wid+beam_out_thi+beam_in_thi),-beam_hei-beam_down_thi-form_thi+(line_pos[2][3]-line_pos[1][3])*rath_wid/beam_len,
+				rath_wid,0,-beam_hei-beam_down_thi-form_thi+(line_pos[2][3]-line_pos[1][3])*rath_wid/beam_len
+			del 1
+		if i<rath_loop_num-1 then
+			add 0.15,0,(line_pos[2][3]-line_pos[1][3])*0.15/beam_len
+		else
+			add beam_len-rath_wid-(rath_loop_num-2)*0.15,0,(line_pos[2][3]-line_pos[1][3])*(beam_len-rath_wid-(rath_loop_num-2)*0.15)/beam_len
+		endif
+		next i
+		del rath_loop_num
+	endif
+
+	!上端
+	if switch_form_top and form_top_type=3 then
+		for i=1 to rath_loop_num
+			add 0,-(beam_wid/2+beam_out_thi),line_pos[1][3]+beam_hei+beam_down_thi+beam_top_thi+form_thi
+				ruledsegmented 4,1+2+4+8+16+32+64,
+				0,0,-beam_hei-beam_down_thi,0,
+				0,(beam_wid+beam_out_thi+beam_in_thi),-beam_hei-beam_down_thi,0,
+				0,(beam_wid+beam_out_thi+beam_in_thi),-beam_hei-beam_down_thi-form_thi,0,
+				0,0,-beam_hei-beam_down_thi-form_thi,0,
+
+				rath_wid,0,-beam_hei-beam_down_thi+(line_pos[2][3]-line_pos[1][3])*rath_wid/beam_len,
+				rath_wid,(beam_wid+beam_out_thi+beam_in_thi),-beam_hei-beam_down_thi+(line_pos[2][3]-line_pos[1][3])*rath_wid/beam_len,
+				rath_wid,(beam_wid+beam_out_thi+beam_in_thi),-beam_hei-beam_down_thi-form_thi+(line_pos[2][3]-line_pos[1][3])*rath_wid/beam_len,
+				rath_wid,0,-beam_hei-beam_down_thi-form_thi+(line_pos[2][3]-line_pos[1][3])*rath_wid/beam_len
+			del 1
+		if i<rath_loop_num-1 then
+			add 0.15,0,(line_pos[2][3]-line_pos[1][3])*0.15/beam_len
+		else
+			add beam_len-rath_wid-(rath_loop_num-2)*0.15,0,(line_pos[2][3]-line_pos[1][3])*(beam_len-rath_wid-(rath_loop_num-2)*0.15)/beam_len
+		endif
+		next i
+		del rath_loop_num
+	endif
+endgroup
+
+split_1=subgroup{3}("split","wall_minus",m_splitline,m_splitline,m_splitline)
+split_2=subgroup{3}(split_1,"slab_minus",m_splitline,m_splitline,m_splitline)
+split_3=subgroup{3}(split_2,"small_beam_minus",m_splitline,m_splitline,m_splitline)
+split_4=subgroup{3}(split_3,"column",m_splitline,m_splitline,m_splitline)
+split_5=subgroup{3}(split_4,"foundation",m_splitline,m_splitline,m_splitline)
+
+if switch_form_down+switch_form_top+switch_form_out+switch_form_in>0 then
+	placegroup split_5
+
+	if auto_split=0 then
+	if dis_split_hotspot then
+	if split_x_num>0 then
+		for i=1 to split_x_num
+			!下端
+			if switch_form_down then
+				add 0,0,-beam_hei-beam_down_thi-form_thi-0.001
+					hotspot 0,0,0,code,split_x_pos[i],1+128:code=code+1
+					hotspot split_x_pos[i],0,split_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3]),code,split_x_pos[i],2:code=code+1
+					hotspot -1,0,-1/beam_len*(line_pos[2][3]-line_pos[1][3]),code,split_x_pos[i],3:code=code+1
+				del 1
+			endif
+		
+			!上端
+			if switch_form_top then
+				add 0,0,beam_top_thi+form_thi+0.001
+					hotspot 0,0,0,code,split_x_pos[i],1+128:code=code+1
+					hotspot split_x_pos[i],0,split_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3]),code,split_x_pos[i],2:code=code+1
+					hotspot -1,0,-1/beam_len*(line_pos[2][3]-line_pos[1][3]),code,split_x_pos[i],3:code=code+1	
+				del 1
+			endif
+		
+			!外面
+			if switch_form_out then
+				add 0,-beam_wid/2-beam_out_thi-form_thi-0.001,-beam_hei/2
+					hotspot 0,0,0,code,split_x_pos[i],1+128:code=code+1
+					hotspot split_x_pos[i],0,split_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3]),code,split_x_pos[i],2:code=code+1
+					hotspot -1,0,-1/beam_len*(line_pos[2][3]-line_pos[1][3]),code,split_x_pos[i],3:code=code+1
+				del 1
+			endif
+		
+			!内面
+			if switch_form_in then
+				add 0,beam_wid/2+beam_in_thi+form_thi+0.001,-beam_hei/2
+					hotspot 0,0,0,code,split_x_pos[i],1+128:code=code+1
+					hotspot split_x_pos[i],0,split_x_pos[i]/beam_len*(line_pos[2][3]-line_pos[1][3]),code,split_x_pos[i],2:code=code+1
+					hotspot -1,0,-1/beam_len*(line_pos[2][3]-line_pos[1][3]),code,split_x_pos[i],3:code=code+1
+				del 1
+			endif
+		next i
+	endif
+	endif
+	endif
+endif
+
+
+
+
+
+del 2
+
+end
+
+
+
+!ピーコン組み合わせ
+"pcon_set":
+	addy -pcon_len/2-pcon_len1
+	
+		material m_separator
+	
+		rotx -90
+		addz -form_thi
+			cylind (pcon_len+pcon_len1+pcon_len2)+2*form_thi,separator_r
+		del 2
+	
+		material m_pcon
+	
+		rotx -90
+			cone pcon_h,pcon_r1,pcon_r2,90,90
+		del 1
+	
+		addy pcon_len+pcon_len1+pcon_len2
+		rotx 90
+			cone pcon_h,pcon_r1,pcon_r2,90,90
+		del 2
+	
+		material m_socket
+	
+		addy -form_thi
+		rotx 90
+			cylind socket_h1,socket_r1
+			cylind socket_h,socket_r
+		del 2
+		
+		addy pcon_len+pcon_len1+pcon_len2+form_thi
+		rotx -90
+			cylind socket_h1,socket_r1
+			cylind socket_h,socket_r
+		del 2
+	
+	del 1
+return
+
+
+
+
+
+"link_set":
+	addy -pcon_len/2-pcon_len1
+	
+		material m_separator
+	
+		rotx -90
+		addz -form_thi
+			cylind (pcon_len+pcon_len1+pcon_len2)*link_h+form_thi,separator_r
+		del 2
+	
+		material m_pcon
+	
+		rotx -90
+			cone pcon_h,pcon_r1,pcon_r2,90,90
+		del 1
+	
+		addy (pcon_len+pcon_len1+pcon_len2)*link_h
+		rotx 90
+		add -socket_h1,-pcon_r2,-socket_h1
+			block 2*socket_h1,2*pcon_r2,2*socket_h1
+		del 3
+	
+		material m_socket
+	
+		addy -form_thi
+		rotx 90
+			cylind socket_h1,socket_r1
+			cylind socket_h,socket_r
+		del 2
+			
+	del 1
+return
+
+
+
+
+
+
+

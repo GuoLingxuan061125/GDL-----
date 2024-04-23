@@ -1,0 +1,292 @@
+eps=1e-5
+x=1
+y=2
+z=3
+
+values "barShape" \
+range[1,220],240,800,801,802,803,804,805,806,807,808,810,812,813,904,905,906,907,909,910,911,912
+!1,2,3,4,5,6,7,8,9,10,
+!11,12,13,14,15,16,17,18,19,20,
+!21,22,23,24,25,26,27,28,29,30,
+!31,32,33,34,35,36,37,38,39,40,
+!41,42,43,44,45,46,47,48,49,50,
+!51,52,53,54,55,56,57,58,59,60,
+!61,62,63,64,65,66,67,68,69,70,
+!71,72,73,74,75,76,77,78,79,80,
+!81,82,83,84,85,86,87,88,89,90,
+!91,92,93,94,95,96,97,98,99,100,
+!101,102,103,104,105,106,107,108,109,110,
+!111,112,113,114,115,116,117,118,119,120,
+!121,122,123,124,125,126,127,128,129,130,
+!131,132,133,134,135,136,137,138,139,140,
+!141,142,143,144,145,146,147,148,149,150,
+!151,152,153,154,155,156,157,158,159,160,
+!161,162,163,164,165,166,167,168,169,170,
+!171,172,173,174,175,176,177,178,179,180,
+!181,182,183,184,185,186,187,188,189,190,
+!191,192,193,194,195,196,197,198,199,200,
+!201,202,203,204,205,206,207,208,209,210,
+!211,212,213,214,215,216,217,218,219,220,
+!240,800,801,802,803,804,805,806,807,808,810,812,813,904,905,906,907,909,910,911,912
+
+dim _barSizeNumList[]
+_barSizeNumList[1]  =1
+_barSizeNumList[2]  =2
+_barSizeNumList[3]  =2
+_barSizeNumList[4]  =2
+_barSizeNumList[5]  =1
+_barSizeNumList[6]  =1
+_barSizeNumList[7]  =2
+_barSizeNumList[8]  =2
+_barSizeNumList[9]  =3
+_barSizeNumList[10] =2
+_barSizeNumList[11] =2
+_barSizeNumList[12] =1
+_barSizeNumList[13] =3
+_barSizeNumList[14] =2
+_barSizeNumList[15] =3
+_barSizeNumList[16] =2
+_barSizeNumList[17] =3
+_barSizeNumList[18] =2
+_barSizeNumList[19] =2
+_barSizeNumList[20] =2
+_barSizeNumList[21] =2
+_barSizeNumList[22] =2
+_barSizeNumList[23] =2
+_barSizeNumList[24] =2
+_barSizeNumList[25] =2
+_barSizeNumList[26] =2
+_barSizeNumList[27] =3
+_barSizeNumList[28] =3
+_barSizeNumList[29] =3
+_barSizeNumList[30] =2
+_barSizeNumList[31] =3
+_barSizeNumList[32] =3
+_barSizeNumList[33] =2
+_barSizeNumList[34] =2
+_barSizeNumList[35] =2
+_barSizeNumList[36] =2
+_barSizeNumList[37] =2
+_barSizeNumList[38] =3
+_barSizeNumList[39] =5
+_barSizeNumList[40] =3
+_barSizeNumList[41] =5
+_barSizeNumList[42] =1
+_barSizeNumList[43] =3
+_barSizeNumList[44] =2
+_barSizeNumList[45] =3
+_barSizeNumList[46] =3
+_barSizeNumList[47] =5
+_barSizeNumList[48] =4
+_barSizeNumList[49] =4
+_barSizeNumList[50] =3
+_barSizeNumList[51] =4
+_barSizeNumList[52] =3
+_barSizeNumList[53] =3
+_barSizeNumList[54] =3
+_barSizeNumList[55] =3
+_barSizeNumList[56] =3
+_barSizeNumList[57] =1
+_barSizeNumList[58] =1
+_barSizeNumList[59] =2
+_barSizeNumList[60] =4
+_barSizeNumList[61] =3
+_barSizeNumList[62] =3
+_barSizeNumList[63] =3
+_barSizeNumList[64] =3
+_barSizeNumList[65] =5
+_barSizeNumList[66] =3
+_barSizeNumList[67] =5
+_barSizeNumList[68] =5
+_barSizeNumList[69] =3
+_barSizeNumList[70] =3
+_barSizeNumList[71] =5
+_barSizeNumList[72] =4
+_barSizeNumList[73] =3
+_barSizeNumList[74] =4
+_barSizeNumList[75] =4
+_barSizeNumList[76] =3
+_barSizeNumList[77] =3
+_barSizeNumList[78] =3
+_barSizeNumList[79] =4
+_barSizeNumList[80] =2
+_barSizeNumList[81] =3
+_barSizeNumList[82] =3
+_barSizeNumList[83] =4
+_barSizeNumList[84] =5
+_barSizeNumList[85] =2
+_barSizeNumList[86] =2
+_barSizeNumList[87] =3
+_barSizeNumList[88] =2
+_barSizeNumList[89] =3
+_barSizeNumList[90] =5
+_barSizeNumList[91] =3
+_barSizeNumList[92] =4
+_barSizeNumList[93] =5
+_barSizeNumList[94] =3
+_barSizeNumList[95] =3
+_barSizeNumList[96] =3
+_barSizeNumList[97] =4
+_barSizeNumList[98] =4
+_barSizeNumList[99] =2
+_barSizeNumList[100]=2
+_barSizeNumList[101]=3
+_barSizeNumList[102]=4
+_barSizeNumList[103]=2
+_barSizeNumList[104]=3
+_barSizeNumList[105]=3
+_barSizeNumList[106]=3
+_barSizeNumList[107]=3
+_barSizeNumList[108]=3
+_barSizeNumList[109]=2
+_barSizeNumList[110]=6
+_barSizeNumList[111]=1
+_barSizeNumList[112]=1
+_barSizeNumList[113]=2
+_barSizeNumList[114]=3
+_barSizeNumList[115]=5
+_barSizeNumList[116]=3
+_barSizeNumList[117]=3
+_barSizeNumList[118]=4
+_barSizeNumList[119]=3
+_barSizeNumList[120]=4
+_barSizeNumList[121]=4
+_barSizeNumList[122]=3
+_barSizeNumList[123]=2
+_barSizeNumList[124]=2
+_barSizeNumList[125]=2
+_barSizeNumList[126]=2
+_barSizeNumList[127]=3
+_barSizeNumList[128]=2
+_barSizeNumList[129]=3
+_barSizeNumList[130]=3
+_barSizeNumList[131]=5
+_barSizeNumList[132]=4
+_barSizeNumList[133]=4
+_barSizeNumList[134]=3
+_barSizeNumList[135]=3
+_barSizeNumList[136]=2
+_barSizeNumList[137]=3
+_barSizeNumList[138]=2
+_barSizeNumList[139]=3
+_barSizeNumList[140]=3
+_barSizeNumList[141]=4
+_barSizeNumList[142]=2
+_barSizeNumList[143]=3
+_barSizeNumList[144]=4
+_barSizeNumList[145]=4
+_barSizeNumList[146]=3
+_barSizeNumList[147]=2
+_barSizeNumList[148]=2
+_barSizeNumList[149]=3
+_barSizeNumList[150]=4
+_barSizeNumList[151]=3
+_barSizeNumList[152]=3
+_barSizeNumList[153]=3
+_barSizeNumList[154]=3
+_barSizeNumList[155]=3
+_barSizeNumList[156]=4
+_barSizeNumList[157]=2
+_barSizeNumList[158]=4
+_barSizeNumList[159]=3
+_barSizeNumList[160]=4
+_barSizeNumList[161]=2
+_barSizeNumList[162]=6
+_barSizeNumList[163]=4
+_barSizeNumList[164]=3
+_barSizeNumList[165]=4
+_barSizeNumList[166]=5
+_barSizeNumList[167]=4
+_barSizeNumList[168]=5
+_barSizeNumList[169]=6
+_barSizeNumList[170]=3
+_barSizeNumList[171]=4
+_barSizeNumList[172]=5
+_barSizeNumList[173]=4
+_barSizeNumList[174]=3
+_barSizeNumList[175]=6
+_barSizeNumList[176]=4
+_barSizeNumList[177]=3
+_barSizeNumList[178]=3
+_barSizeNumList[179]=4
+_barSizeNumList[180]=3
+_barSizeNumList[181]=4
+_barSizeNumList[182]=4
+_barSizeNumList[183]=10
+_barSizeNumList[184]=9
+_barSizeNumList[185]=8
+_barSizeNumList[186]=6
+_barSizeNumList[187]=3
+_barSizeNumList[188]=4
+_barSizeNumList[189]=4
+_barSizeNumList[190]=5
+_barSizeNumList[191]=5
+_barSizeNumList[192]=5
+_barSizeNumList[193]=5
+_barSizeNumList[194]=3
+_barSizeNumList[195]=2
+_barSizeNumList[196]=5
+_barSizeNumList[197]=3
+_barSizeNumList[198]=3
+_barSizeNumList[199]=3
+_barSizeNumList[200]=2
+_barSizeNumList[201]=3
+_barSizeNumList[202]=3
+_barSizeNumList[203]=2
+_barSizeNumList[204]=2
+_barSizeNumList[205]=4
+_barSizeNumList[206]=4
+_barSizeNumList[207]=2
+_barSizeNumList[208]=3
+_barSizeNumList[209]=1
+_barSizeNumList[210]=4
+_barSizeNumList[211]=5
+_barSizeNumList[212]=4
+_barSizeNumList[213]=3
+_barSizeNumList[214]=3
+_barSizeNumList[215]=3
+_barSizeNumList[216]=3
+_barSizeNumList[217]=5
+_barSizeNumList[218]=3
+_barSizeNumList[219]=4
+_barSizeNumList[220]=5
+_barSizeNumList[240]=4
+_barSizeNumList[800]=4
+_barSizeNumList[801]=4
+_barSizeNumList[802]=5
+_barSizeNumList[803]=6
+_barSizeNumList[804]=5
+_barSizeNumList[805]=8
+_barSizeNumList[806]=4
+_barSizeNumList[807]=7
+_barSizeNumList[808]=9
+_barSizeNumList[810]=3
+_barSizeNumList[812]=5
+_barSizeNumList[813]=8
+_barSizeNumList[904]=3
+_barSizeNumList[905]=6
+_barSizeNumList[906]=6
+_barSizeNumList[907]=8
+_barSizeNumList[909]=7
+_barSizeNumList[910]=6
+_barSizeNumList[911]=3
+_barSizeNumList[912]=3
+
+barSizeNum=_barSizeNumList[barShape]
+
+if barSizeNum<2 then hideparameter "barSize2"
+if barSizeNum<3 then hideparameter "barSize3"
+if barSizeNum<4 then hideparameter "barSize4"
+if barSizeNum<5 then hideparameter "barSize5"
+if barSizeNum<6 then hideparameter "barSize6"
+if barSizeNum<7 then hideparameter "barSize7"
+if barSizeNum<8 then hideparameter "barSize8"
+if barSizeNum<9 then hideparameter "barSize9"
+if barSizeNum<10 then hideparameter "barSize10"
+
+values "frameX" range[0.1,]
+values "frameY" range[0.1,]
+
+imageRatio=0.8
+
+

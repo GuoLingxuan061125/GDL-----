@@ -1,0 +1,332 @@
+eps=1e-5
+unID=101
+td=1000
+x=1:y=2:z=3
+
+! structural_hardware_type      設置位置
+! building_law                  告示
+! product_name                  品名
+! product_maker                 メーカー
+! structural_hardware_position  金物位置
+! offset_horizontal_x           柱中心からオフセット値
+! screw_indication              ビス(on/off)
+! bolt_indication               アンカーボルト(on/off)
+! bolt_name                     アンカーボルトタイプ
+! bolt_model_number             アンカーボルト型番
+! bolt_length                   両ネジ長さ
+
+! 1,"告示1460号 第２号(い)",2,"告示1460号 第２号(ろ)",3,"告示1460号 第２号(は)",4,"告示1460号 第２号(に)",5,"告示1460号 第２号(ほ)",\
+! 6,"告示1460号 第２号(へ)",7,"告示1460号 第２号(と)",8,"告示1460号 第２号(ち)",9,"告示1460号 第２号(り)",10,"告示1460号 第２号(ぬ)",\
+! 11,"告示1460号 第１号(ハ)", 12,"告示1460号 第１号(ニ)", 13,"告示1460号 第１号(ホ)"
+
+! 1,"メインプレート",2,"スリムビルトコーナー",3,"スリムビルトコーナー75",4,"アレントコーナー",5,"ウォールコーナー",
+! 6,"プロパスホールダウン25",7,"シークホールダウンC-HD2535",8,"ホールドコーナー",9,"ミニビルトコーナー",
+! 10,"K-タイシンニート",11,"エーステンプレートⅢ-ZM",12,"ライトコーナー",13,"ライトコーナー合板",
+! 14,"スリムヘビー10",15,"スリムヘビー10合板",16,"ミドルコーナー15",17,"ミドルコーナー15合板",18,"ヘビーコーナー20",
+! 19,"プルースホールダウン25",20,"プルースホールダウン40",21,"枠材用フレックスホールダウン20",
+! 22,"枠材用フレックスホールダウン34",25,"デフコーナー",26,"ロックダウン20",27,"ロックダウン30",
+! 29,"ハイパースリム・Ⅱ合板",46,"ホーマープレート240",47,"N-1.6短ざく金物300",48,"ビスどめ短冊S",
+! 50,"釘どめ短冊S",52,"N-フリーダム筋交いプレート",53,"ハイパーガゼットII",54,"ひねり金物ST-II",
+! 61,"フリーダム鋼製火打",62,"鋼製火打N-600(ボルト)",63,"トラスティ600(ボルト)",64,"プロ二ック600",65,"Z火打金物HB",
+! 66,"チャームかすがい90",67,"チャームかすがい120",68,"スリムかすがいII",601,"タルフィックL",602,"タルフィックR"
+
+! L  15	structural_hardware_type=1 building_law=7	product_name=16
+! HD 20	structural_hardware_type=1 building_law=8	product_name=21
+! HD 34	structural_hardware_type=1 building_law=10	product_name=22
+
+
+values{2} "hardware_type" 1,"柱脚柱頭金物",2, "羽子板金物",3, "短ざく金物",4, "筋かい金物",5, "垂木金物",6, "火打金物",7, "かすがい"
+values{2} "bolt_indication" 0,"なし",1,"アンカーボルト",2,"両ねじボルト",3,"座金付きボルト"
+
+if hardware_type=1 then
+	values{2} "hardware_position" 1,"横架材下端",2,"横架材上端"
+	values{2} "building_law" 2,"告示1460号 第２号(ろ)",3,"告示1460号 第２号(は)",6,"告示1460号 第２号(へ)",7,"告示1460号 第２号(と)",
+					  8,"告示1460号 第２号(ち)",9,"告示1460号 第２号(り)",10,"告示1460号 第２号(ぬ)"
+
+    !name
+	if building_law=2 then
+		values{2} "product_name" 9,"ミニビルトコーナー"
+	endif
+
+	if building_law=3 then
+		values{2} "product_name" 1,"メインプレート",2,"スリムビルトコーナー",3,"スリムビルトコーナー75",10,"K-タイシンニート",\
+						  11,"エーステンプレートⅢ-ZM",12,"ライトコーナー",13,"ライトコーナー合板",25,"デフコーナー"
+		if product_name=1 or product_name=10 then hideparameter "hardware_position"
+	endif
+
+	if building_law=6 then
+		values{2} "product_name" 4,"アレントコーナー",8,"ホールドコーナー",14,"スリムヘビー10",15,"スリムヘビー10合板",19,"プルースホールダウン25",29,"ハイパースリム・Ⅱ合板"
+	endif
+
+	if building_law=7 then
+		values{2} "product_name" 5,"ウォールコーナー",16,"ミドルコーナー15",17,"ミドルコーナー15合板",19,"プルースホールダウン25",26,"ロックダウン20"
+	endif
+	
+	if building_law=8 then
+		values{2} "product_name" 18,"ヘビーコーナー20",19,"プルースホールダウン25",21,"枠材用フレックスホールダウン20",26,"ロックダウン20"
+	endif
+
+	if building_law=9 then
+		values{2} "product_name" 6,"プロパスホールダウン25",19,"プルースホールダウン25",27,"ロックダウン30"
+	endif
+
+	if building_law=10 then
+		values{2} "product_name" 7,"シークホールダウンC-HD2535",20,"プルースホールダウン40",22,"枠材用フレックスホールダウン34",27,"ロックダウン30"
+	endif
+
+
+    !maker
+	if product_name<11 then
+		values{2} "product_maker" 1,"カナイ"
+	endif
+	
+	if product_name>10 AND product_name<23 then
+		values{2} "product_maker" 2,"BXカネシン"
+	endif
+	
+	if product_name>=23 AND product_name<29 then
+		values{2} "product_maker" 1,"カナイ"
+	endif
+	
+	if product_name>=29 then
+		values{2} "product_maker" 2,"BXカネシン"
+	endif
+
+	lock "product_maker"
+endif
+
+if hardware_type=2 then
+	values{2} "hardware_position" 1,"横架材下端",2,"横架材上端"
+	values{2} "building_law" 1,"告示1460号 第２号(ろ)",2,"告示1460号 第２号(は)",3,"告示1460号 第２号(に)",
+					  4,"告示1460号 第２号(ほ)",5,"告示1460号 第２号(へ)",6,"告示1460号 第２号(と)",
+					  7,"告示1460号 第２号(ち)",8,"告示1460号 第２号(り)",9,"告示1460号 第２号(ぬ)"
+
+    !name
+	if building_law=1 then
+        values{2} "product_name" 66,"チャームかすがい90",67,"チャームかすがい120",68,"スリムかすがいII"
+	endif
+
+	if building_law=2 then
+		values{2} "product_name" 9,"ミニビルトコーナー"
+	endif
+
+	if building_law=3 then
+		values{2} "product_name" 1,"メインプレート",2,"スリムビルトコーナー",3,"スリムビルトコーナー75",\
+						  10,"K-タイシンニート",11,"エーステンプレートⅢ-ZM",12,"ライトコーナー",13,"ライトコーナー合板",\
+						  25,"デフコーナー"
+		if product_name=1  then hideparameter "hardware_position"
+		if product_name=10 then hideparameter "hardware_position"
+	
+	endif
+
+	if building_law=4 then
+        values{2} "product_name" 52,"N-フリーダム筋交いプレート",53,"ハイパーガゼットII"
+	endif
+
+	if building_law=5 then
+        values{2} "product_name" 52,"N-フリーダム筋交いプレート",53,"ハイパーガゼットII"
+	endif
+
+	if building_law=6 then
+		values{2} "product_name" 4,"アレントコーナー",8,"ホールドコーナー",14,"スリムヘビー10",15,"スリムヘビー10合板",19,"プルースホールダウン25",29,"ハイパースリム・Ⅱ合板"
+	endif
+
+	if building_law=7 then
+		values{2} "product_name" 5,"ウォールコーナー",16,"ミドルコーナー15",17,"ミドルコーナー15合板",19,"プルースホールダウン25",26,"ロックダウン20"
+	endif
+	
+	if building_law=8 then
+		values{2} "product_name" 18,"ヘビーコーナー20",19,"プルースホールダウン25",21,"枠材用フレックスホールダウン20",26,"ロックダウン20"
+	endif
+
+	if building_law=9 then
+		values{2} "product_name" 6,"プロパスホールダウン25",19,"プルースホールダウン25",27,"ロックダウン30"
+	endif
+
+    !maker
+	if product_name<11 then
+		values{2} "product_maker" 1,"カナイ"
+	endif
+	
+	if product_name>10 AND product_name<23  then
+		values{2} "product_maker" 2,"BXカネシン"
+	endif
+	
+	if product_name>=23 AND product_name<29 then
+		values{2} "product_maker" 1,"カナイ"
+	endif
+	
+	if product_name>=29 then
+		values{2} "product_maker" 2,"BXカネシン"
+	endif
+
+	lock "product_maker"
+endif
+
+if hardware_type=3 then
+	values{2} "hardware_position" 1,"左側",2,"右側"
+	values{2} "building_law" 11,"告示1460号 第3号短ざく"
+
+    !name
+	if building_law=11 then
+        values{2} "product_name" 46,"ホーマープレート240",47,"N-1.6短ざく金物300",48,"ビスどめ短冊S",50,"釘どめ短冊S"
+	endif
+
+    !maker
+	if product_name=46 then
+        values{2} "product_maker" 1,"カナイ"
+	endif
+
+	if product_name=47 then
+        values{2} "product_maker" 1,"カナイ"
+        PARAMETERS screw_indication=0
+        lock "screw_indication"
+	endif
+
+	if product_name=48  then
+        values{2} "product_maker" 2,"BXカネシン"
+	endif
+
+	if product_name=50  then
+        values{2} "product_maker" 2,"BXカネシン"
+	endif
+
+	lock "product_maker"
+endif
+
+if hardware_type=4 then
+	values{2} "hardware_position" 1,"左側下",2,"右側下",3,"左側上",4,"右側上"
+	values{2} "building_law" 11,"告示1460号 第１号(ハ)", 12,"告示1460号 第１号(ニ)", 13,"告示1460号 第１号(ホ)"
+
+    !name
+	if building_law=11 then 
+        values{2} "product_name" 52,"N-フリーダム筋交いプレート",53,"ハイパーガゼットII"
+	endif 
+
+	if building_law=12 then values{2} "product_name" 52,"N-フリーダム筋交いプレート"
+	if building_law=13 then values{2} "product_name" 53,"ハイパーガゼットII"
+
+    !maker
+	if product_name=52 then values{2} "product_maker" 1,"カナイ"
+	if product_name=53 then values{2} "product_maker" 2,"BXカネシン"
+
+	lock "product_maker"
+    hideparameter "bolt_indication"
+    parameters bolt_indication=0
+endif
+
+if hardware_type=5 then
+	values{2} "hardware_position" 1,"左側",2,"右側"
+	values{2} "building_law" 11,"施行令47条 垂木"
+
+    !name
+	if building_law=11 then
+        values{2} "product_name" 54,"ひねり金物ST-II",601,"タルフィックL",602,"タルフィックR"
+	endif
+
+    !maker
+	if product_name=54 then
+        values{2} "product_maker" 1,"カナイ"
+	endif
+
+	if product_name=601 OR product_name=602 then
+        values{2} "product_maker" 2,"BXカネシン"
+	endif
+endif
+
+if hardware_type=6 then
+	values{2} "hardware_position" 1,"左側",2,"右側"
+	values{2} "building_law" 12,"施行令46条 火打ち"
+
+    !name
+	if building_law=12 then
+        values{2} "product_name" 61,"フリーダム鋼製火打",62,"鋼製火打N-600(ボルト)",63,"トラスティ600(ボルト)",64,"プロ二ック600",65,"Z火打金物HB"
+	endif
+
+    !maker
+	if product_name=61 OR product_name=62  then
+        values{2} "product_maker" 1,"カナイ"
+	endif
+
+	if product_name=63 OR product_name=64  then
+        values{2} "product_maker" 2,"BXカネシン"
+	endif
+
+	if product_name=65  then
+        values{2} "product_maker" 3,"Zマーク"
+	endif
+
+    hideparameter "hardware_position","bolt_indication"
+    parameters bolt_indication=0
+endif
+
+if hardware_type=7 then
+	values{2} "hardware_position" 1,"左側",2,"右側"
+	values{2} "building_law" 1,"告示1460号 第２号(い)"
+
+    !name
+	if building_law=1 then
+        values{2} "product_name" 66,"チャームかすがい90",67,"チャームかすがい120",68,"スリムかすがいII"
+	endif
+
+    !maker
+	if product_name=66 OR product_name=67 then
+        values{2} "product_maker" 1,"カナイ"
+	endif
+
+	if product_name=68 then
+        values{2} "product_maker" 2,"BXカネシン"
+	endif
+
+    hideparameter "hardware_position","bolt_indication"
+    parameters bolt_indication=0
+endif
+
+
+!アンカーボルド
+if bolt_indication=0 then
+	bolt_model_number=0
+	parameters bolt_model_number=bolt_model_number
+	lock "bolt_model_number"
+	hideparameter "bolt_name","bolt_orientation","bolt_model_number","bolt_length","bolt_embedded_length","bolt_position_z","bolt_position_x","woodenbase_height","woodenbase_packing_thickness"
+else
+	if bolt_indication=1 then
+		values{2} "bolt_name" 1,"ショートクランクアンカーボルト",2,"コルトアンカーボルト"
+		values "bolt_position_x" range[18.7/td,34.5/td]
+
+		!横架材からの距離自動計算
+		hw_offset=0
+		if product_name=19 then hw_offset=77/td
+		if product_name=20 then hw_offset=90/td
+		distance_from_beam=-woodenbase_height-woodenbase_packing_thickness-bolt_embedded_length+bolt_length-bolt_position_z-hw_offset
+		parameters distance_from_beam=distance_from_beam
+		lock "distance_from_beam"
+
+		if product_name=6 or product_name=7 or product_name=19 or product_name=20 or product_name=21 or product_name=22 then
+			if bolt_name=1 then
+				values{2} "bolt_model_number" 1,"SCA16-60",2,"SCA16-70",3,"SCA16-44(ナット無し)(両ねじボルード)"
+
+				if bolt_model_number=3 then
+					values "bolt_length" 300,400,500,600,700,800,900,1000
+				else 
+					hideparameter "bolt_length"
+				endif
+			endif
+
+			if bolt_name=2 then
+				values "bolt_length" 0.330,0.550,0.800
+				values{2} "bolt_model_number" 1,"CA16-33",2,"CA16-55",3,"CA16-80"
+				if bolt_length>0.330-eps and bolt_length<0.330+eps then parameters bolt_model_number=1
+				if bolt_length>0.550-eps and bolt_length<0.550+eps then parameters bolt_model_number=2
+				if bolt_length>0.800-eps and bolt_length<0.800+eps then parameters bolt_model_number=3
+				lock "bolt_model_number"
+			endif
+		endif
+	endif
+endif	
+
+
+
+
+
+

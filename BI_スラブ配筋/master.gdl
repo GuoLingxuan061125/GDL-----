@@ -1,0 +1,5086 @@
+code=1
+
+slab_pos[1][1]=0
+slab_pos[1][2]=0
+slab_pos[5][1]=0
+slab_pos[5][2]=0
+parameters slab_pos=slab_pos
+
+slab_minx=min(slab_pos[1][1],slab_pos[2][1],slab_pos[3][1],slab_pos[4][1])
+slab_maxx=max(slab_pos[1][1],slab_pos[2][1],slab_pos[3][1],slab_pos[4][1])
+slab_miny=min(slab_pos[1][2],slab_pos[2][2],slab_pos[3][2],slab_pos[4][2])
+slab_maxy=max(slab_pos[1][2],slab_pos[2][2],slab_pos[3][2],slab_pos[4][2])
+
+for i=1 to 4
+	slab_len[i]=sqr((slab_pos[i+1][1]-slab_pos[i][1])^2+(slab_pos[i+1][2]-slab_pos[i][2])^2)
+
+	if slab_pos[i+1][2]>slab_pos[i][2] then
+		slab_rtz[i]=acs((slab_pos[i+1][1]-slab_pos[i][1])/slab_len[i])
+	endif
+
+	if slab_pos[i+1][2]<slab_pos[i][2] then
+		slab_rtz[i]=360-acs((slab_pos[i+1][1]-slab_pos[i][1])/slab_len[i])
+	endif
+
+	if slab_pos[i+1][2]=slab_pos[i][2] then
+		if slab_pos[i+1][1]>=slab_pos[i][1] then
+			slab_rtz[i]=0
+		else
+			slab_rtz[i]=180
+		endif
+	endif
+next i
+
+parameters slab_len=slab_len
+parameters slab_rtz=slab_rtz
+
+!実際辺の直線方程式
+dim equ_a[],equ_b[],equ_c[]
+equ_a[1]=0
+equ_b[1]=0
+equ_c[1]=0
+
+for i=1 to 4
+	equ_a[i]=(slab_pos[i+1][2]+beam_offset[i]*cos(slab_rtz[i]))-(slab_pos[i][2]+beam_offset[i]*cos(slab_rtz[i]))
+	equ_b[i]=(slab_pos[i][1]-beam_offset[i]*sin(slab_rtz[i]))-(slab_pos[i+1][1]-beam_offset[i]*sin(slab_rtz[i]))
+	equ_c[i]=(slab_pos[i+1][1]-beam_offset[i]*sin(slab_rtz[i]))*(slab_pos[i][2]+beam_offset[i]*cos(slab_rtz[i]))-\
+		  (slab_pos[i][1]-beam_offset[i]*sin(slab_rtz[i]))*(slab_pos[i+1][2]+beam_offset[i]*cos(slab_rtz[i]))
+next i
+
+
+!実際辺の頂点座標リスト
+for i=1 to 4
+
+	if i=1 then
+		equ_pos[i][1]=(equ_c[i]*equ_b[4]-equ_c[4]*equ_b[i])/(equ_a[4]*equ_b[i]-equ_a[i]*equ_b[4])
+		equ_pos[i][2]=(equ_c[4]*equ_a[i]-equ_c[i]*equ_a[4])/(equ_a[4]*equ_b[i]-equ_a[i]*equ_b[4])
+	else
+		equ_pos[i][1]=(equ_c[i]*equ_b[i-1]-equ_c[i-1]*equ_b[i])/(equ_a[i-1]*equ_b[i]-equ_a[i]*equ_b[i-1])
+		equ_pos[i][2]=(equ_c[i-1]*equ_a[i]-equ_c[i]*equ_a[i-1])/(equ_a[i-1]*equ_b[i]-equ_a[i]*equ_b[i-1])
+	endif
+
+next i
+
+equ_pos[5][1]=equ_pos[1][1]
+equ_pos[5][2]=equ_pos[1][2]
+
+parameters equ_pos=equ_pos
+
+minx=min(equ_pos[1][1],equ_pos[2][1],equ_pos[3][1],equ_pos[4][1])
+maxx=max(equ_pos[1][1],equ_pos[2][1],equ_pos[3][1],equ_pos[4][1])
+miny=min(equ_pos[1][2],equ_pos[2][2],equ_pos[3][2],equ_pos[4][2])
+maxy=max(equ_pos[1][2],equ_pos[2][2],equ_pos[3][2],equ_pos[4][2])
+
+slab_x=maxx-minx
+slab_y=maxy-miny
+slab_lx=min(slab_x,slab_y)
+
+!=================================材質・線色コードリスト
+dim scode_list[]
+scode_list[10]=1
+scode_list[13]=2
+scode_list[16]=3
+scode_list[19]=4
+scode_list[22]=5
+scode_list[25]=6
+scode_list[29]=7
+scode_list[32]=8
+scode_list[35]=9
+scode_list[38]=10
+scode_list[41]=11
+
+!=================================外径半径リスト
+dim dr_list[]
+dr_list[10]=0.0055 !d10
+dr_list[13]=0.007 !d13
+dr_list[16]=0.009 !d16
+dr_list[19]=0.0105 !d19
+dr_list[22]=0.0125 !d22
+dr_list[25]=0.014 !d25
+dr_list[29]=0.0165 !d29
+dr_list[32]=0.018 !d32
+dr_list[35]=0.02 !d35
+dr_list[38]=0.0215 !d38
+dr_list[41]=0.023 !d41
+
+!=================================呼び径リスト
+dim nd_list[]
+nd_list[10]=0.01 !D10
+nd_list[13]=0.013 !D13
+nd_list[16]=0.016 !D16
+nd_list[19]=0.019 !D19
+nd_list[22]=0.022 !D22
+nd_list[25]=0.025 !D25
+nd_list[29]=0.029 !D29
+nd_list[32]=0.032 !D32
+nd_list[35]=0.035 !D35
+nd_list[38]=0.038 !D38
+nd_list[41]=0.041 !D41
+
+!=================================継ぎ手定着長さL1
+dim l1_list[][]
+l1_list[1][18]=45
+l1_list[1][21]=40
+l1_list[1][24]=35
+l1_list[1][27]=35
+l1_list[1][30]=35
+l1_list[1][33]=35
+l1_list[1][36]=35
+l1_list[1][39]=30
+l1_list[1][42]=30
+l1_list[1][45]=30
+l1_list[1][48]=30
+l1_list[1][51]=30
+l1_list[1][54]=30
+l1_list[1][57]=30
+l1_list[1][60]=30
+l1_list[2][18]=50
+l1_list[2][21]=45
+l1_list[2][24]=40
+l1_list[2][27]=40
+l1_list[2][30]=35
+l1_list[2][33]=35
+l1_list[2][36]=35
+l1_list[2][39]=35
+l1_list[2][42]=35
+l1_list[2][45]=35
+l1_list[2][48]=30
+l1_list[2][51]=30
+l1_list[2][54]=30
+l1_list[2][57]=30
+l1_list[2][60]=30
+l1_list[3][18]=0
+l1_list[3][21]=50
+l1_list[3][24]=45
+l1_list[3][27]=45
+l1_list[3][30]=40
+l1_list[3][33]=40
+l1_list[3][36]=40
+l1_list[3][39]=40
+l1_list[3][42]=40
+l1_list[3][45]=40
+l1_list[3][48]=35
+l1_list[3][51]=35
+l1_list[3][54]=35
+l1_list[3][57]=35
+l1_list[3][60]=35
+l1_list[4][18]=0
+l1_list[4][21]=0
+l1_list[4][24]=55
+l1_list[4][27]=55
+l1_list[4][30]=50
+l1_list[4][33]=50
+l1_list[4][36]=50
+l1_list[4][39]=45
+l1_list[4][42]=45
+l1_list[4][45]=45
+l1_list[4][48]=40
+l1_list[4][51]=40
+l1_list[4][54]=40
+l1_list[4][57]=40
+l1_list[4][60]=40
+
+
+
+!=================================定着長さL2
+dim l2_list[][]
+l2_list[1][18]=40
+l2_list[1][21]=35
+l2_list[1][24]=30
+l2_list[1][27]=30
+l2_list[1][30]=30
+l2_list[1][33]=30
+l2_list[1][36]=30
+l2_list[1][39]=25
+l2_list[1][42]=25
+l2_list[1][45]=25
+l2_list[1][48]=25
+l2_list[1][51]=25
+l2_list[1][54]=25
+l2_list[1][57]=25
+l2_list[1][60]=25
+l2_list[2][18]=40
+l2_list[2][21]=35
+l2_list[2][24]=35
+l2_list[2][27]=35
+l2_list[2][30]=30
+l2_list[2][33]=30
+l2_list[2][36]=30
+l2_list[2][39]=30
+l2_list[2][42]=30
+l2_list[2][45]=30
+l2_list[2][48]=25
+l2_list[2][51]=25
+l2_list[2][54]=25
+l2_list[2][57]=25
+l2_list[2][60]=25
+l2_list[3][18]=0
+l2_list[3][21]=40
+l2_list[3][24]=40
+l2_list[3][27]=40
+l2_list[3][30]=35
+l2_list[3][33]=35
+l2_list[3][36]=35
+l2_list[3][39]=35
+l2_list[3][42]=35
+l2_list[3][45]=35
+l2_list[3][48]=30
+l2_list[3][51]=30
+l2_list[3][54]=30
+l2_list[3][57]=30
+l2_list[3][60]=30
+l2_list[4][18]=0
+l2_list[4][21]=0
+l2_list[4][24]=45
+l2_list[4][27]=45
+l2_list[4][30]=40
+l2_list[4][33]=40
+l2_list[4][36]=40
+l2_list[4][39]=40
+l2_list[4][42]=40
+l2_list[4][45]=40
+l2_list[4][48]=35
+l2_list[4][51]=35
+l2_list[4][54]=35
+l2_list[4][57]=35
+l2_list[4][60]=35
+
+
+
+!!=================================定着長さL2h
+!dim l2h_list[][]
+!l2h_list[1][18]=30
+!l2h_list[1][21]=25
+!l2h_list[1][24]=20
+!l2h_list[1][27]=20
+!l2h_list[1][30]=20
+!l2h_list[1][33]=20
+!l2h_list[1][36]=20
+!l2h_list[1][39]=15
+!l2h_list[1][42]=15
+!l2h_list[1][45]=15
+!l2h_list[1][48]=15
+!l2h_list[1][51]=15
+!l2h_list[1][54]=15
+!l2h_list[1][57]=15
+!l2h_list[1][60]=15
+!l2h_list[2][18]=30
+!l2h_list[2][21]=25
+!l2h_list[2][24]=25
+!l2h_list[2][27]=25
+!l2h_list[2][30]=20
+!l2h_list[2][33]=20
+!l2h_list[2][36]=20
+!l2h_list[2][39]=20
+!l2h_list[2][42]=20
+!l2h_list[2][45]=20
+!l2h_list[2][48]=15
+!l2h_list[2][51]=15
+!l2h_list[2][54]=15
+!l2h_list[2][57]=15
+!l2h_list[2][60]=15
+!l2h_list[3][18]=0
+!l2h_list[3][21]=30
+!l2h_list[3][24]=30
+!l2h_list[3][27]=30
+!l2h_list[3][30]=25
+!l2h_list[3][33]=25
+!l2h_list[3][36]=25
+!l2h_list[3][39]=25
+!l2h_list[3][42]=25
+!l2h_list[3][45]=25
+!l2h_list[3][48]=20
+!l2h_list[3][51]=20
+!l2h_list[3][54]=20
+!l2h_list[3][57]=20
+!l2h_list[3][60]=20
+!l2h_list[4][18]=0
+!l2h_list[4][21]=0
+!l2h_list[4][24]=35
+!l2h_list[4][27]=35
+!l2h_list[4][30]=30
+!l2h_list[4][33]=30
+!l2h_list[4][36]=30
+!l2h_list[4][39]=30
+!l2h_list[4][42]=30
+!l2h_list[4][45]=30
+!l2h_list[4][48]=25
+!l2h_list[4][51]=25
+!l2h_list[4][54]=25
+!l2h_list[4][57]=25
+!l2h_list[4][60]=25
+
+
+
+!=================================定着長さLb
+dim lb_list[][]
+lb_list[1][18]=15
+lb_list[1][21]=15
+lb_list[1][24]=15
+lb_list[1][27]=15
+lb_list[1][30]=15
+lb_list[1][33]=15
+lb_list[1][36]=15
+lb_list[1][39]=15
+lb_list[1][42]=15
+lb_list[1][45]=15
+lb_list[1][48]=15
+lb_list[1][51]=15
+lb_list[1][54]=15
+lb_list[1][57]=15
+lb_list[1][60]=15
+lb_list[2][18]=20
+lb_list[2][21]=20
+lb_list[2][24]=15
+lb_list[2][27]=15
+lb_list[2][30]=15
+lb_list[2][33]=15
+lb_list[2][36]=15
+lb_list[2][39]=15
+lb_list[2][42]=15
+lb_list[2][45]=15
+lb_list[2][48]=15
+lb_list[2][51]=15
+lb_list[2][54]=15
+lb_list[2][57]=15
+lb_list[2][60]=15
+lb_list[3][18]=0
+lb_list[3][21]=20
+lb_list[3][24]=20
+lb_list[3][27]=20
+lb_list[3][30]=15
+lb_list[3][33]=15
+lb_list[3][36]=15
+lb_list[3][39]=15
+lb_list[3][42]=15
+lb_list[3][45]=15
+lb_list[3][48]=15
+lb_list[3][51]=15
+lb_list[3][54]=15
+lb_list[3][57]=15
+lb_list[3][60]=15
+lb_list[4][18]=0
+lb_list[4][21]=0
+lb_list[4][24]=0
+lb_list[4][27]=0
+lb_list[4][30]=0
+lb_list[4][33]=0
+lb_list[4][36]=0
+lb_list[4][39]=0
+lb_list[4][42]=0
+lb_list[4][45]=0
+lb_list[4][48]=0
+lb_list[4][51]=0
+lb_list[4][54]=0
+lb_list[4][57]=0
+lb_list[4][60]=0
+
+
+
+!=================================折り曲げフック内法直径
+dim Lb_90d_list[][]
+Lb_90d_list[1][10]=2
+Lb_90d_list[1][13]=2
+Lb_90d_list[1][16]=2
+Lb_90d_list[1][19]=2.5
+Lb_90d_list[1][22]=2.5
+Lb_90d_list[1][25]=2.5
+Lb_90d_list[1][29]=2.5
+Lb_90d_list[1][32]=2.5
+Lb_90d_list[1][35]=2.5
+Lb_90d_list[1][38]=2.5
+Lb_90d_list[1][41]=2.5
+Lb_90d_list[2][10]=2
+Lb_90d_list[2][13]=2
+Lb_90d_list[2][16]=2
+Lb_90d_list[2][19]=2.5
+Lb_90d_list[2][22]=2.5
+Lb_90d_list[2][25]=2.5
+Lb_90d_list[2][29]=2.5
+Lb_90d_list[2][32]=2.5
+Lb_90d_list[2][35]=2.5
+Lb_90d_list[2][38]=2.5
+Lb_90d_list[2][41]=2.5
+Lb_90d_list[3][10]=3
+Lb_90d_list[3][13]=3
+Lb_90d_list[3][16]=3
+Lb_90d_list[3][19]=3
+Lb_90d_list[3][22]=3
+Lb_90d_list[3][25]=3
+Lb_90d_list[3][29]=3
+Lb_90d_list[3][32]=3
+Lb_90d_list[3][35]=3
+Lb_90d_list[3][38]=3
+Lb_90d_list[3][41]=3
+Lb_90d_list[4][10]=3
+Lb_90d_list[4][13]=3
+Lb_90d_list[4][16]=3
+Lb_90d_list[4][19]=3
+Lb_90d_list[4][22]=3
+Lb_90d_list[4][25]=3
+Lb_90d_list[4][29]=3.5
+Lb_90d_list[4][32]=3.5
+Lb_90d_list[4][35]=3.5
+Lb_90d_list[4][38]=3.5
+Lb_90d_list[4][41]=3.5
+
+
+
+!=================================================================梁・角柱
+values "beam_offset" range[0,]
+for i=1 to 4
+	if beam_anc_offset[i]<0 then beam_anc_offset[i]=0
+	if beam_anc_offset[i]>beam_offset[i] then beam_anc_offset[i]=beam_offset[i]
+next i
+parameters beam_anc_offset=beam_anc_offset
+values "column_offset" range[0,]
+column_offset[5][1]=column_offset[1][1]
+column_offset[5][2]=column_offset[1][2]
+
+!=================================================================開口・段差
+if op_num>0 then
+	for i=1 to op_num
+		op_shape[i]=op_shape[i]
+		op_pos[i][1]=op_pos[i][1]
+		op_pos[i][2]=op_pos[i][2]
+		op_len[i]=op_len[i]
+		op_wid[i]=op_wid[i]
+
+		op_start[i][1]=op_pos[i][1]-op_cover
+		op_start[i][2]=op_pos[i][2]-op_cover
+		op_end[i][1]=op_pos[i][1]+op_len[i]+op_cover
+		op_end[i][2]=op_pos[i][2]+op_wid[i]+op_cover
+
+		if op_pos[i][1]<minx then op_pos[i][1]=minx
+		if op_pos[i][1]>maxx then op_pos[i][1]=maxx
+		if op_pos[i][2]<miny then op_pos[i][2]=miny
+		if op_pos[i][2]>maxy then op_pos[i][2]=maxy
+
+		if op_shape[i]=2 then
+			op_wid[i]=op_len[i]
+		endif
+	next i
+else
+	hideparameter "op_pos","op_len","op_wid","op_shape","op_subline"
+endif
+
+parameters op_shape=op_shape
+parameters op_pos=op_pos
+parameters op_len=op_len
+parameters op_wid=op_wid
+parameters op_start=op_start
+parameters op_end=op_end
+values{2} "op_shape" 1,"四角形",2,"円形"
+
+
+if step_num>0 then
+	for i=1 to step_num
+		step_pos[i][1]=step_pos[i][1]
+		step_pos[i][2]=step_pos[i][2]
+		step_len[i]=step_len[i]
+		step_wid[i]=step_wid[i]
+		step_hei[i]=step_hei[i]
+
+		step_out_start[i][1]=max(step_pos[i][1]-step_thi[i],minx)
+		step_out_start[i][2]=max(step_pos[i][2]-step_thi[i],miny)
+		step_out_end[i][1]=min(step_pos[i][1]+step_len[i]+step_thi[i],maxx)
+		step_out_end[i][2]=min(step_pos[i][2]+step_wid[i]+step_thi[i],maxy)
+
+		step_in_start[i][1]=step_pos[i][1]
+		step_in_start[i][2]=step_pos[i][2]
+		step_in_end[i][1]=step_pos[i][1]+step_len[i]
+		step_in_end[i][2]=step_pos[i][2]+step_wid[i]
+
+		if step_pos[i][1]<minx then step_pos[i][1]=minx
+		if step_pos[i][1]>maxx then step_pos[i][1]=maxx
+		if step_pos[i][2]<miny then step_pos[i][2]=miny
+		if step_pos[i][2]>maxy then step_pos[i][2]=maxy
+
+		if step_len[i]<=0 then step_len[i]=0.1
+		if step_len[i]>maxx-step_pos[i][1] then step_len[i]=maxx-step_pos[i][1]
+
+		if step_wid[i]<=0 then step_wid[i]=0.1
+		if step_wid[i]>maxy-step_pos[i][2] then step_wid[i]=maxy-step_pos[i][2]
+
+		if step_hei[i]>=0 then step_hei[i]=-0.01
+		if step_hei[i]<-2*slab_thi then step_hei[i]=-2*slab_thi
+
+		if abs(step_hei[i])<=slab_thi/2 then 
+			step_thi[i]=max(6*abs(step_hei[i]),0.1)
+		else
+			step_thi[i]=max(2*abs(step_hei[i]),0.3)
+		endif
+	next i
+else
+	hideparameter "step_pos","step_len","step_wid","step_hei","step_thi"
+endif
+
+parameters step_pos=step_pos
+parameters step_len=step_len
+parameters step_wid=step_wid
+parameters step_hei=step_hei
+parameters step_thi=step_thi
+parameters step_out_start=step_out_start
+parameters step_out_end=step_out_end
+parameters step_in_start=step_in_start
+parameters step_in_end=step_in_end
+
+!=================================================================配筋
+values "SDresol" range[3,]
+
+values{2} "conFc" 18,"18 N/㎟",21,"21 N/㎟",24,"24 N/㎟",27,"27 N/㎟",30,"30 N/㎟",33,"33 N/㎟",36,"36 N/㎟",39,"39 N/㎟",42,"42 N/㎟",45,"45 N/㎟",\
+				  48,"48 N/㎟",51,"51 N/㎟",54,"54 N/㎟",57,"57 N/㎟",60,"60 N/㎟"
+
+if conFc=18 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345"
+if conFc=21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390"
+if conFc>21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390",4,"SD490"
+
+parameters l1=l1_list[sdType][conFc]
+parameters l2=l2_list[sdType][conFc]
+parameters l3=10
+lock "L1","L2"
+values "L1Plus" range[0,]
+values "L2Plus" range[0,]
+
+values{2} "pattern" 1,"シングル",2,"ダブル",3,"千鳥"
+values{2} "mbar_dir" 1,"Y方向",2,"X方向"
+if change_mbar_dir=0 then
+	if (maxx-minx)>=(maxy-miny) then
+		mbar_dir=1
+	else
+		mbar_dir=2
+	endif
+	parameters mbar_dir=mbar_dir
+	lock "mbar_dir"
+endif
+values{2} "mbar_position" 1,"主筋が外側",2,"配力筋が外側"
+values "connect_len" range[5,]
+
+if mbar_dir=1 then
+	tver_r=dr_list[max(mbar_tside_steel,mbar2_tside_steel,mbar_tcent_steel,mbar2_tcent_steel)]
+	dver_r=dr_list[max(mbar_dside_steel,mbar2_dside_steel,mbar_dcent_steel,mbar2_dcent_steel)]
+	thor_r=dr_list[max(dbar_tside_steel,dbar2_tside_steel,dbar_tcent_steel,dbar2_tcent_steel)]
+	dhor_r=dr_list[max(dbar_dside_steel,dbar2_dside_steel,dbar_dcent_steel,dbar2_dcent_steel)]
+else
+	tver_r=dr_list[max(dbar_tside_steel,dbar2_tside_steel,dbar_tcent_steel,dbar2_tcent_steel)]
+	dver_r=dr_list[max(dbar_dside_steel,dbar2_dside_steel,dbar_dcent_steel,dbar2_dcent_steel)]
+	thor_r=dr_list[max(mbar_tside_steel,mbar2_tside_steel,mbar_tcent_steel,mbar2_tcent_steel)]
+	dhor_r=dr_list[max(mbar_dside_steel,mbar2_dside_steel,mbar_dcent_steel,mbar2_dcent_steel)]
+endif
+
+if mbar_dir=1 then
+	if mbar_position=1 then
+		position_pattern=1
+	else
+		position_pattern=2
+	endif
+else
+	if mbar_position=1 then
+		position_pattern=2
+	else
+		position_pattern=1
+	endif
+endif
+parameters position_pattern=position_pattern
+
+values{2} "mbar_tside_steel"  10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "mbar_tcent_steel"  10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "mbar2_tside_steel" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "mbar2_tcent_steel" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "dbar_tside_steel"  10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "dbar_tcent_steel"  10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "dbar2_tside_steel" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "dbar2_tcent_steel" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+
+values{2} "mbar_dside_steel"  10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "mbar_dcent_steel"  10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "mbar2_dside_steel" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "mbar2_dcent_steel" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "dbar_dside_steel"  10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "dbar_dcent_steel"  10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "dbar2_dside_steel" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "dbar2_dcent_steel" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+
+mbar_tside_steel =max(10,mbar_tside_steel )
+mbar_tcent_steel =max(10,mbar_tcent_steel )
+mbar2_tside_steel=max(10,mbar2_tside_steel)
+mbar2_tcent_steel=max(10,mbar2_tcent_steel)
+dbar_tside_steel =max(10,dbar_tside_steel )
+dbar_tcent_steel =max(10,dbar_tcent_steel )
+dbar2_tside_steel=max(10,dbar2_tside_steel)
+dbar2_tcent_steel=max(10,dbar2_tcent_steel)
+
+mbar_dside_steel =max(10,mbar_dside_steel )
+mbar_dcent_steel =max(10,mbar_dcent_steel )
+mbar2_dside_steel=max(10,mbar2_dside_steel)
+mbar2_dcent_steel=max(10,mbar2_dcent_steel)
+dbar_dside_steel =max(10,dbar_dside_steel )
+dbar_dcent_steel =max(10,dbar_dcent_steel )
+dbar2_dside_steel=max(10,dbar2_dside_steel)
+dbar2_dcent_steel=max(10,dbar2_dcent_steel)
+
+values{2} "dandori_steel" 13,"D13",16,"D16",19,"D19",22,"D22",25,"D25"
+values "dandori_pitch" 0.8,1,1.2
+if switchDandoriBar=0 then
+	hideparameter "dandori_steel","dandori_pitch"
+endif
+values{2} "dandori_pattern" 1,"両端平均割付け",2,"始点ピッチ半分オフセット",3,"終点ピッチ半分オフセット"
+
+if pattern<3 then
+	hideparameter "mbar2_tside_steel","mbar2_tcent_steel","dbar2_tside_steel","dbar2_tcent_steel","mbar2_dside_steel","mbar2_dcent_steel","dbar2_dside_steel","dbar2_dcent_steel"
+	mbar2_tside_steel=max(10,mbar_tside_steel)
+	mbar2_tcent_steel=max(10,mbar_tcent_steel)
+	dbar2_tside_steel=max(10,dbar_tside_steel)
+	dbar2_tcent_steel=max(10,dbar_tcent_steel)
+	mbar2_dside_steel=max(10,mbar_dside_steel)
+	mbar2_dcent_steel=max(10,mbar_dcent_steel)
+	dbar2_dside_steel=max(10,dbar_dside_steel)
+	dbar2_dcent_steel=max(10,dbar_dcent_steel)
+endif
+
+values{2} "opref_steel" 13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "stepref_steel" 13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "sti_steel" 13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+
+values{2} "anc_type" 1,"定着なし",2,"直線定着",3,"折り曲げ定着(下方向)",4,"折り曲げ定着(上方向)"
+
+for i=1 to 4
+	Lb_len[i]=2*beam_offset[i]-beam_anc_offset[i]
+next i
+parameters Lb_len=Lb_len
+
+if mbar_dir=1 then
+	up_ver_side_pitch=max(up_mbar_side_pitch,0.05)
+	up_ver_cen_pitch=max(up_mbar_cen_pitch,0.05)
+	up_ver_offset=up_mbar_offset
+	upCentVerEdge=upCentMbarEdge
+	upCentVerCent=upCentMbarCent
+
+	up_hor_side_pitch=max(up_dbar_side_pitch,0.05)
+	up_hor_cen_pitch=max(up_dbar_cen_pitch,0.05)
+	up_hor_offset=up_dbar_offset
+	upCentHorEdge=upCentDbarEdge
+	upCentHorCent=upCentDbarCent
+
+	low_ver_side_pitch=max(low_mbar_side_pitch,0.05)
+	low_ver_cen_pitch=max(low_mbar_cen_pitch,0.05)
+	low_ver_offset=low_mbar_offset
+	lowCentVerEdge=lowCentMbarEdge
+	lowCentVerCent=lowCentMbarCent
+
+	low_hor_side_pitch=max(low_dbar_side_pitch,0.05)
+	low_hor_cen_pitch=max(low_dbar_cen_pitch,0.05)
+	low_hor_offset=low_dbar_offset
+	lowCentHorEdge=lowCentDbarEdge
+	lowCentHorCent=lowCentDbarCent
+else
+	up_ver_side_pitch=max(up_dbar_side_pitch,0.05)
+	up_ver_cen_pitch=max(up_dbar_cen_pitch,0.05)
+	up_ver_offset=up_dbar_offset
+	upCentVerEdge=upCentDbarEdge
+	upCentVerCent=upCentDbarCent
+
+	up_hor_side_pitch=max(up_mbar_side_pitch,0.05)
+	up_hor_cen_pitch=max(up_mbar_cen_pitch,0.05)
+	up_hor_offset=up_mbar_offset
+	upCentHorEdge=upCentMbarEdge
+	upCentHorCent=upCentMbarCent
+
+	low_ver_side_pitch=max(low_dbar_side_pitch,0.05)
+	low_ver_cen_pitch=max(low_dbar_cen_pitch,0.05)
+	low_ver_offset=low_dbar_offset
+	lowCentVerEdge=lowCentDbarEdge
+	lowCentVerCent=lowCentDbarCent
+
+	low_hor_side_pitch=max(low_mbar_side_pitch,0.05)
+	low_hor_cen_pitch=max(low_mbar_cen_pitch,0.05)
+	low_hor_offset=low_mbar_offset
+	lowCentHorEdge=lowCentMbarEdge
+	lowCentHorCent=lowCentMbarCent
+endif
+
+if pattern<=1 then !シングル配筋の場合ダブル配筋に関する変数を隠す
+	hideparameter "low_mbar_side_pitch","low_mbar_cen_pitch","low_mbar_offset","low_dbar_side_pitch","low_dbar_cen_pitch","low_dbar_offset"
+endif
+
+opref_r=dr_list[opref_steel]
+opref_nd=nd_list[opref_steel]
+
+sti_r=dr_list[sti_steel]
+sti_nd=nd_list[sti_steel]
+
+stepref_r=dr_list[stepref_steel]
+stepref_nd=nd_list[stepref_steel]
+
+dandori_r=dr_list[dandori_steel]
+dandori_nd=nd_list[dandori_steel]
+dandori_pen=SDpen[scode_list[dandori_steel]]
+dandori_mat=SDmat[scode_list[dandori_steel]]
+
+
+!=================================================================上端縦筋
+up_ver_num=0
+dim up_ver_pos[],up_ver_steel[]
+up_ver_pos[1]=0
+up_ver_steel[1]=0
+
+if ver_start_half=0 then
+	up_ver_left_num=int((slab_lx/4-0.05)/up_ver_side_pitch)+1
+else
+	up_ver_left_num=int((slab_lx/4-up_ver_side_pitch/2)/up_ver_side_pitch)+1
+endif
+
+up_ver_cen_num=int((slab_x-slab_lx/2)/up_ver_cen_pitch)+1
+up_ver_cen_offset=(slab_x-slab_lx/2-(up_ver_cen_num-1)*up_ver_cen_pitch)/2
+
+if ver_end_half=0 then
+	up_ver_right_num=int((slab_lx/4-0.05)/up_ver_side_pitch)+1
+	up_ver_right_offset=(slab_lx/4-(up_ver_right_num-1)*up_ver_side_pitch-0.05)
+else
+	up_ver_right_num=int((slab_lx/4-up_ver_side_pitch/2)/up_ver_side_pitch)+1
+	up_ver_right_offset=(slab_lx/4-(up_ver_right_num-1)*up_ver_side_pitch-up_ver_side_pitch/2)
+endif
+
+up_ver_num=up_ver_left_num+up_ver_cen_num+up_ver_right_num+plus_steel_left+plus_steel_right
+
+
+!左側
+if ver_start_half=0 then
+	up_ver_0=minx+0.05
+else
+	up_ver_0=minx+up_ver_side_pitch/2
+endif
+
+for i=1 to up_ver_left_num
+	up_ver_pos[i]=up_ver_0+up_ver_offset
+	up_ver_0=up_ver_0+up_ver_side_pitch
+
+	if mbar_dir=1 then !Y方向
+		if fra(i/2)<>0 then
+			up_ver_steel[i]=mbar_tside_steel
+		else
+			up_ver_steel[i]=mbar2_tside_steel
+		endif
+	else
+		if fra(i/2)<>0 then
+			up_ver_steel[i]=dbar_tside_steel
+		else
+			up_ver_steel[i]=dbar2_tside_steel
+		endif
+	endif
+next i
+
+!中央部
+up_ver_0=minx+slab_lx/4+up_ver_cen_offset
+
+for i=up_ver_left_num+1 to up_ver_left_num+up_ver_cen_num
+	up_ver_pos[i]=up_ver_0+up_ver_offset
+	up_ver_0=up_ver_0+up_ver_cen_pitch
+
+	if mbar_dir=1 then !Y方向
+		if fra(i/2)<>0 then
+			up_ver_steel[i]=mbar_tcent_steel
+		else
+			up_ver_steel[i]=mbar2_tcent_steel
+		endif
+	else
+		if fra(i/2)<>0 then
+			up_ver_steel[i]=dbar_tcent_steel
+		else
+			up_ver_steel[i]=dbar2_tcent_steel
+		endif
+	endif
+next i
+
+!右側
+up_ver_0=minx+slab_x-slab_lx/4+up_ver_right_offset
+
+for i=up_ver_left_num+up_ver_cen_num+1 to up_ver_left_num+up_ver_cen_num+up_ver_right_num
+	up_ver_pos[i]=up_ver_0+up_ver_offset
+	up_ver_0=up_ver_0+up_ver_side_pitch
+
+	if mbar_dir=1 then !Y方向
+		if fra(i/2)<>0 then
+			up_ver_steel[i]=mbar_tside_steel
+		else
+			up_ver_steel[i]=mbar2_tside_steel
+		endif
+	else
+		if fra(i/2)<>0 then
+			up_ver_steel[i]=dbar_tside_steel
+		else
+			up_ver_steel[i]=dbar2_tside_steel
+		endif
+	endif
+next i
+
+if plus_steel_left then
+	if mbar_dir=1 then
+		up_ver_steel[up_ver_left_num+up_ver_cen_num+up_ver_right_num+plus_steel_left]=mbar2_tside_steel
+		up_ver_pos[up_ver_left_num+up_ver_cen_num+up_ver_right_num+plus_steel_left]=minx+dr_list[mbar2_tside_steel]
+	else
+		up_ver_steel[up_ver_left_num+up_ver_cen_num+up_ver_right_num+plus_steel_left]=dbar2_tside_steel
+		up_ver_pos[up_ver_left_num+up_ver_cen_num+up_ver_right_num+plus_steel_left]=minx+dr_list[dbar2_tside_steel]
+	endif
+endif
+
+if plus_steel_right then
+	if mbar_dir=1 then
+		up_ver_steel[up_ver_left_num+up_ver_cen_num+up_ver_right_num+plus_steel_left+plus_steel_right]=mbar2_tside_steel
+		up_ver_pos[up_ver_left_num+up_ver_cen_num+up_ver_right_num+plus_steel_left+plus_steel_right]=maxx-dr_list[mbar2_tside_steel]
+	else
+		up_ver_steel[up_ver_left_num+up_ver_cen_num+up_ver_right_num+plus_steel_left+plus_steel_right]=dbar2_tside_steel
+		up_ver_pos[up_ver_left_num+up_ver_cen_num+up_ver_right_num+plus_steel_left+plus_steel_right]=maxx-dr_list[dbar2_tside_steel]
+	endif
+endif
+
+
+!段差あばら筋
+counter_sti=0
+sti_pen=SDpen[scode_list[sti_steel]]
+sti_mat=SDmat[scode_list[sti_steel]]
+if position_pattern=1 then
+	sti_ver_z=slab_cover+2*tver_r-sti_r
+else
+	sti_ver_z=slab_cover+2*thor_r+sti_r
+endif
+
+!本数
+up_ver_allnum=0
+dim up_ver_ins_pos[][],up_ver_ins_num[][],up_ver_step[],up_ver_order[][],up_ver_op[],up_ver_oporder[][],\
+    up_ver_allpos[],up_ver_alledge_pos[][],up_ver_edge_num[][],up_ver_alledge_pos_2[][],\
+	up_ver_r[],up_ver_nd[],up_ver_pen[],up_ver_mat[]
+up_ver_ins_pos[1][1]=0
+up_ver_ins_pos[1][2]=0
+up_ver_ins_num[1][1]=0
+up_ver_ins_num[1][2]=0
+up_ver_step[1]=0
+up_ver_order[1][1]=0
+up_ver_order[1][2]=0
+up_ver_op[1]=0
+up_ver_oporder[1][1]=0
+up_ver_oporder[1][2]=0
+up_ver_allpos[1]=0
+up_ver_alledge_pos[1][1]=0
+up_ver_alledge_pos[1][2]=0
+up_ver_edge_num[1][1]=0
+up_ver_edge_num[1][2]=0
+up_ver_alledge_pos_2[1][1]=0
+up_ver_alledge_pos_2[1][2]=0
+up_ver_r[1]=0
+up_ver_nd[1]=0
+up_ver_pen[1]=0
+up_ver_mat[1]=0
+
+for i=1 to up_ver_num
+	random_r=dr_list[up_ver_steel[i]]
+	random_nd=nd_list[up_ver_steel[i]]
+	random_steel=up_ver_steel[i]
+	random_pen=SDpen[scode_list[up_ver_steel[i]]]
+	random_mat=SDmat[scode_list[up_ver_steel[i]]]
+
+	!==================================始点と終点
+	counter_ins=0
+
+	for j=1 to 4
+		if up_ver_pos[i]>=min(equ_pos[j][1],equ_pos[j+1][1]) and up_ver_pos[i]<max(equ_pos[j][1],equ_pos[j+1][1]) then
+			counter_ins=counter_ins+1
+			up_ver_ins_pos[i][counter_ins]=-(equ_c[j]+equ_a[j]*up_ver_pos[i])/equ_b[j]
+			up_ver_ins_num[i][counter_ins]=j
+		endif
+	next j
+
+	min_ins_pos=maxy
+	min_ins_num=0
+	max_ins_pos=miny
+	max_ins_num=0
+
+	for j=1 to counter_ins
+		if min_ins_pos>min(min_ins_pos,up_ver_ins_pos[i][j]) then
+			min_ins_pos=up_ver_ins_pos[i][j]
+			min_ins_num=up_ver_ins_num[i][j]
+		endif
+		if max_ins_pos<max(max_ins_pos,up_ver_ins_pos[i][j]) then
+			max_ins_pos=up_ver_ins_pos[i][j]
+			max_ins_num=up_ver_ins_num[i][j]
+		endif
+	next j
+
+	!==================================かぶる開口数と順番
+	counter_op=0
+	up_ver_oporder[i][1]=0
+
+	if op_num>0 then
+		for j=1 to op_num
+			if up_ver_pos[i]>op_start[j][1] and up_ver_pos[i]<op_end[j][1] then
+				if min_ins_pos<op_end[j][2] and max_ins_pos>op_start[j][2] then
+					counter_op=counter_op+1
+					up_ver_oporder[i][counter_op]=j
+				endif
+			endif
+		next j
+	endif
+
+	up_ver_op[i]=counter_op
+
+
+	up_ver_op[i]=counter_op
+
+	if counter_op>1 then
+		for j=1 to counter_op-1
+			for n=1 to counter_op-j
+				if op_start[up_ver_oporder[i][n]][2]>op_start[up_ver_oporder[i][n+1]][2] then
+					tempOrder=up_ver_oporder[i][n]
+					up_ver_oporder[i][n]=up_ver_oporder[i][n+1]
+					up_ver_oporder[i][n+1]=tempOrder
+				endif
+			next n
+		next j
+	endif
+
+	!==================================始点と終点座標をインプットする
+	!始点
+	put min_ins_pos
+
+	!開口部
+	if counter_op>0 then
+		for n=1 to counter_op
+			if op_shape[up_ver_oporder[i][n]]=1 then
+				put op_start[up_ver_oporder[i][n]][2]
+				put op_end[up_ver_oporder[i][n]][2]
+			else
+				put -sqr((op_len[up_ver_oporder[i][n]]/2+op_cover)^2-(up_ver_pos[i]-(op_pos[up_ver_oporder[i][n]][1]+op_len[up_ver_oporder[i][n]]/2))^2)+(op_pos[up_ver_oporder[i][n]][2]+op_len[up_ver_oporder[i][n]]/2)
+				put sqr((op_len[up_ver_oporder[i][n]]/2+op_cover)^2-(up_ver_pos[i]-(op_pos[up_ver_oporder[i][n]][1]+op_len[up_ver_oporder[i][n]]/2))^2)+(op_pos[up_ver_oporder[i][n]][2]+op_len[up_ver_oporder[i][n]]/2)
+			endif
+		next n
+	endif
+	
+	!終点
+	put max_ins_pos
+
+	!==================================始点と終点座標リスト
+	counter_up_ver=1
+
+	if counter_op>0 then
+		for n=1 to counter_op
+			counter_up_ver=counter_up_ver+1
+		next n
+
+		if op_start[up_ver_oporder[i][1]][2]<=miny then
+			counter_up_ver=counter_up_ver-1
+			del_data=get(1)
+			del_data=get(1)
+		endif
+
+		if op_end[up_ver_oporder[i][counter_op]][2]>=maxy then
+			counter_up_ver=counter_up_ver-1
+		endif
+	endif
+
+	if counter_up_ver>0 then
+		for j=1 to counter_up_ver
+			up_ver_totstart=get(1)
+			up_ver_totend=get(1)
+
+			counter_allnum=ceil(abs(up_ver_totend-up_ver_totstart)/connect_len)
+
+			for n=1 to counter_allnum
+				up_ver_allnum=up_ver_allnum+1
+				up_ver_r[up_ver_allnum]=random_r
+				up_ver_nd[up_ver_allnum]=random_nd
+				up_ver_pen[up_ver_allnum]=random_pen
+				up_ver_mat[up_ver_allnum]=random_mat
+				if counter_allnum=1 then
+					up_ver_allpos[up_ver_allnum]=up_ver_pos[i]
+				else
+					if fra(n/2)<>0 then
+						up_ver_allpos[up_ver_allnum]=up_ver_pos[i]-up_ver_r[up_ver_allnum]
+					else
+						up_ver_allpos[up_ver_allnum]=up_ver_pos[i]+up_ver_r[up_ver_allnum]
+					endif
+				endif
+				if n=1 then
+					up_ver_alledge_pos[up_ver_allnum][1]=up_ver_totstart
+				else
+					up_ver_alledge_pos[up_ver_allnum][1]=up_ver_totstart+(n-1)/counter_allnum*(up_ver_totend-up_ver_totstart)-(L1+L1Plus)*up_ver_nd[up_ver_allnum]/2
+				endif
+				if n=counter_allnum then
+					up_ver_alledge_pos[up_ver_allnum][2]=up_ver_totend
+				else
+					up_ver_alledge_pos[up_ver_allnum][2]=up_ver_totstart+n/counter_allnum*(up_ver_totend-up_ver_totstart)+(L1+L1Plus)*up_ver_nd[up_ver_allnum]/2
+				endif
+				up_ver_alledge_pos_2[up_ver_allnum][1]=min_ins_pos
+				up_ver_alledge_pos_2[up_ver_allnum][2]=max_ins_pos
+				up_ver_edge_num[up_ver_allnum][1]=min_ins_num !始点辺の番号
+				up_ver_edge_num[up_ver_allnum][2]=max_ins_num !終点辺の番号
+			next n
+		next j
+	endif
+
+	if nsp>0 then
+		for n=1 to nsp
+			del_data=get(1)
+		next n
+	endif
+
+	!==================================かぶる段差数と順番
+	counter_step=0
+	up_ver_order[i][1]=0
+
+	if step_num>0 then
+		for j=1 to step_num
+			if up_ver_pos[i]>step_in_start[j][1] and up_ver_pos[i]<step_in_end[j][1] then
+				if min_ins_pos<step_in_end[j][2] and max_ins_pos>step_in_start[j][2] then
+					counter_step=counter_step+1
+					up_ver_order[i][counter_step]=j
+				endif
+			endif
+		next j
+	endif
+
+	up_ver_step[i]=counter_step
+
+	if counter_step>1 then
+		for j=1 to counter_step-1
+			for n=1 to counter_step-j
+				if step_in_start[up_ver_order[i][n]][2]>step_in_start[up_ver_order[i][n+1]][2] then
+					tempOrder=up_ver_order[i][n]
+					up_ver_order[i][n]=up_ver_order[i][n+1]
+					up_ver_order[i][n+1]=tempOrder
+				endif
+			next n
+		next j
+	endif
+
+	!==================================あばら筋
+	if counter_step>0 then
+		for j=1 to counter_step
+			if j=1 and min_ins_pos>=step_in_start[up_ver_order[i][1]][2]-step_thi[up_ver_order[i][1]] then	
+			else
+				if abs(step_hei[up_ver_order[i][j]])>0.1 then
+					counter_sti=counter_sti+1
+					sti_point[counter_sti]=5
+					!1
+					sti_coor[counter_sti][1]=up_ver_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][2]=step_out_start[up_ver_order[i][j]][2]+(slab_cover+sti_r)
+					sti_coor[counter_sti][3]=-sti_ver_z
+					!2
+					sti_coor[counter_sti][4]=up_ver_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][5]=step_in_start[up_ver_order[i][j]][2]-(slab_cover+sti_r)
+					sti_coor[counter_sti][6]=-sti_ver_z
+					!3
+					sti_coor[counter_sti][7]=up_ver_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][8]=step_in_start[up_ver_order[i][j]][2]-(slab_cover+sti_r)
+					sti_coor[counter_sti][9]=step_hei[up_ver_order[i][j]]-slab_thi+sti_ver_z+2*dandori_r*switchDandoriBar
+					!4
+					sti_coor[counter_sti][10]=up_ver_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][11]=step_out_start[up_ver_order[i][j]][2]+(slab_cover+sti_r)
+					sti_coor[counter_sti][12]=step_hei[up_ver_order[i][j]]-slab_thi+sti_ver_z+2*dandori_r*switchDandoriBar
+					!5
+					sti_coor[counter_sti][13]=up_ver_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][14]=step_out_start[up_ver_order[i][j]][2]+(slab_cover+sti_r)
+					sti_coor[counter_sti][15]=-sti_ver_z
+				endif
+			endif
+	
+			if j=counter_step and max_ins_pos<=step_in_end[up_ver_order[i][counter_step]][2]+step_thi[up_ver_order[i][counter_step]] then
+			else
+				if abs(step_hei[up_ver_order[i][j]])>0.1 then
+					counter_sti=counter_sti+1
+					sti_point[counter_sti]=5
+					!1
+					sti_coor[counter_sti][1]=up_ver_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][2]=step_out_end[up_ver_order[i][j]][2]-(slab_cover+sti_r)
+					sti_coor[counter_sti][3]=-sti_ver_z
+					!2
+					sti_coor[counter_sti][4]=up_ver_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][5]=step_in_end[up_ver_order[i][j]][2]+(slab_cover+sti_r)
+					sti_coor[counter_sti][6]=-sti_ver_z
+					!3
+					sti_coor[counter_sti][7]=up_ver_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][8]=step_in_end[up_ver_order[i][j]][2]+(slab_cover+sti_r)
+					sti_coor[counter_sti][9]=step_hei[up_ver_order[i][j]]-slab_thi+sti_ver_z+2*dandori_r*switchDandoriBar
+					!4
+					sti_coor[counter_sti][10]=up_ver_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][11]=step_out_end[up_ver_order[i][j]][2]-(slab_cover+sti_r)
+					sti_coor[counter_sti][12]=step_hei[up_ver_order[i][j]]-slab_thi+sti_ver_z+2*dandori_r*switchDandoriBar
+					!5
+					sti_coor[counter_sti][13]=up_ver_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][14]=step_out_end[up_ver_order[i][j]][2]-(slab_cover+sti_r)
+					sti_coor[counter_sti][15]=-sti_ver_z
+				endif
+			endif
+		next j
+	endif
+next i
+
+
+dim up_ver_allstep[],up_ver_allorder[][],up_ver_point[],up_ver_coor[][]
+up_ver_allstep[1]=0
+up_ver_allorder[1][1]=0
+up_ver_allorder[1][2]=0
+up_ver_point[1]=0
+up_ver_coor[1][1]=0
+up_ver_coor[1][2]=0
+
+for i=1 to up_ver_allnum
+	if position_pattern=1 then !主筋方向Y方向
+		up_ver_z=-slab_cover-up_ver_r[i]
+	else
+		up_ver_z=-slab_cover-2*thor_r-up_ver_r[i]
+	endif
+
+	!==================================かぶる段差数と順番
+	counter_step=0
+	up_ver_allorder[i][1]=0
+
+	if step_num>0 then
+		for j=1 to step_num
+			if up_ver_allpos[i]>step_in_start[j][1] and up_ver_allpos[i]<step_in_end[j][1] then
+				if up_ver_alledge_pos[i][1]<step_in_end[j][2] and up_ver_alledge_pos[i][2]>step_in_start[j][2] then
+					counter_step=counter_step+1
+					up_ver_allorder[i][counter_step]=j
+				endif
+			endif
+		next j
+	endif
+
+	up_ver_allstep[i]=counter_step
+
+	if counter_step>1 then
+		for j=1 to counter_step-1
+			for n=1 to counter_step-j
+				if step_in_start[up_ver_allorder[i][n]][2]>step_in_start[up_ver_allorder[i][n+1]][2] then
+					tempOrder=up_ver_allorder[i][n]
+					up_ver_allorder[i][n]=up_ver_allorder[i][n+1]
+					up_ver_allorder[i][n+1]=tempOrder
+				endif
+			next n
+		next j
+	endif
+
+	!==================================頂点数と頂点座標リスト
+	counter_point=0
+
+	!始点端部定着
+	if counter_step<=0 then
+		start_z=up_ver_z
+	else
+		if up_ver_alledge_pos[i][1]>=step_in_start[up_ver_allorder[i][1]][2]-step_thi[up_ver_allorder[i][1]] then
+			start_z=step_hei[up_ver_allorder[i][1]]+up_ver_z
+		else
+			start_z=up_ver_z
+		endif
+	endif
+
+	if up_ver_alledge_pos[i][1]<=up_ver_alledge_pos_2[i][1] then
+		columnCutFlag=0
+		if up_ver_allpos[i]>slab_pos[up_ver_edge_num[i][1]][1]-column_offset[up_ver_edge_num[i][1]][1] and up_ver_allpos[i]<slab_pos[up_ver_edge_num[i][1]][1]+column_offset[up_ver_edge_num[i][1]][1] then
+			columnCutFlag=1
+			counter_point=counter_point+1
+			up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+			up_ver_coor[i][counter_point*3-1]=slab_pos[up_ver_edge_num[i][1]][2]+column_offset[up_ver_edge_num[i][1]][2]-(L2+L2Plus)*up_ver_nd[i]
+			up_ver_coor[i][counter_point*3]=start_z
+		endif
+
+		if up_ver_allpos[i]>slab_pos[up_ver_edge_num[i][1]+1][1]-column_offset[up_ver_edge_num[i][1]+1][1] and up_ver_allpos[i]<slab_pos[up_ver_edge_num[i][1]+1][1]+column_offset[up_ver_edge_num[i][1]+1][1] then
+			columnCutFlag=1
+			counter_point=counter_point+1
+			up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+			up_ver_coor[i][counter_point*3-1]=slab_pos[up_ver_edge_num[i][1]+1][2]+column_offset[up_ver_edge_num[i][1]+1][2]-(L2+L2Plus)*up_ver_nd[i]
+			up_ver_coor[i][counter_point*3]=start_z
+		endif
+
+		if columnCutFlag=0 then
+			if anc_type[up_ver_edge_num[i][1]]=1 then !定着なし
+				counter_point=counter_point+1
+				up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+				up_ver_coor[i][counter_point*3-1]=up_ver_alledge_pos[i][1]
+				up_ver_coor[i][counter_point*3]=start_z
+			endif
+			
+			if anc_type[up_ver_edge_num[i][1]]=2 then !直線定着
+				counter_point=counter_point+1
+				up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+				up_ver_coor[i][counter_point*3-1]=up_ver_alledge_pos[i][1]-(L2+L2Plus)*up_ver_nd[i]
+				up_ver_coor[i][counter_point*3]=start_z
+			endif
+			
+			if anc_type[up_ver_edge_num[i][1]]=3 then !折り曲げ定着(下方向)
+				counter_point=counter_point+1
+				up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+				up_ver_coor[i][counter_point*3-1]=up_ver_alledge_pos[i][1]-Lb_len[up_ver_edge_num[i][1]]+up_ver_r[i]
+				up_ver_coor[i][counter_point*3]=start_z-elbowRad*up_ver_r[i]-max(((L2+L2Plus)*up_ver_nd[i]-Lb_len[up_ver_edge_num[i][1]]),8*up_ver_nd[i])
+		
+				counter_point=counter_point+1
+				up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+				up_ver_coor[i][counter_point*3-1]=up_ver_alledge_pos[i][1]-Lb_len[up_ver_edge_num[i][1]]+up_ver_r[i]
+				up_ver_coor[i][counter_point*3]=start_z
+			endif
+
+			if anc_type[up_ver_edge_num[i][1]]=4 then !折り曲げ定着(上方向)
+				counter_point=counter_point+1
+				up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+				up_ver_coor[i][counter_point*3-1]=up_ver_alledge_pos[i][1]-Lb_len[up_ver_edge_num[i][1]]+up_ver_r[i]
+				up_ver_coor[i][counter_point*3]=start_z+elbowRad*up_ver_r[i]+max(((L2+L2Plus)*up_ver_nd[i]-Lb_len[up_ver_edge_num[i][1]]),8*up_ver_nd[i])
+		
+				counter_point=counter_point+1
+				up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+				up_ver_coor[i][counter_point*3-1]=up_ver_alledge_pos[i][1]-Lb_len[up_ver_edge_num[i][1]]+up_ver_r[i]
+				up_ver_coor[i][counter_point*3]=start_z
+			endif
+		endif
+	else
+		counter_point=counter_point+1
+		up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+		up_ver_coor[i][counter_point*3-1]=up_ver_alledge_pos[i][1]
+		up_ver_coor[i][counter_point*3]=start_z
+	endif
+
+	!段差部
+	if counter_step>0 then
+		for j=1 to counter_step
+			if abs(step_hei[up_ver_allorder[i][j]])>0.1 then
+				coor_plus=slab_cover+2*sti_r+2*stepref_r
+			else
+				coor_plus=0
+			endif
+
+			if j=1 and up_ver_alledge_pos[i][1]>=step_in_start[up_ver_allorder[i][1]][2]-step_thi[up_ver_allorder[i][1]] then	
+			else
+				counter_point=counter_point+1
+				up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+				up_ver_coor[i][counter_point*3-1]=step_out_start[up_ver_allorder[i][j]][2]+coor_plus
+				up_ver_coor[i][counter_point*3]=up_ver_z
+	
+				counter_point=counter_point+1
+				up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+				up_ver_coor[i][counter_point*3-1]=step_in_start[up_ver_allorder[i][j]][2]
+				up_ver_coor[i][counter_point*3]=step_hei[up_ver_allorder[i][j]]+up_ver_z
+			endif
+	
+			if j=counter_step and up_ver_alledge_pos[i][2]<=step_in_end[up_ver_allorder[i][counter_step]][2]+step_thi[up_ver_allorder[i][counter_step]] then
+			else
+				counter_point=counter_point+1
+				up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+				up_ver_coor[i][counter_point*3-1]=step_in_end[up_ver_allorder[i][j]][2]
+				up_ver_coor[i][counter_point*3]=step_hei[up_ver_allorder[i][j]]+up_ver_z
+	
+				counter_point=counter_point+1
+				up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+				up_ver_coor[i][counter_point*3-1]=step_out_end[up_ver_allorder[i][j]][2]-coor_plus
+				up_ver_coor[i][counter_point*3]=up_ver_z
+			endif
+		next j
+	endif
+
+	!終点端部定着
+	if counter_step<=0 then
+		end_z=up_ver_z
+	else
+		if up_ver_alledge_pos[i][2]<=step_in_end[up_ver_allorder[i][counter_step]][2]+step_thi[up_ver_allorder[i][counter_step]] then
+			end_z=step_hei[up_ver_allorder[i][counter_step]]+up_ver_z
+		else
+			end_z=up_ver_z
+		endif
+	endif
+
+	if up_ver_alledge_pos[i][2]>=up_ver_alledge_pos_2[i][2] then
+		columnCutFlag=0
+		if up_ver_allpos[i]>slab_pos[up_ver_edge_num[i][2]][1]-column_offset[up_ver_edge_num[i][2]][1] and up_ver_allpos[i]<slab_pos[up_ver_edge_num[i][2]][1]+column_offset[up_ver_edge_num[i][2]][1] then
+			columnCutFlag=1
+			counter_point=counter_point+1
+			up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+			up_ver_coor[i][counter_point*3-1]=slab_pos[up_ver_edge_num[i][2]][2]-column_offset[up_ver_edge_num[i][2]][2]+(L2+L2Plus)*up_ver_nd[i]
+			up_ver_coor[i][counter_point*3]=start_z
+		endif
+
+		if up_ver_allpos[i]>slab_pos[up_ver_edge_num[i][2]+1][1]-column_offset[up_ver_edge_num[i][2]+1][1] and up_ver_allpos[i]<slab_pos[up_ver_edge_num[i][2]+1][1]+column_offset[up_ver_edge_num[i][2]+1][1] then
+			columnCutFlag=1
+			counter_point=counter_point+1
+			up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+			up_ver_coor[i][counter_point*3-1]=slab_pos[up_ver_edge_num[i][2]+1][2]-column_offset[up_ver_edge_num[i][2]+1][2]+(L2+L2Plus)*up_ver_nd[i]
+			up_ver_coor[i][counter_point*3]=start_z
+		endif
+
+		if columnCutFlag=0 then
+			if anc_type[up_ver_edge_num[i][2]]=1 then !定着なし
+				counter_point=counter_point+1
+				up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+				up_ver_coor[i][counter_point*3-1]=up_ver_alledge_pos[i][2]
+				up_ver_coor[i][counter_point*3]=end_z
+			endif
+		
+			if anc_type[up_ver_edge_num[i][2]]=2 then !直線定着
+				counter_point=counter_point+1
+				up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+				up_ver_coor[i][counter_point*3-1]=up_ver_alledge_pos[i][2]+(L2+L2Plus)*up_ver_nd[i]
+				up_ver_coor[i][counter_point*3]=end_z
+			endif
+		
+			if anc_type[up_ver_edge_num[i][2]]=3 then !折り曲げ定着(下方向)
+				counter_point=counter_point+1
+				up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+				up_ver_coor[i][counter_point*3-1]=up_ver_alledge_pos[i][2]+Lb_len[up_ver_edge_num[i][2]]-up_ver_r[i]
+				up_ver_coor[i][counter_point*3]=end_z
+		
+				counter_point=counter_point+1
+				up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+				up_ver_coor[i][counter_point*3-1]=up_ver_alledge_pos[i][2]+Lb_len[up_ver_edge_num[i][2]]-up_ver_r[i]
+				up_ver_coor[i][counter_point*3]=end_z-elbowRad*up_ver_r[i]-max(((L2+L2Plus)*up_ver_nd[i]-Lb_len[up_ver_edge_num[i][2]]),8*up_ver_nd[i])
+			endif
+
+			if anc_type[up_ver_edge_num[i][2]]=4 then !折り曲げ定着(上方向)
+				counter_point=counter_point+1
+				up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+				up_ver_coor[i][counter_point*3-1]=up_ver_alledge_pos[i][2]+Lb_len[up_ver_edge_num[i][2]]-up_ver_r[i]
+				up_ver_coor[i][counter_point*3]=end_z
+		
+				counter_point=counter_point+1
+				up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+				up_ver_coor[i][counter_point*3-1]=up_ver_alledge_pos[i][2]+Lb_len[up_ver_edge_num[i][2]]-up_ver_r[i]
+				up_ver_coor[i][counter_point*3]=end_z+elbowRad*up_ver_r[i]+max(((L2+L2Plus)*up_ver_nd[i]-Lb_len[up_ver_edge_num[i][2]]),8*up_ver_nd[i])
+			endif
+		endif
+	else
+		counter_point=counter_point+1
+		up_ver_coor[i][counter_point*3-2]=up_ver_allpos[i]
+		up_ver_coor[i][counter_point*3-1]=up_ver_alledge_pos[i][2]
+		up_ver_coor[i][counter_point*3]=end_z
+	endif
+
+	up_ver_point[i]=counter_point
+next i
+
+!上中央プラス縦筋
+if upCentVerEdge or upCentVerCent then
+	if mbar_dir=1 then
+		barSteel=mbar_tcent_steel
+	else
+		barSteel=dbar_tcent_steel
+	endif
+
+	upCentVerNum=0
+	dim upCentVerPos[],upCentVerIntsecPos[][],upCentVerIntsecNum[][]
+	upCentVerPos[1]=0
+	upCentVerIntsecPos[1][1]=0
+	upCentVerIntsecPos[1][2]=0
+	upCentVerIntsecNum[1][1]=0
+	upCentVerIntsecNum[1][2]=0
+
+	upCentVerNum=int((slab_x-slab_lx/2)/up_ver_cen_pitch)
+	upCentVerOffset=(slab_x-slab_lx/2-(upCentVerNum-1)*up_ver_cen_pitch)/2
+
+	for i=1 to upCentVerNum
+		upCentVerPos[i]=minx+slab_lx/4+upCentVerOffset+(i-1)*up_ver_cen_pitch
+
+		!始点と終点
+		intsecCount=0
+
+		for j=1 to 4
+			if upCentVerPos[i]>=min(equ_pos[j][1],equ_pos[j+1][1]) and upCentVerPos[i]<max(equ_pos[j][1],equ_pos[j+1][1]) then
+				intsecCount=intsecCount+1
+				upCentVerIntsecPos[i][intsecCount]=-(equ_c[j]+equ_a[j]*upCentVerPos[i])/equ_b[j]
+				upCentVerIntsecNum[i][intsecCount]=j
+			endif
+		next j
+
+		if upCentVerIntsecPos[i][1]<=upCentVerIntsecPos[i][2] then
+			startIntsecPos=upCentVerIntsecPos[i][1]
+			startIntsecNum=upCentVerIntsecNum[i][1]
+			endIntsecPos=upCentVerIntsecPos[i][2]
+			endIntsecNum=upCentVerIntsecNum[i][2]
+		else
+			startIntsecPos=upCentVerIntsecPos[i][2]
+			startIntsecNum=upCentVerIntsecNum[i][2]
+			endIntsecPos=upCentVerIntsecPos[i][1]
+			endIntsecNum=upCentVerIntsecNum[i][1]
+		endif
+
+		if upCentVerEdge then
+			!始点端部
+			if startIntsecPos<miny+slab_lx/4 then
+				up_ver_allnum=up_ver_allnum+1
+				up_ver_r[up_ver_allnum]=dr_list[barSteel]
+				up_ver_nd[up_ver_allnum]=nd_list[barSteel]
+				up_ver_pen[up_ver_allnum]=SDpen[scode_list[barSteel]]
+				up_ver_mat[up_ver_allnum]=SDmat[scode_list[barSteel]]
+
+				if anc_type[startIntsecNum]=1 then !定着なし
+					startYpos=startIntsecPos
+				endif
+
+				if anc_type[startIntsecNum]=2 then !直線定着
+					startYpos=startIntsecPos-(L2+L2Plus)*up_ver_nd[up_ver_allnum]
+				endif
+
+				if anc_type[startIntsecNum]=3 then !折り曲げ定着(下方向)
+					startYpos=startIntsecPos-Lb_len[startIntsecNum]+up_ver_r[up_ver_allnum]
+				endif
+
+				if anc_type[startIntsecNum]=4 then !折り曲げ定着(上方向)
+					startYpos=startIntsecPos-Lb_len[startIntsecNum]+up_ver_r[up_ver_allnum]
+				endif
+
+				up_ver_point[up_ver_allnum]=2
+
+				if anc_type[startIntsecNum]=3 then
+					up_ver_point[up_ver_allnum]=up_ver_point[up_ver_allnum]+1
+
+					put upCentVerPos[i]
+					put startYpos
+					put up_ver_z-(elbowRad*up_ver_r[up_ver_allnum]+max(((L2+L2Plus)*up_ver_nd[up_ver_allnum]-Lb_len[startIntsecNum]),8*up_ver_nd[up_ver_allnum]))
+				endif
+
+				if anc_type[startIntsecNum]=4 then
+					up_ver_point[up_ver_allnum]=up_ver_point[up_ver_allnum]+1
+
+					put upCentVerPos[i]
+					put startYpos
+					put up_ver_z+(elbowRad*up_ver_r[up_ver_allnum]+max(((L2+L2Plus)*up_ver_nd[up_ver_allnum]-Lb_len[startIntsecNum]),8*up_ver_nd[up_ver_allnum]))
+				endif
+
+				put upCentVerPos[i]
+				put startYpos
+				put up_ver_z
+
+				put upCentVerPos[i]
+				put miny+slab_lx/4
+				put up_ver_z
+
+				for n=1 to 3*up_ver_point[up_ver_allnum]
+					up_ver_coor[up_ver_allnum][n]=get(1)
+				next n
+			endif
+
+			!終点端部
+			if endIntsecPos>maxy-slab_lx/4 then
+				up_ver_allnum=up_ver_allnum+1
+				up_ver_r[up_ver_allnum]=dr_list[barSteel]
+				up_ver_nd[up_ver_allnum]=nd_list[barSteel]
+				up_ver_pen[up_ver_allnum]=SDpen[scode_list[barSteel]]
+				up_ver_mat[up_ver_allnum]=SDmat[scode_list[barSteel]]
+
+				if anc_type[endIntsecNum]=1 then !定着なし
+					endYpos=endIntsecPos
+				endif
+
+				if anc_type[endIntsecNum]=2 then !直線定着
+					endYpos=endIntsecPos+(L2+L2Plus)*up_ver_nd[up_ver_allnum]
+				endif
+
+				if anc_type[endIntsecNum]=3 then !折り曲げ定着(下方向)
+					endYpos=endIntsecPos+Lb_len[endIntsecNum]-up_ver_r[up_ver_allnum]
+				endif
+
+				if anc_type[endIntsecNum]=4 then !折り曲げ定着(上方向)
+					endYpos=endIntsecPos+Lb_len[endIntsecNum]-up_ver_r[up_ver_allnum]
+				endif
+
+				up_ver_point[up_ver_allnum]=2
+
+				put upCentVerPos[i]
+				put maxy-slab_lx/4
+				put up_ver_z
+
+				put upCentVerPos[i]
+				put endYpos
+				put up_ver_z
+
+				if anc_type[endIntsecNum]=3 then
+					up_ver_point[up_ver_allnum]=up_ver_point[up_ver_allnum]+1
+
+					put upCentVerPos[i]
+					put endYpos
+					put up_ver_z-(elbowRad*up_ver_r[up_ver_allnum]+max(((L2+L2Plus)*up_ver_nd[up_ver_allnum]-Lb_len[endIntsecNum]),8*up_ver_nd[up_ver_allnum]))
+				endif
+
+				if anc_type[endIntsecNum]=4 then
+					up_ver_point[up_ver_allnum]=up_ver_point[up_ver_allnum]+1
+
+					put upCentVerPos[i]
+					put endYpos
+					put up_ver_z+(elbowRad*up_ver_r[up_ver_allnum]+max(((L2+L2Plus)*up_ver_nd[up_ver_allnum]-Lb_len[endIntsecNum]),8*up_ver_nd[up_ver_allnum]))
+				endif
+
+				for n=1 to 3*up_ver_point[up_ver_allnum]
+					up_ver_coor[up_ver_allnum][n]=get(1)
+				next n
+			endif
+		endif
+
+		if upCentVerCent then
+			up_ver_allnum=up_ver_allnum+1
+			up_ver_r[up_ver_allnum]=dr_list[barSteel]
+			up_ver_nd[up_ver_allnum]=nd_list[barSteel]
+			up_ver_pen[up_ver_allnum]=SDpen[scode_list[barSteel]]
+			up_ver_mat[up_ver_allnum]=SDmat[scode_list[barSteel]]
+
+			up_ver_point[up_ver_allnum]=2
+
+			put upCentVerPos[i]
+			put max(miny+slab_lx/4,startIntsecPos)
+			put up_ver_z
+		
+			put upCentVerPos[i]
+			put min(maxy-slab_lx/4,endIntsecPos)
+			put up_ver_z
+
+			for n=1 to 3*up_ver_point[up_ver_allnum]
+				up_ver_coor[up_ver_allnum][n]=get(1)
+			next n
+		endif
+	next i
+endif
+
+if switchUpperY=0 then up_ver_allnum=0
+
+
+!=================================================================下端縦筋(ダブル)
+low_ver_num=0
+dim low_ver_pos[],low_ver_steel[]
+low_ver_pos[1]=0
+low_ver_steel[1]=0
+
+if ver_start_half=0 then
+	low_ver_left_num=int((slab_lx/4-0.05)/low_ver_side_pitch)+1
+else
+	low_ver_left_num=int((slab_lx/4-low_ver_side_pitch/2)/low_ver_side_pitch)+1
+endif
+
+low_ver_cen_num=int((slab_x-slab_lx/2)/low_ver_cen_pitch)+1
+low_ver_cen_offset=(slab_x-slab_lx/2-(low_ver_cen_num-1)*low_ver_cen_pitch)/2
+
+if ver_end_half=0 then
+	low_ver_right_num=int((slab_lx/4-0.05)/low_ver_side_pitch)+1
+	low_ver_right_offset=(slab_lx/4-(low_ver_right_num-1)*low_ver_side_pitch-0.05)
+else
+	low_ver_right_num=int((slab_lx/4-low_ver_side_pitch/2)/low_ver_side_pitch)+1
+	low_ver_right_offset=(slab_lx/4-(low_ver_right_num-1)*low_ver_side_pitch-low_ver_side_pitch/2)
+endif
+
+low_ver_num=low_ver_left_num+low_ver_cen_num+low_ver_right_num+plus_steel_left+plus_steel_right
+
+!左側
+if ver_start_half=0 then
+	low_ver_0=minx+0.05
+else
+	low_ver_0=minx+low_ver_side_pitch/2
+endif
+
+for i=1 to low_ver_left_num
+	low_ver_pos[i]=low_ver_0+low_ver_offset
+	low_ver_0=low_ver_0+low_ver_side_pitch
+
+	if mbar_dir=1 then !Y方向
+		if fra(i/2)<>0 then
+			low_ver_steel[i]=mbar_dside_steel
+		else
+			low_ver_steel[i]=mbar2_dside_steel
+		endif
+	else
+		if fra(i/2)<>0 then
+			low_ver_steel[i]=dbar_dside_steel
+		else
+			low_ver_steel[i]=dbar2_dside_steel
+		endif
+	endif
+next i
+
+!中央部
+low_ver_0=minx+slab_lx/4+low_ver_cen_offset
+
+for i=low_ver_left_num+1 to low_ver_left_num+low_ver_cen_num
+	low_ver_pos[i]=low_ver_0+low_ver_offset
+	low_ver_0=low_ver_0+low_ver_cen_pitch
+
+	if mbar_dir=1 then !Y方向
+		if fra(i/2)<>0 then
+			low_ver_steel[i]=mbar_dcent_steel
+		else
+			low_ver_steel[i]=mbar2_dcent_steel
+		endif
+	else
+		if fra(i/2)<>0 then
+			low_ver_steel[i]=dbar_dcent_steel
+		else
+			low_ver_steel[i]=dbar2_dcent_steel
+		endif
+	endif
+next i
+
+!右側
+low_ver_0=minx+slab_x-slab_lx/4+low_ver_right_offset
+
+for i=low_ver_left_num+low_ver_cen_num+1 to low_ver_left_num+low_ver_cen_num+low_ver_right_num
+	low_ver_pos[i]=low_ver_0+low_ver_offset
+	low_ver_0=low_ver_0+low_ver_side_pitch
+
+	if mbar_dir=1 then !Y方向
+		if fra(i/2)<>0 then
+			low_ver_steel[i]=mbar_dside_steel
+		else
+			low_ver_steel[i]=mbar2_dside_steel
+		endif
+	else
+		if fra(i/2)<>0 then
+			low_ver_steel[i]=dbar_dside_steel
+		else
+			low_ver_steel[i]=dbar2_dside_steel
+		endif
+	endif
+next i
+
+if plus_steel_left then
+	if mbar_dir=1 then
+		low_ver_steel[low_ver_left_num+low_ver_cen_num+low_ver_right_num+plus_steel_left]=mbar2_dside_steel
+		low_ver_pos[low_ver_left_num+low_ver_cen_num+low_ver_right_num+plus_steel_left]=minx+dr_list[mbar2_dside_steel]
+	else
+		low_ver_steel[low_ver_left_num+low_ver_cen_num+low_ver_right_num+plus_steel_left]=dbar2_dside_steel
+		low_ver_pos[low_ver_left_num+low_ver_cen_num+low_ver_right_num+plus_steel_left]=minx+dr_list[dbar2_dside_steel]
+	endif
+endif
+
+if plus_steel_right then
+	if mbar_dir=1 then
+		low_ver_steel[low_ver_left_num+low_ver_cen_num+low_ver_right_num+plus_steel_left+plus_steel_right]=mbar2_dside_steel
+		low_ver_pos[low_ver_left_num+low_ver_cen_num+low_ver_right_num+plus_steel_left+plus_steel_right]=maxx-dr_list[mbar2_dside_steel]
+	else
+		low_ver_steel[low_ver_left_num+low_ver_cen_num+low_ver_right_num+plus_steel_left+plus_steel_right]=dbar2_dside_steel
+		low_ver_pos[low_ver_left_num+low_ver_cen_num+low_ver_right_num+plus_steel_left+plus_steel_right]=maxx-dr_list[dbar2_dside_steel]
+	endif
+endif
+
+
+!本数
+low_ver_allnum=0
+dim low_ver_ins_pos[][],low_ver_ins_num[][],low_ver_step[],low_ver_order[][],low_ver_op[],low_ver_oporder[][],\
+    low_ver_allpos[],low_ver_alledge_pos[][],low_ver_edge_num[][],low_ver_alledge_pos_2[][],\
+	low_ver_r[],low_ver_nd[],low_ver_pen[],low_ver_mat[]
+low_ver_ins_pos[1][1]=0
+low_ver_ins_pos[1][2]=0
+low_ver_ins_num[1][1]=0
+low_ver_ins_num[1][2]=0
+low_ver_step[1]=0
+low_ver_order[1][1]=0
+low_ver_order[1][2]=0
+low_ver_op[1]=0
+low_ver_oporder[1][1]=0
+low_ver_oporder[1][2]=0
+low_ver_allpos[1]=0
+low_ver_alledge_pos[1][1]=0
+low_ver_alledge_pos[1][2]=0
+low_ver_edge_num[1][1]=0
+low_ver_edge_num[1][2]=0
+low_ver_alledge_pos_2[1][1]=0
+low_ver_alledge_pos_2[1][2]=0
+low_ver_r[1]=0
+low_ver_nd[1]=0
+low_ver_pen[1]=0
+low_ver_mat[1]=0
+
+if low_ver_num>0 and pattern<>1 then
+
+for i=1 to low_ver_num
+	random_r=dr_list[low_ver_steel[i]]
+	random_nd=nd_list[low_ver_steel[i]]
+	random_steel=low_ver_steel[i]
+	random_pen=SDpen[scode_list[low_ver_steel[i]]]
+	random_mat=SDmat[scode_list[low_ver_steel[i]]]
+
+	!==================================始点と終点
+	counter_ins=0
+
+	for j=1 to 4
+		if low_ver_pos[i]>=min(equ_pos[j][1],equ_pos[j+1][1]) and low_ver_pos[i]<max(equ_pos[j][1],equ_pos[j+1][1]) then
+			counter_ins=counter_ins+1
+			low_ver_ins_pos[i][counter_ins]=-(equ_c[j]+equ_a[j]*low_ver_pos[i])/equ_b[j]
+			low_ver_ins_num[i][counter_ins]=j
+		endif
+	next j
+
+	min_ins_pos=maxy
+	min_ins_num=0
+	max_ins_pos=miny
+	max_ins_num=0
+
+	for j=1 to counter_ins
+		if min_ins_pos>min(min_ins_pos,low_ver_ins_pos[i][j]) then
+			min_ins_pos=low_ver_ins_pos[i][j]
+			min_ins_num=low_ver_ins_num[i][j]
+		endif
+		if max_ins_pos<max(max_ins_pos,low_ver_ins_pos[i][j]) then
+			max_ins_pos=low_ver_ins_pos[i][j]
+			max_ins_num=low_ver_ins_num[i][j]
+		endif
+	next j
+
+
+	!==================================かぶる開口数と順番
+	counter_op=0
+	low_ver_oporder[i][1]=0
+
+	if op_num>0 then
+		for j=1 to op_num
+			if low_ver_pos[i]>op_start[j][1] and low_ver_pos[i]<op_end[j][1] then
+				if min_ins_pos<op_end[j][2] and max_ins_pos>op_start[j][2] then
+					counter_op=counter_op+1
+					low_ver_oporder[i][counter_op]=j
+				endif
+			endif
+		next j
+	endif
+
+	low_ver_op[i]=counter_op
+
+	if counter_op>1 then
+		for j=1 to counter_op-1
+			for n=1 to counter_op-j
+				if op_start[low_ver_oporder[i][n]][2]>op_start[low_ver_oporder[i][n+1]][2] then
+					tempOrder=low_ver_oporder[i][n]
+					low_ver_oporder[i][n]=low_ver_oporder[i][n+1]
+					low_ver_oporder[i][n+1]=tempOrder
+				endif
+			next n
+		next j
+	endif
+
+	!==================================始点と終点座標をインプットする
+	!始点
+	put min_ins_pos
+
+	!開口部
+	if counter_op>0 then
+		for n=1 to counter_op
+			if op_shape[low_ver_oporder[i][n]]=1 then
+				put op_start[low_ver_oporder[i][n]][2]
+				put op_end[low_ver_oporder[i][n]][2]
+			else
+				put -sqr((op_len[low_ver_oporder[i][n]]/2+op_cover)^2-(low_ver_pos[i]-(op_pos[low_ver_oporder[i][n]][1]+op_len[low_ver_oporder[i][n]]/2))^2)+(op_pos[low_ver_oporder[i][n]][2]+op_len[low_ver_oporder[i][n]]/2)
+				put sqr((op_len[low_ver_oporder[i][n]]/2+op_cover)^2-(low_ver_pos[i]-(op_pos[low_ver_oporder[i][n]][1]+op_len[low_ver_oporder[i][n]]/2))^2)+(op_pos[low_ver_oporder[i][n]][2]+op_len[low_ver_oporder[i][n]]/2)
+			endif
+		next n
+	endif
+	
+	!終点
+	put max_ins_pos
+
+	!==================================始点と終点座標リスト
+	counter_low_ver=1
+
+	if counter_op>0 then
+		for n=1 to counter_op
+			counter_low_ver=counter_low_ver+1
+		next n
+
+		if op_start[low_ver_oporder[i][1]][2]<=miny then
+			counter_low_ver=counter_low_ver-1
+			del_data=get(1)
+			del_data=get(1)
+		endif
+
+		if op_end[low_ver_oporder[i][counter_op]][2]>=maxy then
+			counter_low_ver=counter_low_ver-1
+		endif
+	endif
+
+	if counter_low_ver>0 then
+		for j=1 to counter_low_ver
+			low_ver_totstart=get(1)
+			low_ver_totend=get(1)
+
+			counter_allnum=ceil(abs(low_ver_totend-low_ver_totstart)/connect_len)
+
+			for n=1 to counter_allnum
+				low_ver_allnum=low_ver_allnum+1
+				low_ver_r[low_ver_allnum]=random_r
+				low_ver_nd[low_ver_allnum]=random_nd
+				low_ver_pen[low_ver_allnum]=random_pen
+				low_ver_mat[low_ver_allnum]=random_mat
+				if counter_allnum=1 then
+					low_ver_allpos[low_ver_allnum]=low_ver_pos[i]
+				else
+					if fra(n/2)<>0 then
+						low_ver_allpos[low_ver_allnum]=low_ver_pos[i]-low_ver_r[low_ver_allnum]
+					else
+						low_ver_allpos[low_ver_allnum]=low_ver_pos[i]+low_ver_r[low_ver_allnum]
+					endif
+				endif
+				if n=1 then
+					low_ver_alledge_pos[low_ver_allnum][1]=low_ver_totstart
+				else
+					low_ver_alledge_pos[low_ver_allnum][1]=low_ver_totstart+(n-1)/counter_allnum*(low_ver_totend-low_ver_totstart)-(L1+L1Plus)*low_ver_nd[low_ver_allnum]/2
+				endif
+				if n=counter_allnum then
+					low_ver_alledge_pos[low_ver_allnum][2]=low_ver_totend
+				else
+					low_ver_alledge_pos[low_ver_allnum][2]=low_ver_totstart+n/counter_allnum*(low_ver_totend-low_ver_totstart)+(L1+L1Plus)*low_ver_nd[low_ver_allnum]/2
+				endif
+				low_ver_alledge_pos_2[low_ver_allnum][1]=min_ins_pos
+				low_ver_alledge_pos_2[low_ver_allnum][2]=max_ins_pos
+
+				low_ver_edge_num[low_ver_allnum][1]=min_ins_num !始点辺の番号
+				low_ver_edge_num[low_ver_allnum][2]=max_ins_num !終点辺の番号
+			next n
+		next j
+	endif
+
+	if nsp>0 then
+		for n=1 to nsp
+			del_data=get(1)
+		next n
+	endif
+next i
+
+
+dim low_ver_allstep[],low_ver_allorder[][],low_ver_point[],low_ver_coor[][]
+low_ver_allstep[1]=0
+low_ver_allorder[1][1]=0
+low_ver_allorder[1][2]=0
+low_ver_point[1]=0
+low_ver_coor[1][1]=0
+low_ver_coor[1][2]=0
+
+for i=1 to low_ver_allnum
+	if position_pattern=1 then
+		low_ver_z=-slab_thi+slab_cover+low_ver_r[i]+2*dandori_r*switchDandoriBar
+	else
+		low_ver_z=-slab_thi+slab_cover+2*dhor_r+low_ver_r[i]+2*dandori_r*switchDandoriBar
+	endif
+
+	!==================================かぶる段差数と順番
+	counter_step=0
+	low_ver_allorder[i][1]=0
+
+	if step_num>0 then
+		for j=1 to step_num
+			if low_ver_allpos[i]>step_in_start[j][1] and low_ver_allpos[i]<step_in_end[j][1] then
+				if low_ver_alledge_pos[i][1]<step_in_end[j][2] and low_ver_alledge_pos[i][2]>step_in_start[j][2] then
+					counter_step=counter_step+1
+					low_ver_allorder[i][counter_step]=j
+				endif
+			endif
+		next j
+	endif
+
+	low_ver_allstep[i]=counter_step
+
+	if counter_step>1 then
+		for j=1 to counter_step-1
+			for n=1 to counter_step-j
+				if step_in_start[low_ver_allorder[i][n]][2]>step_in_start[low_ver_allorder[i][n+1]][2] then
+					tempOrder=low_ver_allorder[i][n]
+					low_ver_allorder[i][n]=low_ver_allorder[i][n+1]
+					low_ver_allorder[i][n+1]=tempOrder
+				endif
+			next n
+		next j
+	endif
+
+	!==================================頂点数と頂点座標リスト
+	counter_point=0
+
+	!始点端部定着
+	if counter_step<=0 then
+		start_z=low_ver_z
+	else
+		if low_ver_alledge_pos[i][1]>=step_in_start[low_ver_allorder[i][1]][2]-step_thi[low_ver_allorder[i][1]] then
+			start_z=step_hei[low_ver_allorder[i][1]]+low_ver_z
+		else
+			start_z=low_ver_z
+		endif
+	endif
+
+	if low_ver_alledge_pos[i][1]<=low_ver_alledge_pos_2[i][1] then
+		columnCutFlag=0
+		if low_ver_allpos[i]>slab_pos[low_ver_edge_num[i][1]][1]-column_offset[low_ver_edge_num[i][1]][1] and low_ver_allpos[i]<slab_pos[low_ver_edge_num[i][1]][1]+column_offset[low_ver_edge_num[i][1]][1] then
+			columnCutFlag=1
+			counter_point=counter_point+1
+			low_ver_coor[i][counter_point*3-2]=low_ver_allpos[i]
+			low_ver_coor[i][counter_point*3-1]=slab_pos[low_ver_edge_num[i][1]][2]+column_offset[low_ver_edge_num[i][1]][2]-(L2+L2Plus)*low_ver_nd[i]
+			low_ver_coor[i][counter_point*3]=start_z
+		endif
+
+		if low_ver_allpos[i]>slab_pos[low_ver_edge_num[i][1]+1][1]-column_offset[low_ver_edge_num[i][1]+1][1] and low_ver_allpos[i]<slab_pos[low_ver_edge_num[i][1]+1][1]+column_offset[low_ver_edge_num[i][1]+1][1] then
+			columnCutFlag=1
+			counter_point=counter_point+1
+			low_ver_coor[i][counter_point*3-2]=low_ver_allpos[i]
+			low_ver_coor[i][counter_point*3-1]=slab_pos[low_ver_edge_num[i][1]+1][2]+column_offset[low_ver_edge_num[i][1]+1][2]-(L2+L2Plus)*low_ver_nd[i]
+			low_ver_coor[i][counter_point*3]=start_z
+		endif
+
+		if columnCutFlag=0 then
+			if anc_type[low_ver_edge_num[i][1]]=1 then !定着なし
+				counter_point=counter_point+1
+				low_ver_coor[i][counter_point*3-2]=low_ver_allpos[i]
+				low_ver_coor[i][counter_point*3-1]=low_ver_alledge_pos[i][1]
+				low_ver_coor[i][counter_point*3]=start_z
+			endif
+			
+			if anc_type[low_ver_edge_num[i][1]]=2 then !直線定着
+				counter_point=counter_point+1
+				low_ver_coor[i][counter_point*3-2]=low_ver_allpos[i]
+				low_ver_coor[i][counter_point*3-1]=low_ver_alledge_pos[i][1]-(L2+L2Plus)*low_ver_nd[i]
+				low_ver_coor[i][counter_point*3]=start_z
+			endif
+			
+			if anc_type[low_ver_edge_num[i][1]]=3 or anc_type[low_ver_edge_num[i][1]]=4 then !折り曲げ定着
+				counter_point=counter_point+1
+				low_ver_coor[i][counter_point*3-2]=low_ver_allpos[i]
+				low_ver_coor[i][counter_point*3-1]=low_ver_alledge_pos[i][1]-max(L3*low_ver_nd[i],0.15)
+				low_ver_coor[i][counter_point*3]=start_z
+			endif
+		endif
+	else
+		counter_point=counter_point+1
+		low_ver_coor[i][counter_point*3-2]=low_ver_allpos[i]
+		low_ver_coor[i][counter_point*3-1]=low_ver_alledge_pos[i][1]
+		low_ver_coor[i][counter_point*3]=start_z
+	endif
+
+	!段差部
+	if counter_step>0 then
+		for j=1 to counter_step
+			if abs(step_hei[low_ver_allorder[i][j]])>0.1 then
+				coor_plus=slab_cover+2*sti_r+2*stepref_r
+			else
+				coor_plus=0
+			endif
+
+			if j=1 and low_ver_alledge_pos[i][1]>=step_in_start[low_ver_allorder[i][1]][2]-step_thi[low_ver_allorder[i][1]] then	
+			else
+				counter_point=counter_point+1
+				low_ver_coor[i][counter_point*3-2]=low_ver_allpos[i]
+				low_ver_coor[i][counter_point*3-1]=step_out_start[low_ver_allorder[i][j]][2]
+				low_ver_coor[i][counter_point*3]=low_ver_z
+	
+				counter_point=counter_point+1
+				low_ver_coor[i][counter_point*3-2]=low_ver_allpos[i]
+				low_ver_coor[i][counter_point*3-1]=step_in_start[low_ver_allorder[i][j]][2]-coor_plus
+				low_ver_coor[i][counter_point*3]=step_hei[low_ver_allorder[i][j]]+low_ver_z
+			endif
+	
+			if j=counter_step and low_ver_alledge_pos[i][2]<=step_in_end[low_ver_allorder[i][counter_step]][2]+step_thi[low_ver_allorder[i][counter_step]] then
+			else
+				counter_point=counter_point+1
+				low_ver_coor[i][counter_point*3-2]=low_ver_allpos[i]
+				low_ver_coor[i][counter_point*3-1]=step_in_end[low_ver_allorder[i][j]][2]+coor_plus
+				low_ver_coor[i][counter_point*3]=step_hei[low_ver_allorder[i][j]]+low_ver_z
+	
+				counter_point=counter_point+1
+				low_ver_coor[i][counter_point*3-2]=low_ver_allpos[i]
+				low_ver_coor[i][counter_point*3-1]=step_out_end[low_ver_allorder[i][j]][2]
+				low_ver_coor[i][counter_point*3]=low_ver_z
+			endif
+		next j
+	endif
+
+	!終点端部定着
+	if counter_step<=0 then
+		end_z=low_ver_z
+	else
+		if low_ver_alledge_pos[i][2]<=step_in_end[low_ver_allorder[i][counter_step]][2]+step_thi[low_ver_allorder[i][counter_step]] then
+			end_z=step_hei[low_ver_allorder[i][counter_step]]+low_ver_z
+		else
+			end_z=low_ver_z
+		endif
+	endif
+
+	if low_ver_alledge_pos[i][2]>=low_ver_alledge_pos_2[i][2] then
+		columnCutFlag=0
+		if low_ver_allpos[i]>slab_pos[low_ver_edge_num[i][2]][1]-column_offset[low_ver_edge_num[i][2]][1] and low_ver_allpos[i]<slab_pos[low_ver_edge_num[i][2]][1]+column_offset[low_ver_edge_num[i][2]][1] then
+			columnCutFlag=1
+			counter_point=counter_point+1
+			low_ver_coor[i][counter_point*3-2]=low_ver_allpos[i]
+			low_ver_coor[i][counter_point*3-1]=slab_pos[low_ver_edge_num[i][2]][2]-column_offset[low_ver_edge_num[i][2]][2]+(L2+L2Plus)*low_ver_nd[i]
+			low_ver_coor[i][counter_point*3]=start_z
+		endif
+
+		if low_ver_allpos[i]>slab_pos[low_ver_edge_num[i][2]+1][1]-column_offset[low_ver_edge_num[i][2]+1][1] and low_ver_allpos[i]<slab_pos[low_ver_edge_num[i][2]+1][1]+column_offset[low_ver_edge_num[i][2]+1][1] then
+			columnCutFlag=1
+			counter_point=counter_point+1
+			low_ver_coor[i][counter_point*3-2]=low_ver_allpos[i]
+			low_ver_coor[i][counter_point*3-1]=slab_pos[low_ver_edge_num[i][2]+1][2]-column_offset[low_ver_edge_num[i][2]+1][2]+(L2+L2Plus)*low_ver_nd[i]
+			low_ver_coor[i][counter_point*3]=start_z
+		endif
+
+		if columnCutFlag=0 then
+			if anc_type[low_ver_edge_num[i][2]]=1 then !定着なし
+				counter_point=counter_point+1
+				low_ver_coor[i][counter_point*3-2]=low_ver_allpos[i]
+				low_ver_coor[i][counter_point*3-1]=low_ver_alledge_pos[i][2]
+				low_ver_coor[i][counter_point*3]=end_z
+			endif
+
+			if anc_type[low_ver_edge_num[i][2]]=2 then !直線定着
+				counter_point=counter_point+1
+				low_ver_coor[i][counter_point*3-2]=low_ver_allpos[i]
+				low_ver_coor[i][counter_point*3-1]=low_ver_alledge_pos[i][2]+(L2+L2Plus)*low_ver_nd[i]
+				low_ver_coor[i][counter_point*3]=end_z
+			endif
+
+			if anc_type[low_ver_edge_num[i][2]]=3 or anc_type[max_ins_num]=4 then !折り曲げ定着
+				counter_point=counter_point+1
+				low_ver_coor[i][counter_point*3-2]=low_ver_allpos[i]
+				low_ver_coor[i][counter_point*3-1]=low_ver_alledge_pos[i][2]+max(L3*low_ver_nd[i],0.15)
+				low_ver_coor[i][counter_point*3]=end_z
+			endif
+		endif
+	else
+		counter_point=counter_point+1
+		low_ver_coor[i][counter_point*3-2]=low_ver_allpos[i]
+		low_ver_coor[i][counter_point*3-1]=low_ver_alledge_pos[i][2]
+		low_ver_coor[i][counter_point*3]=end_z
+	endif
+
+	low_ver_point[i]=counter_point
+next i
+
+!下中央プラス縦筋
+if lowCentVerEdge or lowCentVerCent then
+	if mbar_dir=1 then
+		barSteel=mbar_tcent_steel
+	else
+		barSteel=dbar_tcent_steel
+	endif
+
+	lowCentVerNum=0
+	dim lowCentVerPos[],lowCentVerIntsecPos[][],lowCentVerIntsecNum[][]
+	lowCentVerPos[1]=0
+	lowCentVerIntsecPos[1][1]=0
+	lowCentVerIntsecPos[1][2]=0
+	lowCentVerIntsecNum[1][1]=0
+	lowCentVerIntsecNum[1][2]=0
+
+	lowCentVerNum=int((slab_x-slab_lx/2)/low_ver_cen_pitch)
+	lowCentVerOffset=(slab_x-slab_lx/2-(lowCentVerNum-1)*low_ver_cen_pitch)/2
+
+	for i=1 to lowCentVerNum
+		lowCentVerPos[i]=minx+slab_lx/4+lowCentVerOffset+(i-1)*low_ver_cen_pitch
+
+		!始点と終点
+		intsecCount=0
+
+		for j=1 to 4
+			if lowCentVerPos[i]>=min(equ_pos[j][1],equ_pos[j+1][1]) and lowCentVerPos[i]<max(equ_pos[j][1],equ_pos[j+1][1]) then
+				intsecCount=intsecCount+1
+				lowCentVerIntsecPos[i][intsecCount]=-(equ_c[j]+equ_a[j]*lowCentVerPos[i])/equ_b[j]
+				lowCentVerIntsecNum[i][intsecCount]=j
+			endif
+		next j
+
+		if lowCentVerIntsecPos[i][1]<=lowCentVerIntsecPos[i][2] then
+			startIntsecPos=lowCentVerIntsecPos[i][1]
+			startIntsecNum=lowCentVerIntsecNum[i][1]
+			endIntsecPos=lowCentVerIntsecPos[i][2]
+			endIntsecNum=lowCentVerIntsecNum[i][2]
+		else
+			startIntsecPos=lowCentVerIntsecPos[i][2]
+			startIntsecNum=lowCentVerIntsecNum[i][2]
+			endIntsecPos=lowCentVerIntsecPos[i][1]
+			endIntsecNum=lowCentVerIntsecNum[i][1]
+		endif
+
+		if lowCentVerEdge then
+			!始点端部
+			if startIntsecPos<miny+slab_lx/4 then
+				low_ver_allnum=low_ver_allnum+1
+				low_ver_r[low_ver_allnum]=dr_list[barSteel]
+				low_ver_nd[low_ver_allnum]=nd_list[barSteel]
+				low_ver_pen[low_ver_allnum]=SDpen[scode_list[barSteel]]
+				low_ver_mat[low_ver_allnum]=SDmat[scode_list[barSteel]]
+
+				if anc_type[startIntsecNum]=1 then !定着なし
+					startYpos=startIntsecPos
+				endif
+
+				if anc_type[startIntsecNum]=2 then !直線定着
+					startYpos=startIntsecPos-(L2+L2Plus)*low_ver_nd[low_ver_allnum]
+				endif
+
+				if anc_type[startIntsecNum]=3 or anc_type[startIntsecNum]=4 then !折り曲げ定着
+					startYpos=startIntsecPos-max(L3*low_ver_nd[low_ver_allnum],0.15)
+				endif
+
+				low_ver_point[low_ver_allnum]=2
+
+				put lowCentVerPos[i]
+				put startYpos
+				put low_ver_z
+
+				put lowCentVerPos[i]
+				put miny+slab_lx/4
+				put low_ver_z
+
+				for n=1 to 3*low_ver_point[low_ver_allnum]
+					low_ver_coor[low_ver_allnum][n]=get(1)
+				next n
+			endif
+
+			!終点端部
+			if endIntsecPos>maxy-slab_lx/4 then
+				low_ver_allnum=low_ver_allnum+1
+				low_ver_r[low_ver_allnum]=dr_list[barSteel]
+				low_ver_nd[low_ver_allnum]=nd_list[barSteel]
+				low_ver_pen[low_ver_allnum]=SDpen[scode_list[barSteel]]
+				low_ver_mat[low_ver_allnum]=SDmat[scode_list[barSteel]]
+
+				if anc_type[endIntsecNum]=1 then !定着なし
+					endYpos=endIntsecPos
+				endif
+
+				if anc_type[endIntsecNum]=2 then !直線定着
+					endYpos=endIntsecPos+(L2+L2Plus)*low_ver_nd[low_ver_allnum]
+				endif
+
+				if anc_type[endIntsecNum]=3 or anc_type[endIntsecNum]=4 then !折り曲げ定着
+					endYpos=endIntsecPos+max(L3*low_ver_nd[low_ver_allnum],0.15)
+				endif
+
+				low_ver_point[low_ver_allnum]=2
+
+				put lowCentVerPos[i]
+				put maxy-slab_lx/4
+				put low_ver_z
+
+				put lowCentVerPos[i]
+				put endYpos
+				put low_ver_z
+
+				for n=1 to 3*low_ver_point[low_ver_allnum]
+					low_ver_coor[low_ver_allnum][n]=get(1)
+				next n
+			endif
+		endif
+
+		if lowCentVerCent then
+			low_ver_allnum=low_ver_allnum+1
+			low_ver_r[low_ver_allnum]=dr_list[barSteel]
+			low_ver_nd[low_ver_allnum]=nd_list[barSteel]
+			low_ver_pen[low_ver_allnum]=SDpen[scode_list[barSteel]]
+			low_ver_mat[low_ver_allnum]=SDmat[scode_list[barSteel]]
+
+			low_ver_point[low_ver_allnum]=2
+
+			put lowCentVerPos[i]
+			put max(miny+slab_lx/4,startIntsecPos)
+			put low_ver_z
+		
+			put lowCentVerPos[i]
+			put min(maxy-slab_lx/4,endIntsecPos)
+			put low_ver_z
+
+			for n=1 to 3*low_ver_point[low_ver_allnum]
+				low_ver_coor[low_ver_allnum][n]=get(1)
+			next n
+		endif
+	next i
+endif
+
+endif
+
+if switchLowerY=0 then low_ver_allnum=0
+parameters low_ver_allnum=low_ver_allnum
+
+
+!=================================================================上端横筋
+up_hor_num=0
+dim up_hor_pos[],up_hor_steel[]
+up_hor_pos[1]=0
+up_hor_steel[1]=0
+
+if hor_start_half=0 then
+	up_hor_down_num=int((slab_lx/4-0.05)/up_hor_side_pitch)+1
+else
+	up_hor_down_num=int((slab_lx/4-up_hor_side_pitch/2)/up_hor_side_pitch)+1
+endif
+
+up_hor_cen_num=int((slab_y-slab_lx/2)/up_hor_cen_pitch)+1
+up_hor_cen_offset=(slab_y-slab_lx/2-(up_hor_cen_num-1)*up_hor_cen_pitch)/2
+
+if hor_end_half=0 then
+	up_hor_top_num=int((slab_lx/4-0.05)/up_hor_side_pitch)+1
+	up_hor_top_offset=(slab_lx/4-(up_hor_top_num-1)*up_hor_side_pitch-0.05)
+else
+	up_hor_top_num=int((slab_lx/4-up_hor_side_pitch/2)/up_hor_side_pitch)+1
+	up_hor_top_offset=(slab_lx/4-(up_hor_top_num-1)*up_hor_side_pitch-up_hor_side_pitch/2)
+endif
+
+up_hor_num=up_hor_down_num+up_hor_cen_num+up_hor_top_num+plus_steel_down+plus_steel_top
+
+!左側
+if hor_start_half=0 then
+	up_hor_0=miny+0.05
+else
+	up_hor_0=miny+up_hor_side_pitch/2
+endif
+
+for i=1 to up_hor_down_num
+	up_hor_pos[i]=up_hor_0+up_hor_offset
+	up_hor_0=up_hor_0+up_hor_side_pitch
+
+	if mbar_dir=1 then !Y方向
+		if fra(i/2)<>0 then
+			up_hor_steel[i]=dbar_tside_steel
+		else
+			up_hor_steel[i]=dbar2_tside_steel
+		endif
+	else
+		if fra(i/2)<>0 then
+			up_hor_steel[i]=mbar_tside_steel
+		else
+			up_hor_steel[i]=mbar2_tside_steel
+		endif
+	endif
+next i
+
+!中央部
+up_hor_0=miny+slab_lx/4+up_hor_cen_offset
+
+for i=up_hor_down_num+1 to up_hor_down_num+up_hor_cen_num
+	up_hor_pos[i]=up_hor_0+up_hor_offset
+	up_hor_0=up_hor_0+up_hor_cen_pitch
+
+	if mbar_dir=1 then !Y方向
+		if fra(i/2)<>0 then
+			up_hor_steel[i]=dbar_tcent_steel
+		else
+			up_hor_steel[i]=dbar2_tcent_steel
+		endif
+	else
+		if fra(i/2)<>0 then
+			up_hor_steel[i]=mbar_tcent_steel
+		else
+			up_hor_steel[i]=mbar2_tcent_steel
+		endif
+	endif
+next i
+
+!右側
+up_hor_0=miny+slab_y-slab_lx/4+up_hor_top_offset
+
+for i=up_hor_down_num+up_hor_cen_num+1 to up_hor_down_num+up_hor_cen_num+up_hor_top_num
+	up_hor_pos[i]=up_hor_0+up_hor_offset
+	up_hor_0=up_hor_0+up_hor_side_pitch
+
+	if mbar_dir=1 then !Y方向
+		if fra(i/2)<>0 then
+			up_hor_steel[i]=dbar_tside_steel
+		else
+			up_hor_steel[i]=dbar2_tside_steel
+		endif
+	else
+		if fra(i/2)<>0 then
+			up_hor_steel[i]=mbar_tside_steel
+		else
+			up_hor_steel[i]=mbar2_tside_steel
+		endif
+	endif
+next i
+
+if plus_steel_down then
+	if mbar_dir=1 then
+		up_hor_steel[up_hor_down_num+up_hor_cen_num+up_hor_top_num+plus_steel_down]=dbar2_tside_steel
+		up_hor_pos[up_hor_down_num+up_hor_cen_num+up_hor_top_num+plus_steel_down]=miny+dr_list[dbar2_tside_steel]
+	else
+		up_hor_steel[up_hor_down_num+up_hor_cen_num+up_hor_top_num+plus_steel_down]=mbar2_tside_steel
+		up_hor_pos[up_hor_down_num+up_hor_cen_num+up_hor_top_num+plus_steel_down]=miny+dr_list[mbar2_tside_steel]
+	endif
+endif
+
+if plus_steel_top then
+	if mbar_dir=1 then
+		up_hor_steel[up_hor_down_num+up_hor_cen_num+up_hor_top_num+plus_steel_down+plus_steel_top]=dbar2_tside_steel
+		up_hor_pos[up_hor_down_num+up_hor_cen_num+up_hor_top_num+plus_steel_down+plus_steel_top]=maxy-dr_list[dbar2_tside_steel]
+	else
+		up_hor_steel[up_hor_down_num+up_hor_cen_num+up_hor_top_num+plus_steel_down+plus_steel_top]=mbar2_tside_steel
+		up_hor_pos[up_hor_down_num+up_hor_cen_num+up_hor_top_num+plus_steel_down+plus_steel_top]=maxy-dr_list[mbar2_tside_steel]
+	endif
+endif
+
+
+!段差あばら筋
+if position_pattern=1 then
+	sti_hor_z=slab_cover+2*thor_r+sti_r
+else
+	sti_hor_z=slab_cover+2*tver_r-sti_r
+endif
+
+!本数
+up_hor_allnum=0
+dim up_hor_ins_pos[][],up_hor_ins_num[][],up_hor_step[],up_hor_order[][],up_hor_op[],up_hor_oporder[][],\
+    up_hor_allpos[],up_hor_alledge_pos[][],up_hor_edge_num[][],up_hor_alledge_pos_2[][],\
+	up_hor_r[],up_hor_nd[],up_hor_pen[],up_hor_mat[]
+up_hor_ins_pos[1][1]=0
+up_hor_ins_pos[1][2]=0
+up_hor_ins_num[1][1]=0
+up_hor_ins_num[1][2]=0
+up_hor_step[1]=0
+up_hor_order[1][1]=0
+up_hor_order[1][2]=0
+up_hor_op[1]=0
+up_hor_oporder[1][1]=0
+up_hor_oporder[1][2]=0
+up_hor_allpos[1]=0
+up_hor_alledge_pos[1][1]=0
+up_hor_alledge_pos[1][2]=0
+up_hor_edge_num[1][1]=0
+up_hor_edge_num[1][2]=0
+up_hor_alledge_pos_2[1][1]=0
+up_hor_alledge_pos_2[1][2]=0
+up_hor_r[1]=0
+up_hor_nd[1]=0
+up_hor_pen[1]=0
+up_hor_mat[1]=0
+
+for i=1 to up_hor_num
+	random_r=dr_list[up_hor_steel[i]]
+	random_nd=nd_list[up_hor_steel[i]]
+	random_steel=up_hor_steel[i]
+	random_pen=SDpen[scode_list[up_hor_steel[i]]]
+	random_mat=SDmat[scode_list[up_hor_steel[i]]]
+
+	!==================================始点と終点
+	counter_ins=0
+
+	for j=1 to 4
+		if up_hor_pos[i]>=min(equ_pos[j][2],equ_pos[j+1][2]) and up_hor_pos[i]<max(equ_pos[j][2],equ_pos[j+1][2]) then
+			counter_ins=counter_ins+1
+			up_hor_ins_pos[i][counter_ins]=-(equ_c[j]+equ_b[j]*up_hor_pos[i])/equ_a[j]
+			up_hor_ins_num[i][counter_ins]=j
+		endif
+	next j
+
+	min_ins_pos=maxx
+	min_ins_num=0
+	max_ins_pos=minx
+	max_ins_num=0
+
+	for j=1 to counter_ins
+		if min_ins_pos>min(min_ins_pos,up_hor_ins_pos[i][j]) then
+			min_ins_pos=up_hor_ins_pos[i][j]
+			min_ins_num=up_hor_ins_num[i][j]
+		endif
+		if max_ins_pos<max(max_ins_pos,up_hor_ins_pos[i][j]) then
+			max_ins_pos=up_hor_ins_pos[i][j]
+			max_ins_num=up_hor_ins_num[i][j]
+		endif
+	next j
+
+
+	!==================================かぶる開口数と順番
+	counter_op=0
+	up_hor_oporder[i][1]=0
+
+	if op_num>0 then
+		for j=1 to op_num
+			if up_hor_pos[i]>op_start[j][2] and up_hor_pos[i]<op_end[j][2] then
+				if min_ins_pos<op_end[j][1] and max_ins_pos>op_start[j][1] then
+					counter_op=counter_op+1
+					up_hor_oporder[i][counter_op]=j
+				endif
+			endif
+		next j
+	endif
+
+	up_hor_op[i]=counter_op
+
+	if counter_op>1 then
+		for j=1 to counter_op-1
+			for n=1 to counter_op-j
+				if op_start[up_hor_oporder[i][n]][1]>op_start[up_hor_oporder[i][n+1]][1] then
+					tempOrder=up_hor_oporder[i][n]
+					up_hor_oporder[i][n]=up_hor_oporder[i][n+1]
+					up_hor_oporder[i][n+1]=tempOrder
+				endif
+			next n
+		next j 
+	endif
+
+	!==================================始点と終点座標をインプットする
+	!始点
+	put min_ins_pos
+
+	!開口部
+	if counter_op>0 then
+		for n=1 to counter_op
+			if op_shape[up_hor_oporder[i][n]]=1 then
+				put op_start[up_hor_oporder[i][n]][1]
+				put op_end[up_hor_oporder[i][n]][1]
+			else
+				put -sqr((op_len[up_hor_oporder[i][n]]/2+op_cover)^2-(up_hor_pos[i]-(op_pos[up_hor_oporder[i][n]][2]+op_len[up_hor_oporder[i][n]]/2))^2)+(op_pos[up_hor_oporder[i][n]][1]+op_len[up_hor_oporder[i][n]]/2)
+				put	sqr((op_len[up_hor_oporder[i][n]]/2+op_cover)^2-(up_hor_pos[i]-(op_pos[up_hor_oporder[i][n]][2]+op_len[up_hor_oporder[i][n]]/2))^2)+(op_pos[up_hor_oporder[i][n]][1]+op_len[up_hor_oporder[i][n]]/2)
+			endif
+		next n
+	endif
+
+	!終点
+	put max_ins_pos
+
+	!==================================始点と終点座標リスト
+	counter_up_hor=1
+
+	if counter_op>0 then
+		for n=1 to counter_op
+			counter_up_hor=counter_up_hor+1
+		next n
+
+		if op_start[up_hor_oporder[i][1]][1]<=minx then
+			counter_up_hor=counter_up_hor-1
+			del_data=get(1)
+			del_data=get(1)
+		endif
+
+		if op_end[up_hor_oporder[i][counter_op]][1]>=maxx then
+			counter_up_hor=counter_up_hor-1
+		endif
+	endif
+
+	if counter_up_hor>0 then
+		for j=1 to counter_up_hor
+			up_hor_totstart=get(1)
+			up_hor_totend=get(1)
+
+			counter_allnum=ceil(abs(up_hor_totend-up_hor_totstart)/connect_len)
+
+			for n=1 to counter_allnum
+				up_hor_allnum=up_hor_allnum+1
+				up_hor_r[up_hor_allnum]=random_r
+				up_hor_nd[up_hor_allnum]=random_nd
+				up_hor_pen[up_hor_allnum]=random_pen
+				up_hor_mat[up_hor_allnum]=random_mat
+				if counter_allnum=1 then
+					up_hor_allpos[up_hor_allnum]=up_hor_pos[i]
+				else
+					if fra(n/2)<>0 then
+						up_hor_allpos[up_hor_allnum]=up_hor_pos[i]-up_hor_r[up_hor_allnum]
+					else
+						up_hor_allpos[up_hor_allnum]=up_hor_pos[i]+up_hor_r[up_hor_allnum]
+					endif
+				endif
+				if n=1 then
+					up_hor_alledge_pos[up_hor_allnum][1]=up_hor_totstart
+				else
+					up_hor_alledge_pos[up_hor_allnum][1]=up_hor_totstart+(n-1)/counter_allnum*(up_hor_totend-up_hor_totstart)-(L1+L1Plus)*up_hor_nd[up_hor_allnum]/2
+				endif
+				if n=counter_allnum then
+					up_hor_alledge_pos[up_hor_allnum][2]=up_hor_totend
+				else
+					up_hor_alledge_pos[up_hor_allnum][2]=up_hor_totstart+n/counter_allnum*(up_hor_totend-up_hor_totstart)+(L1+L1Plus)*up_hor_nd[up_hor_allnum]/2
+				endif
+				up_hor_alledge_pos_2[up_hor_allnum][1]=min_ins_pos
+				up_hor_alledge_pos_2[up_hor_allnum][2]=max_ins_pos
+
+				up_hor_edge_num[up_hor_allnum][1]=min_ins_num !始点辺の番号
+				up_hor_edge_num[up_hor_allnum][2]=max_ins_num !終点辺の番号
+			next n
+		next j
+	endif
+
+	if nsp>0 then
+		for n=1 to nsp
+			del_data=get(1)
+		next n
+	endif
+
+	!==================================かぶる段差数と順番
+	counter_step=0
+	up_hor_order[i][1]=0
+
+	if step_num>0 then
+		for j=1 to step_num
+			if up_hor_pos[i]>step_in_start[j][2] and up_hor_pos[i]<step_in_end[j][2] then
+				if min_ins_pos<step_in_end[j][1] and max_ins_pos>step_in_start[j][1] then
+					counter_step=counter_step+1
+					up_hor_order[i][counter_step]=j
+				endif
+			endif
+		next j
+	endif
+
+	up_hor_step[i]=counter_step
+
+	if counter_step>1 then
+		for j=1 to counter_step-1
+			for n=1 to counter_step-j
+				if step_in_start[up_hor_order[i][n]][1]>step_in_start[up_hor_order[i][n+1]][1] then
+					tempOrder=up_hor_order[i][n]
+					up_hor_order[i][n]=up_hor_order[i][n+1]
+					up_hor_order[i][n+1]=tempOrder
+				endif
+			next n
+		next j
+	endif
+
+	!==================================あばら筋
+	if counter_step>0 then
+		for j=1 to counter_step
+			if j=1 and min_ins_pos>=step_in_start[up_hor_order[i][1]][1]-step_thi[up_hor_order[i][1]] then	
+			else
+				if abs(step_hei[up_hor_order[i][j]])>0.1 then
+					counter_sti=counter_sti+1
+					sti_point[counter_sti]=5
+					!1
+					sti_coor[counter_sti][1]=step_out_start[up_hor_order[i][j]][1]+(slab_cover+sti_r)
+					sti_coor[counter_sti][2]=up_hor_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][3]=-sti_hor_z
+					!2
+					sti_coor[counter_sti][4]=step_in_start[up_hor_order[i][j]][1]-(slab_cover+sti_r)
+					sti_coor[counter_sti][5]=up_hor_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][6]=-sti_hor_z
+					!3
+					sti_coor[counter_sti][7]=step_in_start[up_hor_order[i][j]][1]-(slab_cover+sti_r)
+					sti_coor[counter_sti][8]=up_hor_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][9]=step_hei[up_hor_order[i][j]]-slab_thi+sti_hor_z+2*dandori_r*switchDandoriBar
+					!4
+					sti_coor[counter_sti][10]=step_out_start[up_hor_order[i][j]][1]+(slab_cover+sti_r)
+					sti_coor[counter_sti][11]=up_hor_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][12]=step_hei[up_hor_order[i][j]]-slab_thi+sti_hor_z+2*dandori_r*switchDandoriBar
+					!5
+					sti_coor[counter_sti][13]=step_out_start[up_hor_order[i][j]][1]+(slab_cover+sti_r)
+					sti_coor[counter_sti][14]=up_hor_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][15]=-sti_hor_z
+				endif
+			endif
+	
+			if j=counter_step and max_ins_pos<=step_in_end[up_hor_order[i][counter_step]][1]+step_thi[up_hor_order[i][counter_step]] then
+			else
+				if abs(step_hei[up_hor_order[i][j]])>0.1 then
+					counter_sti=counter_sti+1
+					sti_point[counter_sti]=5
+					!1
+					sti_coor[counter_sti][1]=step_out_end[up_hor_order[i][j]][1]-(slab_cover+sti_r)
+					sti_coor[counter_sti][2]=up_hor_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][3]=-sti_hor_z
+					!2
+					sti_coor[counter_sti][4]=step_in_end[up_hor_order[i][j]][1]+(slab_cover+sti_r)
+					sti_coor[counter_sti][5]=up_hor_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][6]=-sti_hor_z
+					!3
+					sti_coor[counter_sti][7]=step_in_end[up_hor_order[i][j]][1]+(slab_cover+sti_r)
+					sti_coor[counter_sti][8]=up_hor_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][9]=step_hei[up_hor_order[i][j]]-slab_thi+sti_hor_z+2*dandori_r*switchDandoriBar
+					!4
+					sti_coor[counter_sti][10]=step_out_end[up_hor_order[i][j]][1]-(slab_cover+sti_r)
+					sti_coor[counter_sti][11]=up_hor_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][12]=step_hei[up_hor_order[i][j]]-slab_thi+sti_hor_z+2*dandori_r*switchDandoriBar
+					!5
+					sti_coor[counter_sti][13]=step_out_end[up_hor_order[i][j]][1]-(slab_cover+sti_r)
+					sti_coor[counter_sti][14]=up_hor_pos[i]+random_r+sti_r
+					sti_coor[counter_sti][15]=-sti_hor_z
+				endif
+			endif
+		next j
+	endif
+next i
+
+
+dim up_hor_allstep[],up_hor_allorder[][],up_hor_point[],up_hor_coor[][]
+up_hor_allstep[1]=0
+up_hor_allorder[1][1]=0
+up_hor_allorder[1][2]=0
+up_hor_point[1]=0
+up_hor_coor[1][1]=0
+up_hor_coor[1][2]=0
+
+for i=1 to up_hor_allnum
+	if position_pattern=1 then
+		up_hor_z=-slab_cover-2*tver_r-up_hor_r[i]
+	else
+		up_hor_z=-slab_cover-up_hor_r[i]
+	endif
+
+	!==================================かぶる段差数と順番
+	counter_step=0
+	up_hor_allorder[i][1]=0
+
+	if step_num>0 then
+		for j=1 to step_num
+			if up_hor_allpos[i]>step_in_start[j][2] and up_hor_allpos[i]<step_in_end[j][2] then
+				if up_hor_alledge_pos[i][1]<step_in_end[j][1] and up_hor_alledge_pos[i][2]>step_in_start[j][1] then
+					counter_step=counter_step+1
+					up_hor_allorder[i][counter_step]=j
+				endif
+			endif
+		next j
+	endif
+
+	up_hor_allstep[i]=counter_step
+
+	if counter_step>1 then
+		for j=1 to counter_step-1
+			for n=1 to counter_step-j
+				if step_in_start[up_hor_allorder[i][n]][1]>step_in_start[up_hor_allorder[i][n+1]][1] then
+					tempOrder=up_hor_allorder[i][n]
+					up_hor_allorder[i][n]=up_hor_allorder[i][n+1]
+					up_hor_allorder[i][n+1]=tempOrder
+				endif
+			next n
+		next j
+	endif
+
+	!==================================頂点数と頂点座標リスト
+	counter_point=0
+
+	!始点端部定着
+	if counter_step<=0 then
+		start_z=up_hor_z
+	else
+		if up_hor_alledge_pos[i][1]>=step_in_start[up_hor_allorder[i][1]][1]-step_thi[up_hor_allorder[i][1]] then
+			start_z=step_hei[up_hor_allorder[i][1]]+up_hor_z
+		else
+			start_z=up_hor_z
+		endif
+	endif
+
+	if up_hor_alledge_pos[i][1]<=up_hor_alledge_pos_2[i][1] then
+		columnCutFlag=0
+		if up_hor_allpos[i]>slab_pos[up_hor_edge_num[i][1]][2]-column_offset[up_hor_edge_num[i][1]][2] and up_hor_allpos[i]<slab_pos[up_hor_edge_num[i][1]][2]+column_offset[up_hor_edge_num[i][1]][2] then
+			columnCutFlag=1
+			counter_point=counter_point+1
+			up_hor_coor[i][counter_point*3-2]=slab_pos[up_hor_edge_num[i][1]][1]+column_offset[up_hor_edge_num[i][1]][1]-(L2+L2Plus)*up_hor_nd[i]
+			up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+			up_hor_coor[i][counter_point*3]=start_z
+		endif
+
+		if up_hor_allpos[i]>slab_pos[up_hor_edge_num[i][1]+1][2]-column_offset[up_hor_edge_num[i][1]+1][2] and up_hor_allpos[i]<slab_pos[up_hor_edge_num[i][1]+1][2]+column_offset[up_hor_edge_num[i][1]+1][2] then
+			columnCutFlag=1
+			counter_point=counter_point+1
+			up_hor_coor[i][counter_point*3-2]=slab_pos[up_hor_edge_num[i][1]+1][1]+column_offset[up_hor_edge_num[i][1]+1][1]-(L2+L2Plus)*up_hor_nd[i]
+			up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+			up_hor_coor[i][counter_point*3]=start_z
+		endif
+
+		if columnCutFlag=0 then
+			if anc_type[up_hor_edge_num[i][1]]=1 then !定着なし
+				counter_point=counter_point+1
+				up_hor_coor[i][counter_point*3-2]=up_hor_alledge_pos[i][1]
+				up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+				up_hor_coor[i][counter_point*3]=start_z
+			endif
+			
+			if anc_type[up_hor_edge_num[i][1]]=2 then !直線定着
+				counter_point=counter_point+1
+				up_hor_coor[i][counter_point*3-2]=up_hor_alledge_pos[i][1]-(L2+L2Plus)*up_hor_nd[i]
+				up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+				up_hor_coor[i][counter_point*3]=start_z
+			endif
+			
+			if anc_type[up_hor_edge_num[i][1]]=3 then !折り曲げ定着(下方向)
+				counter_point=counter_point+1
+				up_hor_coor[i][counter_point*3-2]=up_hor_alledge_pos[i][1]-Lb_len[up_hor_edge_num[i][1]]+up_hor_r[i]
+				up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+				up_hor_coor[i][counter_point*3]=start_z-elbowRad*up_hor_r[i]-max(((L2+L2Plus)*up_hor_nd[i]-Lb_len[up_hor_edge_num[i][1]]),8*up_hor_nd[i])
+		
+				counter_point=counter_point+1
+				up_hor_coor[i][counter_point*3-2]=up_hor_alledge_pos[i][1]-Lb_len[up_hor_edge_num[i][1]]+up_hor_r[i]
+				up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+				up_hor_coor[i][counter_point*3]=start_z
+			endif
+
+			if anc_type[up_hor_edge_num[i][1]]=4 then !折り曲げ定着(上方向)
+				counter_point=counter_point+1
+				up_hor_coor[i][counter_point*3-2]=up_hor_alledge_pos[i][1]-Lb_len[up_hor_edge_num[i][1]]+up_hor_r[i]
+				up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+				up_hor_coor[i][counter_point*3]=start_z+elbowRad*up_hor_r[i]+max(((L2+L2Plus)*up_hor_nd[i]-Lb_len[up_hor_edge_num[i][1]]),8*up_hor_nd[i])
+		
+				counter_point=counter_point+1
+				up_hor_coor[i][counter_point*3-2]=up_hor_alledge_pos[i][1]-Lb_len[up_hor_edge_num[i][1]]+up_hor_r[i]
+				up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+				up_hor_coor[i][counter_point*3]=start_z
+			endif
+		endif
+	else
+		counter_point=counter_point+1
+		up_hor_coor[i][counter_point*3-2]=up_hor_alledge_pos[i][1]
+		up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+		up_hor_coor[i][counter_point*3]=start_z
+	endif
+
+	!段差部
+	if counter_step>0 then
+		for j=1 to counter_step
+			if abs(step_hei[up_hor_allorder[i][j]])>0.1 then
+				coor_plus=slab_cover+2*sti_r+2*stepref_r
+			else
+				coor_plus=0
+			endif
+
+			if j=1 and up_hor_alledge_pos[i][1]>=step_in_start[up_hor_allorder[i][1]][1]-step_thi[up_hor_allorder[i][1]] then	
+			else
+				counter_point=counter_point+1
+				up_hor_coor[i][counter_point*3-2]=step_out_start[up_hor_allorder[i][j]][1]+coor_plus
+				up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+				up_hor_coor[i][counter_point*3]=up_hor_z
+	
+				counter_point=counter_point+1
+				up_hor_coor[i][counter_point*3-2]=step_in_start[up_hor_allorder[i][j]][1]
+				up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+				up_hor_coor[i][counter_point*3]=step_hei[up_hor_allorder[i][j]]+up_hor_z
+			endif
+	
+			if j=counter_step and up_hor_alledge_pos[i][2]<=step_in_end[up_hor_allorder[i][counter_step]][1]+step_thi[up_hor_allorder[i][counter_step]] then
+			else
+				counter_point=counter_point+1
+				up_hor_coor[i][counter_point*3-2]=step_in_end[up_hor_allorder[i][j]][1]
+				up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+				up_hor_coor[i][counter_point*3]=step_hei[up_hor_allorder[i][j]]+up_hor_z
+	
+				counter_point=counter_point+1
+				up_hor_coor[i][counter_point*3-2]=step_out_end[up_hor_allorder[i][j]][1]-coor_plus
+				up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+				up_hor_coor[i][counter_point*3]=up_hor_z
+			endif
+		next j
+	endif
+
+	!終点端部定着
+	if counter_step<=0 then
+		end_z=up_hor_z
+	else
+		if up_hor_alledge_pos[i][2]<=step_in_end[up_hor_allorder[i][counter_step]][1]+step_thi[up_hor_allorder[i][counter_step]] then
+			end_z=step_hei[up_hor_allorder[i][counter_step]]+up_hor_z
+		else
+			end_z=up_hor_z
+		endif
+	endif
+
+	if up_hor_alledge_pos[i][2]>=up_hor_alledge_pos_2[i][2] then
+		columnCutFlag=0
+		if up_hor_allpos[i]>slab_pos[up_hor_edge_num[i][2]][2]-column_offset[up_hor_edge_num[i][2]][2] and up_hor_allpos[i]<slab_pos[up_hor_edge_num[i][2]][2]+column_offset[up_hor_edge_num[i][2]][2] then
+			columnCutFlag=1
+			counter_point=counter_point+1
+			up_hor_coor[i][counter_point*3-2]=slab_pos[up_hor_edge_num[i][2]][1]-column_offset[up_hor_edge_num[i][2]][1]+(L2+L2Plus)*up_hor_nd[i]
+			up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+			up_hor_coor[i][counter_point*3]=start_z
+		endif
+
+		if up_hor_allpos[i]>slab_pos[up_hor_edge_num[i][2]+1][2]-column_offset[up_hor_edge_num[i][2]+1][2] and up_hor_allpos[i]<slab_pos[up_hor_edge_num[i][2]+1][2]+column_offset[up_hor_edge_num[i][2]+1][2] then
+			columnCutFlag=1
+			counter_point=counter_point+1
+			up_hor_coor[i][counter_point*3-2]=slab_pos[up_hor_edge_num[i][2]+1][1]-column_offset[up_hor_edge_num[i][2]+1][1]+(L2+L2Plus)*up_hor_nd[i]
+			up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+			up_hor_coor[i][counter_point*3]=start_z
+		endif
+
+		if columnCutFlag=0 then
+			if anc_type[up_hor_edge_num[i][2]]=1 then !定着なし
+				counter_point=counter_point+1
+				up_hor_coor[i][counter_point*3-2]=up_hor_alledge_pos[i][2]
+				up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+				up_hor_coor[i][counter_point*3]=end_z
+			endif
+
+			if anc_type[up_hor_edge_num[i][2]]=2 then !直線定着
+				counter_point=counter_point+1
+				up_hor_coor[i][counter_point*3-2]=up_hor_alledge_pos[i][2]+(L2+L2Plus)*up_hor_nd[i]
+				up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+				up_hor_coor[i][counter_point*3]=end_z
+			endif
+
+			if anc_type[up_hor_edge_num[i][2]]=3 then !折り曲げ定着(下方向)
+				counter_point=counter_point+1
+				up_hor_coor[i][counter_point*3-2]=up_hor_alledge_pos[i][2]+Lb_len[up_hor_edge_num[i][2]]-up_hor_r[i]
+				up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+				up_hor_coor[i][counter_point*3]=end_z
+
+				counter_point=counter_point+1
+				up_hor_coor[i][counter_point*3-2]=up_hor_alledge_pos[i][2]+Lb_len[up_hor_edge_num[i][2]]-up_hor_r[i]
+				up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+				up_hor_coor[i][counter_point*3]=end_z-elbowRad*up_hor_r[i]-max(((L2+L2Plus)*up_hor_nd[i]-Lb_len[up_hor_edge_num[i][2]]),8*up_hor_nd[i])
+			endif
+
+			if anc_type[up_hor_edge_num[i][2]]=4 then !折り曲げ定着(上方向)
+				counter_point=counter_point+1
+				up_hor_coor[i][counter_point*3-2]=up_hor_alledge_pos[i][2]+Lb_len[up_hor_edge_num[i][2]]-up_hor_r[i]
+				up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+				up_hor_coor[i][counter_point*3]=end_z
+
+				counter_point=counter_point+1
+				up_hor_coor[i][counter_point*3-2]=up_hor_alledge_pos[i][2]+Lb_len[up_hor_edge_num[i][2]]-up_hor_r[i]
+				up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+				up_hor_coor[i][counter_point*3]=end_z+elbowRad*up_hor_r[i]+max(((L2+L2Plus)*up_hor_nd[i]-Lb_len[up_hor_edge_num[i][2]]),8*up_hor_nd[i])
+			endif
+		endif
+	else
+		counter_point=counter_point+1
+		up_hor_coor[i][counter_point*3-2]=up_hor_alledge_pos[i][2]
+		up_hor_coor[i][counter_point*3-1]=up_hor_allpos[i]
+		up_hor_coor[i][counter_point*3]=end_z
+	endif
+
+	up_hor_point[i]=counter_point
+next i
+
+
+!上中央プラス横筋
+if upCentHorEdge or upCentHorCent then
+	if mbar_dir=1 then
+		barSteel=dbar_tcent_steel
+	else
+		barSteel=mbar_tcent_steel
+	endif
+
+	upCentHorNum=0
+	dim upCentHorPos[],upCentHorIntsecPos[][],upCentHorIntsecNum[][]
+	upCentHorPos[1]=0
+	upCentHorIntsecPos[1][1]=0
+	upCentHorIntsecPos[1][2]=0
+	upCentHorIntsecNum[1][1]=0
+	upCentHorIntsecNum[1][2]=0
+
+	upCentHorNum=int((slab_y-slab_lx/2)/up_hor_cen_pitch)
+	upCentHorOffset=(slab_y-slab_lx/2-(upCentHorNum-1)*up_hor_cen_pitch)/2
+
+	for i=1 to upCentHorNum
+		upCentHorPos[i]=miny+slab_lx/4+upCentHorOffset+(i-1)*up_hor_cen_pitch
+
+		!始点と終点
+		intsecCount=0
+
+		for j=1 to 4
+			if upCentHorPos[i]>=min(equ_pos[j][2],equ_pos[j+1][2]) and upCentHorPos[i]<max(equ_pos[j][2],equ_pos[j+1][2]) then
+				intsecCount=intsecCount+1
+				upCentHorIntsecPos[i][intsecCount]=-(equ_c[j]+equ_b[j]*upCentHorPos[i])/equ_a[j]
+				upCentHorIntsecNum[i][intsecCount]=j
+			endif
+		next j
+
+		if upCentHorIntsecPos[i][1]<=upCentHorIntsecPos[i][2] then
+			startIntsecPos=upCentHorIntsecPos[i][1]
+			startIntsecNum=upCentHorIntsecNum[i][1]
+			endIntsecPos=upCentHorIntsecPos[i][2]
+			endIntsecNum=upCentHorIntsecNum[i][2]
+		else
+			startIntsecPos=upCentHorIntsecPos[i][2]
+			startIntsecNum=upCentHorIntsecNum[i][2]
+			endIntsecPos=upCentHorIntsecPos[i][1]
+			endIntsecNum=upCentHorIntsecNum[i][1]
+		endif
+
+		if upCentHorEdge then
+			!始点端部
+			if startIntsecPos<minx+slab_lx/4 then
+				up_hor_allnum=up_hor_allnum+1
+				up_hor_r[up_hor_allnum]=dr_list[barSteel]
+				up_hor_nd[up_hor_allnum]=nd_list[barSteel]
+				up_hor_pen[up_hor_allnum]=SDpen[scode_list[barSteel]]
+				up_hor_mat[up_hor_allnum]=SDmat[scode_list[barSteel]]
+
+				if anc_type[startIntsecNum]=1 then !定着なし
+					startXpos=startIntsecPos
+				endif
+
+				if anc_type[startIntsecNum]=2 then !直線定着
+					startXpos=startIntsecPos-(L2+L2Plus)*up_hor_nd[up_hor_allnum]
+				endif
+
+				if anc_type[startIntsecNum]=3 then !折り曲げ定着(下方向)
+					startXpos=startIntsecPos-Lb_len[startIntsecNum]+up_hor_r[up_hor_allnum]
+				endif
+
+				if anc_type[startIntsecNum]=4 then !折り曲げ定着(上方向)
+					startXpos=startIntsecPos-Lb_len[startIntsecNum]+up_hor_r[up_hor_allnum]
+				endif
+
+				up_hor_point[up_hor_allnum]=2
+
+				if anc_type[startIntsecNum]=3 then
+					up_hor_point[up_hor_allnum]=up_hor_point[up_hor_allnum]+1
+
+					put startXpos
+					put upCentHorPos[i]
+					put up_hor_z-(elbowRad*up_hor_r[up_hor_allnum]+max(((L2+L2Plus)*up_hor_nd[up_hor_allnum]-Lb_len[startIntsecNum]),8*up_hor_nd[up_hor_allnum]))
+				endif
+
+				if anc_type[startIntsecNum]=4 then
+					up_hor_point[up_hor_allnum]=up_hor_point[up_hor_allnum]+1
+
+					put startXpos
+					put upCentHorPos[i]
+					put up_hor_z+(elbowRad*up_hor_r[up_hor_allnum]+max(((L2+L2Plus)*up_hor_nd[up_hor_allnum]-Lb_len[startIntsecNum]),8*up_hor_nd[up_hor_allnum]))
+				endif
+
+				put startXpos
+				put upCentHorPos[i]
+				put up_hor_z
+
+				put minx+slab_lx/4
+				put upCentHorPos[i]
+				put up_hor_z
+
+				for n=1 to 3*up_hor_point[up_hor_allnum]
+					up_hor_coor[up_hor_allnum][n]=get(1)
+				next n
+			endif
+
+			!終点端部
+			if endIntsecPos>maxx-slab_lx/4 then
+				up_hor_allnum=up_hor_allnum+1
+				up_hor_r[up_hor_allnum]=dr_list[barSteel]
+				up_hor_nd[up_hor_allnum]=nd_list[barSteel]
+				up_hor_pen[up_hor_allnum]=SDpen[scode_list[barSteel]]
+				up_hor_mat[up_hor_allnum]=SDmat[scode_list[barSteel]]
+
+				if anc_type[endIntsecNum]=1 then !定着なし
+					endXpos=endIntsecPos
+				endif
+
+				if anc_type[endIntsecNum]=2 then !直線定着
+					endXpos=endIntsecPos+(L2+L2Plus)*up_hor_nd[up_hor_allnum]
+				endif
+
+				if anc_type[endIntsecNum]=3 then !折り曲げ定着(下方向)
+					endXpos=endIntsecPos+Lb_len[endIntsecNum]-up_hor_r[up_hor_allnum]
+				endif
+
+				if anc_type[endIntsecNum]=4 then !折り曲げ定着(上方向)
+					endXpos=endIntsecPos+Lb_len[endIntsecNum]-up_hor_r[up_hor_allnum]
+				endif
+
+				up_hor_point[up_hor_allnum]=2
+
+				put maxx-slab_lx/4
+				put upCentHorPos[i]
+				put up_hor_z
+
+				put endXpos
+				put upCentHorPos[i]
+				put up_hor_z
+
+				if anc_type[endIntsecNum]=3 then
+					up_hor_point[up_hor_allnum]=up_hor_point[up_hor_allnum]+1
+
+					put endXpos
+					put upCentHorPos[i]
+					put up_hor_z-(elbowRad*up_hor_r[up_hor_allnum]+max(((L2+L2Plus)*up_hor_nd[up_hor_allnum]-Lb_len[endIntsecNum]),8*up_hor_nd[up_hor_allnum]))
+				endif
+
+				if anc_type[endIntsecNum]=4 then
+					up_hor_point[up_hor_allnum]=up_hor_point[up_hor_allnum]+1
+
+					put endXpos
+					put upCentHorPos[i]
+					put up_hor_z+(elbowRad*up_hor_r[up_hor_allnum]+max(((L2+L2Plus)*up_hor_nd[up_hor_allnum]-Lb_len[endIntsecNum]),8*up_hor_nd[up_hor_allnum]))
+				endif
+
+				for n=1 to 3*up_hor_point[up_hor_allnum]
+					up_hor_coor[up_hor_allnum][n]=get(1)
+				next n
+			endif
+		endif
+
+		if upCentHorCent then
+			up_hor_allnum=up_hor_allnum+1
+			up_hor_r[up_hor_allnum]=dr_list[barSteel]
+			up_hor_nd[up_hor_allnum]=nd_list[barSteel]
+			up_hor_pen[up_hor_allnum]=SDpen[scode_list[barSteel]]
+			up_hor_mat[up_hor_allnum]=SDmat[scode_list[barSteel]]
+
+			up_hor_point[up_hor_allnum]=2
+
+			put max(minx+slab_lx/4,startIntsecPos)
+			put upCentHorPos[i]
+			put up_hor_z
+		
+			put min(maxx-slab_lx/4,endIntsecPos)
+			put upCentHorPos[i]
+			put up_hor_z
+
+			for n=1 to 3*up_hor_point[up_hor_allnum]
+				up_hor_coor[up_hor_allnum][n]=get(1)
+			next n
+		endif
+	next i
+endif
+
+if switchUpperX=0 then up_hor_allnum=0
+parameters up_hor_allnum=up_hor_allnum
+
+
+!=================================================================下端横筋(ダブル)
+low_hor_num=0
+dim low_hor_pos[],low_hor_steel[]
+low_hor_pos[1]=0
+low_hor_steel[1]=0
+
+if hor_start_half=0 then
+	low_hor_down_num=int((slab_lx/4-0.05)/low_hor_side_pitch)+1
+else
+	low_hor_down_num=int((slab_lx/4-low_hor_side_pitch/2)/low_hor_side_pitch)+1
+endif
+
+low_hor_cen_num=int((slab_y-slab_lx/2)/low_hor_cen_pitch)+1
+low_hor_cen_offset=(slab_y-slab_lx/2-(low_hor_cen_num-1)*low_hor_cen_pitch)/2
+
+if hor_end_half=0 then
+	low_hor_top_num=int((slab_lx/4-0.05)/low_hor_side_pitch)+1
+	low_hor_top_offset=(slab_lx/4-(low_hor_top_num-1)*low_hor_side_pitch-0.05)
+else
+	low_hor_top_num=int((slab_lx/4-low_hor_side_pitch/2)/low_hor_side_pitch)+1
+	low_hor_top_offset=(slab_lx/4-(low_hor_top_num-1)*low_hor_side_pitch-low_hor_side_pitch/2)
+endif
+
+low_hor_num=low_hor_down_num+low_hor_cen_num+low_hor_top_num+plus_steel_down+plus_steel_top
+
+!左側
+if hor_start_half=0 then
+	low_hor_0=miny+0.05
+else
+	low_hor_0=miny+low_hor_side_pitch/2
+endif
+
+for i=1 to low_hor_down_num
+	low_hor_pos[i]=low_hor_0+low_hor_offset
+	low_hor_0=low_hor_0+low_hor_side_pitch
+
+	if mbar_dir=1 then !Y方向
+		if fra(i/2)<>0 then
+			low_hor_steel[i]=dbar_dside_steel
+		else
+			low_hor_steel[i]=dbar2_dside_steel
+		endif
+	else
+		if fra(i/2)<>0 then
+			low_hor_steel[i]=mbar_dside_steel
+		else
+			low_hor_steel[i]=mbar2_dside_steel
+		endif
+	endif
+next i
+
+!中央部
+low_hor_0=miny+slab_lx/4+low_hor_cen_offset
+
+for i=low_hor_down_num+1 to low_hor_down_num+low_hor_cen_num
+	low_hor_pos[i]=low_hor_0+low_hor_offset
+	low_hor_0=low_hor_0+low_hor_cen_pitch
+
+	if mbar_dir=1 then !Y方向
+		if fra(i/2)<>0 then
+			low_hor_steel[i]=dbar_dcent_steel
+		else
+			low_hor_steel[i]=dbar2_dcent_steel
+		endif
+	else
+		if fra(i/2)<>0 then
+			low_hor_steel[i]=mbar_dcent_steel
+		else
+			low_hor_steel[i]=mbar2_dcent_steel
+		endif
+	endif
+next i
+
+!右側
+low_hor_0=miny+slab_y-slab_lx/4+low_hor_top_offset
+
+for i=low_hor_down_num+low_hor_cen_num+1 to low_hor_down_num+low_hor_cen_num+low_hor_top_num
+	low_hor_pos[i]=low_hor_0+low_hor_offset
+	low_hor_0=low_hor_0+low_hor_side_pitch
+
+	if mbar_dir=1 then !Y方向
+		if fra(i/2)<>0 then
+			low_hor_steel[i]=dbar_dside_steel
+		else
+			low_hor_steel[i]=dbar2_dside_steel
+		endif
+	else
+		if fra(i/2)<>0 then
+			low_hor_steel[i]=mbar_dside_steel
+		else
+			low_hor_steel[i]=mbar2_dside_steel
+		endif
+	endif
+next i
+
+if plus_steel_down then
+	if mbar_dir=1 then
+		low_hor_steel[low_hor_down_num+low_hor_cen_num+low_hor_top_num+plus_steel_down]=dbar2_dside_steel
+		low_hor_pos[low_hor_down_num+low_hor_cen_num+low_hor_top_num+plus_steel_down]=miny+dr_list[dbar2_dside_steel]
+	else
+		low_hor_steel[low_hor_down_num+low_hor_cen_num+low_hor_top_num+plus_steel_down]=mbar2_dside_steel
+		low_hor_pos[low_hor_down_num+low_hor_cen_num+low_hor_top_num+plus_steel_down]=miny+dr_list[mbar2_dside_steel]
+	endif
+endif
+
+if plus_steel_top then
+	if mbar_dir=1 then
+		low_hor_steel[low_hor_down_num+low_hor_cen_num+low_hor_top_num+plus_steel_down+plus_steel_top]=dbar2_dside_steel
+		low_hor_pos[low_hor_down_num+low_hor_cen_num+low_hor_top_num+plus_steel_down+plus_steel_top]=maxy-dr_list[dbar2_dside_steel]
+	else
+		low_hor_steel[low_hor_down_num+low_hor_cen_num+low_hor_top_num+plus_steel_down+plus_steel_top]=mbar2_dside_steel
+		low_hor_pos[low_hor_down_num+low_hor_cen_num+low_hor_top_num+plus_steel_down+plus_steel_top]=maxy-dr_list[mbar2_dside_steel]
+	endif
+endif
+
+
+!本数
+low_hor_allnum=0
+dim low_hor_ins_pos[][],low_hor_ins_num[][],low_hor_step[],low_hor_order[][],low_hor_op[],low_hor_oporder[][],\
+    low_hor_allpos[],low_hor_alledge_pos[][],low_hor_edge_num[][],low_hor_alledge_pos_2[][],\
+	low_hor_r[],low_hor_nd[],low_hor_pen[],low_hor_mat[]
+low_hor_ins_pos[1][1]=0
+low_hor_ins_pos[1][2]=0
+low_hor_ins_num[1][1]=0
+low_hor_ins_num[1][2]=0
+low_hor_step[1]=0
+low_hor_order[1][1]=0
+low_hor_order[1][2]=0
+low_hor_op[1]=0
+low_hor_oporder[1][1]=0
+low_hor_oporder[1][2]=0
+low_hor_allpos[1]=0
+low_hor_alledge_pos[1][1]=0
+low_hor_alledge_pos[1][2]=0
+low_hor_edge_num[1][1]=0
+low_hor_edge_num[1][2]=0
+low_hor_alledge_pos_2[1][1]=0
+low_hor_alledge_pos_2[1][2]=0
+low_hor_r[1]=0
+low_hor_nd[1]=0
+low_hor_pen[1]=0
+low_hor_mat[1]=0
+
+if low_hor_num>0 and pattern<>1 then
+
+for i=1 to low_hor_num
+	random_r=dr_list[low_hor_steel[i]]
+	random_nd=nd_list[low_hor_steel[i]]
+	random_steel=low_hor_steel[i]
+	random_pen=SDpen[scode_list[low_hor_steel[i]]]
+	random_mat=SDmat[scode_list[low_hor_steel[i]]]
+
+	!==================================始点と終点
+	counter_ins=0
+
+	for j=1 to 4
+		if low_hor_pos[i]>=min(equ_pos[j][2],equ_pos[j+1][2]) and low_hor_pos[i]<max(equ_pos[j][2],equ_pos[j+1][2]) then
+			counter_ins=counter_ins+1
+			low_hor_ins_pos[i][counter_ins]=-(equ_c[j]+equ_b[j]*low_hor_pos[i])/equ_a[j]
+			low_hor_ins_num[i][counter_ins]=j
+		endif
+	next j
+
+	min_ins_pos=maxx
+	min_ins_num=0
+	max_ins_pos=minx
+	max_ins_num=0
+
+	for j=1 to counter_ins
+		if min_ins_pos>min(min_ins_pos,low_hor_ins_pos[i][j]) then
+			min_ins_pos=low_hor_ins_pos[i][j]
+			min_ins_num=low_hor_ins_num[i][j]
+		endif
+		if max_ins_pos<max(max_ins_pos,low_hor_ins_pos[i][j]) then
+			max_ins_pos=low_hor_ins_pos[i][j]
+			max_ins_num=low_hor_ins_num[i][j]
+		endif
+	next j
+
+
+	!==================================かぶる開口数と順番
+	counter_op=0
+	low_hor_oporder[i][1]=0
+
+	if op_num>0 then
+		for j=1 to op_num
+			if low_hor_pos[i]>op_start[j][2] and low_hor_pos[i]<op_end[j][2] then
+				if min_ins_pos<op_end[j][1] and max_ins_pos>op_start[j][1] then
+					counter_op=counter_op+1
+					low_hor_oporder[i][counter_op]=j
+				endif
+			endif
+		next j
+	endif
+
+	low_hor_op[i]=counter_op
+
+	if counter_op>1 then
+		for j=1 to counter_op-1
+			for n=1 to counter_op-j
+				if op_start[low_hor_oporder[i][n]][1]>op_start[low_hor_oporder[i][n+1]][1] then
+					tempOrder=low_hor_oporder[i][n]
+					low_hor_oporder[i][n]=low_hor_oporder[i][n+1]
+					low_hor_oporder[i][n+1]=tempOrder
+				endif
+			next n
+		next j
+	endif
+
+	!==================================始点と終点座標をインプットする
+	!始点
+	put min_ins_pos
+
+	!開口部
+	if counter_op>0 then
+		for n=1 to counter_op
+			if op_shape[low_hor_oporder[i][n]]=1 then
+				put op_start[low_hor_oporder[i][n]][1]
+				put op_end[low_hor_oporder[i][n]][1]
+			else
+				put -sqr((op_len[low_hor_oporder[i][n]]/2+op_cover)^2-(low_hor_pos[i]-(op_pos[low_hor_oporder[i][n]][2]+op_len[low_hor_oporder[i][n]]/2))^2)+(op_pos[low_hor_oporder[i][n]][1]+op_len[low_hor_oporder[i][n]]/2)
+				put	sqr((op_len[low_hor_oporder[i][n]]/2+op_cover)^2-(low_hor_pos[i]-(op_pos[low_hor_oporder[i][n]][2]+op_len[low_hor_oporder[i][n]]/2))^2)+(op_pos[low_hor_oporder[i][n]][1]+op_len[low_hor_oporder[i][n]]/2)
+			endif
+		next n
+	endif
+	
+	!終点
+	put max_ins_pos
+
+	!==================================始点と終点座標リスト
+	counter_low_hor=1
+
+	if counter_op>0 then
+		for n=1 to counter_op
+			counter_low_hor=counter_low_hor+1
+		next n
+
+		if op_start[low_hor_oporder[i][1]][1]<=minx then
+			counter_low_hor=counter_low_hor-1
+			del_data=get(1)
+			del_data=get(1)
+		endif
+
+		if op_end[low_hor_oporder[i][counter_op]][1]>=maxx then
+			counter_low_hor=counter_low_hor-1
+		endif
+	endif
+
+	if counter_low_hor>0 then
+		for j=1 to counter_low_hor
+			low_hor_totstart=get(1)
+			low_hor_totend=get(1)
+
+			counter_allnum=ceil(abs(low_hor_totend-low_hor_totstart)/connect_len)
+
+			for n=1 to counter_allnum
+				low_hor_allnum=low_hor_allnum+1
+				low_hor_r[low_hor_allnum]=random_r
+				low_hor_nd[low_hor_allnum]=random_nd
+				low_hor_pen[low_hor_allnum]=random_pen
+				low_hor_mat[low_hor_allnum]=random_mat
+				if counter_allnum=1 then
+					low_hor_allpos[low_hor_allnum]=low_hor_pos[i]
+				else
+					if fra(n/2)<>0 then
+						low_hor_allpos[low_hor_allnum]=low_hor_pos[i]-low_hor_r[low_hor_allnum]
+					else
+						low_hor_allpos[low_hor_allnum]=low_hor_pos[i]+low_hor_r[low_hor_allnum]
+					endif
+				endif
+				if n=1 then
+					low_hor_alledge_pos[low_hor_allnum][1]=low_hor_totstart
+				else
+					low_hor_alledge_pos[low_hor_allnum][1]=low_hor_totstart+(n-1)/counter_allnum*(low_hor_totend-low_hor_totstart)-(L1+L1Plus)*low_hor_nd[low_hor_allnum]/2
+				endif
+				if n=counter_allnum then
+					low_hor_alledge_pos[low_hor_allnum][2]=low_hor_totend
+				else
+					low_hor_alledge_pos[low_hor_allnum][2]=low_hor_totstart+n/counter_allnum*(low_hor_totend-low_hor_totstart)+(L1+L1Plus)*low_hor_nd[low_hor_allnum]/2
+				endif
+				low_hor_alledge_pos_2[low_hor_allnum][1]=min_ins_pos
+				low_hor_alledge_pos_2[low_hor_allnum][2]=max_ins_pos
+
+				low_hor_edge_num[low_hor_allnum][1]=min_ins_num !始点辺の番号
+				low_hor_edge_num[low_hor_allnum][2]=max_ins_num !終点辺の番号
+			next n
+		next j
+	endif
+
+	if nsp>0 then
+		for n=1 to nsp
+			del_data=get(1)
+		next n
+	endif
+next i
+
+
+dim low_hor_allstep[],low_hor_allorder[][],low_hor_point[],low_hor_coor[][]
+low_hor_allstep[1]=0
+low_hor_allorder[1][1]=0
+low_hor_allorder[1][2]=0
+low_hor_point[1]=0
+low_hor_coor[1][1]=0
+low_hor_coor[1][2]=0
+
+for i=1 to low_hor_allnum
+	if position_pattern=1 then
+		low_hor_z=-slab_thi+slab_cover+2*dver_r+low_hor_r[i]+2*dandori_r*switchDandoriBar
+	else
+		low_hor_z=-slab_thi+slab_cover+low_hor_r[i]+2*dandori_r*switchDandoriBar
+	endif
+
+	!==================================かぶる段差数と順番
+	counter_step=0
+	low_hor_allorder[i][1]=0
+
+	if step_num>0 then
+		for j=1 to step_num
+			if low_hor_allpos[i]>step_in_start[j][2] and low_hor_allpos[i]<step_in_end[j][2] then
+				if low_hor_alledge_pos[i][1]<step_in_end[j][1] and low_hor_alledge_pos[i][2]>step_in_start[j][1] then
+					counter_step=counter_step+1
+					low_hor_allorder[i][counter_step]=j
+				endif
+			endif
+		next j
+	endif
+
+	low_hor_allstep[i]=counter_step
+
+	if counter_step>1 then
+		for j=1 to counter_step-1
+			for n=1 to counter_step-j
+				if step_in_start[low_hor_allorder[i][n]][1]>step_in_start[low_hor_allorder[i][n+1]][1] then
+					tempOrder=low_hor_allorder[i][n]
+					low_hor_allorder[i][n]=low_hor_allorder[i][n+1]
+					low_hor_allorder[i][n+1]=tempOrder
+				endif
+			next n
+		next j
+	endif
+
+	!==================================頂点数と頂点座標リスト
+	counter_point=0
+
+	!始点端部定着
+	if counter_step<=0 then
+		start_z=low_hor_z
+	else
+		if low_hor_alledge_pos[i][1]>=step_in_start[low_hor_allorder[i][1]][1]-step_thi[low_hor_allorder[i][1]] then
+			start_z=step_hei[low_hor_allorder[i][1]]+low_hor_z
+		else
+			start_z=low_hor_z
+		endif
+	endif
+
+	if low_hor_alledge_pos[i][1]<=low_hor_alledge_pos_2[i][1] then
+		columnCutFlag=0
+		if low_hor_allpos[i]>slab_pos[low_hor_edge_num[i][1]][2]-column_offset[low_hor_edge_num[i][1]][2] and low_hor_allpos[i]<slab_pos[low_hor_edge_num[i][1]][2]+column_offset[low_hor_edge_num[i][1]][2] then
+			columnCutFlag=1
+			counter_point=counter_point+1
+			low_hor_coor[i][counter_point*3-2]=slab_pos[low_hor_edge_num[i][1]][1]+column_offset[low_hor_edge_num[i][1]][1]-(L2+L2Plus)*low_hor_nd[i]
+			low_hor_coor[i][counter_point*3-1]=low_hor_allpos[i]
+			low_hor_coor[i][counter_point*3]=start_z
+		endif
+
+		if low_hor_allpos[i]>slab_pos[low_hor_edge_num[i][1]+1][2]-column_offset[low_hor_edge_num[i][1]+1][2] and low_hor_allpos[i]<slab_pos[low_hor_edge_num[i][1]+1][2]+column_offset[low_hor_edge_num[i][1]+1][2] then
+			columnCutFlag=1
+			counter_point=counter_point+1
+			low_hor_coor[i][counter_point*3-2]=slab_pos[low_hor_edge_num[i][1]+1][1]+column_offset[low_hor_edge_num[i][1]+1][1]-(L2+L2Plus)*low_hor_nd[i]
+			low_hor_coor[i][counter_point*3-1]=low_hor_allpos[i]
+			low_hor_coor[i][counter_point*3]=start_z
+		endif
+
+		if columnCutFlag=0 then
+			if anc_type[low_hor_edge_num[i][1]]=1 then !定着なし
+				counter_point=counter_point+1
+				low_hor_coor[i][counter_point*3-2]=low_hor_alledge_pos[i][1]
+				low_hor_coor[i][counter_point*3-1]=low_hor_allpos[i]
+				low_hor_coor[i][counter_point*3]=start_z
+			endif
+			
+			if anc_type[low_hor_edge_num[i][1]]=2 then !直線定着
+				counter_point=counter_point+1
+				low_hor_coor[i][counter_point*3-2]=low_hor_alledge_pos[i][1]-(L2+L2Plus)*low_hor_nd[i]
+				low_hor_coor[i][counter_point*3-1]=low_hor_allpos[i]
+				low_hor_coor[i][counter_point*3]=start_z
+			endif
+			
+			if anc_type[low_hor_edge_num[i][1]]=3 or anc_type[low_hor_edge_num[i][1]]=4 then !折り曲げ定着
+				counter_point=counter_point+1
+				low_hor_coor[i][counter_point*3-2]=low_hor_alledge_pos[i][1]-max(L3*low_hor_nd[i],0.15)
+				low_hor_coor[i][counter_point*3-1]=low_hor_allpos[i]
+				low_hor_coor[i][counter_point*3]=start_z
+			endif
+		endif
+	else
+		counter_point=counter_point+1
+		low_hor_coor[i][counter_point*3-2]=low_hor_alledge_pos[i][1]
+		low_hor_coor[i][counter_point*3-1]=low_hor_allpos[i]
+		low_hor_coor[i][counter_point*3]=start_z
+	endif
+
+	!段差部
+	if counter_step>0 then
+		for j=1 to counter_step
+			if abs(step_hei[low_hor_allorder[i][j]])>0.1 then
+				coor_plus=slab_cover+2*sti_r+2*stepref_r
+			else
+				coor_plus=0
+			endif
+
+			if j=1 and low_hor_alledge_pos[i][1]>=step_in_start[low_hor_allorder[i][1]][1]-step_thi[low_hor_allorder[i][1]] then	
+			else
+				counter_point=counter_point+1
+				low_hor_coor[i][counter_point*3-2]=step_out_start[low_hor_allorder[i][j]][1]
+				low_hor_coor[i][counter_point*3-1]=low_hor_allpos[i]
+				low_hor_coor[i][counter_point*3]=low_hor_z
+	
+				counter_point=counter_point+1
+				low_hor_coor[i][counter_point*3-2]=step_in_start[low_hor_allorder[i][j]][1]-coor_plus
+				low_hor_coor[i][counter_point*3-1]=low_hor_allpos[i]
+				low_hor_coor[i][counter_point*3]=step_hei[low_hor_allorder[i][j]]+low_hor_z
+			endif
+	
+			if j=counter_step and low_hor_alledge_pos[i][2]<=step_in_end[low_hor_allorder[i][counter_step]][1]+step_thi[low_hor_allorder[i][counter_step]] then
+			else
+				counter_point=counter_point+1
+				low_hor_coor[i][counter_point*3-2]=step_in_end[low_hor_allorder[i][j]][1]+coor_plus
+				low_hor_coor[i][counter_point*3-1]=low_hor_allpos[i]
+				low_hor_coor[i][counter_point*3]=step_hei[low_hor_allorder[i][j]]+low_hor_z
+	
+				counter_point=counter_point+1
+				low_hor_coor[i][counter_point*3-2]=step_out_end[low_hor_allorder[i][j]][1]
+				low_hor_coor[i][counter_point*3-1]=low_hor_allpos[i]
+				low_hor_coor[i][counter_point*3]=low_hor_z
+			endif
+		next j
+	endif
+
+	!終点端部定着
+	if counter_step<=0 then
+		end_z=low_hor_z
+	else
+		if low_hor_alledge_pos[i][2]<=step_in_end[low_hor_allorder[i][counter_step]][1]+step_thi[low_hor_allorder[i][counter_step]] then
+			end_z=step_hei[low_hor_allorder[i][counter_step]]+low_hor_z
+		else
+			end_z=low_hor_z
+		endif
+	endif
+
+	if low_hor_alledge_pos[i][2]>=low_hor_alledge_pos_2[i][2] then
+		columnCutFlag=0
+		if low_hor_allpos[i]>slab_pos[low_hor_edge_num[i][2]][2]-column_offset[low_hor_edge_num[i][2]][2] and low_hor_allpos[i]<slab_pos[low_hor_edge_num[i][2]][2]+column_offset[low_hor_edge_num[i][2]][2] then
+			columnCutFlag=1
+			counter_point=counter_point+1
+			low_hor_coor[i][counter_point*3-2]=slab_pos[low_hor_edge_num[i][2]][1]-column_offset[low_hor_edge_num[i][2]][1]+(L2+L2Plus)*low_hor_nd[i]
+			low_hor_coor[i][counter_point*3-1]=low_hor_allpos[i]
+			low_hor_coor[i][counter_point*3]=start_z
+		endif
+
+		if low_hor_allpos[i]>slab_pos[low_hor_edge_num[i][2]+1][2]-column_offset[low_hor_edge_num[i][2]+1][2] and low_hor_allpos[i]<slab_pos[low_hor_edge_num[i][2]+1][2]+column_offset[low_hor_edge_num[i][2]+1][2] then
+			columnCutFlag=1
+			counter_point=counter_point+1
+			low_hor_coor[i][counter_point*3-2]=slab_pos[low_hor_edge_num[i][2]+1][1]-column_offset[low_hor_edge_num[i][2]+1][1]+(L2+L2Plus)*low_hor_nd[i]
+			low_hor_coor[i][counter_point*3-1]=low_hor_allpos[i]
+			low_hor_coor[i][counter_point*3]=start_z
+		endif
+
+		if columnCutFlag=0 then
+			if anc_type[low_hor_edge_num[i][2]]=1 then !定着なし
+				counter_point=counter_point+1
+				low_hor_coor[i][counter_point*3-2]=low_hor_alledge_pos[i][2]
+				low_hor_coor[i][counter_point*3-1]=low_hor_allpos[i]
+				low_hor_coor[i][counter_point*3]=end_z
+			endif
+
+			if anc_type[low_hor_edge_num[i][2]]=2 then !直線定着
+				counter_point=counter_point+1
+				low_hor_coor[i][counter_point*3-2]=low_hor_alledge_pos[i][2]+(L2+L2Plus)*low_hor_nd[i]
+				low_hor_coor[i][counter_point*3-1]=low_hor_allpos[i]
+				low_hor_coor[i][counter_point*3]=end_z
+			endif
+
+			if anc_type[low_hor_edge_num[i][2]]=3 or anc_type[low_hor_edge_num[i][2]]=4 then !折り曲げ定着
+				counter_point=counter_point+1
+				low_hor_coor[i][counter_point*3-2]=low_hor_alledge_pos[i][2]+max(L3*low_hor_nd[i],0.15)
+				low_hor_coor[i][counter_point*3-1]=low_hor_allpos[i]
+				low_hor_coor[i][counter_point*3]=end_z
+			endif
+		endif
+	else
+		counter_point=counter_point+1
+		low_hor_coor[i][counter_point*3-2]=low_hor_alledge_pos[i][2]
+		low_hor_coor[i][counter_point*3-1]=low_hor_allpos[i]
+		low_hor_coor[i][counter_point*3]=end_z
+	endif
+
+	low_hor_point[i]=counter_point
+next i
+
+!下中央プラス横筋
+if lowCentHorEdge or lowCentHorCent then
+	if mbar_dir=1 then
+		barSteel=dbar_tcent_steel
+	else
+		barSteel=mbar_tcent_steel
+	endif
+
+	lowCentHorNum=0
+	dim lowCentHorPos[],lowCentHorIntsecPos[][],lowCentHorIntsecNum[][]
+	lowCentHorPos[1]=0
+	lowCentHorIntsecPos[1][1]=0
+	lowCentHorIntsecPos[1][2]=0
+	lowCentHorIntsecNum[1][1]=0
+	lowCentHorIntsecNum[1][2]=0
+
+	lowCentHorNum=int((slab_y-slab_lx/2)/low_hor_cen_pitch)
+	lowCentHorOffset=(slab_y-slab_lx/2-(lowCentHorNum-1)*low_hor_cen_pitch)/2
+
+	for i=1 to lowCentHorNum
+		lowCentHorPos[i]=miny+slab_lx/4+lowCentHorOffset+(i-1)*low_hor_cen_pitch
+
+		!始点と終点
+		intsecCount=0
+
+		for j=1 to 4
+			if lowCentHorPos[i]>=min(equ_pos[j][2],equ_pos[j+1][2]) and lowCentHorPos[i]<max(equ_pos[j][2],equ_pos[j+1][2]) then
+				intsecCount=intsecCount+1
+				lowCentHorIntsecPos[i][intsecCount]=-(equ_c[j]+equ_b[j]*lowCentHorPos[i])/equ_a[j]
+				lowCentHorIntsecNum[i][intsecCount]=j
+			endif
+		next j
+
+		if lowCentHorIntsecPos[i][1]<=lowCentHorIntsecPos[i][2] then
+			startIntsecPos=lowCentHorIntsecPos[i][1]
+			startIntsecNum=lowCentHorIntsecNum[i][1]
+			endIntsecPos=lowCentHorIntsecPos[i][2]
+			endIntsecNum=lowCentHorIntsecNum[i][2]
+		else
+			startIntsecPos=lowCentHorIntsecPos[i][2]
+			startIntsecNum=lowCentHorIntsecNum[i][2]
+			endIntsecPos=lowCentHorIntsecPos[i][1]
+			endIntsecNum=lowCentHorIntsecNum[i][1]
+		endif
+
+		if lowCentHorEdge then
+			!始点端部
+			if startIntsecPos<minx+slab_lx/4 then
+				low_hor_allnum=low_hor_allnum+1
+				low_hor_r[low_hor_allnum]=dr_list[barSteel]
+				low_hor_nd[low_hor_allnum]=nd_list[barSteel]
+				low_hor_pen[low_hor_allnum]=SDpen[scode_list[barSteel]]
+				low_hor_mat[low_hor_allnum]=SDmat[scode_list[barSteel]]
+
+				if anc_type[startIntsecNum]=1 then !定着なし
+					startXpos=startIntsecPos
+				endif
+
+				if anc_type[startIntsecNum]=2 then !直線定着
+					startXpos=startIntsecPos-(L2+L2Plus)*low_hor_nd[low_hor_allnum]
+				endif
+
+				if anc_type[startIntsecNum]=3 or anc_type[startIntsecNum]=4 then !折り曲げ定着
+					startXpos=startIntsecPos-max(L3*low_hor_nd[low_hor_allnum],0.15)
+				endif
+
+				low_hor_point[low_hor_allnum]=2
+
+				put startXpos
+				put lowCentHorPos[i]
+				put low_hor_z
+
+				put minx+slab_lx/4
+				put lowCentHorPos[i]
+				put low_hor_z
+
+				for n=1 to 3*low_hor_point[low_hor_allnum]
+					low_hor_coor[low_hor_allnum][n]=get(1)
+				next n
+			endif
+
+			!終点端部
+			if endIntsecPos>maxx-slab_lx/4 then
+				low_hor_allnum=low_hor_allnum+1
+				low_hor_r[low_hor_allnum]=dr_list[barSteel]
+				low_hor_nd[low_hor_allnum]=nd_list[barSteel]
+				low_hor_pen[low_hor_allnum]=SDpen[scode_list[barSteel]]
+				low_hor_mat[low_hor_allnum]=SDmat[scode_list[barSteel]]
+
+				if anc_type[endIntsecNum]=1 then !定着なし
+					endXpos=endIntsecPos
+				endif
+
+				if anc_type[endIntsecNum]=2 then !直線定着
+					endXpos=endIntsecPos+(L2+L2Plus)*low_hor_nd[low_hor_allnum]
+				endif
+
+				if anc_type[endIntsecNum]=3 or anc_type[endIntsecNum]=4 then !折り曲げ定着(下方向)
+					endXpos=endIntsecPos+max(L3*low_hor_nd[low_hor_allnum],0.15)
+				endif
+
+				low_hor_point[low_hor_allnum]=2
+
+				put maxx-slab_lx/4
+				put lowCentHorPos[i]
+				put low_hor_z
+
+				put endXpos
+				put lowCentHorPos[i]
+				put low_hor_z
+
+				for n=1 to 3*low_hor_point[low_hor_allnum]
+					low_hor_coor[low_hor_allnum][n]=get(1)
+				next n
+			endif
+		endif
+
+		if lowCentHorCent then
+			low_hor_allnum=low_hor_allnum+1
+			low_hor_r[low_hor_allnum]=dr_list[barSteel]
+			low_hor_nd[low_hor_allnum]=nd_list[barSteel]
+			low_hor_pen[low_hor_allnum]=SDpen[scode_list[barSteel]]
+			low_hor_mat[low_hor_allnum]=SDmat[scode_list[barSteel]]
+
+			low_hor_point[low_hor_allnum]=2
+
+			put max(minx+slab_lx/4,startIntsecPos)
+			put lowCentHorPos[i]
+			put low_hor_z
+		
+			put min(maxx-slab_lx/4,endIntsecPos)
+			put lowCentHorPos[i]
+			put low_hor_z
+
+			for n=1 to 3*low_hor_point[low_hor_allnum]
+				low_hor_coor[low_hor_allnum][n]=get(1)
+			next n
+		endif
+	next i
+endif
+
+endif
+
+if switchLowerX=0 then low_hor_allnum=0
+parameters low_hor_allnum=low_hor_allnum
+
+parameters sti_num=counter_sti
+parameters sti_pen=sti_pen
+parameters sti_mat=sti_mat
+parameters sti_r=sti_r
+parameters sti_nd=sti_nd
+parameters sti_point=sti_point
+parameters sti_coor=sti_coor
+
+if switchReinforce then
+	sti_num=counter_sti
+else
+	sti_num=0
+endif
+parameters sti_num=sti_num
+
+if sti_num<=0 then
+	hideparameter "step_stirrup"
+endif
+
+
+!=================================================================開口補強筋
+opref_pen=SDpen[scode_list[opref_steel]]
+opref_mat=SDmat[scode_list[opref_steel]]
+
+counter_opref=0
+
+if op_num>0 then
+
+	for i=1 to op_num
+	
+		if position_pattern=1 then
+			opref_ver_z_1=-(slab_cover+2*tver_r+2*thor_r+opref_r)
+			opref_hor_z_1=-(slab_cover+2*tver_r+2*thor_r+3*opref_r)
+			opref_dia_z_1=-(slab_cover+2*tver_r+2*thor_r+5*opref_r)
+			opref_ver_z_2=-slab_thi+(slab_cover+2*dver_r+2*dhor_r+opref_r)
+			opref_hor_z_2=-slab_thi+(slab_cover+2*dver_r+2*dhor_r+3*opref_r)
+			opref_dia_z_2=-slab_thi+(slab_cover+2*dver_r+2*dhor_r+5*opref_r)
+		else
+			opref_ver_z_1=-(slab_cover+2*tver_r+2*thor_r+3*opref_r)
+			opref_hor_z_1=-(slab_cover+2*tver_r+2*thor_r+opref_r)
+			opref_dia_z_1=-(slab_cover+2*tver_r+2*thor_r+5*opref_r)
+			opref_ver_z_2=-slab_thi+(slab_cover+2*dver_r+2*dhor_r+3*opref_r)
+			opref_hor_z_2=-slab_thi+(slab_cover+2*dver_r+2*dhor_r+opref_r)
+			opref_dia_z_2=-slab_thi+(slab_cover+2*dver_r+2*dhor_r+5*opref_r)
+		endif
+	
+		!下端
+		if op_start[i][2]>=miny then
+			counter_opref=counter_opref+1
+			opref_point[counter_opref]=2
+			opref_coor[counter_opref][1]=op_start[i][1]-(L2+L2Plus)*opref_nd
+			opref_coor[counter_opref][2]=op_start[i][2]-opref_r
+			opref_coor[counter_opref][3]=opref_hor_z_1
+			opref_coor[counter_opref][4]=op_end[i][1]+(L2+L2Plus)*opref_nd
+			opref_coor[counter_opref][5]=op_start[i][2]-opref_r
+			opref_coor[counter_opref][6]=opref_hor_z_1
+
+			if pattern>1 then
+				counter_opref=counter_opref+1
+				opref_point[counter_opref]=2
+				opref_coor[counter_opref][1]=op_start[i][1]-(L2+L2Plus)*opref_nd
+				opref_coor[counter_opref][2]=op_start[i][2]-opref_r
+				opref_coor[counter_opref][3]=opref_hor_z_2
+				opref_coor[counter_opref][4]=op_end[i][1]+(L2+L2Plus)*opref_nd
+				opref_coor[counter_opref][5]=op_start[i][2]-opref_r
+				opref_coor[counter_opref][6]=opref_hor_z_2
+			endif
+		endif
+
+		!上端
+		if op_end[i][2]<=maxy then
+			counter_opref=counter_opref+1
+			opref_point[counter_opref]=2
+			opref_coor[counter_opref][1]=op_start[i][1]-(L2+L2Plus)*opref_nd
+			opref_coor[counter_opref][2]=op_end[i][2]+opref_r
+			opref_coor[counter_opref][3]=opref_hor_z_1
+			opref_coor[counter_opref][4]=op_end[i][1]+(L2+L2Plus)*opref_nd
+			opref_coor[counter_opref][5]=op_end[i][2]+opref_r
+			opref_coor[counter_opref][6]=opref_hor_z_1
+
+			if pattern>1 then
+				counter_opref=counter_opref+1
+				opref_point[counter_opref]=2
+				opref_coor[counter_opref][1]=op_start[i][1]-(L2+L2Plus)*opref_nd
+				opref_coor[counter_opref][2]=op_end[i][2]+opref_r
+				opref_coor[counter_opref][3]=opref_hor_z_2
+				opref_coor[counter_opref][4]=op_end[i][1]+(L2+L2Plus)*opref_nd
+				opref_coor[counter_opref][5]=op_end[i][2]+opref_r
+				opref_coor[counter_opref][6]=opref_hor_z_2
+			endif
+		endif
+
+		!左側
+		if op_start[i][1]>=minx then
+			counter_opref=counter_opref+1
+			opref_point[counter_opref]=2
+			opref_coor[counter_opref][1]=op_start[i][1]-opref_r
+			opref_coor[counter_opref][2]=op_start[i][2]-(L2+L2Plus)*opref_nd
+			opref_coor[counter_opref][3]=opref_ver_z_1
+			opref_coor[counter_opref][4]=op_start[i][1]-opref_r
+			opref_coor[counter_opref][5]=op_end[i][2]+(L2+L2Plus)*opref_nd
+			opref_coor[counter_opref][6]=opref_ver_z_1
+
+			if pattern>1 then
+				counter_opref=counter_opref+1
+				opref_point[counter_opref]=2
+				opref_coor[counter_opref][1]=op_start[i][1]-opref_r
+				opref_coor[counter_opref][2]=op_start[i][2]-(L2+L2Plus)*opref_nd
+				opref_coor[counter_opref][3]=opref_ver_z_2
+				opref_coor[counter_opref][4]=op_start[i][1]-opref_r
+				opref_coor[counter_opref][5]=op_end[i][2]+(L2+L2Plus)*opref_nd
+				opref_coor[counter_opref][6]=opref_ver_z_2
+			endif
+		endif
+
+		!右側
+		if op_end[i][1]<=maxx then
+			counter_opref=counter_opref+1
+			opref_point[counter_opref]=2
+			opref_coor[counter_opref][1]=op_end[i][1]+opref_r
+			opref_coor[counter_opref][2]=op_start[i][2]-(L2+L2Plus)*opref_nd
+			opref_coor[counter_opref][3]=opref_ver_z_1
+			opref_coor[counter_opref][4]=op_end[i][1]+opref_r
+			opref_coor[counter_opref][5]=op_end[i][2]+(L2+L2Plus)*opref_nd
+			opref_coor[counter_opref][6]=opref_ver_z_1
+
+			if pattern>1 then
+				counter_opref=counter_opref+1
+				opref_point[counter_opref]=2
+				opref_coor[counter_opref][1]=op_end[i][1]+opref_r
+				opref_coor[counter_opref][2]=op_start[i][2]-(L2+L2Plus)*opref_nd
+				opref_coor[counter_opref][3]=opref_ver_z_2
+				opref_coor[counter_opref][4]=op_end[i][1]+opref_r
+				opref_coor[counter_opref][5]=op_end[i][2]+(L2+L2Plus)*opref_nd
+				opref_coor[counter_opref][6]=opref_ver_z_2
+			endif
+		endif
+
+		!左下角
+		if op_start[i][2]>=miny and op_start[i][1]>=minx then
+			counter_opref=counter_opref+1
+			opref_point[counter_opref]=2
+			opref_coor[counter_opref][1]=op_start[i][1]-opref_r-(L2+L2Plus)*opref_nd/sqr(2)
+			opref_coor[counter_opref][2]=op_start[i][2]-opref_r+(L2+L2Plus)*opref_nd/sqr(2)
+			opref_coor[counter_opref][3]=opref_dia_z_1
+			opref_coor[counter_opref][4]=op_start[i][1]-opref_r+(L2+L2Plus)*opref_nd/sqr(2)
+			opref_coor[counter_opref][5]=op_start[i][2]-opref_r-(L2+L2Plus)*opref_nd/sqr(2)
+			opref_coor[counter_opref][6]=opref_dia_z_1
+
+			if pattern>1 then
+				counter_opref=counter_opref+1
+				opref_point[counter_opref]=2
+				opref_coor[counter_opref][1]=op_start[i][1]-opref_r-(L2+L2Plus)*opref_nd/sqr(2)
+				opref_coor[counter_opref][2]=op_start[i][2]-opref_r+(L2+L2Plus)*opref_nd/sqr(2)
+				opref_coor[counter_opref][3]=opref_dia_z_2
+				opref_coor[counter_opref][4]=op_start[i][1]-opref_r+(L2+L2Plus)*opref_nd/sqr(2)
+				opref_coor[counter_opref][5]=op_start[i][2]-opref_r-(L2+L2Plus)*opref_nd/sqr(2)
+				opref_coor[counter_opref][6]=opref_dia_z_2
+			endif
+		endif
+
+		!右下角
+		if op_start[i][2]>=miny and op_end[i][1]<=maxx then
+			counter_opref=counter_opref+1
+			opref_point[counter_opref]=2
+			opref_coor[counter_opref][1]=op_end[i][1]+opref_r+(L2+L2Plus)*opref_nd/sqr(2)
+			opref_coor[counter_opref][2]=op_start[i][2]-opref_r+(L2+L2Plus)*opref_nd/sqr(2)
+			opref_coor[counter_opref][3]=opref_dia_z_1
+			opref_coor[counter_opref][4]=op_end[i][1]+opref_r-(L2+L2Plus)*opref_nd/sqr(2)
+			opref_coor[counter_opref][5]=op_start[i][2]-opref_r-(L2+L2Plus)*opref_nd/sqr(2)
+			opref_coor[counter_opref][6]=opref_dia_z_1
+
+			if pattern>1 then
+				counter_opref=counter_opref+1
+				opref_point[counter_opref]=2
+				opref_coor[counter_opref][1]=op_end[i][1]+opref_r+(L2+L2Plus)*opref_nd/sqr(2)
+				opref_coor[counter_opref][2]=op_start[i][2]-opref_r+(L2+L2Plus)*opref_nd/sqr(2)
+				opref_coor[counter_opref][3]=opref_dia_z_2
+				opref_coor[counter_opref][4]=op_end[i][1]+opref_r-(L2+L2Plus)*opref_nd/sqr(2)
+				opref_coor[counter_opref][5]=op_start[i][2]-opref_r-(L2+L2Plus)*opref_nd/sqr(2)
+				opref_coor[counter_opref][6]=opref_dia_z_2
+			endif
+		endif
+
+		!左上角
+		if op_end[i][2]<=maxy and op_start[i][1]>=minx then
+			counter_opref=counter_opref+1
+			opref_point[counter_opref]=2
+			opref_coor[counter_opref][1]=op_start[i][1]-opref_r+(L2+L2Plus)*opref_nd/sqr(2)
+			opref_coor[counter_opref][2]=op_end[i][2]+opref_r+(L2+L2Plus)*opref_nd/sqr(2)
+			opref_coor[counter_opref][3]=opref_dia_z_1
+			opref_coor[counter_opref][4]=op_start[i][1]-opref_r-(L2+L2Plus)*opref_nd/sqr(2)
+			opref_coor[counter_opref][5]=op_end[i][2]+opref_r-(L2+L2Plus)*opref_nd/sqr(2)
+			opref_coor[counter_opref][6]=opref_dia_z_1
+
+			if pattern>1 then
+				counter_opref=counter_opref+1
+				opref_point[counter_opref]=2
+				opref_coor[counter_opref][1]=op_start[i][1]-opref_r+(L2+L2Plus)*opref_nd/sqr(2)
+				opref_coor[counter_opref][2]=op_end[i][2]+opref_r+(L2+L2Plus)*opref_nd/sqr(2)
+				opref_coor[counter_opref][3]=opref_dia_z_2
+				opref_coor[counter_opref][4]=op_start[i][1]-opref_r-(L2+L2Plus)*opref_nd/sqr(2)
+				opref_coor[counter_opref][5]=op_end[i][2]+opref_r-(L2+L2Plus)*opref_nd/sqr(2)
+				opref_coor[counter_opref][6]=opref_dia_z_2
+			endif
+		endif
+
+		!右上角
+		if op_end[i][2]<=maxy and op_end[i][1]<=maxx then
+			counter_opref=counter_opref+1
+			opref_point[counter_opref]=2
+			opref_coor[counter_opref][1]=op_end[i][1]+opref_r-(L2+L2Plus)*opref_nd/sqr(2)
+			opref_coor[counter_opref][2]=op_end[i][2]+opref_r+(L2+L2Plus)*opref_nd/sqr(2)
+			opref_coor[counter_opref][3]=opref_dia_z_1
+			opref_coor[counter_opref][4]=op_end[i][1]+opref_r+(L2+L2Plus)*opref_nd/sqr(2)
+			opref_coor[counter_opref][5]=op_end[i][2]+opref_r-(L2+L2Plus)*opref_nd/sqr(2)
+			opref_coor[counter_opref][6]=opref_dia_z_1
+
+			if pattern>1 then
+				counter_opref=counter_opref+1
+				opref_point[counter_opref]=2
+				opref_coor[counter_opref][1]=op_end[i][1]+opref_r-(L2+L2Plus)*opref_nd/sqr(2)
+				opref_coor[counter_opref][2]=op_end[i][2]+opref_r+(L2+L2Plus)*opref_nd/sqr(2)
+				opref_coor[counter_opref][3]=opref_dia_z_2
+				opref_coor[counter_opref][4]=op_end[i][1]+opref_r+(L2+L2Plus)*opref_nd/sqr(2)
+				opref_coor[counter_opref][5]=op_end[i][2]+opref_r-(L2+L2Plus)*opref_nd/sqr(2)
+				opref_coor[counter_opref][6]=opref_dia_z_2
+			endif
+		endif
+
+	next i
+
+endif
+
+if switchReinforce then
+	opref_num=counter_opref
+else
+	opref_num=0
+endif
+
+parameters opref_num=opref_num
+parameters opref_pen=opref_pen
+parameters opref_mat=opref_mat
+parameters opref_r=opref_r
+parameters opref_nd=opref_nd
+parameters opref_point=opref_point
+parameters opref_coor=opref_coor
+
+
+
+!=================================================================段差補強筋
+stepref_pen=SDpen[scode_list[stepref_steel]]
+stepref_mat=SDmat[scode_list[stepref_steel]]
+
+counter_stepref=0
+
+if step_num>0 then
+
+	for i=1 to step_num
+	
+		if abs(step_hei[i])<=0.1 then !あばら筋なし
+			if position_pattern=1 then
+				stepref_hor_z_1=slab_cover+2*tver_r+stepref_r
+				stepref_ver_z_1=slab_cover+2*tver_r+3*stepref_r
+				stepref_hor_z_2=slab_cover-stepref_r
+				stepref_ver_z_2=slab_cover+stepref_r
+			else
+				stepref_hor_z_1=slab_cover+2*tver_r+3*stepref_r
+				stepref_ver_z_1=slab_cover+2*tver_r+stepref_r
+				stepref_hor_z_2=slab_cover+stepref_r
+				stepref_ver_z_2=slab_cover-stepref_r
+			endif
+
+			!下端
+			if step_out_start[i][2]=step_in_start[i][2]-step_thi[i] then
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_out_start[i][1]
+				stepref_coor[counter_stepref][2]=step_out_start[i][2]
+				stepref_coor[counter_stepref][3]=-stepref_hor_z_1
+				stepref_coor[counter_stepref][4]=step_out_end[i][1]
+				stepref_coor[counter_stepref][5]=step_out_start[i][2]
+				stepref_coor[counter_stepref][6]=-stepref_hor_z_1
+			
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_in_start[i][1]
+				stepref_coor[counter_stepref][2]=step_in_start[i][2]
+				stepref_coor[counter_stepref][3]=step_hei[i]-stepref_hor_z_2
+				stepref_coor[counter_stepref][4]=step_in_end[i][1]
+				stepref_coor[counter_stepref][5]=step_in_start[i][2]
+				stepref_coor[counter_stepref][6]=step_hei[i]-stepref_hor_z_2
+
+				if pattern>1 then
+					counter_stepref=counter_stepref+1
+					stepref_point[counter_stepref]=2
+					stepref_coor[counter_stepref][1]=step_out_start[i][1]
+					stepref_coor[counter_stepref][2]=step_out_start[i][2]
+					stepref_coor[counter_stepref][3]=-slab_thi+stepref_hor_z_2+2*dandori_r*switchDandoriBar
+					stepref_coor[counter_stepref][4]=step_out_end[i][1]
+					stepref_coor[counter_stepref][5]=step_out_start[i][2]
+					stepref_coor[counter_stepref][6]=-slab_thi+stepref_hor_z_2+2*dandori_r*switchDandoriBar
+				
+					counter_stepref=counter_stepref+1
+					stepref_point[counter_stepref]=2
+					stepref_coor[counter_stepref][1]=step_in_start[i][1]
+					stepref_coor[counter_stepref][2]=step_in_start[i][2]
+					stepref_coor[counter_stepref][3]=step_hei[i]-slab_thi+stepref_hor_z_1+2*dandori_r*switchDandoriBar
+					stepref_coor[counter_stepref][4]=step_in_end[i][1]
+					stepref_coor[counter_stepref][5]=step_in_start[i][2]
+					stepref_coor[counter_stepref][6]=step_hei[i]-slab_thi+stepref_hor_z_1+2*dandori_r*switchDandoriBar
+				endif
+			endif
+			
+			!上端
+			if step_out_end[i][2]=step_in_end[i][2]+step_thi[i] then
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_out_start[i][1]
+				stepref_coor[counter_stepref][2]=step_out_end[i][2]
+				stepref_coor[counter_stepref][3]=-stepref_hor_z_1
+				stepref_coor[counter_stepref][4]=step_out_end[i][1]
+				stepref_coor[counter_stepref][5]=step_out_end[i][2]
+				stepref_coor[counter_stepref][6]=-stepref_hor_z_1
+			
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_in_start[i][1]
+				stepref_coor[counter_stepref][2]=step_in_end[i][2]
+				stepref_coor[counter_stepref][3]=step_hei[i]-stepref_hor_z_2
+				stepref_coor[counter_stepref][4]=step_in_end[i][1]
+				stepref_coor[counter_stepref][5]=step_in_end[i][2]
+				stepref_coor[counter_stepref][6]=step_hei[i]-stepref_hor_z_2
+
+				if pattern>1 then
+					counter_stepref=counter_stepref+1
+					stepref_point[counter_stepref]=2
+					stepref_coor[counter_stepref][1]=step_out_start[i][1]
+					stepref_coor[counter_stepref][2]=step_out_end[i][2]
+					stepref_coor[counter_stepref][3]=-slab_thi+stepref_hor_z_2+2*dandori_r*switchDandoriBar
+					stepref_coor[counter_stepref][4]=step_out_end[i][1]
+					stepref_coor[counter_stepref][5]=step_out_end[i][2]
+					stepref_coor[counter_stepref][6]=-slab_thi+stepref_hor_z_2+2*dandori_r*switchDandoriBar
+				
+					counter_stepref=counter_stepref+1
+					stepref_point[counter_stepref]=2
+					stepref_coor[counter_stepref][1]=step_in_start[i][1]
+					stepref_coor[counter_stepref][2]=step_in_end[i][2]
+					stepref_coor[counter_stepref][3]=step_hei[i]-slab_thi+stepref_hor_z_1+2*dandori_r*switchDandoriBar
+					stepref_coor[counter_stepref][4]=step_in_end[i][1]
+					stepref_coor[counter_stepref][5]=step_in_end[i][2]
+					stepref_coor[counter_stepref][6]=step_hei[i]-slab_thi+stepref_hor_z_1+2*dandori_r*switchDandoriBar
+				endif
+			endif
+			
+			!左側
+			if step_out_start[i][1]=step_in_start[i][1]-step_thi[i] then
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_out_start[i][1]
+				stepref_coor[counter_stepref][2]=step_out_start[i][2]
+				stepref_coor[counter_stepref][3]=-stepref_ver_z_1
+				stepref_coor[counter_stepref][4]=step_out_start[i][1]
+				stepref_coor[counter_stepref][5]=step_out_end[i][2]
+				stepref_coor[counter_stepref][6]=-stepref_ver_z_1
+			
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_in_start[i][1]
+				stepref_coor[counter_stepref][2]=step_in_start[i][2]
+				stepref_coor[counter_stepref][3]=step_hei[i]-stepref_ver_z_2
+				stepref_coor[counter_stepref][4]=step_in_start[i][1]
+				stepref_coor[counter_stepref][5]=step_in_end[i][2]
+				stepref_coor[counter_stepref][6]=step_hei[i]-stepref_ver_z_2
+
+				if pattern>1 then
+					counter_stepref=counter_stepref+1
+					stepref_point[counter_stepref]=2
+					stepref_coor[counter_stepref][1]=step_out_start[i][1]
+					stepref_coor[counter_stepref][2]=step_out_start[i][2]
+					stepref_coor[counter_stepref][3]=-slab_thi+stepref_ver_z_2+2*dandori_r*switchDandoriBar
+					stepref_coor[counter_stepref][4]=step_out_start[i][1]
+					stepref_coor[counter_stepref][5]=step_out_end[i][2]
+					stepref_coor[counter_stepref][6]=-slab_thi+stepref_ver_z_2+2*dandori_r*switchDandoriBar
+				
+					counter_stepref=counter_stepref+1
+					stepref_point[counter_stepref]=2
+					stepref_coor[counter_stepref][1]=step_in_start[i][1]
+					stepref_coor[counter_stepref][2]=step_in_start[i][2]
+					stepref_coor[counter_stepref][3]=step_hei[i]-slab_thi+stepref_ver_z_1+2*dandori_r*switchDandoriBar
+					stepref_coor[counter_stepref][4]=step_in_start[i][1]
+					stepref_coor[counter_stepref][5]=step_in_end[i][2]
+					stepref_coor[counter_stepref][6]=step_hei[i]-slab_thi+stepref_ver_z_1+2*dandori_r*switchDandoriBar
+				endif
+			endif
+			
+			!右側
+			if step_out_end[i][1]=step_in_end[i][1]+step_thi[i] then
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_out_end[i][1]
+				stepref_coor[counter_stepref][2]=step_out_start[i][2]
+				stepref_coor[counter_stepref][3]=-stepref_ver_z_1
+				stepref_coor[counter_stepref][4]=step_out_end[i][1]
+				stepref_coor[counter_stepref][5]=step_out_end[i][2]
+				stepref_coor[counter_stepref][6]=-stepref_ver_z_1
+			
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_in_end[i][1]
+				stepref_coor[counter_stepref][2]=step_in_start[i][2]
+				stepref_coor[counter_stepref][3]=step_hei[i]-stepref_ver_z_2
+				stepref_coor[counter_stepref][4]=step_in_end[i][1]
+				stepref_coor[counter_stepref][5]=step_in_end[i][2]
+				stepref_coor[counter_stepref][6]=step_hei[i]-stepref_ver_z_2
+
+				if pattern>1 then
+					counter_stepref=counter_stepref+1
+					stepref_point[counter_stepref]=2
+					stepref_coor[counter_stepref][1]=step_out_end[i][1]
+					stepref_coor[counter_stepref][2]=step_out_start[i][2]
+					stepref_coor[counter_stepref][3]=-slab_thi+stepref_ver_z_2+2*dandori_r*switchDandoriBar
+					stepref_coor[counter_stepref][4]=step_out_end[i][1]
+					stepref_coor[counter_stepref][5]=step_out_end[ i][2]
+					stepref_coor[counter_stepref][6]=-slab_thi+stepref_ver_z_2+2*dandori_r*switchDandoriBar
+				
+					counter_stepref=counter_stepref+1
+					stepref_point[counter_stepref]=2
+					stepref_coor[counter_stepref][1]=step_in_end[i][1]
+					stepref_coor[counter_stepref][2]=step_in_start[i][2]
+					stepref_coor[counter_stepref][3]=step_hei[i]-slab_thi+stepref_ver_z_1+2*dandori_r*switchDandoriBar
+					stepref_coor[counter_stepref][4]=step_in_end[i][1]
+					stepref_coor[counter_stepref][5]=step_in_end[i][2]
+					stepref_coor[counter_stepref][6]=step_hei[i]-slab_thi+stepref_ver_z_1+2*dandori_r*switchDandoriBar
+				endif
+			endif
+		else !あばら筋あり
+			stepref_offset=(elbowRad*sti_nd*sqr(2)-elbowRad*sti_nd+sti_r+stepref_r)/sqr(2)
+
+			!下端
+			if step_out_start[i][2]=step_in_start[i][2]-step_thi[i] then
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_out_start[i][1]+slab_cover
+				stepref_coor[counter_stepref][2]=step_out_start[i][2]+(slab_cover+sti_r)+stepref_offset
+				stepref_coor[counter_stepref][3]=-sti_ver_z-stepref_offset
+				stepref_coor[counter_stepref][4]=step_out_end[i][1]-slab_cover
+				stepref_coor[counter_stepref][5]=step_out_start[i][2]+(slab_cover+sti_r)+stepref_offset
+				stepref_coor[counter_stepref][6]=-sti_ver_z-stepref_offset
+			
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_out_start[i][1]+slab_cover
+				stepref_coor[counter_stepref][2]=step_in_start[i][2]-(slab_cover+sti_r)-stepref_offset
+				stepref_coor[counter_stepref][3]=-sti_ver_z-stepref_offset
+				stepref_coor[counter_stepref][4]=step_out_end[i][1]-slab_cover
+				stepref_coor[counter_stepref][5]=step_in_start[i][2]-(slab_cover+sti_r)-stepref_offset
+				stepref_coor[counter_stepref][6]=-sti_ver_z-stepref_offset
+
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_out_start[i][1]+slab_cover
+				stepref_coor[counter_stepref][2]=step_out_start[i][2]+(slab_cover+sti_r)+stepref_offset
+				stepref_coor[counter_stepref][3]=step_hei[i]-slab_thi+sti_ver_z+stepref_offset+2*dandori_r*switchDandoriBar
+				stepref_coor[counter_stepref][4]=step_out_end[i][1]-slab_cover
+				stepref_coor[counter_stepref][5]=step_out_start[i][2]+(slab_cover+sti_r)+stepref_offset
+				stepref_coor[counter_stepref][6]=step_hei[i]-slab_thi+sti_ver_z+stepref_offset+2*dandori_r*switchDandoriBar
+			
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_out_start[i][1]+slab_cover
+				stepref_coor[counter_stepref][2]=step_in_start[i][2]-(slab_cover+sti_r)-stepref_offset
+				stepref_coor[counter_stepref][3]=step_hei[i]-slab_thi+sti_ver_z+stepref_offset+2*dandori_r*switchDandoriBar
+				stepref_coor[counter_stepref][4]=step_out_end[i][1]-slab_cover
+				stepref_coor[counter_stepref][5]=step_in_start[i][2]-(slab_cover+sti_r)-stepref_offset
+				stepref_coor[counter_stepref][6]=step_hei[i]-slab_thi+sti_ver_z+stepref_offset+2*dandori_r*switchDandoriBar
+			endif
+			
+			!上端
+			if step_out_end[i][2]=step_in_end[i][2]+step_thi[i] then
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_out_start[i][1]+slab_cover
+				stepref_coor[counter_stepref][2]=step_out_end[i][2]-(slab_cover+sti_r)-stepref_offset
+				stepref_coor[counter_stepref][3]=-sti_ver_z-stepref_offset
+				stepref_coor[counter_stepref][4]=step_out_end[i][1]-slab_cover
+				stepref_coor[counter_stepref][5]=step_out_end[i][2]-(slab_cover+sti_r)-stepref_offset
+				stepref_coor[counter_stepref][6]=-sti_ver_z-stepref_offset
+			
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_out_start[i][1]+slab_cover
+				stepref_coor[counter_stepref][2]=step_in_end[i][2]+(slab_cover+sti_r)+stepref_offset
+				stepref_coor[counter_stepref][3]=-sti_ver_z-stepref_offset
+				stepref_coor[counter_stepref][4]=step_out_end[i][1]-slab_cover
+				stepref_coor[counter_stepref][5]=step_in_end[i][2]+(slab_cover+sti_r)+stepref_offset
+				stepref_coor[counter_stepref][6]=-sti_ver_z-stepref_offset
+
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_out_start[i][1]+slab_cover
+				stepref_coor[counter_stepref][2]=step_out_end[i][2]-(slab_cover+sti_r)-stepref_offset
+				stepref_coor[counter_stepref][3]=step_hei[i]-slab_thi+sti_ver_z+stepref_offset+2*dandori_r*g
+				stepref_coor[counter_stepref][4]=step_out_end[i][1]-slab_cover
+				stepref_coor[counter_stepref][5]=step_out_end[i][2]-(slab_cover+sti_r)-stepref_offset
+				stepref_coor[counter_stepref][6]=step_hei[i]-slab_thi+sti_ver_z+stepref_offset+2*dandori_r*switchDandoriBar
+			
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_out_start[i][1]+slab_cover
+				stepref_coor[counter_stepref][2]=step_in_end[i][2]+(slab_cover+sti_r)+stepref_offset
+				stepref_coor[counter_stepref][3]=step_hei[i]-slab_thi+sti_ver_z+stepref_offset+2*dandori_r*switchDandoriBar
+				stepref_coor[counter_stepref][4]=step_out_end[i][1]-slab_cover
+				stepref_coor[counter_stepref][5]=step_in_end[i][2]+(slab_cover+sti_r)+stepref_offset
+				stepref_coor[counter_stepref][6]=step_hei[i]-slab_thi+sti_ver_z+stepref_offset+2*dandori_r*switchDandoriBar
+			endif
+			
+			!左側
+			if step_out_start[i][1]=step_in_start[i][1]-step_thi[i] then
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_out_start[i][1]+(slab_cover+sti_r)+stepref_offset
+				stepref_coor[counter_stepref][2]=step_out_start[i][2]+slab_cover
+				stepref_coor[counter_stepref][3]=-sti_hor_z-stepref_offset
+				stepref_coor[counter_stepref][4]=step_out_start[i][1]+(slab_cover+sti_r)+stepref_offset
+				stepref_coor[counter_stepref][5]=step_out_end[i][2]-slab_cover
+				stepref_coor[counter_stepref][6]=-sti_hor_z-stepref_offset
+			
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_in_start[i][1]-(slab_cover+sti_r)-stepref_offset
+				stepref_coor[counter_stepref][2]=step_out_start[i][2]+slab_cover
+				stepref_coor[counter_stepref][3]=-sti_hor_z-stepref_offset
+				stepref_coor[counter_stepref][4]=step_in_start[i][1]-(slab_cover+sti_r)-stepref_offset
+				stepref_coor[counter_stepref][5]=step_out_end[i][2]-slab_cover
+				stepref_coor[counter_stepref][6]=-sti_hor_z-stepref_offset
+
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_out_start[i][1]+(slab_cover+sti_r)+stepref_offset
+				stepref_coor[counter_stepref][2]=step_out_start[i][2]+slab_cover
+				stepref_coor[counter_stepref][3]=step_hei[i]-slab_thi+sti_hor_z+stepref_offset+2*dandori_r*switchDandoriBar
+				stepref_coor[counter_stepref][4]=step_out_start[i][1]+(slab_cover+sti_r)+stepref_offset
+				stepref_coor[counter_stepref][5]=step_out_end[i][2]-slab_cover
+				stepref_coor[counter_stepref][6]=step_hei[i]-slab_thi+sti_hor_z+stepref_offset+2*dandori_r*switchDandoriBar
+			
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_in_start[i][1]-(slab_cover+sti_r)-stepref_offset
+				stepref_coor[counter_stepref][2]=step_out_start[i][2]+slab_cover
+				stepref_coor[counter_stepref][3]=step_hei[i]-slab_thi+sti_hor_z+stepref_offset+2*dandori_r*switchDandoriBar
+				stepref_coor[counter_stepref][4]=step_in_start[i][1]-(slab_cover+sti_r)-stepref_offset
+				stepref_coor[counter_stepref][5]=step_out_end[i][2]-slab_cover
+				stepref_coor[counter_stepref][6]=step_hei[i]-slab_thi+sti_hor_z+stepref_offset+2*dandori_r*switchDandoriBar
+			endif
+			
+			!右側
+			if step_out_end[i][1]=step_in_end[i][1]+step_thi[i] then
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_out_end[i][1]-(slab_cover+sti_r)-stepref_offset
+				stepref_coor[counter_stepref][2]=step_out_start[i][2]+slab_cover
+				stepref_coor[counter_stepref][3]=-sti_hor_z-stepref_offset
+				stepref_coor[counter_stepref][4]=step_out_end[i][1]-(slab_cover+sti_r)-stepref_offset
+				stepref_coor[counter_stepref][5]=step_out_end[i][2]-slab_cover
+				stepref_coor[counter_stepref][6]=-sti_hor_z-stepref_offset
+			
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_in_end[i][1]+(slab_cover+sti_r)+stepref_offset
+				stepref_coor[counter_stepref][2]=step_out_start[i][2]+slab_cover
+				stepref_coor[counter_stepref][3]=-sti_hor_z-stepref_offset
+				stepref_coor[counter_stepref][4]=step_in_end[i][1]+(slab_cover+sti_r)+stepref_offset
+				stepref_coor[counter_stepref][5]=step_out_end[i][2]-slab_cover
+				stepref_coor[counter_stepref][6]=-sti_hor_z-stepref_offset
+
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_out_end[i][1]-(slab_cover+sti_r)-stepref_offset
+				stepref_coor[counter_stepref][2]=step_out_start[i][2]+slab_cover
+				stepref_coor[counter_stepref][3]=step_hei[i]-slab_thi+sti_hor_z+stepref_offset+2*dandori_r*switchDandoriBar
+				stepref_coor[counter_stepref][4]=step_out_end[i][1]-(slab_cover+sti_r)-stepref_offset
+				stepref_coor[counter_stepref][5]=step_out_end[i][2]-slab_cover
+				stepref_coor[counter_stepref][6]=step_hei[i]-slab_thi+sti_hor_z+stepref_offset+2*dandori_r*switchDandoriBar
+			
+				counter_stepref=counter_stepref+1
+				stepref_point[counter_stepref]=2
+				stepref_coor[counter_stepref][1]=step_in_end[i][1]+(slab_cover+sti_r)+stepref_offset
+				stepref_coor[counter_stepref][2]=step_out_start[i][2]+slab_cover
+				stepref_coor[counter_stepref][3]=step_hei[i]-slab_thi+sti_hor_z+stepref_offset+2*dandori_r*switchDandoriBar
+				stepref_coor[counter_stepref][4]=step_in_end[i][1]+(slab_cover+sti_r)+stepref_offset
+				stepref_coor[counter_stepref][5]=step_out_end[i][2]-slab_cover
+				stepref_coor[counter_stepref][6]=step_hei[i]-slab_thi+sti_hor_z+stepref_offset+2*dandori_r*switchDandoriBar
+			endif
+		endif
+	
+	next i
+
+else
+	hideparameter "step_reinforcement_bar"
+endif
+
+parameters stepref_pen=stepref_pen
+parameters stepref_mat=stepref_mat
+parameters stepref_r=stepref_r
+parameters stepref_nd=stepref_nd
+parameters stepref_point=stepref_point
+parameters stepref_coor=stepref_coor
+
+if switchReinforce then
+	stepref_num=counter_stepref
+else
+	stepref_num=0
+endif
+parameters stepref_num=stepref_num
+
+
+!=================================================================上端主筋
+if mbar_dir=1 then
+	up_mbar_num=up_ver_allnum
+	up_mbar_pen=up_ver_pen
+	up_mbar_mat=up_ver_mat
+	up_mbar_r=up_ver_r
+	up_mbar_nd=up_ver_nd
+	up_mbar_point=up_ver_point
+	up_mbar_coor=up_ver_coor
+else
+	up_mbar_num=up_hor_allnum
+	up_mbar_pen=up_hor_pen
+	up_mbar_mat=up_hor_mat
+	up_mbar_r=up_hor_r
+	up_mbar_nd=up_hor_nd
+	up_mbar_point=up_hor_point
+	up_mbar_coor=up_hor_coor
+endif
+
+
+parameters up_mbar_num=up_mbar_num
+parameters up_mbar_pen=up_mbar_pen
+parameters up_mbar_mat=up_mbar_mat
+parameters up_mbar_r=up_mbar_r
+parameters up_mbar_nd=up_mbar_nd
+parameters up_mbar_point=up_mbar_point
+parameters up_mbar_coor=up_mbar_coor
+
+
+!=================================================================下端主筋
+if mbar_dir=1 then
+	low_mbar_num=low_ver_allnum
+	low_mbar_pen=low_ver_pen
+	low_mbar_mat=low_ver_mat
+	if low_mbar_num>0 then
+		low_mbar_r=low_ver_r
+		low_mbar_nd=low_ver_nd
+		low_mbar_point=low_ver_point
+		low_mbar_coor=low_ver_coor
+	endif
+else
+	low_mbar_num=low_hor_allnum
+	low_mbar_pen=low_hor_pen
+	low_mbar_mat=low_hor_mat
+	if low_mbar_num>0 then
+		low_mbar_r=low_hor_r
+		low_mbar_nd=low_hor_nd
+		low_mbar_point=low_hor_point
+		low_mbar_coor=low_hor_coor
+	endif
+endif
+
+parameters low_mbar_num=low_mbar_num
+parameters low_mbar_pen=low_mbar_pen
+parameters low_mbar_mat=low_mbar_mat
+parameters low_mbar_r=low_mbar_r
+parameters low_mbar_nd=low_mbar_nd
+parameters low_mbar_point=low_mbar_point
+parameters low_mbar_coor=low_mbar_coor
+
+if pattern<=1 then
+	hideparameter "lower_main_rebar"
+endif
+
+
+!=================================================================上端配力筋
+if mbar_dir=1 then
+	up_dbar_num=up_hor_allnum
+	up_dbar_pen=up_hor_pen
+	up_dbar_mat=up_hor_mat
+	up_dbar_r=up_hor_r
+	up_dbar_nd=up_hor_nd
+	up_dbar_point=up_hor_point
+	up_dbar_coor=up_hor_coor
+else
+	up_dbar_num=up_ver_allnum
+	up_dbar_pen=up_ver_pen
+	up_dbar_mat=up_ver_mat
+	up_dbar_r=up_ver_r
+	up_dbar_nd=up_ver_nd
+	up_dbar_point=up_ver_point
+	up_dbar_coor=up_ver_coor
+endif
+
+parameters up_dbar_num=up_dbar_num
+parameters up_dbar_pen=up_dbar_pen
+parameters up_dbar_mat=up_dbar_mat
+parameters up_dbar_r=up_dbar_r
+parameters up_dbar_nd=up_dbar_nd
+parameters up_dbar_point=up_dbar_point
+parameters up_dbar_coor=up_dbar_coor
+
+
+!=================================================================下端配力筋
+if mbar_dir=1 then
+	low_dbar_num=low_hor_allnum
+	low_dbar_pen=low_hor_pen
+	low_dbar_mat=low_hor_mat
+	if low_dbar_num>0 then
+		low_dbar_r=low_hor_r
+		low_dbar_nd=low_hor_nd
+		low_dbar_point=low_hor_point
+		low_dbar_coor=low_hor_coor
+	endif
+else
+	low_dbar_num=low_ver_allnum
+	low_dbar_pen=low_ver_pen
+	low_dbar_mat=low_ver_mat
+	if low_dbar_num>0 then
+		low_dbar_r=low_ver_r
+		low_dbar_nd=low_ver_nd
+		low_dbar_point=low_ver_point
+		low_dbar_coor=low_ver_coor
+	endif
+endif
+
+parameters low_dbar_num=low_dbar_num
+parameters low_dbar_pen=low_dbar_pen
+parameters low_dbar_mat=low_dbar_mat
+parameters low_dbar_r=low_dbar_r
+parameters low_dbar_nd=low_dbar_nd
+parameters low_dbar_point=low_dbar_point
+parameters low_dbar_coor=low_dbar_coor
+
+if pattern<=1 then
+	hideparameter "lower_distribution_bar"
+endif
+
+
+!=================================================================矢印
+if mbar_dir=1 then
+	for i=1 to 4
+		if (minx+maxx)/2>=min(equ_pos[i][1],equ_pos[i+1][1]) and (minx+maxx)/2<max(equ_pos[i][1],equ_pos[i+1][1]) then
+			put (equ_a[i]*(minx+maxx)+equ_c[i])/(-equ_b[i])
+		endif
+	next i
+
+	start_pos=min(use(nsp))
+	end_pos=max(get(nsp))	
+else
+	for i=1 to 4
+		if (miny+maxy)/2>=min(equ_pos[i][2],equ_pos[i+1][2]) and (miny+maxy)/2<max(equ_pos[i][2],equ_pos[i+1][2]) then
+			put (equ_b[i]*(miny+maxy)+equ_c[i])/(-equ_a[i])
+		endif
+	next i
+
+	start_pos=min(use(nsp))
+	end_pos=max(get(nsp))
+endif
+
+parameters arr_start=(start_pos*9+end_pos)/10
+parameters arr_end=(start_pos+end_pos*9)/10
+
+
+!=================================================================段取り筋
+if switchDandoriBar then
+	dandori_num=0
+
+	dim dandori_pos[]
+	dim dandori_ins_pos[][]
+	dim dandori_ins_num[][]
+	dim dandori_op[]
+	dim dandori_oporder[][]
+	dim dandori_allpos[]
+	dim dandori_alledge_pos[][]
+	dim dandori_edge_num[][]
+	dim dandori_alledge_pos_2[][]
+	dim dandori_allstep[]
+	dim dandori_allorder[][]
+
+	if position_pattern=1 then !横
+		if dandori_pattern=1 then
+			dandori_y_num=int((slab_y-2*dandori_offset)/dandori_pitch)+1
+		else
+			dandori_y_num=int((slab_y-dandori_pitch/2-dandori_offset)/dandori_pitch)+1
+		endif
+	
+		for i=1 to dandori_y_num
+			if dandori_pattern=1 then
+				dandori_pos[i]=miny+(slab_y-(dandori_y_num-1)*dandori_pitch)/2+(i-1)*dandori_pitch
+			else
+				if dandori_pattern=2 then
+					dandori_pos[i]=miny+dandori_pitch/2+(i-1)*dandori_pitch
+				else
+					dandori_pos[i]=miny+(slab_y-dandori_pitch/2-(dandori_y_num-1)*dandori_pitch)+(i-1)*dandori_pitch
+				endif
+			endif
+		
+			!==================================始点と終点
+			counter_ins=0
+		
+			for j=1 to 4
+				if dandori_pos[i]>=min(equ_pos[j][2],equ_pos[j+1][2]) and dandori_pos[i]<max(equ_pos[j][2],equ_pos[j+1][2]) then
+					counter_ins=counter_ins+1
+					dandori_ins_pos[i][counter_ins]=-(equ_c[j]+equ_b[j]*dandori_pos[i])/equ_a[j]
+					dandori_ins_num[i][counter_ins]=j
+				endif
+			next j
+		
+			min_ins_pos=maxx
+			min_ins_num=0
+			max_ins_pos=minx
+			max_ins_num=0
+		
+			for j=1 to counter_ins
+				if min_ins_pos>min(min_ins_pos,dandori_ins_pos[i][j]) then
+					min_ins_pos=dandori_ins_pos[i][j]
+					min_ins_num=dandori_ins_num[i][j]
+				endif
+				if max_ins_pos<max(max_ins_pos,dandori_ins_pos[i][j]) then
+					max_ins_pos=dandori_ins_pos[i][j]
+					max_ins_num=dandori_ins_num[i][j]
+				endif
+			next j
+		
+		
+			!==================================かぶる開口数と順番
+			counter_op=0
+			dandori_oporder[i][1]=0
+		
+			if op_num>0 then
+				for j=1 to op_num
+					if dandori_pos[i]>op_start[j][2] and dandori_pos[i]<op_end[j][2] then
+						if min_ins_pos<op_end[j][1] and max_ins_pos>op_start[j][1] then
+							counter_op=counter_op+1
+							dandori_oporder[i][counter_op]=j
+						endif
+					endif
+				next j
+			endif
+		
+			dandori_op[i]=counter_op
+		
+			if counter_op>1 then
+				for j=1 to counter_op-1
+					for n=1 to counter_op-j
+						if op_start[dandori_oporder[i][n]][1]>op_start[dandori_oporder[i][n+1]][1] then
+							tempOrder=dandori_oporder[i][n]
+							dandori_oporder[i][n]=dandori_oporder[i][n+1]
+							dandori_oporder[i][n+1]=tempOrder
+						endif
+					next n
+				next j
+			endif
+		
+			!==================================始点と終点座標をインプットする
+			!始点
+			put min_ins_pos
+		
+			!開口部
+			if counter_op>0 then
+				for n=1 to counter_op
+					if op_shape[dandori_oporder[i][n]]=1 then
+						put op_start[dandori_oporder[i][n]][1]
+						put op_end[dandori_oporder[i][n]][1]
+					else
+						put -sqr((op_len[dandori_oporder[i][n]]/2+op_cover)^2-(dandori_pos[i]-(op_pos[dandori_oporder[i][n]][2]+op_len[dandori_oporder[i][n]]/2))^2)+(op_pos[dandori_oporder[i][n]][1]+op_len[dandori_oporder[i][n]]/2)
+						put	sqr((op_len[dandori_oporder[i][n]]/2+op_cover)^2-(dandori_pos[i]-(op_pos[dandori_oporder[i][n]][2]+op_len[dandori_oporder[i][n]]/2))^2)+(op_pos[dandori_oporder[i][n]][1]+op_len[dandori_oporder[i][n]]/2)
+					endif
+				next n
+			endif
+			
+			!終点
+			put max_ins_pos
+		
+			!==================================始点と終点座標リスト
+			counter_dandori=1
+		
+			if counter_op>0 then
+				for n=1 to counter_op
+					counter_dandori=counter_dandori+1
+				next n
+		
+				if op_start[dandori_oporder[i][1]][1]<=minx then
+					counter_dandori=counter_dandori-1
+					del_data=get(1)
+					del_data=get(1)
+				endif
+		
+				if op_end[dandori_oporder[i][counter_op]][1]>=maxx then
+					counter_dandori=counter_dandori-1
+				endif
+			endif
+		
+			if counter_dandori>0 then
+				for j=1 to counter_dandori
+					dandori_totstart=get(1)
+					dandori_totend=get(1)
+		
+					counter_allnum=ceil(abs(dandori_totend-dandori_totstart)/connect_len)
+		
+					for n=1 to counter_allnum
+						dandori_num=dandori_num+1
+						if counter_allnum=1 then
+							dandori_allpos[dandori_num]=dandori_pos[i]
+						else
+							if fra(n/2)<>0 then
+								dandori_allpos[dandori_num]=dandori_pos[i]-dandori_r
+							else
+								dandori_allpos[dandori_num]=dandori_pos[i]+dandori_r
+							endif
+						endif
+						if n=1 then
+							dandori_alledge_pos[dandori_num][1]=dandori_totstart
+						else
+							dandori_alledge_pos[dandori_num][1]=dandori_totstart+(n-1)/counter_allnum*(dandori_totend-dandori_totstart)-(L1+L1Plus)*dandori_nd/2
+						endif
+						if n=counter_allnum then
+							dandori_alledge_pos[dandori_num][2]=dandori_totend
+						else
+							dandori_alledge_pos[dandori_num][2]=dandori_totstart+n/counter_allnum*(dandori_totend-dandori_totstart)+(L1+L1Plus)*dandori_nd/2
+						endif
+						dandori_alledge_pos_2[dandori_num][1]=min_ins_pos
+						dandori_alledge_pos_2[dandori_num][2]=max_ins_pos
+		
+						dandori_edge_num[dandori_num][1]=min_ins_num !始点辺の番号
+						dandori_edge_num[dandori_num][2]=max_ins_num !終点辺の番号
+					next n
+				next j
+			endif
+		
+			if nsp>0 then
+				for n=1 to nsp
+					del_data=get(1)
+				next n
+			endif
+		next i
+
+		for i=1 to dandori_num
+			dandori_z=-slab_thi+slab_cover+dandori_r
+		
+			!==================================かぶる段差数と順番
+			counter_step=0
+			dandori_allorder[i][1]=0
+		
+			if step_num>0 then
+				for j=1 to step_num
+					if dandori_allpos[i]>step_in_start[j][2] and dandori_allpos[i]<step_in_end[j][2] then
+						if dandori_alledge_pos[i][1]<step_in_end[j][1] and dandori_alledge_pos[i][2]>step_in_start[j][1] then
+							counter_step=counter_step+1
+							dandori_allorder[i][counter_step]=j
+						endif
+					endif
+				next j
+			endif
+		
+			dandori_allstep[i]=counter_step
+
+			if counter_step>1 then
+				for j=1 to counter_step-1
+					for n=1 to counter_step-j
+						if step_in_start[dandori_allorder[i][n]][1]>step_in_start[dandori_allorder[i][n+1]][1] then
+							tempOrder=dandori_allorder[i][n]
+							dandori_allorder[i][n]=dandori_allorder[i][n+1]
+							dandori_allorder[i][n+1]=tempOrder
+						endif
+					next n
+				next j
+			endif
+		
+			!==================================頂点数と頂点座標リスト
+			counter_point=0
+		
+			!始点端部定着
+			if counter_step<=0 then
+				start_z=dandori_z
+			else
+				if dandori_alledge_pos[i][1]>=step_in_start[dandori_allorder[i][1]][1]-step_thi[dandori_allorder[i][1]] then
+					start_z=step_hei[dandori_allorder[i][1]]+dandori_z
+				else
+					start_z=dandori_z
+				endif
+			endif
+		
+			if dandori_alledge_pos[i][1]<=dandori_alledge_pos_2[i][1] then
+				if anc_type[dandori_edge_num[i][1]]=1 then !定着なし
+					counter_point=counter_point+1
+					dandori_coor[i][counter_point*3-2]=dandori_alledge_pos[i][1]
+					dandori_coor[i][counter_point*3-1]=dandori_allpos[i]
+					dandori_coor[i][counter_point*3]=start_z
+				endif
+				
+				if anc_type[dandori_edge_num[i][1]]=2 then !直線定着
+					counter_point=counter_point+1
+					dandori_coor[i][counter_point*3-2]=dandori_alledge_pos[i][1]-(L2+L2Plus)*dandori_nd
+					dandori_coor[i][counter_point*3-1]=dandori_allpos[i]
+					dandori_coor[i][counter_point*3]=start_z
+				endif
+				
+				if anc_type[dandori_edge_num[i][1]]=3 or anc_type[dandori_edge_num[i][1]]=4 then !折り曲げ定着
+					counter_point=counter_point+1
+					dandori_coor[i][counter_point*3-2]=dandori_alledge_pos[i][1]-max(L3*dandori_nd,0.15)
+					dandori_coor[i][counter_point*3-1]=dandori_allpos[i]
+					dandori_coor[i][counter_point*3]=start_z
+				endif
+			else
+				counter_point=counter_point+1
+				dandori_coor[i][counter_point*3-2]=dandori_alledge_pos[i][1]
+				dandori_coor[i][counter_point*3-1]=dandori_allpos[i]
+				dandori_coor[i][counter_point*3]=start_z
+			endif
+		
+			!段差部
+			if counter_step>0 then
+				for j=1 to counter_step
+					if abs(step_hei[dandori_allorder[i][j]])>0.1 then
+						coor_plus=slab_cover+2*sti_r+2*stepref_r
+					else
+						coor_plus=0
+					endif
+		
+					if j=1 and dandori_alledge_pos[i][1]>=step_in_start[dandori_allorder[i][1]][1]-step_thi[dandori_allorder[i][1]] then	
+					else
+						counter_point=counter_point+1
+						dandori_coor[i][counter_point*3-2]=step_out_start[dandori_allorder[i][j]][1]
+						dandori_coor[i][counter_point*3-1]=dandori_allpos[i]
+						dandori_coor[i][counter_point*3]=dandori_z
+			
+						counter_point=counter_point+1
+						dandori_coor[i][counter_point*3-2]=step_in_start[dandori_allorder[i][j]][1]-coor_plus
+						dandori_coor[i][counter_point*3-1]=dandori_allpos[i]
+						dandori_coor[i][counter_point*3]=step_hei[dandori_allorder[i][j]]+dandori_z
+					endif
+			
+					if j=counter_step and dandori_alledge_pos[i][2]<=step_in_end[dandori_allorder[i][counter_step]][1]+step_thi[dandori_allorder[i][counter_step]] then
+					else
+						counter_point=counter_point+1
+						dandori_coor[i][counter_point*3-2]=step_in_end[dandori_allorder[i][j]][1]+coor_plus
+						dandori_coor[i][counter_point*3-1]=dandori_allpos[i]
+						dandori_coor[i][counter_point*3]=step_hei[dandori_allorder[i][j]]+dandori_z
+			
+						counter_point=counter_point+1
+						dandori_coor[i][counter_point*3-2]=step_out_end[dandori_allorder[i][j]][1]
+						dandori_coor[i][counter_point*3-1]=dandori_allpos[i]
+						dandori_coor[i][counter_point*3]=dandori_z
+					endif
+				next j
+			endif
+		
+			!終点端部定着
+			if counter_step<=0 then
+				end_z=dandori_z
+			else
+				if dandori_alledge_pos[i][2]<=step_in_end[dandori_allorder[i][counter_step]][1]+step_thi[dandori_allorder[i][counter_step]] then
+					end_z=step_hei[dandori_allorder[i][counter_step]]+dandori_z
+				else
+					end_z=dandori_z
+				endif
+			endif
+		
+			if dandori_alledge_pos[i][2]>=dandori_alledge_pos_2[i][2] then
+				if anc_type[dandori_edge_num[i][2]]=1 then !定着なし
+					counter_point=counter_point+1
+					dandori_coor[i][counter_point*3-2]=dandori_alledge_pos[i][2]
+					dandori_coor[i][counter_point*3-1]=dandori_allpos[i]
+					dandori_coor[i][counter_point*3]=end_z
+				endif
+			
+				if anc_type[dandori_edge_num[i][2]]=2 then !直線定着
+					counter_point=counter_point+1
+					dandori_coor[i][counter_point*3-2]=dandori_alledge_pos[i][2]+(L2+L2Plus)*dandori_nd
+					dandori_coor[i][counter_point*3-1]=dandori_allpos[i]
+					dandori_coor[i][counter_point*3]=end_z
+				endif
+			
+				if anc_type[dandori_edge_num[i][2]]=3 or anc_type[dandori_edge_num[i][2]]=4 then !折り曲げ定着
+					counter_point=counter_point+1
+					dandori_coor[i][counter_point*3-2]=dandori_alledge_pos[i][2]+max(L3*dandori_nd,0.15)
+					dandori_coor[i][counter_point*3-1]=dandori_allpos[i]
+					dandori_coor[i][counter_point*3]=end_z
+				endif
+			else
+				counter_point=counter_point+1
+				dandori_coor[i][counter_point*3-2]=dandori_alledge_pos[i][2]
+				dandori_coor[i][counter_point*3-1]=dandori_allpos[i]
+				dandori_coor[i][counter_point*3]=end_z
+			endif
+		
+			dandori_point[i]=counter_point
+		next i
+
+	else !縦
+		if dandori_pattern=1 then
+			dandori_x_num=int((slab_x-2*dandori_offset)/dandori_pitch)+1
+		else
+			dandori_x_num=int((slab_x-dandori_pitch/2-dandori_offset)/dandori_pitch)+1
+		endif
+	
+		for i=1 to dandori_x_num
+			if dandori_pattern=1 then
+				dandori_pos[i]=miny+(slab_x-(dandori_x_num-1)*dandori_pitch)/2+(i-1)*dandori_pitch
+			else
+				if dandori_pattern=2 then
+					dandori_pos[i]=miny+dandori_pitch/2+(i-1)*dandori_pitch
+				else
+					dandori_pos[i]=miny+(slab_x-dandori_pitch/2-(dandori_x_num-1)*dandori_pitch)+(i-1)*dandori_pitch
+				endif
+			endif
+
+		
+			!==================================始点と終点
+			counter_ins=0
+		
+			for j=1 to 4
+				if dandori_pos[i]>=min(equ_pos[j][1],equ_pos[j+1][1]) and dandori_pos[i]<max(equ_pos[j][1],equ_pos[j+1][1]) then
+					counter_ins=counter_ins+1
+					dandori_ins_pos[i][counter_ins]=-(equ_c[j]+equ_a[j]*dandori_pos[i])/equ_b[j]
+					dandori_ins_num[i][counter_ins]=j
+				endif
+			next j
+		
+			min_ins_pos=maxy
+			min_ins_num=0
+			max_ins_pos=miny
+			max_ins_num=0
+		
+			for j=1 to counter_ins
+				if min_ins_pos>min(min_ins_pos,dandori_ins_pos[i][j]) then
+					min_ins_pos=dandori_ins_pos[i][j]
+					min_ins_num=dandori_ins_num[i][j]
+				endif
+				if max_ins_pos<max(max_ins_pos,dandori_ins_pos[i][j]) then
+					max_ins_pos=dandori_ins_pos[i][j]
+					max_ins_num=dandori_ins_num[i][j]
+				endif
+			next j
+		
+		
+			!==================================かぶる開口数と順番
+			counter_op=0
+			dandori_oporder[i][1]=0
+		
+			if op_num>0 then
+				for j=1 to op_num
+					if dandori_pos[i]>op_start[j][1] and dandori_pos[i]<op_end[j][1] then
+						if min_ins_pos<op_end[j][2] and max_ins_pos>op_start[j][2] then
+							counter_op=counter_op+1
+							dandori_oporder[i][counter_op]=j
+						endif
+					endif
+				next j
+			endif
+		
+			dandori_op[i]=counter_op
+		
+			if counter_op>1 then
+				for j=1 to counter_op-1
+					for n=1 to counter_op-j
+						if op_start[dandori_oporder[i][n]][2]>op_start[dandori_oporder[i][n+1]][2] then
+							tempOrder=dandori_oporder[i][n]
+							dandori_oporder[i][n]=dandori_oporder[i][n+1]
+							dandori_oporder[i][n+1]=tempOrder
+						endif
+					next n
+				next j
+			endif
+		
+			!==================================始点と終点座標をインプットする
+			!始点
+			put min_ins_pos
+		
+			!開口部
+			if counter_op>0 then
+				for n=1 to counter_op
+					if op_shape[dandori_oporder[i][n]]=1 then
+						put op_start[dandori_oporder[i][n]][2]
+						put op_end[dandori_oporder[i][n]][2]
+					else
+						put -sqr((op_len[dandori_oporder[i][n]]/2+op_cover)^2-(dandori_pos[i]-(op_pos[dandori_oporder[i][n]][1]+op_len[dandori_oporder[i][n]]/2))^2)+(op_pos[dandori_oporder[i][n]][2]+op_len[dandori_oporder[i][n]]/2)
+						put sqr((op_len[dandori_oporder[i][n]]/2+op_cover)^2-(dandori_pos[i]-(op_pos[dandori_oporder[i][n]][1]+op_len[dandori_oporder[i][n]]/2))^2)+(op_pos[dandori_oporder[i][n]][2]+op_len[dandori_oporder[i][n]]/2)
+					endif
+				next n
+			endif
+			
+			!終点
+			put max_ins_pos
+		
+			!==================================始点と終点座標リスト
+			counter_dandori=1
+		
+			if counter_op>0 then
+				for n=1 to counter_op
+					counter_dandori=counter_dandori+1
+				next n
+		
+				if op_start[dandori_oporder[i][1]][2]<=miny then
+					counter_dandori=counter_dandori-1
+					del_data=get(1)
+					del_data=get(1)
+				endif
+		
+				if op_end[dandori_oporder[i][counter_op]][2]>=maxy then
+					counter_dandori=counter_dandori-1
+				endif
+			endif
+		
+			if counter_dandori>0 then
+				for j=1 to counter_dandori
+					dandori_totstart=get(1)
+					dandori_totend=get(1)
+		
+					counter_allnum=ceil(abs(dandori_totend-dandori_totstart)/connect_len)
+		
+					for n=1 to counter_allnum
+						dandori_num=dandori_num+1
+						if counter_allnum=1 then
+							dandori_allpos[dandori_num]=dandori_pos[i]
+						else
+							if fra(n/2)<>0 then
+								dandori_allpos[dandori_num]=dandori_pos[i]-dandori_r
+							else
+								dandori_allpos[dandori_num]=dandori_pos[i]+dandori_r
+							endif
+						endif
+						if n=1 then
+							dandori_alledge_pos[dandori_num][1]=dandori_totstart
+						else
+							dandori_alledge_pos[dandori_num][1]=dandori_totstart+(n-1)/counter_allnum*(dandori_totend-dandori_totstart)-(L1+L1Plus)*dandori_nd/2
+						endif
+						if n=counter_allnum then
+							dandori_alledge_pos[dandori_num][2]=dandori_totend
+						else
+							dandori_alledge_pos[dandori_num][2]=dandori_totstart+n/counter_allnum*(dandori_totend-dandori_totstart)+(L1+L1Plus)*dandori_nd/2
+						endif
+						dandori_alledge_pos_2[dandori_num][1]=min_ins_pos
+						dandori_alledge_pos_2[dandori_num][2]=max_ins_pos
+		
+						dandori_edge_num[dandori_num][1]=min_ins_num !始点辺の番号
+						dandori_edge_num[dandori_num][2]=max_ins_num !終点辺の番号
+					next n
+				next j
+			endif
+		
+			if nsp>0 then
+				for n=1 to nsp
+					del_data=get(1)
+				next n
+			endif
+		next i
+
+		for i=1 to dandori_num
+			dandori_z=-slab_thi+slab_cover+dandori_r
+		
+			!==================================かぶる段差数と順番
+			counter_step=0
+			dandori_allorder[i][1]=0
+		
+			if step_num>0 then
+				for j=1 to step_num
+					if dandori_allpos[i]>step_in_start[j][1] and dandori_allpos[i]<step_in_end[j][1] then
+						if dandori_alledge_pos[i][1]<step_in_end[j][2] and dandori_alledge_pos[i][2]>step_in_start[j][2] then
+							counter_step=counter_step+1
+							dandori_allorder[i][counter_step]=j
+						endif
+					endif
+				next j
+			endif
+		
+			dandori_allstep[i]=counter_step
+
+			if counter_step>1 then
+				for j=1 to counter_step-1
+					for n=1 to counter_step-j
+						if step_in_start[dandori_allorder[i][n]][2]>step_in_start[dandori_allorder[i][n+1]][2] then
+							tempOrder=dandori_allorder[i][n]
+							dandori_allorder[i][n]=dandori_allorder[i][n+1]
+							dandori_allorder[i][n+1]=tempOrder
+						endif
+					next n
+				next j
+			endif
+		
+			!==================================頂点数と頂点座標リスト
+			counter_point=0
+		
+			!始点端部定着
+			if counter_step<=0 then
+				start_z=dandori_z
+			else
+				if dandori_alledge_pos[i][1]>=step_in_start[dandori_allorder[i][1]][2]-step_thi[dandori_allorder[i][1]] then
+					start_z=step_hei[dandori_allorder[i][1]]+dandori_z
+				else
+					start_z=dandori_z
+				endif
+			endif
+		
+			if dandori_alledge_pos[i][1]<=dandori_alledge_pos_2[i][1] then
+				if anc_type[dandori_edge_num[i][1]]=1 then !定着なし
+					counter_point=counter_point+1
+					dandori_coor[i][counter_point*3-2]=dandori_allpos[i]
+					dandori_coor[i][counter_point*3-1]=dandori_alledge_pos[i][1]
+					dandori_coor[i][counter_point*3]=start_z
+				endif
+				
+				if anc_type[dandori_edge_num[i][1]]=2 then !直線定着
+					counter_point=counter_point+1
+					dandori_coor[i][counter_point*3-2]=dandori_allpos[i]
+					dandori_coor[i][counter_point*3-1]=dandori_alledge_pos[i][1]-(L2+L2Plus)*dandori_nd
+					dandori_coor[i][counter_point*3]=start_z
+				endif
+				
+				if anc_type[dandori_edge_num[i][1]]=3 or anc_type[dandori_edge_num[i][1]]=4 then !折り曲げ定着
+					counter_point=counter_point+1
+					dandori_coor[i][counter_point*3-2]=dandori_allpos[i]
+					dandori_coor[i][counter_point*3-1]=dandori_alledge_pos[i][1]-max(L3*dandori_nd,0.15)
+					dandori_coor[i][counter_point*3]=start_z
+				endif
+			else
+				counter_point=counter_point+1
+				dandori_coor[i][counter_point*3-2]=dandori_allpos[i]
+				dandori_coor[i][counter_point*3-1]=dandori_alledge_pos[i][1]
+				dandori_coor[i][counter_point*3]=start_z
+			endif
+		
+			!段差部
+			if counter_step>0 then
+				for j=1 to counter_step
+					if abs(step_hei[dandori_allorder[i][j]])>0.1 then
+						coor_plus=slab_cover+2*sti_r+2*stepref_r
+					else
+						coor_plus=0
+					endif
+		
+					if j=1 and dandori_alledge_pos[i][1]>=step_in_start[dandori_allorder[i][1]][2]-step_thi[dandori_allorder[i][1]] then	
+					else
+						counter_point=counter_point+1
+						dandori_coor[i][counter_point*3-2]=dandori_allpos[i]
+						dandori_coor[i][counter_point*3-1]=step_out_start[dandori_allorder[i][j]][2]
+						dandori_coor[i][counter_point*3]=dandori_z
+			
+						counter_point=counter_point+1
+						dandori_coor[i][counter_point*3-2]=dandori_allpos[i]
+						dandori_coor[i][counter_point*3-1]=step_in_start[dandori_allorder[i][j]][2]-coor_plus
+						dandori_coor[i][counter_point*3]=step_hei[dandori_allorder[i][j]]+dandori_z
+					endif
+			
+					if j=counter_step and dandori_alledge_pos[i][2]<=step_in_end[dandori_allorder[i][counter_step]][2]+step_thi[dandori_allorder[i][counter_step]] then
+					else
+						counter_point=counter_point+1
+						dandori_coor[i][counter_point*3-2]=dandori_allpos[i]
+						dandori_coor[i][counter_point*3-1]=step_in_end[dandori_allorder[i][j]][2]+coor_plus
+						dandori_coor[i][counter_point*3]=step_hei[dandori_allorder[i][j]]+dandori_z
+			
+						counter_point=counter_point+1
+						dandori_coor[i][counter_point*3-2]=dandori_allpos[i]
+						dandori_coor[i][counter_point*3-1]=step_out_end[dandori_allorder[i][j]][2]
+						dandori_coor[i][counter_point*3]=dandori_z
+					endif
+				next j
+			endif
+		
+			!終点端部定着
+			if counter_step<=0 then
+				end_z=dandori_z
+			else
+				if dandori_alledge_pos[i][2]<=step_in_end[dandori_allorder[i][counter_step]][2]+step_thi[dandori_allorder[i][counter_step]] then
+					end_z=step_hei[dandori_allorder[i][counter_step]]+dandori_z
+				else
+					end_z=dandori_z
+				endif
+			endif
+		
+			if dandori_alledge_pos[i][2]>=dandori_alledge_pos_2[i][2] then
+				if anc_type[dandori_edge_num[i][2]]=1 then !定着なし
+					counter_point=counter_point+1
+					dandori_coor[i][counter_point*3-2]=dandori_allpos[i]
+					dandori_coor[i][counter_point*3-1]=dandori_alledge_pos[i][2]
+					dandori_coor[i][counter_point*3]=end_z
+				endif
+			
+				if anc_type[dandori_edge_num[i][2]]=2 then !直線定着
+					counter_point=counter_point+1
+					dandori_coor[i][counter_point*3-2]=dandori_allpos[i]
+					dandori_coor[i][counter_point*3-1]=dandori_alledge_pos[i][2]+(L2+L2Plus)*dandori_nd
+					dandori_coor[i][counter_point*3]=end_z
+				endif
+			
+				if anc_type[dandori_edge_num[i][2]]=3 or anc_type[max_ins_num]=4 then !折り曲げ定着
+					counter_point=counter_point+1
+					dandori_coor[i][counter_point*3-2]=dandori_allpos[i]
+					dandori_coor[i][counter_point*3-1]=dandori_alledge_pos[i][2]+max(L3*dandori_nd,0.15)
+					dandori_coor[i][counter_point*3]=end_z
+				endif
+			else
+				counter_point=counter_point+1
+				dandori_coor[i][counter_point*3-2]=dandori_allpos[i]
+				dandori_coor[i][counter_point*3-1]=dandori_alledge_pos[i][2]
+				dandori_coor[i][counter_point*3]=end_z
+			endif
+		
+			dandori_point[i]=counter_point
+		next i
+	endif
+else
+	dandori_num=0
+	hideparameter "dandori_bar"
+endif
+
+
+parameters dandori_num=dandori_num
+parameters dandori_pen=dandori_pen
+parameters dandori_mat=dandori_mat
+parameters dandori_r=dandori_r
+parameters dandori_nd=dandori_nd
+parameters dandori_point=dandori_point
+parameters dandori_coor=dandori_coor
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

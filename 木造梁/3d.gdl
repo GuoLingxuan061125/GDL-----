@@ -1,0 +1,598 @@
+rotx rotate
+addz -B_hei/td
+
+hotspot 0,0,B_hei/td
+hotspot 0,-0.105/2,B_hei/td
+hotspot 0,0.105/2,B_hei/td
+hotspot 0,0,0
+hotspot 0,-0.105/2,0
+hotspot 0,0.105/2,0
+
+hotspot len,0,B_hei/td
+hotspot len,-0.105/2,B_hei/td
+hotspot len,0.105/2,B_hei/td
+hotspot len,0,0
+hotspot len,-0.105/2,0
+hotspot len,0.105/2,0
+
+!土台長さ======================================================================================================
+
+hotspot 0,0,0
+
+addz B_hei/td
+	hotspot 0,0,0 ,unID,len,1+256	:unID=unID+1
+	hotspot -1,0,0 ,unID,len,3		:unID=unID+1
+	hotspot len,0,0 ,unID,len,2		:unID=unID+1
+del 1
+
+
+!土台
+group "base"
+	material mw
+
+	add list[left+1],-0.105/2,0
+        block len-list[left+1]-list[right+1],0.105,B_hei/td
+    del 1
+endgroup
+
+
+!柱座標===================================================================================================
+for j=1 to list_len2
+    for i=1 to num3[j]
+        hotspot 0,-my[i][j],B_hei/td,			unID,mx[i][j],1+128		:unID=unID+1
+        hotspot -1,-my[i][j],B_hei/td ,		unID,mx[i][j],3			:unID=unID+1
+        hotspot mx[i][j],-my[i][j],B_hei/td ,	unID,mx[i][j],2			:unID=unID+1
+        hotspot mx[i][j],0,B_hei/td ,			unID,my[i][j],1+128		:unID=unID+1
+        hotspot mx[i][j],1,B_hei/td ,			unID,my[i][j],3			:unID=unID+1
+        hotspot mx[i][j],-my[i][j],B_hei/td ,	unID,my[i][j],2			:unID=unID+1
+    next i
+next j
+
+
+for j=1 to list_len
+    for i=1 to num2[j]
+        hotspot 0,-jy[i][j],B_hei/td,			unID,jx[i][j],1+128		:unID=unID+1
+        hotspot -1,-jy[i][j],B_hei/td,		unID,jx[i][j],3			:unID=unID+1
+        hotspot jx[i][j],-jy[i][j],B_hei/td,	unID,jx[i][j],2			:unID=unID+1
+        hotspot jx[i][j],0,B_hei/td,			unID,jy[i][j],1+128		:unID=unID+1
+        hotspot jx[i][j],1,B_hei/td,			unID,jy[i][j],3			:unID=unID+1
+        hotspot jx[i][j],-jy[i][j],B_hei/td,  unID,jy[i][j],2			:unID=unID+1
+    next i
+next j
+
+
+
+!継手===================================================================================================
+group "connection" !ほぞ
+    material mw
+
+    mul 1,1,B_hei/105
+        if left<>0 and left<>12 then
+            if left%2=0 then
+                rotz 180
+                    call "wood_connection" parameters mw=mw,mm=mm,connection_type=left,reverse_lr=1,joint=0
+                del 1
+            else
+                call "wood_connection" parameters mw=mw,mm=mm,connection_type=left,reverse_lr=1,joint=0
+            endif
+        endif
+
+        if right<>0 and right<>12 then
+            if right%2=0 then
+                addx len
+                    call "wood_connection" parameters mw=mw,mm=mm,connection_type=right,joint=0
+                del 1
+            else
+                addx len
+                rotz 180
+                    call "wood_connection" parameters mw=mw,mm=mm,connection_type=right,joint=0
+                del 2
+            endif
+        endif
+    del 1
+
+    group "hardwareEdge"
+        group "hardwareEdge_1"
+            addy -0.105/2
+                block hardwareX,0.105,B_hei/td
+            del 1
+        endgroup
+
+        group "hardwareEdge_2"
+            add 0,-hardwareWid/2,B_hei/td-ditchDep[hardwareCode]
+                block hardwareX,hardwareThi,ditchDep[hardwareCode]
+            del 1
+
+            addz B_hei/td-ditchDep[hardwareCode]
+                extrude 9,0,0,ditchDep[hardwareCode],1+2+4+8+16,
+                0          ,-hardwareWid/2            ,0 ,
+                hardwareX  ,-hardwareWid/2            ,0 ,
+                hardwareX  ,-hardwareWid/2+hardwareThi,0 ,
+                hardwareGap,-hardwareWid/2+hardwareThi,0 ,
+                hardwareGap,hardwareWid/2-hardwareThi ,0 ,
+                hardwareX  ,hardwareWid/2-hardwareThi ,0 ,
+                hardwareX  ,hardwareWid/2             ,0 ,
+                0          ,hardwareWid/2             ,0 ,
+                0          ,-hardwareWid/2            ,-1
+            del 1
+        endgroup
+
+        placegroup subgroup ("hardwareEdge_1","hardwareEdge_2")
+    endgroup
+
+    if left=12 then
+        placegroup "hardwareEdge"
+    endif
+
+    if right=12 then
+        addx len
+        rotz 180
+            placegroup "hardwareEdge"
+        del 2
+    endif
+endgroup
+
+
+
+!金物===================================================================================================
+group "hardware"
+    material hardwareMat
+
+    addz B_hei/td-ditchDep[hardwareCode]
+        !TH-10
+        if hardwareCode=1 then
+            group "TH_10_part1"
+                addz 0.008
+                    extrude 7,0,0,hardwareZ[hardwareCode]-(hardwareWid-2*cornerRad)/2-0.008,1+2+4+16+32,
+                    0          ,-hardwareWid/2+cornerRad  ,1   ,
+                    cornerRad  ,-hardwareWid/2+cornerRad  ,901 ,
+                    0          ,90                        ,4001,
+                    cornerRad  ,-hardwareWid/2+hardwareThi,1   ,
+                    cornerRad  ,-hardwareWid/2+cornerRad  ,901 ,
+                    0          ,-90                       ,4001,
+                    0          ,-hardwareWid/2+cornerRad  ,-1
+
+                    extrude 7,0,0,hardwareZ[hardwareCode]-(hardwareWid-2*cornerRad)/2-0.008,1+2+4+16+32,
+                    hardwareThi,hardwareWid/2-cornerRad   ,1   ,
+                    cornerRad  ,hardwareWid/2-cornerRad   ,901 ,
+                    0          ,-90                       ,4001,
+                    cornerRad  ,hardwareWid/2             ,1   ,
+                    cornerRad  ,hardwareWid/2-cornerRad   ,901 ,
+                    0          ,90                        ,4001,
+                    hardwareThi,hardwareWid/2-cornerRad   ,-1
+                del 1
+            endgroup
+
+            group "TH_10_part2"
+                add hardwareThi,0,0.008
+                roty -90
+                    extrude 13,0,0,hardwareThi,1+2+4+16+32,
+                    0                                                        ,-hardwareWid/2+cornerRad,1   ,
+                    hardwareZ[hardwareCode]-(hardwareWid-2*cornerRad)/2-0.008,-hardwareWid/2+cornerRad,1   ,
+                    hardwareZ[hardwareCode]-(hardwareWid-2*cornerRad)/2-0.008,-hardwareWid/2+cornerRad,1   ,
+                    hardwareZ[hardwareCode]-(hardwareWid-2*cornerRad)/2-0.008,0                       ,901 ,
+                    hardwareZ[hardwareCode]-(hardwareWid-2*cornerRad)/2-0.008,180                     ,4001,
+                    0                                                        ,hardwareWid/2-cornerRad ,1   ,
+                    0                                                        ,hardwareWid/2-cornerRad ,-1  ,
+                    0.008+0.0205                                             ,0                       ,901 ,
+                    driftPinRad2                                             ,360                     ,4001,
+                    0.008+0.0205+0.025                                       ,0                       ,901 ,
+                    driftPinRad2                                             ,360                     ,4001,
+                    0.008+0.0205+2*0.025                                     ,0                       ,901 ,
+                    driftPinRad2                                             ,360                     ,4001
+                del 2
+            endgroup
+
+            group "TH_10_part3"
+                for i=1 to 2
+                    addy -hardwareWid/2+hardwareThi
+                    rotx 90
+                        extrude 15,0,0,hardwareThi,1+2+4+16+32,
+                        cornerRad         ,0.008                                              ,1   ,
+                        0.02              ,0.008                                              ,1   ,
+                        0.02              ,0                                                  ,1   ,
+                        hardwareX         ,0                                                  ,1   ,
+                        hardwareX         ,hardwareZ[hardwareCode]-0.015                      ,1   ,
+                        0.075+driftPinRad1,hardwareZ[hardwareCode]-0.015                      ,1   ,
+                        0.075+driftPinRad1,hardwareZ[hardwareCode]-0.029                      ,1   ,
+                        0.075             ,hardwareZ[hardwareCode]-0.029                      ,901 ,
+                        0                 ,-180                                               ,4001,
+                        0.075-driftPinRad1,hardwareZ[hardwareCode]-0.015                      ,1   ,
+                        0.01              ,hardwareZ[hardwareCode]-0.015                      ,1   ,
+                        cornerRad         ,hardwareZ[hardwareCode]-(hardwareWid-2*cornerRad)/2,1   ,
+                        cornerRad         ,0.008                                              ,-1  ,
+                        0.075             ,0.034                                              ,901 ,
+                        driftPinRad1      ,360                                                ,4001
+                    del 2
+                addy hardwareWid-hardwareThi
+                next i
+                del 2
+            endgroup
+
+            TH_10_1 = addgroup ("TH_10_part1","TH_10_part2")
+            TH_10_2 = addgroup (TH_10_1,"TH_10_part3")
+            placegroup TH_10_2
+        endif
+
+        !TH-18
+        if hardwareCode=2 then
+            group "TH_18_part1"
+                extrude 7,0,0,hardwareZ[hardwareCode],1+2+4+16+32,
+                0          ,-hardwareWid/2+cornerRad  ,1   ,
+                cornerRad  ,-hardwareWid/2+cornerRad  ,901 ,
+                0          ,90                        ,4001,
+                cornerRad  ,-hardwareWid/2+hardwareThi,1   ,
+                cornerRad  ,-hardwareWid/2+cornerRad  ,901 ,
+                0          ,-90                       ,4001,
+                0          ,-hardwareWid/2+cornerRad  ,-1
+
+                extrude 7,0,0,hardwareZ[hardwareCode],1+2+4+16+32,
+                hardwareThi,hardwareWid/2-cornerRad   ,1   ,
+                cornerRad  ,hardwareWid/2-cornerRad   ,901 ,
+                0          ,-90                       ,4001,
+                cornerRad  ,hardwareWid/2             ,1   ,
+                cornerRad  ,hardwareWid/2-cornerRad   ,901 ,
+                0          ,90                        ,4001,
+                hardwareThi,hardwareWid/2-cornerRad   ,-1
+            endgroup
+
+            group "TH_18_part2"
+                addx hardwareThi
+                roty -90
+                    extrude 9,0,0,hardwareThi,1+2+4+16+32,
+                    0                      ,-hardwareWid/2+cornerRad,1   ,
+                    hardwareZ[hardwareCode],-hardwareWid/2+cornerRad,1   ,
+                    hardwareZ[hardwareCode],hardwareWid/2-cornerRad ,1   ,
+                    0                      ,hardwareWid/2-cornerRad ,1   ,
+                    0                      ,-hardwareWid/2+cornerRad,-1  ,
+                    0.045                  ,0                       ,901 ,
+                    driftPinRad2           ,360                     ,4001,
+                    0.045+0.07             ,0                       ,901 ,
+                    driftPinRad2           ,360                     ,4001
+                del 2
+            endgroup
+
+            group "TH_18_part3"
+                for i=1 to 2
+                    addy -hardwareWid/2+hardwareThi
+                    rotx 90
+                        extrude 23,0,0,hardwareThi,1+2+4+16+32,
+                        cornerRad         ,0                                         ,1   ,
+                        0.075-driftPinRad1,0                                         ,1   ,
+                        0.075-driftPinRad1,0.014                                     ,1   ,
+                        0.075             ,0.014                                     ,901 ,
+                        0                 ,-180                                      ,4001,
+                        0.075+driftPinRad1,0                                         ,1   ,
+                        hardwareX         ,0                                         ,1   ,
+                        hardwareX         ,hardwareZ[hardwareCode]                   ,1   ,
+                        0.075+driftPinRad1,hardwareZ[hardwareCode]                   ,1   ,
+                        0.075+driftPinRad1,hardwareZ[hardwareCode]-0.014             ,1   ,
+                        0.075             ,hardwareZ[hardwareCode]-0.014             ,901 ,
+                        0                 ,-180                                      ,4001,
+                        0.075-driftPinRad1,hardwareZ[hardwareCode]                   ,1   ,
+                        cornerRad         ,hardwareZ[hardwareCode]                   ,1   ,
+                        cornerRad         ,0                                         ,-1  ,
+                        0.075             ,0.014+0.0215                              ,901 ,
+                        driftPinRad1      ,360                                       ,4001,
+                        0.075             ,hardwareZ[hardwareCode]-0.014-0.0215      ,901 ,
+                        driftPinRad1      ,360                                       ,4001,
+                        0.0885            ,0.014+0.0215+0.019                        ,901 ,
+                        driftPinRad1      ,360                                       ,4001,
+                        0.0885            ,hardwareZ[hardwareCode]-0.014-0.0215-0.019,901 ,
+                        driftPinRad1      ,360                                       ,4001
+                    del 2
+                addy hardwareWid-hardwareThi
+                next i
+                del 2
+            endgroup
+
+            TH_18_1 = addgroup ("TH_18_part1","TH_18_part2")
+            TH_18_2 = addgroup (TH_18_1,"TH_18_part3")
+            placegroup TH_18_2
+        endif
+
+        !TH-24
+        if hardwareCode=3 then
+            group "TH_24_part1"
+                extrude 7,0,0,hardwareZ[hardwareCode],1+2+4+16+32,
+                0          ,-hardwareWid/2+cornerRad  ,1   ,
+                cornerRad  ,-hardwareWid/2+cornerRad  ,901 ,
+                0          ,90                        ,4001,
+                cornerRad  ,-hardwareWid/2+hardwareThi,1   ,
+                cornerRad  ,-hardwareWid/2+cornerRad  ,901 ,
+                0          ,-90                       ,4001,
+                0          ,-hardwareWid/2+cornerRad  ,-1
+
+                extrude 7,0,0,hardwareZ[hardwareCode],1+2+4+16+32,
+                hardwareThi,hardwareWid/2-cornerRad   ,1   ,
+                cornerRad  ,hardwareWid/2-cornerRad   ,901 ,
+                0          ,-90                       ,4001,
+                cornerRad  ,hardwareWid/2             ,1   ,
+                cornerRad  ,hardwareWid/2-cornerRad   ,901 ,
+                0          ,90                        ,4001,
+                hardwareThi,hardwareWid/2-cornerRad   ,-1
+            endgroup
+
+            group "TH_24_part2"
+                addx hardwareThi
+                roty -90
+                    extrude 11,0,0,hardwareThi,1+2+4+16+32,
+                    0                      ,-hardwareWid/2+cornerRad,1   ,
+                    hardwareZ[hardwareCode],-hardwareWid/2+cornerRad,1   ,
+                    hardwareZ[hardwareCode],hardwareWid/2-cornerRad ,1   ,
+                    0                      ,hardwareWid/2-cornerRad ,1   ,
+                    0                      ,-hardwareWid/2+cornerRad,-1  ,
+                    0.045                  ,0                       ,901 ,
+                    driftPinRad2           ,360                     ,4001,
+                    0.045+0.07             ,0                       ,901 ,
+                    driftPinRad2           ,360                     ,4001,
+                    0.045+0.07+0.07        ,0                       ,901 ,
+                    driftPinRad2           ,360                     ,4001
+                del 2
+            endgroup
+
+            group "TH_24_part3"
+                for i=1 to 2
+                    addy -hardwareWid/2+hardwareThi
+                    rotx 90
+                        extrude 23,0,0,hardwareThi,1+2+4+16+32,
+                        cornerRad         ,0                             ,1   ,
+                        0.075-driftPinRad1,0                             ,1   ,
+                        0.075-driftPinRad1,0.019                         ,1   ,
+                        0.075             ,0.019                         ,901 ,
+                        0                 ,-180                          ,4001,
+                        0.075+driftPinRad1,0                             ,1   ,
+                        hardwareX         ,0                             ,1   ,
+                        hardwareX         ,hardwareZ[hardwareCode]       ,1   ,
+                        0.075+driftPinRad1,hardwareZ[hardwareCode]       ,1   ,
+                        0.075+driftPinRad1,hardwareZ[hardwareCode]-0.019 ,1   ,
+                        0.075             ,hardwareZ[hardwareCode]-0.019 ,901 ,
+                        0                 ,-180                          ,4001,
+                        0.075-driftPinRad1,hardwareZ[hardwareCode]       ,1   ,
+                        cornerRad         ,hardwareZ[hardwareCode]       ,1   ,
+                        cornerRad         ,0                             ,-1  ,
+                        0.075             ,0.019+0.0265                  ,901 ,
+                        driftPinRad1      ,360                           ,4001,
+                        0.075             ,0.019+0.0265+0.044            ,901 ,
+                        driftPinRad1      ,360                           ,4001,
+                        0.075             ,0.019+0.0265+0.044+0.026      ,901 ,
+                        driftPinRad1      ,360                           ,4001,
+                        0.075             ,0.019+0.0265+0.044+0.026+0.044,901 ,
+                        driftPinRad1      ,360                           ,4001
+                    del 2
+                addy hardwareWid-hardwareThi
+                next i
+                del 2
+            endgroup
+
+            TH_24_1 = addgroup ("TH_24_part1","TH_24_part2")
+            TH_24_2 = addgroup (TH_24_1,"TH_24_part3")
+            placegroup TH_24_2
+        endif
+
+        !TH-33
+        if hardwareCode=4 then
+            group "TH_33_part1"
+                extrude 7,0,0,hardwareZ[hardwareCode],1+2+4+16+32,
+                0          ,-hardwareWid/2+cornerRad  ,1   ,
+                cornerRad  ,-hardwareWid/2+cornerRad  ,901 ,
+                0          ,90                        ,4001,
+                cornerRad  ,-hardwareWid/2+hardwareThi,1   ,
+                cornerRad  ,-hardwareWid/2+cornerRad  ,901 ,
+                0          ,-90                       ,4001,
+                0          ,-hardwareWid/2+cornerRad  ,-1
+
+                extrude 7,0,0,hardwareZ[hardwareCode],1+2+4+16+32,
+                hardwareThi,hardwareWid/2-cornerRad   ,1   ,
+                cornerRad  ,hardwareWid/2-cornerRad   ,901 ,
+                0          ,-90                       ,4001,
+                cornerRad  ,hardwareWid/2             ,1   ,
+                cornerRad  ,hardwareWid/2-cornerRad   ,901 ,
+                0          ,90                        ,4001,
+                hardwareThi,hardwareWid/2-cornerRad   ,-1
+            endgroup
+
+            group "TH_33_part2"
+                addx hardwareThi
+                roty -90
+                    extrude 13,0,0,hardwareThi,1+2+4+16+32,
+                    0                      ,-hardwareWid/2+cornerRad,1   ,
+                    hardwareZ[hardwareCode],-hardwareWid/2+cornerRad,1   ,
+                    hardwareZ[hardwareCode],hardwareWid/2-cornerRad ,1   ,
+                    0                      ,hardwareWid/2-cornerRad ,1   ,
+                    0                      ,-hardwareWid/2+cornerRad,-1  ,
+                    0.045                  ,0                       ,901 ,
+                    driftPinRad2           ,360                     ,4001,
+                    0.045+0.07             ,0                       ,901 ,
+                    driftPinRad2           ,360                     ,4001,
+                    0.045+0.07+0.07        ,0                       ,901 ,
+                    driftPinRad2           ,360                     ,4001,
+                    0.045+0.07+0.07+0.07   ,0                       ,901 ,
+                    driftPinRad2           ,360                     ,4001
+                del 2
+            endgroup
+
+            group "TH_33_part3"
+                for i=1 to 2
+                    addy -hardwareWid/2+hardwareThi
+                    rotx 90
+                        extrude 27,0,0,hardwareThi,1+2+4+16+32,
+                        cornerRad         ,0                                   ,1   ,
+                        0.075-driftPinRad1,0                                   ,1   ,
+                        0.075-driftPinRad1,0.019                               ,1   ,
+                        0.075             ,0.019                               ,901 ,
+                        0                 ,-180                                ,4001,
+                        0.075+driftPinRad1,0                                   ,1   ,
+                        hardwareX         ,0                                   ,1   ,
+                        hardwareX         ,hardwareZ[hardwareCode]             ,1   ,
+                        0.075+driftPinRad1,hardwareZ[hardwareCode]             ,1   ,
+                        0.075+driftPinRad1,hardwareZ[hardwareCode]-0.019       ,1   ,
+                        0.075             ,hardwareZ[hardwareCode]-0.019       ,901 ,
+                        0                 ,-180                                ,4001,
+                        0.075-driftPinRad1,hardwareZ[hardwareCode]             ,1   ,
+                        cornerRad         ,hardwareZ[hardwareCode]             ,1   ,
+                        cornerRad         ,0                                   ,-1  ,
+                        0.075             ,0.019+0.0265                        ,901 ,
+                        driftPinRad1      ,360                                 ,4001,
+                        0.075             ,0.019+0.0265+0.044                  ,901 ,
+                        driftPinRad1      ,360                                 ,4001,
+                        0.075             ,0.019+0.0265+0.044+0.026            ,901 ,
+                        driftPinRad1      ,360                                 ,4001,
+                        0.075             ,0.019+0.0265+0.044+0.026+0.044      ,901 ,
+                        driftPinRad1      ,360                                 ,4001,
+                        0.075             ,0.019+0.0265+0.044+0.026+0.044+0.026,901 ,
+                        driftPinRad1      ,360                                 ,4001,
+                        0.075             ,hardwareZ[hardwareCode]-0.019-0.0265,901 ,
+                        driftPinRad1      ,360                                 ,4001
+                    del 2
+                addy hardwareWid-hardwareThi
+                next i
+                del 2
+            endgroup
+
+            TH_33_1 = addgroup ("TH_33_part1","TH_33_part2")
+            TH_33_2 = addgroup (TH_33_1,"TH_33_part3")
+            placegroup TH_33_2
+        endif
+    del 1
+endgroup
+
+
+
+!ドリフトピン============================================================================================
+group "driftPin"
+    material driftPinMat
+
+    driftPinCount=0
+    dim driftPinPos[][]
+
+    if hardwareCode=1 then
+        driftPinCount=2
+        driftPinPos[1][1]=0.075 : driftPinPos[1][2]=0.034
+        driftPinPos[2][1]=0.075 : driftPinPos[2][2]=0.034+0.0355
+    endif
+
+    if hardwareCode=2 then
+        driftPinCount=3
+        driftPinPos[1][1]=0.075 : driftPinPos[1][2]=0.014+0.0215
+        driftPinPos[2][1]=0.0885 : driftPinPos[2][2]=0.014+0.0215+0.019+0.026
+        driftPinPos[3][1]=0.075 : driftPinPos[3][2]=hardwareZ[hardwareCode]-0.014
+    endif
+
+    if hardwareCode=3 then
+        driftPinCount=3
+        driftPinPos[1][1]=0.075 : driftPinPos[1][2]=0.019+0.0265
+        driftPinPos[2][1]=0.075 : driftPinPos[2][2]=0.019+0.0265+0.044+0.026
+        driftPinPos[3][1]=0.075 : driftPinPos[3][2]=hardwareZ[hardwareCode]-0.019
+    endif
+
+    if hardwareCode=4 then
+        driftPinCount=4
+        driftPinPos[1][1]=0.075 : driftPinPos[1][2]=0.019+0.0265
+        driftPinPos[2][1]=0.075 : driftPinPos[2][2]=0.019+0.0265+0.044+0.026
+        driftPinPos[3][1]=0.075 : driftPinPos[3][2]=0.019+0.0265+0.044+0.026+0.044+0.026
+        driftPinPos[4][1]=0.075 : driftPinPos[4][2]=hardwareZ[hardwareCode]-0.019
+    endif
+
+    addz B_hei/td-ditchDep[hardwareCode]
+        for i=1 to driftPinCount
+            add driftPinPos[i][1],0,driftPinPos[i][2]
+            rotx 90
+            addz -0.105/2-0.001
+                cylind 0.105+2*0.001,driftPinRad1
+            del 3
+        next i
+    del 1
+endgroup
+
+
+if left=12 then
+    placegroup "hardware"
+    placegroup "driftPin"
+endif
+
+if right=12 then
+    addx len
+    rotz 180
+        placegroup "hardware"
+        placegroup "driftPin"
+    del 2
+endif
+
+
+
+!仕口===================================================================================================
+group "joint" !仕口開口
+    material mw
+
+    if mortise<>0 then
+        addz B_hei/td
+            call "wood_column" parameters mw=mw,col=1,num3=num3,mx=mx,my=my,cz=cz,list_len2=list_len2
+            call "wood_column" parameters mw=mw,col=2,num3=num3,mx=mx,my=my,cz=cz,list_len2=list_len2
+            call "wood_column" parameters mw=mw,col=3,num3=num3,mx=mx,my=my,cz=cz,list_len2=list_len2
+        del 1
+
+        if mortise_mirror=1 then
+            rotx 180
+                call "wood_column" parameters mw=mw,col=1,num3=num3,mx=mx,my=my,cz=cz,list_len2=list_len2
+                call "wood_column" parameters mw=mw,col=2,num3=num3,mx=mx,my=my,cz=cz,list_len2=list_len2
+                call "wood_column" parameters mw=mw,col=3,num3=num3,mx=mx,my=my,cz=cz,list_len2=list_len2
+            del 1
+        endif
+    endif
+
+    mul 1,1,B_hei/105
+        for j=1 to list_len
+            if num2[j]>0 and joint<>0  then	
+                for i=1 to num2[j]
+                    if jy[i][j]<0 then 
+                        add jx[i][j],0.105/2,0
+                        rotz -90
+                            if jx[i][j]<>len and jx[i][j]<=len/2 then call "wood_connection" parameters mw=mw,mm=mm,connection_type=0 ,joint=joint_list[j]
+                            if jx[i][j]<>len and jx[i][j]>len/2 then call "wood_connection" parameters mw=mw,mm=mw,connection_type=0 ,reverse_LR=1,joint=joint_list[j]
+                    else
+                        add jx[i][j],-0.105/2,0
+                        rotz 90
+                            if jx[i][j]<>len and jx[i][j]<=len/2 then call "wood_connection" parameters mw=mw,mm=mm,connection_type=0 ,reverse_LR=1,joint=joint_list[j]
+                            if jx[i][j]<>len and jx[i][j]>len/2 then call "wood_connection" parameters mw=mw,mm=mm,connection_type=0 ,reverse_LR=0,joint=joint_list[j]
+                    endif
+                    del 2
+                next i 
+            endif
+        next j
+    del 1
+endgroup
+
+
+group "jo"!仕口
+    material mw
+
+    mul 1,1,B_hei/105
+        for j=1 to list_len
+            if num2[j]>0 and joint<>0  then	
+                for i=1 to num2[j]
+                    if jy[i][j]<0 then 
+                        add jx[i][j],0.105/2,0
+                        rotz -90
+                            if jx[i][j]<>len and jx[i][j]<=len/2 then call "wood_connection" parameters mw=mw,mm=mm,connection_type=joint_list[j],joint=0
+                            if jx[i][j]<>len and jx[i][j]>len/2 then call "wood_connection" parameters mw=mw,mm=mm,connection_type=joint_list[j],reverse_LR=1,joint=0
+                    else
+                        add jx[i][j],-0.105/2,0
+                        rotz 90
+                            if jx[i][j]<>len and jx[i][j]<=len/2 then call "wood_connection" parameters mw=mw,mm=mm,connection_type=joint_list[j],reverse_LR=1,joint=0
+                            if jx[i][j]<>len and jx[i][j]>len/2 then call "wood_connection" parameters mw=mw,mm=mm,connection_type=joint_list[j],reverse_LR=0,joint=0
+                    endif
+                    del 2
+                next i
+            endif
+        next j
+    del 1
+endgroup
+
+group "add"
+	placegroup(subgroup("base","joint"))
+	placegroup"jo"
+endgroup
+
+placegroup (addgroup("connection","add"))
+

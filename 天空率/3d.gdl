@@ -1,0 +1,161 @@
+resol 120
+
+fontSize3D=0.3
+
+define style "moji3D" textFont,fontSize3D*1000,5,0
+set style "moji3D"
+
+hotspot 0,0,0
+
+lin_ min(0,Apos[1][x],Bpos[1][x]),0,0,max(0,Apos[1][x],Bpos[1][x]),0,0
+lin_ 0,min(0,Apos[1][y],Bpos[1][y]),0,0,max(0,Apos[1][y],Bpos[1][y]),0
+lin_ 0,0,0,0,0,hei
+
+
+!O
+hotspot 0         ,Opos[1][y],Opos[1][z],code,Opos[1][x],1+128:code=code+1
+hotspot Opos[1][x],Opos[1][y],Opos[1][z],code,Opos[1][x],2    :code=code+1
+hotspot -1        ,Opos[1][y],Opos[1][z],code,Opos[1][x],3    :code=code+1
+
+hotspot Opos[1][x],0         ,Opos[1][z],code,Opos[1][y],1+128:code=code+1
+hotspot Opos[1][x],Opos[1][y],Opos[1][z],code,Opos[1][y],2    :code=code+1
+hotspot Opos[1][x],-1        ,Opos[1][z],code,Opos[1][y],3    :code=code+1
+
+material mojiMat
+add Opos[1][x],Opos[1][y],Opos[1][z]+fontSize3D
+rotx 90
+addz -0.1/2
+    if disText3D then
+        text 0.1,0,"O"
+    endif
+del 3
+
+
+!A
+hotspot 0         ,Apos[1][y],hei,code,Apos[1][x],1+128:code=code+1
+hotspot Apos[1][x],Apos[1][y],hei,code,Apos[1][x],2    :code=code+1
+hotspot -1        ,Apos[1][y],hei,code,Apos[1][x],3    :code=code+1
+
+hotspot Apos[1][x],0         ,hei,code,Apos[1][y],1+128:code=code+1
+hotspot Apos[1][x],Apos[1][y],hei,code,Apos[1][y],2    :code=code+1
+hotspot Apos[1][x],-1        ,hei,code,Apos[1][y],3    :code=code+1
+
+hotspot A1pos[1][x],A1pos[1][y],A1pos[1][z]
+
+material mojiMat
+add Apos[1][x],Apos[1][y],Apos[1][z]+fontSize3D
+rotx 90
+addz -0.1/2
+    if disText3D then
+        text 0.1,0,"A"
+    endif
+del 3
+
+add A1pos[1][x],A1pos[1][y],A1pos[1][z]+fontSize3D
+rotx 90
+addz -0.1/2
+    if disText3D then
+        text 0.1,0,"A1"
+    endif
+del 3
+
+
+!B
+hotspot 0         ,Bpos[1][y],hei,code,Bpos[1][x],1+128:code=code+1
+hotspot Bpos[1][x],Bpos[1][y],hei,code,Bpos[1][x],2    :code=code+1
+hotspot -1        ,Bpos[1][y],hei,code,Bpos[1][x],3    :code=code+1
+
+hotspot Bpos[1][x],0         ,hei,code,Bpos[1][y],1+128:code=code+1
+hotspot Bpos[1][x],Bpos[1][y],hei,code,Bpos[1][y],2    :code=code+1
+hotspot Bpos[1][x],-1        ,hei,code,Bpos[1][y],3    :code=code+1
+
+hotspot B1pos[1][x],B1pos[1][y],B1pos[1][z]
+
+material mojiMat
+add Bpos[1][x],Bpos[1][y],Bpos[1][z]+fontSize3D
+rotx 90
+addz -0.1/2
+    if disText3D then
+        text 0.1,0,"B"
+    endif
+del 3
+
+add B1pos[1][x],B1pos[1][y],B1pos[1][z]+fontSize3D
+rotx 90
+addz -0.1/2
+    if disText3D then
+        text 0.1,0,"B1"
+    endif
+del 3
+
+
+!sphere
+group "sphere"
+    material sphereMat
+    add Opos[1][x],Opos[1][y],Opos[1][z]
+        if disSphere then
+            sphere sphereRad
+        endif
+    del 1
+endgroup
+
+placegroup "sphere"
+
+
+!triangle
+group "triangle"
+    ruledsegmented 4,1+2+4+8+16+32,
+    Opos[1][x],Opos[1][y],Opos[1][z],0,
+    Apos[1][x],Apos[1][y],Apos[1][z],0,
+    Bpos[1][x],Bpos[1][y],Bpos[1][z],0,
+    Opos[1][x],Opos[1][y],Opos[1][z],0,
+    Opos[1][x],Opos[1][y],Opos[1][z]+0.0001,
+    Apos[1][x],Apos[1][y],Apos[1][z]+0.0001,
+    Bpos[1][x],Bpos[1][y],Bpos[1][z]+0.0001,
+    Opos[1][x],Opos[1][y],Opos[1][z]+0.0001
+endgroup
+
+placegroup "triangle"
+
+lin_ Opos[1][x],Opos[1][y],Opos[1][z],Apos[1][x],Apos[1][y],Apos[1][z]
+lin_ Opos[1][x],Opos[1][y],Opos[1][z],Bpos[1][x],Bpos[1][y],Bpos[1][z]
+lin_ Apos[1][x],Apos[1][y],Apos[1][z],Bpos[1][x],Bpos[1][y],Bpos[1][z]
+
+
+!Oから直線ABの垂心F
+hotspot Fpos[1][x],Fpos[1][y],Fpos[1][z]
+
+material mojiMat
+add Fpos[1][x],Fpos[1][y],Fpos[1][z]+fontSize3D
+rotx 90
+addz -0.1/2
+    if disText3D then
+        text 0.1,0,"F"
+    endif
+del 3
+
+
+!円弧
+group "arc"
+    add Opos[1][x],Opos[1][y],Opos[1][z]
+    rotz rtz
+    rotx rte
+        extrude 2,0,0,0,16+32,
+        0,0,900,
+        sphereRad,360,4000
+    del 3
+endgroup
+
+arc_part= isectgroup ("arc","triangle")
+!placegroup arc_part
+placegroup "arc"
+
+
+lin_ A1pos[1][x],A1pos[1][y],A1pos[1][z],B1pos[1][x],B1pos[1][y],B1pos[1][z]
+hotspot Epos[1][x],Epos[1][y],Epos[1][z]
+
+add moveX,moveY,moveZ
+    lin_ A1pos[1][x],A1pos[1][y],A1pos[1][z],B1pos[1][x],B1pos[1][y],B1pos[1][z]
+    hotspot A1pos[1][x],A1pos[1][y],A1pos[1][z]
+    hotspot B1pos[1][x],B1pos[1][y],B1pos[1][z]
+del 1

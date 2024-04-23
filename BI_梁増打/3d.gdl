@@ -1,0 +1,96 @@
+!=====================================================中心線
+lin_ beam_pos[1][1],beam_pos[1][2],0,beam_pos[2][1],beam_pos[2][2],0
+
+for i=1 to 2
+    hotspot 0             ,beam_pos[i][2],0,code,beam_pos[i][1],1+128:code=code+1
+    hotspot beam_pos[i][1],beam_pos[i][2],0,code,beam_pos[i][1],2    :code=code+1
+    hotspot -1            ,beam_pos[i][2],0,code,beam_pos[i][1],3    :code=code+1
+
+    hotspot beam_pos[i][1],0             ,0,code,beam_pos[i][2],1+128:code=code+1
+    hotspot beam_pos[i][1],beam_pos[i][2],0,code,beam_pos[i][2],2    :code=code+1
+    hotspot beam_pos[i][1],-1            ,0,code,beam_pos[i][2],3    :code=code+1
+next i
+
+
+!=====================================================梁躯体
+material m_beam
+
+!断面座標インプット
+put beam_len,-beam_right_wid,0        -beam_right_wid*top_rat ,0
+put beam_len,-beam_right_wid,-beam_hei-beam_right_wid*down_rat,0
+put 0       ,-beam_right_wid,-beam_hei-beam_right_wid*down_rat,0
+put 0       ,-beam_right_wid,0        -beam_right_wid*top_rat ,0
+
+for i=1 to beam_top_point_num
+    put beam_top_point_pos[i][1],-beam_right_wid,beam_top_point_pos[i][2]-beam_right_wid*top_rat,0
+next i
+
+put beam_len,beam_left_wid,0        +beam_left_wid*top_rat
+put beam_len,beam_left_wid,-beam_hei+beam_left_wid*down_rat
+put 0       ,beam_left_wid,-beam_hei+beam_left_wid*down_rat
+put 0       ,beam_left_wid,0        +beam_left_wid*top_rat
+
+for i=1 to beam_top_point_num
+    put beam_top_point_pos[i][1],beam_left_wid,beam_top_point_pos[i][2]+beam_left_wid*top_rat
+next i
+
+add beam_pos[1][1],beam_pos[1][2],0
+rotz beam_rtz
+    ruledsegmented 4+beam_top_point_num,1+2+4+8+16+32,
+    get(nsp)
+del 2
+
+!=====================================================梁ホットスポット
+add beam_pos[1][1],beam_pos[1][2],0
+rotz beam_rtz
+    !頂点hotspot
+    hotspot beam_len,-beam_right_wid,0        -beam_right_wid*top_rat 
+    hotspot beam_len,-beam_right_wid,-beam_hei-beam_right_wid*down_rat
+    hotspot 0       ,-beam_right_wid,-beam_hei-beam_right_wid*down_rat
+    hotspot 0       ,-beam_right_wid,0        -beam_right_wid*top_rat 
+
+    for i=1 to beam_top_point_num
+        hotspot beam_top_point_pos[i][1],-beam_right_wid,beam_top_point_pos[i][2]-beam_right_wid*top_rat
+    next i
+
+    hotspot beam_len,beam_left_wid,0        +beam_left_wid*top_rat
+    hotspot beam_len,beam_left_wid,-beam_hei+beam_left_wid*down_rat
+    hotspot 0       ,beam_left_wid,-beam_hei+beam_left_wid*down_rat
+    hotspot 0       ,beam_left_wid,0        +beam_left_wid*top_rat
+
+    for i=1 to beam_top_point_num
+        hotspot beam_top_point_pos[i][1],beam_left_wid,beam_top_point_pos[i][2]+beam_left_wid*top_rat
+    next i
+
+    !天端形状調整点hotspot
+    for i=1 to beam_top_point_num
+        hotspot 0                       ,0,beam_top_point_pos[i][2],code,beam_top_point_pos[i][1],1+128:code=code+1
+        hotspot beam_top_point_pos[i][1],0,beam_top_point_pos[i][2],code,beam_top_point_pos[i][1],2    :code=code+1
+        hotspot -1                      ,0,beam_top_point_pos[i][2],code,beam_top_point_pos[i][1],3    :code=code+1
+
+        hotspot beam_top_point_pos[i][1],0,0                       ,code,beam_top_point_pos[i][2],1+128:code=code+1
+        hotspot beam_top_point_pos[i][1],0,beam_top_point_pos[i][2],code,beam_top_point_pos[i][2],2    :code=code+1
+        hotspot beam_top_point_pos[i][1],0,-1                      ,code,beam_top_point_pos[i][2],3    :code=code+1
+    next i
+
+    !梁せいhotspot
+    hotspot beam_len/2,0,0        ,code,beam_hei,1+128:code=code+1
+    hotspot beam_len/2,0,-beam_hei,code,beam_hei,2    :code=code+1
+    hotspot beam_len/2,0,1        ,code,beam_hei,3    :code=code+1
+
+    !右側幅
+    hotspot beam_len/2,0              ,-beam_hei/2,code,beam_right_wid,1+128:code=code+1
+    hotspot beam_len/2,-beam_right_wid,-beam_hei/2,code,beam_right_wid,2    :code=code+1
+    hotspot beam_len/2,1              ,-beam_hei/2,code,beam_right_wid,3    :code=code+1
+
+    !左側幅
+    if switch_wid_equal then
+        hotspot beam_len/2,0             ,-beam_hei/2,code,beam_right_wid,1+128:code=code+1
+        hotspot beam_len/2,beam_right_wid,-beam_hei/2,code,beam_right_wid,2    :code=code+1
+        hotspot beam_len/2,-1            ,-beam_hei/2,code,beam_right_wid,3    :code=code+1
+    else
+        hotspot beam_len/2,0            ,-beam_hei/2,code,beam_left_wid,1+128:code=code+1
+        hotspot beam_len/2,beam_left_wid,-beam_hei/2,code,beam_left_wid,2    :code=code+1
+        hotspot beam_len/2,-1           ,-beam_hei/2,code,beam_left_wid,3    :code=code+1
+    endif
+del 2

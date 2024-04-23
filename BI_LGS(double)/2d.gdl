@@ -1,0 +1,1268 @@
+define style "stud_detail" textfont,font_size*10/GLOB_SCALE,5,0
+define style "len_detail" textfont,font_size*10/GLOB_SCALE,5,0
+define style "board_detail" textfont,font_size*10/GLOB_SCALE,5,0
+define style "board_detail2" textfont,font_size*10/GLOB_SCALE,4,0
+define style "board_detail3" textfont,font_size*10/GLOB_SCALE,7,0
+define style "board_detail4" textfont,font_size*10/GLOB_SCALE,1,0
+
+
+pen line_color
+
+if dis_base then
+	hotspot2 ori_point[1][1],ori_point[1][2]
+	add2 ori_point[1][1],ori_point[1][2]
+
+	hotspot2 mov_point[1][1],mov_point[1][2]
+	add2 mov_point[1][1],mov_point[1][2]
+endif
+
+
+hotspot2 coo_start[1],coo_start[2]
+hotspot2 coo_end[1],coo_end[2]
+
+hotspot2 0,coo_start[2],code,coo_start[1],1+128:code=code+1
+hotspot2 -1,coo_start[2],code,coo_start[1],3:code=code+1
+hotspot2 coo_start[1],coo_start[2],code,coo_start[1],2:code=code+1
+hotspot2 coo_start[1],0,code,coo_start[2],1+128:code=code+1
+hotspot2 coo_start[1],-1,code,coo_start[2],3:code=code+1
+hotspot2 coo_start[1],coo_start[2],code,coo_start[2],2:code=code+1
+
+hotspot2 0,coo_end[2],code,coo_end[1],1+128:code=code+1
+hotspot2 -1,coo_end[2],code,coo_end[1],3:code=code+1
+hotspot2 coo_end[1],coo_end[2],code,coo_end[1],2:code=code+1
+hotspot2 coo_end[1],0,code,coo_end[2],1+128:code=code+1
+hotspot2 coo_end[1],-1,code,coo_end[2],3:code=code+1
+hotspot2 coo_end[1],coo_end[2],code,coo_end[2],2:code=code+1
+
+absx=len-sqr(coo_end[1]^2+coo_end[2]^2)
+
+add2 coo_start[1],coo_start[2]
+rot2 angle
+
+hotspot2 0,wid_run+lgs_gap/2
+hotspot2 0,-wid_run-lgs_gap/2
+hotspot2 len,wid_run+lgs_gap/2
+hotspot2 len,-wid_run-lgs_gap/2
+
+!==========================================================ランナー
+if switch_lgs then
+	for i=1 to 2
+		rect2 0,-lgs_gap/2-wid_run-0.001,len,-lgs_gap/2+0.001
+		rect2 0,-lgs_gap/2-wid_run,len,-lgs_gap/2
+	add2 0,wid_run+lgs_gap
+	next i
+	del 2
+endif
+
+
+!==========================================================LGS詳細
+if switch_lgs and switch_2d_detail then
+	style "board_detail"
+	add2 len/2+0.3,lgs_gap/2+wid_run+thi_board2_totle*(1-reverse)+thi_board_totle*reverse+font_size/100
+	if switch_moji_turn then mul2 1,-1
+		text2 0,0,txt_part
+	if switch_moji_turn then del 1
+	del 1
+
+	style "board_detail"
+	add2 len/2+0.3,-lgs_gap/2-wid_run-thi_board_totle*(1-reverse)-thi_board2_totle*reverse-font_size/100
+	if switch_moji_turn then mul2 1,-1
+		text2 0,0,type_text+" "+pattern_text
+	if switch_moji_turn then del 1
+	del 1
+endif
+
+
+!==========================================================スタッド番号と長さ表示
+if switch_lgs and switch_detail then
+	for i=1 to num_stud2
+		if switch_end and I>2*switch_start+num_stud then add2 -wid2_stud,0
+			if fra(i/2)=0 then
+				line2 coo_stud2[i]+wid2_stud/2,lgs_gap/2+wid_run/2,coo_stud2[i]+wid2_stud/2,lgs_gap/2+wid_run+0.03
+				circle2 coo_stud2[i]+wid2_stud/2,lgs_gap/2+wid_run+0.09,0.06
+
+				style "stud_detail"
+				add2 coo_stud2[i]+wid2_stud/2,lgs_gap/2+wid_run+0.11
+				if switch_moji_turn then mul2 1,-1
+					text2 0,0,"S"+str(i,1,0)
+				if switch_moji_turn then del 1
+				del 1
+
+				style "len_detail"
+				add2 coo_stud2[i]+wid2_stud/2,lgs_gap/2+wid_run+0.07
+				if switch_moji_turn then mul2 1,-1
+					text2 0,0,str("%.0",stud_len[i]*1000)
+				if switch_moji_turn then del 1
+				del 1
+			else
+				line2 coo_stud2[i]+wid2_stud/2,-lgs_gap/2-wid_run/2,coo_stud2[i]+wid2_stud/2,-lgs_gap/2-wid_run-0.03
+				circle2 coo_stud2[i]+wid2_stud/2,-lgs_gap/2-wid_run-0.09,0.06
+
+				style "stud_detail"
+				add2 coo_stud2[i]+wid2_stud/2,-lgs_gap/2-wid_run-0.07
+				if switch_moji_turn then mul2 1,-1
+					text2 0,0,"S"+str(i,1,0)
+				if switch_moji_turn then del 1
+				del 1
+
+				style "len_detail"
+				add2 coo_stud2[i]+wid2_stud/2,-lgs_gap/2-wid_run-0.11
+				if switch_moji_turn then mul2 1,-1
+					text2 0,0,str("%.0",stud_len[i]*1000)
+				if switch_moji_turn then del 1
+				del 1
+			endif
+		if switch_end and I>2*switch_start+num_stud then del 1
+	next i
+endif
+
+!==========================================================振れ止めー2D表示
+if switch_lgs and  switch_stop2d then
+	POLY2 4,1+2+4,0,-lgs_gap/2-wid_run/2+wid_stop/2,0,-lgs_gap/2-wid_run/2-wid_stop/2,len,-lgs_gap/2-wid_run/2-wid_stop/2,len,-lgs_gap/2-wid_run/2+wid_stop/2
+	POLY2 4,1+2+4,0,lgs_gap/2+wid_run/2+wid_stop/2,0,lgs_gap/2+wid_run/2-wid_stop/2,len,lgs_gap/2+wid_run/2-wid_stop/2,len,lgs_gap/2+wid_run/2+wid_stop/2
+endif
+
+
+!==========================================================スタッドー2D表示
+if switch_lgs and switch_stud2d then
+	for i=1 to num_stud2
+		add2 coo_stud2[i],0
+		if switch_end and i>2*switch_start+num_stud then rot2 180
+			if fra(i/2)=0 then
+				add2 0,lgs_gap/2+wid_stud/2+shift_stud
+					gosub "stud_2d"
+				del 1
+			else
+				add2 0,-lgs_gap/2-wid_stud/2
+					gosub "stud_2d"
+				del 1
+			endif
+		if switch_end and i>2*switch_start+num_stud then del 1
+		del 1
+	next i
+endif
+
+
+!==========================================================遮音材ー2D表示
+if switch_lgs and switch_sound2d and switch_sound then
+	fill fill_sound
+	
+	poly2 5,2,
+	0,wid_run/2,0,-wid_run/2,len,-wid_run/2,len,wid_run/2,0,wid_run/2
+endif
+
+
+!==========================================================開口情報
+if switch_lgs and switch_op and switch_2d_detail then
+	add2 absx,0
+		for i=1 to win_num
+			line2 0+win_xz2[i][1],0,0+win_xz2[i][1],-lgs_gap/2-wid_run-0.18
+			line2 0+win_xz2[i][1]+win_wid2[i],0,0+win_xz2[i][1]+win_wid2[i],-lgs_gap/2-wid_run-0.18
+			line2 0+win_xz2[i][1],-lgs_gap/2-wid_run-0.16,0+win_xz2[i][1]+win_wid2[i],-lgs_gap/2-wid_run-0.16
+		
+			hotspot2 win_xz2[i][1],-lgs_gap/2-wid_run-0.16
+			hotspot2 win_xz2[i][1]+win_wid2[i],-lgs_gap/2-wid_run-0.16
+
+			line2 0+win_xz2[i][1],-lgs_gap/2-wid_run-0.16,0+win_xz2[i][1]+0.04,-lgs_gap/2-wid_run-0.18
+			line2 0+win_xz2[i][1],-lgs_gap/2-wid_run-0.16,0+win_xz2[i][1]+0.04,-lgs_gap/2-wid_run-0.14
+			line2 0+win_xz2[i][1]+win_wid2[i],-lgs_gap/2-wid_run-0.16,0+win_xz2[i][1]+win_wid2[i]-0.04,-lgs_gap/2-wid_run-0.18
+			line2 0+win_xz2[i][1]+win_wid2[i],-lgs_gap/2-wid_run-0.16,0+win_xz2[i][1]+win_wid2[i]-0.04,-lgs_gap/2-wid_run-0.14
+		
+			style "stud_detail"
+			if win_type[i]=1 then
+				add2 0+win_xz2[i][1]+win_wid2[i]/2,-lgs_gap/2-wid_run-0.16-font_size/100
+				if switch_moji_turn then mul2 1,-1
+					text2 0,0,"扉     W="+str("%.0",win_wid2[i]*1000)+"     H="+str("%.0",win_hei2[i]*1000)
+				if switch_moji_turn then del 1
+				del 1
+			else
+				add2 0+win_xz2[i][1]+win_wid2[i]/2,-lgs_gap/2-wid_run-0.16-font_size/100
+				if switch_moji_turn then mul2 1,-1
+					text2 0,0,"窓     W="+str("%.0",win_wid2[i]*1000)+"     H="+str("%.0",win_hei2[i]*1000)
+				if switch_moji_turn then del 1
+				del 1
+			endif
+		next i
+	del 1
+endif
+
+
+!==========================================================開口補強ー2D表示
+if switch_lgs and switch_ref_win and switch_op then
+	ref_index=0
+	ref_stud_index=0
+
+	add2 absx,0
+		for i=1 to win_num
+			hotspot2 win_xz2[i][1],0
+			hotspot2 win_xz2[i][1]+win_wid2[i],0
+	
+			line2 win_xz2[i][1],0,win_xz2[i][1]+win_wid2[i],0
+	
+			hotspot2 0,0,code,win_xz[i][1],1+128:code=code+1
+			hotspot2 0-1,0,code,win_xz[i][1],3:code=code+1
+			hotspot2 0+win_xz[i][1],0,code,win_xz[i][1],2:code=code+1
+	
+			hotspot2 0+win_xz[i][1],0,code,win_wid[i],1+128:code=code+1
+			hotspot2 0+win_xz[i][1]-1,0,code,win_wid[i],3:code=code+1
+			hotspot2 0+win_xz[i][1]+win_wid[i],0,code,win_wid[i],2:code=code+1
+	
+			add2 win_xz2[i][1],0
+			rot2 180
+				for j=1 to 2
+					if win_side_ref[i][1]=1 then
+						add2 0,-lgs_gap/2-wid_run/2
+							poly2_ 9,1+2,
+							0,-wid_op/2,1,
+							wid2_op,-wid_op/2,1,
+							wid2_op,-wid_op/2+0.001,1,
+							0.001,-wid_op/2+0.001,1,
+							0.001,wid_op/2-0.001,1,
+							wid2_op,wid_op/2-0.001,1,
+							wid2_op,wid_op/2,1,
+							0,wid_op/2,1,
+							0,-wid_op/2,1
+						del 1
+					endif
+				add2 0,lgs_gap+wid_run
+				next j
+				del 2
+			del 1
+	
+			add2 -wid2_op,0
+			rot2 180
+				for j=1 to 2
+					if win_side_ref[i][1]=1 then
+						add2 0,-lgs_gap/2-wid_run/2
+							gosub "stud_2d"
+						del 1
+					endif
+				add2 0,lgs_gap+wid_run
+				next j
+				del 2
+			del 3
+	
+			add2 win_xz2[i][1]+win_wid2[i],0
+				for j=1 to 2
+					if win_side_ref[i][2]=1 then
+						add2 0,-lgs_gap/2-wid_run/2
+							poly2_ 9,1+2,
+							0,-wid_op/2,1,
+							wid2_op,-wid_op/2,1,
+							wid2_op,-wid_op/2+0.001,1,
+							0.001,-wid_op/2+0.001,1,
+							0.001,wid_op/2-0.001,1,
+							wid2_op,wid_op/2-0.001,1,
+							wid2_op,wid_op/2,1,
+							0,wid_op/2,1,
+							0,-wid_op/2,1
+						del 1
+					endif
+				add2 0,lgs_gap+wid_run
+				next j
+				del 2
+
+			add2 wid2_op,0
+				for j=1 to 2
+					if win_side_ref[i][2]=1 then
+						add2 0,-lgs_gap/2-wid_run/2
+							gosub "stud_2d"
+						del 1
+					endif
+				add2 0,lgs_gap+wid_run
+				next j
+				del 2
+			del 2
+	
+			!文字情報
+			if switch_ref_detail then
+				!開口左側
+				if win_side_ref[i][1]=1 then
+					ref_index=ref_index+1
+				
+					line2 win_xz2[i][1]-wid2_op/2,-lgs_gap/2-wid_run/2,win_xz2[i][1]-wid2_op/2+0.06+wid_run/2,-lgs_gap/2-wid_run-0.03
+					circle2 win_xz2[i][1]-wid2_op/2+0.06+wid_run/2,-lgs_gap/2-wid_run-0.09,0.06
+				
+					style "stud_detail"
+					add2 win_xz2[i][1]-wid2_op/2+0.06+wid_run/2,-lgs_gap/2-wid_run-0.07
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,"KH"+str(ref_index,1,0)
+					if switch_moji_turn then del 1
+					del 1
+				
+					style "len_detail"
+					add2 win_xz2[i][1]-wid2_op/2+0.06+wid_run/2,-lgs_gap/2-wid_run-0.11
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,str("%.0",ref_len[ref_index]*1000)
+					if switch_moji_turn then del 1
+					del 1
+
+					ref_index=ref_index+1
+					line2 win_xz2[i][1]-wid2_op/2,lgs_gap/2+wid_run/2,win_xz2[i][1]-wid2_op/2+0.06+wid_run/2,lgs_gap/2+wid_run+0.03
+					circle2 win_xz2[i][1]-wid2_op/2+0.06+wid_run/2,lgs_gap/2+wid_run+0.09,0.06
+
+					style "stud_detail"
+					add2 win_xz2[i][1]-wid2_op/2+0.06+wid_run/2,lgs_gap/2+wid_run+0.11
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,"KH"+str(ref_index,1,0)
+					if switch_moji_turn then del 1
+					del 1
+
+					style "len_detail"
+					add2 win_xz2[i][1]-wid2_op/2+0.06+wid_run/2,lgs_gap/2+wid_run+0.07
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,str("%.0",ref_len[ref_index]*1000)
+					if switch_moji_turn then del 1
+					del 1
+
+					ref_stud_index=ref_stud_index+1
+
+					line2 win_xz2[i][1]-wid2_op-wid2_stud/2,-lgs_gap/2-wid_run/2,win_xz2[i][1]-wid2_op-wid2_stud/2-0.06-wid_run/2,-lgs_gap/2-wid_run-0.03
+					circle2 win_xz2[i][1]-wid2_op-wid2_stud/2-0.06-wid_run/2,-lgs_gap/2-wid_run-0.09,0.06
+				
+					style "stud_detail"
+					add2 win_xz2[i][1]-wid2_op-wid2_stud/2-0.06-wid_run/2,-lgs_gap/2-wid_run-0.07
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,"KS"+str(ref_stud_index,1,0)
+					if switch_moji_turn then del 1
+					del 1
+				
+					style "len_detail"
+					add2 win_xz2[i][1]-wid2_op-wid2_stud/2-0.06-wid_run/2,-lgs_gap/2-wid_run-0.11
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,str("%.0",refstud_len[ref_stud_index]*1000)
+					if switch_moji_turn then del 1
+					del 1
+
+					ref_stud_index=ref_stud_index+1
+
+					line2 win_xz2[i][1]-wid2_op-wid2_stud/2,lgs_gap/2+wid_run/2,win_xz2[i][1]-wid2_op-wid2_stud/2-0.06-wid_run/2,lgs_gap/2+wid_run+0.03
+					circle2 win_xz2[i][1]-wid2_op-wid2_stud/2-0.06-wid_run/2,lgs_gap/2+wid_run+0.09,0.06
+				
+					style "stud_detail"
+					add2 win_xz2[i][1]-wid2_op-wid2_stud/2-0.06-wid_run/2,lgs_gap/2+wid_run+0.11
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,"KS"+str(ref_stud_index,1,0)
+					if switch_moji_turn then del 1
+					del 1
+				
+					style "len_detail"
+					add2 win_xz2[i][1]-wid2_op-wid2_stud/2-0.06-wid_run/2,lgs_gap/2+wid_run+0.07
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,str("%.0",refstud_len[ref_stud_index]*1000)
+					if switch_moji_turn then del 1
+					del 1
+				endif
+	
+				!開口右側
+				if win_side_ref[i][2]=1 then
+					ref_index=ref_index+1
+	
+					line2 win_xz2[i][1]+win_wid2[i]+wid2_op/2,-lgs_gap/2-wid_run/2,win_xz2[i][1]+win_wid2[i]+wid2_op/2-0.06-wid_run/2,-lgs_gap/2-wid_run-0.03
+					circle2 win_xz2[i][1]+win_wid2[i]+wid2_op/2-0.06-wid_run/2,-lgs_gap/2-wid_run-0.09,0.06
+				
+					style "stud_detail"
+					add2 win_xz2[i][1]+win_wid2[i]+wid2_op/2-0.06-wid_run/2,-lgs_gap/2-wid_run-0.07
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,"KH"+str(ref_index,1,0)
+					if switch_moji_turn then del 1
+					del 1
+				
+					style "len_detail"
+					add2 win_xz2[i][1]+win_wid2[i]+wid2_op/2-0.06-wid_run/2,-lgs_gap/2-wid_run-0.11
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,str("%.0",ref_len[ref_index]*1000)
+					if switch_moji_turn then del 1
+					del 1
+
+					ref_index=ref_index+1
+	
+					line2 win_xz2[i][1]+win_wid2[i]+wid2_op/2,lgs_gap/2+wid_run/2,win_xz2[i][1]+win_wid2[i]+wid2_op/2-0.06-wid_run/2,lgs_gap/2+wid_run+0.03
+					circle2 win_xz2[i][1]+win_wid2[i]+wid2_op/2-0.06-wid_run/2,lgs_gap/2+wid_run+0.09,0.06
+				
+					style "stud_detail"
+					add2 win_xz2[i][1]+win_wid2[i]+wid2_op/2-0.06-wid_run/2,lgs_gap/2+wid_run+0.11
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,"KH"+str(ref_index,1,0)
+					if switch_moji_turn then del 1
+					del 1
+				
+					style "len_detail"
+					add2 win_xz2[i][1]+win_wid2[i]+wid2_op/2-0.06-wid_run/2,lgs_gap/2+wid_run+0.07
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,str("%.0",ref_len[ref_index]*1000)
+					if switch_moji_turn then del 1
+					del 1
+
+					ref_stud_index=ref_stud_index+1
+
+					line2 win_xz2[i][1]+win_wid2[i]+wid2_op+wid2_stud/2,-lgs_gap/2-wid_run/2,win_xz2[i][1]+win_wid2[i]+wid2_op+wid2_stud/2+0.06+wid_run/2,-lgs_gap/2-wid_run-0.03
+					circle2 win_xz2[i][1]+win_wid2[i]+wid2_op+wid2_stud/2+0.06+wid_run/2,-lgs_gap/2-wid_run-0.09,0.06
+				
+					style "stud_detail"
+					add2 win_xz2[i][1]+win_wid2[i]+wid2_op+wid2_stud/2+0.06+wid_run/2,-lgs_gap/2-wid_run-0.07
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,"KS"+str(ref_stud_index,1,0)
+					if switch_moji_turn then del 1
+					del 1
+				
+					style "len_detail"
+					add2 win_xz2[i][1]+win_wid2[i]+wid2_op+wid2_stud/2+0.06+wid_run/2,-lgs_gap/2-wid_run-0.11
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,str("%.0",refstud_len[ref_stud_index]*1000)
+					if switch_moji_turn then del 1
+					del 1
+
+					ref_stud_index=ref_stud_index+1
+
+					line2 win_xz2[i][1]+win_wid2[i]+wid2_op+wid2_stud/2,lgs_gap/2+wid_run/2,win_xz2[i][1]+win_wid2[i]+wid2_op+wid2_stud/2+0.06+wid_run/2,lgs_gap/2+wid_run+0.03
+					circle2 win_xz2[i][1]+win_wid2[i]+wid2_op+wid2_stud/2+0.06+wid_run/2,lgs_gap/2+wid_run+0.09,0.06
+				
+					style "stud_detail"
+					add2 win_xz2[i][1]+win_wid2[i]+wid2_op+wid2_stud/2+0.06+wid_run/2,lgs_gap/2+wid_run+0.11
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,"KS"+str(ref_stud_index,1,0)
+					if switch_moji_turn then del 1
+					del 1
+				
+					style "len_detail"
+					add2 win_xz2[i][1]+win_wid2[i]+wid2_op+wid2_stud/2+0.06+wid_run/2,lgs_gap/2+wid_run+0.07
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,str("%.0",refstud_len[ref_stud_index]*1000)
+					if switch_moji_turn then del 1
+					del 1
+				endif
+			endif
+		next i
+	del 1
+endif
+
+
+!==========================================================梁開口補強ー2D表示
+if switch_lgs and switch_ref_beam and switch_beam then
+	bnn=0
+
+	add2 absx,0
+		for i=1 to beam_num
+			hotspot2 beam_x[i],0
+			hotspot2 beam_x[i]+beam_wid[i],0
+
+			line2 beam_x[i],-lgs_gap/2-wid_run,beam_x[i]+beam_wid[i],lgs_gap/2+wid_run
+			line2 beam_x[i],lgs_gap/2+wid_run,beam_x[i]+beam_wid[i],-lgs_gap/2-wid_run
+			line2 beam_x[i],-lgs_gap/2-wid_run,beam_x[i],lgs_gap/2+wid_run
+			line2 beam_x[i]+beam_wid[i],lgs_gap/2+wid_run,beam_x[i]+beam_wid[i],-lgs_gap/2-wid_run
+
+			for j=1 to 2
+				if beam_ref[i][2]=1 then
+					add2 beam_x[i]+beam_wid[i],-lgs_gap/2-wid_run/2
+						gosub "stud_2d"
+					del 1
+				endif
+
+				if beam_ref[i][1]=1 then
+					add2 beam_x[i],-lgs_gap/2-wid_run/2
+					rot2 180
+						gosub "stud_2d"
+					del 2
+				endif
+			add2 0,lgs_gap+wid_run
+			next j
+			del 2
+
+			if switch_ref_detail then
+				if beam_ref[i][1]=1 then
+					bnn=bnn+1
+
+					line2 beam_x[i]-wid2_stud/2,-lgs_gap/2-wid_run/2,beam_x[i]-wid2_stud/2,-lgs_gap/2-wid_run-0.03
+					circle2 beam_x[i]-wid2_stud/2,-lgs_gap/2-wid_run-0.09,0.06
+
+					style "stud_detail"
+					add2 beam_x[i]-wid2_stud/2,-lgs_gap/2-wid_run-0.07
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,"BS"+str(bnn,1,0)
+					if switch_moji_turn then del 1
+					del 1
+
+					style "len_detail"
+					add2 beam_x[i]-wid2_stud/2,-lgs_gap/2-wid_run-0.11
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,str("%.0",beam_len[bnn]*1000)
+					if switch_moji_turn then del 1
+					del 1
+
+					bnn=bnn+1
+
+					line2 beam_x[i]-wid2_stud/2,lgs_gap/2+wid_run/2,beam_x[i]-wid2_stud/2,lgs_gap/2+wid_run+0.03
+					circle2 beam_x[i]-wid2_stud/2,lgs_gap/2+wid_run+0.09,0.06
+
+					style "stud_detail"
+					add2 beam_x[i]-wid2_stud/2,lgs_gap/2+wid_run+0.11
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,"BS"+str(bnn,1,0)
+					if switch_moji_turn then del 1
+					del 1
+
+					style "len_detail"
+					add2 beam_x[i]-wid2_stud/2,lgs_gap/2+wid_run+0.07
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,str("%.0",beam_len[bnn]*1000)
+					if switch_moji_turn then del 1
+					del 1
+				endif
+
+				if beam_ref[i][2]=1 then
+					bnn=bnn+1
+
+					line2 beam_x[i]+beam_wid[i]+wid2_stud/2,-lgs_gap/2-wid_run/2,beam_x[i]+beam_wid[i]+wid2_stud/2,-lgs_gap/2-wid_run-0.03
+					circle2 beam_x[i]+beam_wid[i]+wid2_stud/2,-lgs_gap/2-wid_run-0.09,0.06
+
+					style "stud_detail"
+					add2 beam_x[i]+beam_wid[i]+wid2_stud/2,-lgs_gap/2-wid_run-0.07
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,"BS"+str(bnn,1,0)
+					if switch_moji_turn then del 1
+					del 1
+
+					style "len_detail"
+					add2 beam_x[i]+beam_wid[i]+wid2_stud/2,-lgs_gap/2-wid_run-0.11
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,str("%.0",beam_len[bnn]*1000)
+					if switch_moji_turn then del 1
+					del 1
+
+					bnn=bnn+1
+
+					line2 beam_x[i]+beam_wid[i]+wid2_stud/2,lgs_gap/2+wid_run/2,beam_x[i]+beam_wid[i]+wid2_stud/2,lgs_gap/2+wid_run+0.03
+					circle2 beam_x[i]+beam_wid[i]+wid2_stud/2,lgs_gap/2+wid_run+0.09,0.06
+
+					style "stud_detail"
+					add2 beam_x[i]+beam_wid[i]+wid2_stud/2,lgs_gap/2+wid_run+0.11
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,"BS"+str(bnn,1,0)
+					if switch_moji_turn then del 1
+					del 1
+
+					style "len_detail"
+					add2 beam_x[i]+beam_wid[i]+wid2_stud/2,lgs_gap/2+wid_run+0.07
+					if switch_moji_turn then mul2 1,-1
+						text2 0,0,str("%.0",beam_len[bnn]*1000)
+					if switch_moji_turn then del 1
+					del 1
+				endif
+			endif
+		next i
+	del 1
+endif
+
+
+!==========================================================ボードー2D表示
+if display_board2D then
+	if reverse then mul2 1,-1
+		if switch_board then
+			if board_start=3 then
+				hotspot2 0,-lgs_gap/2-wid_run-0.001-thi_board_totle,code,offset_free,1+128:code=code+1
+				hotspot2 -1,-lgs_gap/2-wid_run-0.001-thi_board_totle,code,offset_free,3:code=code+1
+				hotspot2 offset_free,-lgs_gap/2-wid_run-0.001-thi_board_totle,code,offset_free,2:code=code+1
+				line2 offset_free,-lgs_gap/2-wid_run-0.001,offset_free,-lgs_gap/2-wid_run-0.001-thi_board_totle
+			
+				style "len_detail"
+				add2 offset_free,-lgs_gap/2-wid_run-0.001-thi_board_totle-0.025
+				if switch_moji_turn then mul2 1,-1
+					text2 0,0,"割り付け芯"
+				if switch_moji_turn then del 1
+				del 1
+			endif
+
+			for i=1 to num_board 
+				add2 -offset_start[i],-lgs_gap/2-wid_run-0.001-thi_board[i]
+					rect2 0,0,len+offset_start[i]+offset_end[i],thi_board[i]
+					hotspot2 0,0
+					hotspot2 len+offset_start[i]+offset_end[i],0
+				del 1
+			add2 0,-thi_board[i]
+			next i
+			del num_board 
+		endif
+	
+		if switch_board2 then
+			if board_start=3 then
+				hotspot2 0,lgs_gap/2+wid_run+0.001+thi_board2_totle,code,offset_free,1+128:code=code+1
+				hotspot2 -1,lgs_gap/2+wid_run+0.001+thi_board2_totle,code,offset_free,3:code=code+1
+				hotspot2 offset_free,lgs_gap/2+wid_run+0.001+thi_board2_totle,code,offset_free,2:code=code+1
+				line2 offset_free,lgs_gap/2+wid_run+0.001,offset_free,lgs_gap/2+wid_run+0.001+thi_board2_totle
+		
+				style "len_detail"
+				add2 offset_free,lgs_gap/2+wid_run+0.001+thi_board2_totle+0.025
+				if switch_moji_turn then mul2 1,-1
+					text2 0,0,"割り付け芯"
+				if switch_moji_turn then del 1
+				del 1
+			endif
+
+			for i=1 to num_board2
+				add2 -offset_start2[i],lgs_gap/2+wid_run+0.001+thi_board2[i]
+					rect2 0,0,len+offset_start2[i]+offset_end2[i],-thi_board2[i]
+					hotspot2 0,0
+					hotspot2 len+offset_start2[i]+offset_end2[i],0
+				del 1
+			add2 0,thi_board2[i]
+			next i
+			del num_board2
+		endif
+
+		if display_boardspot2D then
+			if switch_board then
+				for i=1 to num_board
+					hotspot2 0,-lgs_gap/2-wid_run-0.001-thi_board[i]/2,code,offset_start[i],1+128:code=code+1
+					hotspot2 1,-lgs_gap/2-wid_run-0.001-thi_board[i]/2,code,offset_start[i],3:code=code+1
+					hotspot2 -offset_start[i],-lgs_gap/2-wid_run-0.001-thi_board[i]/2,code,offset_start[i],2:code=code+1
+		
+					hotspot2 len,-lgs_gap/2-wid_run-0.001-thi_board[i]/2,code,offset_end[i],1+128:code=code+1
+					hotspot2 len-1,-lgs_gap/2-wid_run-0.001-thi_board[i]/2,code,offset_end[i],3:code=code+1
+					hotspot2 len+offset_end[i],-lgs_gap/2-wid_run-0.001-thi_board[i]/2,code,offset_end[i],2:code=code+1
+				add2 0,-thi_board[i]
+				next i
+				del num_board
+			endif
+
+			if switch_board2 then
+				for i=1 to num_board2
+					hotspot2 0,lgs_gap/2+wid_run+0.001+thi_board2[i]/2,code,offset_start2[i],1+128:code=code+1
+					hotspot2 1,lgs_gap/2+wid_run+0.001+thi_board2[i]/2,code,offset_start2[i],3:code=code+1
+					hotspot2 -offset_start2[i],lgs_gap/2+wid_run+0.001+thi_board2[i]/2,code,offset_start2[i],2:code=code+1
+		
+					hotspot2 len,lgs_gap/2+wid_run+0.001+thi_board2[i]/2,code,offset_end2[i],1+128:code=code+1
+					hotspot2 len-1,lgs_gap/2+wid_run+0.001+thi_board2[i]/2,code,offset_end2[i],3:code=code+1
+					hotspot2 len+offset_end2[i],lgs_gap/2+wid_run+0.001+thi_board2[i]/2,code,offset_end2[i],2:code=code+1
+				add2 0,thi_board2[i]
+				next i
+				del num_board2
+			endif
+		endif
+	if reverse then del 1
+endif
+
+
+!==========================================================化粧板ー2D表示
+if display_panel2D then
+	if reverse then mul2 1,-1
+		if switch_panel then
+			panel_y=-lgs_gap/2-wid_run-0.001
+		
+			if switch_board then
+				for i=1 to num_board
+					panel_y=panel_y-thi_board[i]
+				next i
+			endif
+
+			add2 -offset_start_p,panel_y-thi_panel
+				rect2 0,0,len+offset_start_p+offset_end_p,thi_panel
+				hotspot2 0,0
+				hotspot2 len+offset_start_p+offset_end_p,0
+			del 1
+		endif
+
+		if switch_panel2 then
+			panel_y2=lgs_gap/2+wid_run+0.001
+		
+			if switch_board2 then
+				for i=1 to num_board2
+					panel_y2=panel_y2+thi_board2[i]
+				next i
+			endif
+		
+			add2 -offset_start_p2,panel_y2
+				rect2 0,0,len+offset_start_p2+offset_end_p2,thi_panel2
+				hotspot2 0,thi_panel2
+				hotspot2 len+offset_start_p2+offset_end_p2,thi_panel2
+			del 1
+		endif
+
+		if display_panelspot2D then
+			if switch_panel then
+				hotspot2 0,panel_y-thi_panel/2,code,offset_start_p,1+128:code=code+1
+				hotspot2 1,panel_y-thi_panel/2,code,offset_start_p,3:code=code+1
+				hotspot2 -offset_start_p,panel_y-thi_panel/2,code,offset_start_p,2:code=code+1
+
+				hotspot2 len,panel_y-thi_panel/2,code,offset_end_p,1+128:code=code+1
+				hotspot2 len-1,panel_y-thi_panel/2,code,offset_end_p,3:code=code+1
+				hotspot2 len+offset_end_p,panel_y-thi_panel/2,code,offset_end_p,2:code=code+1
+			endif
+
+			if switch_panel2 then
+				hotspot2 0,panel_y2+thi_panel2/2,code,offset_start_p2,1+128:code=code+1
+				hotspot2 1,panel_y2+thi_panel2/2,code,offset_start_p2,3:code=code+1
+				hotspot2 -offset_start_p2,panel_y2+thi_panel2/2,code,offset_start_p2,2:code=code+1
+
+				hotspot2 len,panel_y2+thi_panel2/2,code,offset_end_p2,1+128:code=code+1
+				hotspot2 len-1,panel_y2+thi_panel2/2,code,offset_end_p2,3:code=code+1
+				hotspot2 len+offset_end_p2,panel_y2+thi_panel2/2,code,offset_end_p2,2:code=code+1
+			endif
+		endif
+	if reverse then del 1
+endif
+
+
+!==========================================================ボードと化粧板ー詳細表示
+if switch_board_detail then
+	!================================表
+	if switch_board or switch_panel then
+		if reverse then mul2 1,-1
+            hotspot2 len/2         ,-lgs_gap/2-wid_run-0.005,code,movex[1],1+128:code=code+1
+            hotspot2 len/2+movex[1],-lgs_gap/2-wid_run-0.005,code,movex[1],2    :code=code+1
+            hotspot2 len/2-1       ,-lgs_gap/2-wid_run-0.005,code,movex[1],3    :code=code+1
+		if reverse then del 1
+
+		add2 movex[1],0
+		if reverse then mul2 1,-1
+			hotspot2 len/2           ,-lgs_gap/2-wid_run-font_size/10+spot[1][2],code,spot[1][1],1+128:code=code+1
+			hotspot2 len/2-1         ,-lgs_gap/2-wid_run-font_size/10+spot[1][2],code,spot[1][1],3    :code=code+1
+			hotspot2 len/2+spot[1][1],-lgs_gap/2-wid_run-font_size/10+spot[1][2],code,spot[1][1],2    :code=code+1
+			
+			hotspot2 len/2+spot[1][1],-lgs_gap/2-wid_run-font_size/10           ,code,spot[1][2],1+128:code=code+1
+			hotspot2 len/2+spot[1][1],-lgs_gap/2-wid_run-font_size/10-1         ,code,spot[1][2],3    :code=code+1
+			hotspot2 len/2+spot[1][1],-lgs_gap/2-wid_run-font_size/10+spot[1][2],code,spot[1][2],2    :code=code+1
+		
+			hotspot2 len/2+spot[1][1]           ,-lgs_gap/2-wid_run-font_size/10+spot[1][2],code,len_bar[1],1+128:code=code+1
+			hotspot2 len/2+spot[1][1]-1         ,-lgs_gap/2-wid_run-font_size/10+spot[1][2],code,len_bar[1],3    :code=code+1
+			hotspot2 len/2+spot[1][1]+len_bar[1],-lgs_gap/2-wid_run-font_size/10+spot[1][2],code,len_bar[1],2    :code=code+1
+
+			line2 len/2,-lgs_gap/2-wid_run-0.005,len/2+spot[1][1],-lgs_gap/2-wid_run-font_size/10+spot[1][2]
+		
+			for i=1 to num_board+switch_panel
+				line2 len/2+spot[1][1],-lgs_gap/2-wid_run-font_size/10+spot[1][2],len/2+spot[1][1]+len_bar[1],-lgs_gap/2-wid_run-font_size/10+spot[1][2]
+			add2 -(spot[1][1]/2)/max((num_board+switch_panel-1),1),-((spot[1][2]-font_size/10)/2)/max((num_board+switch_panel-1),1)
+			next i
+			del num_board+switch_panel
+		if reverse then del 1
+
+		style "board_detail"
+		add2 len/2+spot[1][1]+0.2,(lgs_gap/2+wid_run+font_size/10-spot[1][2]+font_size/50)*(2*reverse-1)
+		if switch_moji_turn then mul2 1,-1
+			if switch_pillar=0 then
+				text2 0,0,txt_fire1+" (表)"
+			else
+				text2 0,0,txt_fire1+" (表)"+" (柱型)"
+			endif
+		if switch_moji_turn then del 1
+		del 1
+
+		style "board_detail2"
+		if switch_board or switch_panel then
+			for i=1 to num_board+switch_panel
+				add2 len/2+spot[1][1]+len_bar[1]+0.05,(lgs_gap/2+wid_run+font_size/10-spot[1][2])*(2*reverse-1)
+				if switch_moji_turn then mul2 1,-1
+					if switch_panel and i=1 then
+						text2 0,0,txt_type_panel1+"  t"+str(thi_panel*1000,3,2)
+					else
+						text2 0,0,txt_type_board1[num_board+1+switch_panel-i]+"  t"+str(thi_board[num_board+1+switch_panel-i]*1000,2,1)
+
+						if switch_board_num_detail then
+							text2 stw(txt_type_board1[num_board+1+switch_panel-i]+"  t"+str(thi_board[num_board+1+switch_panel-i]*1000,2,1)+"  ")/1000*GLOB_SCALE,0,"("+str(totle_num_board[num_board+1+switch_panel-i],3,2)+"枚)"
+						endif
+					endif
+				if switch_moji_turn then del 1
+				del 1
+			add2 -(spot[1][1]/2)/max((num_board+switch_panel-1),1),((spot[1][2]-font_size/10)/2)/max((num_board+switch_panel-1),1)*(2*reverse-1)
+			next i
+			del num_board+switch_panel
+		endif
+		del 1
+	endif
+
+	!================================裏
+	if switch_board2 or switch_panel2 then
+		if reverse then mul2 1,-1
+			hotspot2 len/2         ,lgs_gap/2+wid_run+0.005,code,movex[2],1+128:code=code+1
+			hotspot2 len/2+movex[2],lgs_gap/2+wid_run+0.005,code,movex[2],2    :code=code+1
+			hotspot2 len/2-1       ,lgs_gap/2+wid_run+0.005,code,movex[2],3    :code=code+1
+		if reverse then del 1
+
+		add2 movex[2],0
+		if reverse then mul2 1,-1
+			hotspot2 len/2           ,lgs_gap/2+wid_run+font_size/10+spot[2][2],code,spot[2][1],1+128:code=code+1
+			hotspot2 len/2-1         ,lgs_gap/2+wid_run+font_size/10+spot[2][2],code,spot[2][1],3    :code=code+1
+			hotspot2 len/2+spot[2][1],lgs_gap/2+wid_run+font_size/10+spot[2][2],code,spot[2][1],2    :code=code+1
+			
+			hotspot2 len/2+spot[2][1],lgs_gap/2+wid_run+font_size/10           ,code,spot[2][2],1+128:code=code+1
+			hotspot2 len/2+spot[2][1],lgs_gap/2+wid_run+font_size/10-1         ,code,spot[2][2],3    :code=code+1
+			hotspot2 len/2+spot[2][1],lgs_gap/2+wid_run+font_size/10+spot[2][2],code,spot[2][2],2    :code=code+1
+
+			hotspot2 len/2+spot[2][1]           ,lgs_gap/2+wid_run+font_size/10+spot[2][2],code,len_bar[2],1+128:code=code+1
+			hotspot2 len/2+spot[2][1]-1         ,lgs_gap/2+wid_run+font_size/10+spot[2][2],code,len_bar[2],3    :code=code+1
+			hotspot2 len/2+spot[2][1]+len_bar[2],lgs_gap/2+wid_run+font_size/10+spot[2][2],code,len_bar[2],2    :code=code+1
+
+			line2 len/2,lgs_gap/2+wid_run+0.005,len/2+spot[2][1],lgs_gap/2+wid_run+font_size/10+spot[2][2]
+		
+			for i=1 to num_board2+switch_panel2
+				line2 len/2+spot[2][1],lgs_gap/2+wid_run+font_size/10+spot[2][2],len/2+spot[2][1]+len_bar[2],lgs_gap/2+wid_run+font_size/10+spot[2][2]
+			add2 -(spot[2][1]/2)/max((num_board2+switch_panel2-1),1),((-spot[2][2]-font_size/10)/2)/max((num_board2+switch_panel2-1),1)
+			next i
+			del num_board2+switch_panel2
+		if reverse then del 1
+
+		style "board_detail"
+		add2 len/2+spot[2][1]+0.2,(lgs_gap/2+wid_run+font_size/10+spot[2][2]+font_size/50)*(1-2*reverse)
+		if switch_moji_turn then mul2 1,-1
+			if switch_pillar=0 then
+				text2 0,0,txt_fire2+" (裏)"
+			else
+				text2 0,0,txt_fire2+" (裏)"+" (柱型)"
+			endif
+		if switch_moji_turn then del 1
+		del 1
+
+		style "board_detail2"
+		if switch_board2 or switch_panel2 then
+			for i=1 to num_board2+switch_panel2
+				add2 len/2+spot[2][1]+len_bar[2]+0.05,(lgs_gap/2+wid_run+font_size/10+spot[2][2])*(1-2*reverse)
+				if switch_moji_turn then mul2 1,-1
+					if switch_panel2 and i=1 then
+						text2 0,0,txt_type_panel2+"  t"+str(thi_panel2*1000,3,2)
+					else
+						text2 0,0,txt_type_board2[num_board2+1+switch_panel2-i]+"  t"+str(thi_board2[num_board2+1+switch_panel2-i]*1000,2,1)
+
+						if switch_board_num_detail then
+							text2 stw(txt_type_board2[num_board2+1+switch_panel2-i]+"  t"+str(thi_board2[num_board2+1+switch_panel2-i]*1000,2,1)+"  ")/1000*GLOB_SCALE,0,"("+str(totle_num_board2[num_board2+1+switch_panel2-i],3,2)+"枚)"
+						endif
+					endif
+				if switch_moji_turn then del 1
+				del 1
+			add2 -(spot[2][1]/2)/max((num_board2+switch_panel2-1),1),((-spot[2][2]-font_size/10)/2)/max((num_board2+switch_panel2-1),1)*(1-2*reverse)
+			next i
+			del num_board2+switch_panel2
+		endif
+		del 1
+	endif
+
+	!================================シール詳細表示
+	fill seal_fill
+	style "board_detail"
+
+	if switch_board then
+		seal_y=-lgs_gap/2-wid_run-0.001
+	
+		for i=1 to num_board
+			seal_y=seal_y-thi_board[i]
+		next i
+
+		if reverse=0 then 
+			dir_y=seal_y-0.3
+		else
+			dir_y=-seal_y+0.3
+		endif
+
+		if reverse=0 then 
+			dir_yb=seal_y-0.15
+		else
+			dir_yb=-seal_y+0.15
+		endif
+
+		pen blank_pen
+
+		if switch_seal[1][1] or switch_soundseal[1][1] then
+			add2 -offset_start[num_seal],dir_y
+			if switch_moji_turn then mul2 1,-1
+				text2 0,0,"L"
+			if switch_moji_turn then del 1
+			del 1
+		endif
+
+		if switch_seal[1][2] or switch_soundseal[1][2] then
+			add2 len+offset_end[num_seal],dir_
+			if switch_moji_turn then mul2 1,-1
+				text2 0,0,"R"
+			if switch_moji_turn then del 1
+			del 1
+		endif
+
+		if switch_seal[1][3] or switch_soundseal[1][3] then
+			add2 len/3,dir_y
+			if switch_moji_turn then mul2 1,-1
+				text2 0,0,"U"
+			if switch_moji_turn then del 1
+			del 1
+		endif
+
+		if switch_seal[1][4] or switch_soundseal[1][4] then
+			add2 len*2/3,dir_y
+			if switch_moji_turn then mul2 1,-1
+				text2 0,0,"D"
+			if switch_moji_turn then del 1
+			del 1
+		endif
+
+		if switch_seal[1][1] and switch_soundseal[1][1]=0 then
+			pen fire_pen
+
+			add2 -offset_start[num_seal],dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_soundseal[1][1] and switch_seal[1][1]=0 then
+			pen sound_pen
+
+			add2 -offset_start[num_seal],dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[1][1] and switch_soundseal[1][1] then
+			pen fire_pen
+
+			add2 -offset_start[num_seal],dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0,0.1,0,0
+			del 1
+
+			pen sound_pen
+
+			add2 -offset_start[num_seal],dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,0.05,-0.1,0,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,0.05,0.1,0,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[1][2] and switch_soundseal[1][2]=0 then
+			pen fire_pen
+
+			add2 len+offset_end[num_seal],dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_soundseal[1][2] and switch_seal[1][2]=0 then
+			pen sound_pen
+
+			add2 len+offset_end[num_seal],dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[1][2] and switch_soundseal[1][2] then
+			pen fire_pen
+
+			add2 len+offset_end[num_seal],dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0,0.1,0,0
+			del 1
+
+			pen sound_pen
+
+			add2 len+offset_end[num_seal],dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,0.05,-0.1,0,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,0.05,0.1,0,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[1][3] and switch_soundseal[1][3]=0 then
+			pen fire_pen
+
+			add2 len/3,dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_soundseal[1][3] and switch_seal[1][3]=0 then
+			pen sound_pen
+
+			add2 len/3,dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[1][3] and switch_soundseal[1][3] then
+			pen fire_pen
+
+			add2 len/3,dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0,0.1,0,0
+			del 1
+
+			pen sound_pen
+
+			add2 len/3,dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,0.05,-0.1,0,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,0.05,0.1,0,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[1][4] and switch_soundseal[1][4]=0 then
+			pen fire_pen
+
+			add2 len*2/3,dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_soundseal[1][4] and switch_seal[1][4]=0 then
+			pen sound_pen
+
+			add2 len*2/3,dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[1][4] and switch_soundseal[1][4] then
+			pen fire_pen
+
+			add2 len*2/3,dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,-0.1,0,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,-0.05,0.1,0,0.1,0,0
+			del 1
+
+			pen sound_pen
+
+			add2 len*2/3,dir_yb
+				if reverse=0 then poly2 4,1+2+4,0,0,0.05,-0.1,0,-0.1,0,0
+				if reverse then poly2 4,1+2+4,0,0,0.05,0.1,0,0.1,0,0
+			del 1
+		endif
+	endif
+
+	if switch_board2 then
+		seal_y2=lgs_gap/2+wid_run+0.001
+	
+		for i=1 to num_board2
+			seal_y2=seal_y2+thi_board2[i]
+		next i
+
+		if reverse=0 then 
+			dir_y2=seal_y2+0.3
+		else
+			dir_y2=-seal_y2-0.3
+		endif
+
+		if reverse=0 then 
+			dir_yb2=seal_y2+0.15
+		else
+			dir_yb2=-seal_y2-0.15
+		endif
+
+		pen blank_pen
+
+		if switch_seal[2][1] or switch_soundseal[2][1] then
+			add2 -offset_start2[num_seal2],dir_y2
+			if switch_moji_turn then mul2 1,-1
+				text2 0,0,"L"
+			if switch_moji_turn then del 1
+			del 1
+		endif
+
+		if switch_seal[2][2] or switch_soundseal[2][2] then
+			add2 len+offset_end2[num_seal2],dir_y2
+			if switch_moji_turn then mul2 1,-1
+				text2 0,0,"R"
+			if switch_moji_turn then del 1
+			del 1
+		endif
+
+		if switch_seal[2][3] or switch_soundseal[2][3] then
+			add2 len/3,dir_y2
+			if switch_moji_turn then mul2 1,-1
+				text2 0,0,"U"
+			if switch_moji_turn then del 1
+			del 1
+		endif
+
+		if switch_seal[2][4] or switch_soundseal[2][4] then
+			add2 len*2/3,dir_y2
+			if switch_moji_turn then mul2 1,-1
+				text2 0,0,"D"
+			if switch_moji_turn then del 1
+			del 1
+		endif
+
+		if switch_seal[2][1] and switch_soundseal[2][1]=0 then
+			pen fire_pen
+
+			add2 -offset_start2[num_seal2],dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_soundseal[2][1] and switch_seal[2][1]=0 then
+			pen sound_pen
+
+			add2 -offset_start2[num_seal2],dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[2][1] and switch_soundseal[2][1] then
+			pen fire_pen
+
+			add2 -offset_start2[num_seal2],dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0,0.1,0,0
+			del 1
+
+			pen sound_pen
+
+			add2 -offset_start2[num_seal2],dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,0.05,-0.1,0,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,0.05,0.1,0,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[2][2] and switch_soundseal[2][2]=0 then
+			pen fire_pen
+
+			add2 len+offset_end2[num_seal2],dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_soundseal[2][2] and switch_seal[2][2]=0 then
+			pen sound_pen
+
+			add2 len+offset_end2[num_seal2],dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[2][2] and switch_soundseal[2][2] then
+			pen fire_pen
+
+			add2 len+offset_end2[num_seal2],dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0,0.1,0,0
+			del 1
+
+			pen sound_pen
+
+			add2 len+offset_end2[num_seal2],dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,0.05,-0.1,0,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,0.05,0.1,0,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[2][3] and switch_soundseal[2][3]=0 then
+			pen fire_pen
+
+			add2 len/3,dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_soundseal[2][3] and switch_seal[2][3]=0 then
+			pen sound_pen
+
+			add2 len/3,dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[2][3] and switch_soundseal[2][3] then
+			pen fire_pen
+
+			add2 len/3,dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0,0.1,0,0
+			del 1
+
+			pen sound_pen
+
+			add2 len/3,dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,0.05,-0.1,0,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,0.05,0.1,0,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[2][4] and switch_soundseal[2][4]=0 then
+			pen fire_pen
+
+			add2 len*2/3,dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_soundseal[2][4] and switch_seal[2][4]=0 then
+			pen sound_pen
+
+			add2 len*2/3,dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0.05,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0.05,0.1,0,0
+			del 1
+		endif
+
+		if switch_seal[2][4] and switch_soundseal[2][4] then
+			pen fire_pen
+
+			add2 len*2/3,dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,-0.05,-0.1,0,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,-0.05,0.1,0,0.1,0,0
+			del 1
+
+			pen sound_pen
+
+			add2 len*2/3,dir_yb2
+				if reverse then poly2 4,1+2+4,0,0,0.05,-0.1,0,-0.1,0,0
+				if reverse=0 then poly2 4,1+2+4,0,0,0.05,0.1,0,0.1,0,0
+			del 1
+		endif
+	endif
+endif
+
+
+
+del top
+
+end
+
+
+
+
+
+
+
+
+"stud_2d":
+	add2 0,-wid_run/2
+		poly2_ 9,1+2,
+		0,0,1,
+		wid2_stud,0,1,
+		wid2_stud,0.001,1,
+		0.001,0.001,1,
+		0.001,wid_stud-0.001,1,
+		wid2_stud,wid_stud-0.001,1,
+		wid2_stud,wid_stud,1,
+		0,wid_stud,1,
+		0,0,1
+	del 1
+return
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

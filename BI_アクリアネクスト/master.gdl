@@ -1,0 +1,64 @@
+code=1
+eps=1e-5
+
+values{2} "boardThi" 1,"85",2,"89",3,"90",4,"105"
+
+if boardThi=1 then
+    values{2} "boardWid" 1,"395",2,"430",3,"470"
+    sizeThi=0.085
+endif
+
+if boardThi=2 then
+    values{2} "boardWid" 4,"420"
+    sizeThi=0.089
+endif
+
+if boardThi=3 then
+    values{2} "boardWid" 1,"395",2,"430"
+    sizeThi=0.090
+endif
+
+if boardThi=4 then
+    values{2} "boardWid" 1,"395",2,"430",3,"470"
+    sizeThi=0.105
+endif
+
+if boardWid=1 then sizeWid=0.395
+if boardWid=2 then sizeWid=0.430
+if boardWid=3 then sizeWid=0.470
+if boardWid=4 then sizeWid=0.420
+
+if boardThi=2 then
+    boardHei=2.360
+else
+    boardHei=2.880
+endif
+parameters boardHei=boardHei
+lock "boardHei"
+
+values "vertexNum" range[3,]
+dim _vertexPos[][]
+_vertexPos[1][1]=0 : _vertexPos[1][2]=0
+for i=1 to vertexNum
+    _vertexPos[i][1]=max(min(vertexPos[i][1],sizeWid),0)
+    _vertexPos[i][2]=max(min(vertexPos[i][2],boardHei),0)
+next i
+parameters vertexPos=_vertexPos
+
+
+!枚数
+factArea=0
+for i=1 to vertexNum
+    if i<vertexNum then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    factArea=factArea+(_vertexPos[i2][1]-_vertexPos[i][1])*(_vertexPos[i2][2]+_vertexPos[i][2])/2
+next i
+factArea=abs(factArea)
+
+boardNum=factArea/(sizeWid*boardHei)
+parameters boardNum=boardNum
+lock "boardNum"

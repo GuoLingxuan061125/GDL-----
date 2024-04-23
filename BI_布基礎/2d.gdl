@@ -1,0 +1,95 @@
+project2{3} 3,270,1,1+2+4+8+16,parameters disSD=0,disFooting=0
+
+!====================================================================布基礎躯体
+hotspot2 vertexPos[1][x],vertexPos[1][y]
+hotspot2 vertexPos[2][x],vertexPos[2][y]
+
+for i=1 to 2
+    hotspot2 0              ,vertexPos[i][y],code,vertexPos[i][x],1+128:code=code+1
+    hotspot2 vertexPos[i][x],vertexPos[i][y],code,vertexPos[i][x],2    :code=code+1
+    hotspot2 -1             ,vertexPos[i][y],code,vertexPos[i][x],3    :code=code+1
+
+    hotspot2 vertexPos[i][x],0              ,code,vertexPos[i][y],1+128:code=code+1
+    hotspot2 vertexPos[i][x],vertexPos[i][y],code,vertexPos[i][y],2    :code=code+1
+    hotspot2 vertexPos[i][x],-1             ,code,vertexPos[i][y],3    :code=code+1
+next i
+
+set line_type spotLine
+line2 vertexPos[1][x],vertexPos[1][y],vertexPos[2][x],vertexPos[2][y]
+hotline2 vertexPos[1][x],vertexPos[1][y],vertexPos[2][x],vertexPos[2][y],code:code=code+1
+
+!基礎部枠線
+set line_type solidLine
+add2 _basePos[1][x],_basePos[1][y]
+rot2 vertexRtz
+    rect2 0,-baseWid/2,baseLen,baseWid/2
+    hotspot2 0,-baseWid/2
+    hotspot2 0,baseWid/2
+    hotspot2 baseLen,-baseWid/2
+    hotspot2 baseLen,baseWid/2
+del 2
+
+!立上り部枠線
+set line_type solidLine
+add2 _footingPos[1][x],_footingPos[1][y]
+rot2 vertexRtz
+    rect2 0,-footingWid/2,footingLen,footingWid/2
+    hotspot2 0,-footingWid/2
+    hotspot2 0,footingWid/2
+    hotspot2 footingLen,-footingWid/2
+    hotspot2 footingLen,footingWid/2
+del 2
+
+
+!====================================================================型枠
+if disFrame then
+    add2 vertexPos[1][x],vertexPos[1][y]
+    rot2 vertexRtz
+        !外側ベース型枠
+        rect2 -startOutBaseOffset,-baseWid/2-frameThi,vertexLen+endOutBaseOffset,-baseWid/2
+
+        hotspot2 0                  ,-baseWid/2-frameThi,code,startOutBaseOffset,1+128:code=code+1
+        hotspot2 -startOutBaseOffset,-baseWid/2-frameThi,code,startOutBaseOffset,2    :code=code+1
+        hotspot2 1                  ,-baseWid/2-frameThi,code,startOutBaseOffset,3    :code=code+1
+
+        hotspot2 vertexLen                 ,-baseWid/2-frameThi,code,endOutBaseOffset,1+128:code=code+1
+        hotspot2 vertexLen+endOutBaseOffset,-baseWid/2-frameThi,code,endOutBaseOffset,2    :code=code+1
+        hotspot2 vertexLen-1               ,-baseWid/2-frameThi,code,endOutBaseOffset,3    :code=code+1
+
+        !内側ベース型枠
+        rect2 -startInBaseOffset,baseWid/2+frameThi,vertexLen+endInBaseOffset,baseWid/2
+
+        hotspot2 0                  ,baseWid/2+frameThi,code,startInBaseOffset,1+128:code=code+1
+        hotspot2 -startInBaseOffset ,baseWid/2+frameThi,code,startInBaseOffset,2    :code=code+1
+        hotspot2 1                  ,baseWid/2+frameThi,code,startInBaseOffset,3    :code=code+1
+
+        hotspot2 vertexLen                 ,baseWid/2+frameThi,code,endInBaseOffset,1+128:code=code+1
+        hotspot2 vertexLen+endInBaseOffset ,baseWid/2+frameThi,code,endInBaseOffset,2    :code=code+1
+        hotspot2 vertexLen-1               ,baseWid/2+frameThi,code,endInBaseOffset,3    :code=code+1
+
+        !外側基礎梁型枠
+        rect2 -startOutFootingOffset,-FootingWid/2-frameThi,vertexLen+endOutFootingOffset,-FootingWid/2
+
+        hotspot2 0                     ,-footingWid/2-frameThi,code,startOutFootingOffset,1+128:code=code+1
+        hotspot2 -startOutFootingOffset,-footingWid/2-frameThi,code,startOutFootingOffset,2    :code=code+1
+        hotspot2 1                     ,-footingWid/2-frameThi,code,startOutFootingOffset,3    :code=code+1
+
+        hotspot2 vertexLen                    ,-footingWid/2-frameThi,code,endOutFootingOffset,1+128:code=code+1
+        hotspot2 vertexLen+endOutFootingOffset,-footingWid/2-frameThi,code,endOutFootingOffset,2    :code=code+1
+        hotspot2 vertexLen-1                  ,-footingWid/2-frameThi,code,endOutFootingOffset,3    :code=code+1
+
+        !内側基礎梁型枠
+        rect2 -startInFootingOffset,FootingWid/2+frameThi,vertexLen+endInFootingOffset,FootingWid/2
+
+        hotspot2 0                    ,footingWid/2+frameThi,code,startInFootingOffset,1+128:code=code+1
+        hotspot2 -startInFootingOffset,footingWid/2+frameThi,code,startInFootingOffset,2    :code=code+1
+        hotspot2 1                    ,footingWid/2+frameThi,code,startInFootingOffset,3    :code=code+1
+
+        hotspot2 vertexLen                   ,footingWid/2+frameThi,code,endInFootingOffset,1+128:code=code+1
+        hotspot2 vertexLen+endInFootingOffset,footingWid/2+frameThi,code,endInFootingOffset,2    :code=code+1
+        hotspot2 vertexLen-1                 ,footingWid/2+frameThi,code,endInFootingOffset,3    :code=code+1
+    del 2
+endif
+
+
+

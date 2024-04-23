@@ -1,0 +1,134 @@
+eps=1e-5
+unid=101
+td=1000
+
+
+values "jy" range[-0.105/2,0.105/2]  !, range [0.105/2,0.105/2]
+values "jx" range[0,len]
+values "my" range[0,0]  !, range [0.105/2,0.105/2]
+values "mx" range[0,len]
+
+values "B_hei" 105,120,150,180,210,240,270,300,330,360,390,420
+
+values{2} "left" 	0,"なし",2,"腰掛け蟻継ぎ・オス",3,"腰掛け鎌継ぎ・メス",4,"腰掛け鎌継ぎ・オス",6,"腰掛け半蟻落し継ぎ・オス",8,"大入れ掛け・オス",10,"胴差・オス",12,"金物工法"
+values{2} "right" 	0,"なし",2,"腰掛け蟻継ぎ・オス",3,"腰掛け鎌継ぎ・メス",4,"腰掛け鎌継ぎ・オス",6,"腰掛け半蟻落し継ぎ・オス",8,"大入れ掛け・オス",10,"胴差・オス",12,"金物工法"
+
+values{2} "joint"	0,"なし",1,"1.腰掛け蟻継ぎ仕口",5,"2.腰掛け半蟻落し継ぎ仕口",7,"3.大入れ仕口",99,"カスタム設定"
+values{2} "mortise"	0,"なし",1,"1.間柱欠き",2,"2.柱ほぞ",3,"3.管柱ほぞ",99,"カスタム設定"
+
+values{2} "pro_2d"	1,"輪郭",3,"カラー"
+
+if joint=0 then hideparameter "num2","jx","jy"
+if mortise=0 then hideparameter "num3","mx","my"
+
+dim matrix[][]
+list_len=3
+list_len2=3
+
+for j=1 to list_len
+	FOR i=1 TO num2[j]
+        parameters	jx[i][j]=jx[i][j]
+        parameters	jy[i][j]=jy[i][j]
+	NEXT i
+next j
+
+for j=1 to list_len2
+    FOR i=1 TO num3[j]
+        parameters	mx[i][j]=mx[i][j]
+        parameters	my[i][j]=my[i][j]
+    NEXT i
+next j
+
+for j=1 to list_len
+    FOR i=1 TO num2[j]
+        jx[i][j]=jx[i][j]
+        jy[i][j]=jy[i][j]
+    NEXT i
+next j
+
+for j=1 to list_len2
+    FOR i=1 TO num3[j]
+        mx[i][j]=mx[i][j]
+        my[i][j]=my[i][j]
+    NEXT i
+next j
+
+
+!金物寸法
+if B_hei>=105 and B_hei<=150 then hardwareCode=1
+if B_hei>=180 and B_hei<=210 then hardwareCode=2
+if B_hei>=240 and B_hei<=300 then hardwareCode=3
+if B_hei>=330 and B_hei<=420 then hardwareCode=4
+
+hardwareX=0.1
+hardwareWid=0.04
+hardwareGap=0.03
+hardwareThi=0.002
+cornerRad=0.0067
+driftPinRad1=0.0065
+driftPinRad2=0.0064
+
+dim hardwareZ[] 
+hardwareZ[1]=0.0985
+hardwareZ[2]=0.135
+hardwareZ[3]=0.205
+hardwareZ[4]=0.275
+
+
+dim ditchDep[]
+ditchDep[1]=0.104
+ditchDep[2]=0.1655
+ditchDep[3]=0.2355
+ditchDep[4]=0.3055
+
+
+dim list[]
+list[0+1]=0
+list[1+1]=0.105/2+0.015
+list[2+1]=0
+list[3+1]=0.15+0.015
+list[4+1]=0
+list[5+1]=0
+list[6+1]=0
+list[7+1]=0
+list[8+1]=0
+list[9+1]=0
+list[10+1]=0
+list[11+1]=0
+list[12+1]=hardwareX
+
+
+dim joint_list[]
+joint_list[1]=1
+joint_list[2]=5
+joint_list[3]=7
+
+
+!金物数
+hardwareNum=0
+if left=12 then hardwareNum=hardwareNum+1
+if right=12 then hardwareNum=hardwareNum+1
+parameters hardwareNum=hardwareNum
+lock "hardwareNum"
+
+!金物品番
+dim hardwareTypeNumList[]
+hardwareTypeNumList[1]="TH-10"
+hardwareTypeNumList[2]="TH-18"
+hardwareTypeNumList[3]="TH-24"
+hardwareTypeNumList[4]="TH-33"
+hardwareTypeNum=hardwareTypeNumList[hardwareCode]
+parameters hardwareTypeNum=hardwareTypeNum
+lock "hardwareTypeNum"
+
+!ドリフトピン数
+dim driftPinNumList[]
+driftPinNumList[1]=2
+driftPinNumList[2]=3
+driftPinNumList[3]=3
+driftPinNumList[4]=4
+driftPinNum=hardwareNum*driftPinNumList[hardwareCode]
+parameters driftPinNum=driftPinNum
+lock "driftPinNum"
+
+

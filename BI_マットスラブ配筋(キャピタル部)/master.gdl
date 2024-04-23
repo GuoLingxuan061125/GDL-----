@@ -1,0 +1,2326 @@
+code=1
+eps=1e-5
+
+!=================================L1継ぎ手定着係数
+dim l1_list[][]
+l1_list[1][18]=45
+l1_list[1][21]=40
+l1_list[1][24]=35
+l1_list[1][27]=35
+l1_list[1][30]=35
+l1_list[1][33]=35
+l1_list[1][36]=35
+l1_list[1][39]=30
+l1_list[1][42]=30
+l1_list[1][45]=30
+l1_list[1][48]=30
+l1_list[1][51]=30
+l1_list[1][54]=30
+l1_list[1][57]=30
+l1_list[1][60]=30
+l1_list[2][18]=50
+l1_list[2][21]=45
+l1_list[2][24]=40
+l1_list[2][27]=40
+l1_list[2][30]=35
+l1_list[2][33]=35
+l1_list[2][36]=35
+l1_list[2][39]=35
+l1_list[2][42]=35
+l1_list[2][45]=35
+l1_list[2][48]=30
+l1_list[2][51]=30
+l1_list[2][54]=30
+l1_list[2][57]=30
+l1_list[2][60]=30
+l1_list[3][18]=0
+l1_list[3][21]=50
+l1_list[3][24]=45
+l1_list[3][27]=45
+l1_list[3][30]=40
+l1_list[3][33]=40
+l1_list[3][36]=40
+l1_list[3][39]=40
+l1_list[3][42]=40
+l1_list[3][45]=40
+l1_list[3][48]=35
+l1_list[3][51]=35
+l1_list[3][54]=35
+l1_list[3][57]=35
+l1_list[3][60]=35
+l1_list[4][18]=0
+l1_list[4][21]=0
+l1_list[4][24]=55
+l1_list[4][27]=55
+l1_list[4][30]=50
+l1_list[4][33]=50
+l1_list[4][36]=50
+l1_list[4][39]=45
+l1_list[4][42]=45
+l1_list[4][45]=45
+l1_list[4][48]=40
+l1_list[4][51]=40
+l1_list[4][54]=40
+l1_list[4][57]=40
+l1_list[4][60]=40
+
+
+!=================================L2定着係数
+dim l2_list[][]
+l2_list[1][18]=40
+l2_list[1][21]=35
+l2_list[1][24]=30
+l2_list[1][27]=30
+l2_list[1][30]=30
+l2_list[1][33]=30
+l2_list[1][36]=30
+l2_list[1][39]=25
+l2_list[1][42]=25
+l2_list[1][45]=25
+l2_list[1][48]=25
+l2_list[1][51]=25
+l2_list[1][54]=25
+l2_list[1][57]=25
+l2_list[1][60]=25
+l2_list[2][18]=40
+l2_list[2][21]=35
+l2_list[2][24]=35
+l2_list[2][27]=35
+l2_list[2][30]=30
+l2_list[2][33]=30
+l2_list[2][36]=30
+l2_list[2][39]=30
+l2_list[2][42]=30
+l2_list[2][45]=30
+l2_list[2][48]=25
+l2_list[2][51]=25
+l2_list[2][54]=25
+l2_list[2][57]=25
+l2_list[2][60]=25
+l2_list[3][18]=0
+l2_list[3][21]=40
+l2_list[3][24]=40
+l2_list[3][27]=40
+l2_list[3][30]=35
+l2_list[3][33]=35
+l2_list[3][36]=35
+l2_list[3][39]=35
+l2_list[3][42]=35
+l2_list[3][45]=35
+l2_list[3][48]=30
+l2_list[3][51]=30
+l2_list[3][54]=30
+l2_list[3][57]=30
+l2_list[3][60]=30
+l2_list[4][18]=0
+l2_list[4][21]=0
+l2_list[4][24]=45
+l2_list[4][27]=45
+l2_list[4][30]=40
+l2_list[4][33]=40
+l2_list[4][36]=40
+l2_list[4][39]=40
+l2_list[4][42]=40
+l2_list[4][45]=40
+l2_list[4][48]=35
+l2_list[4][51]=35
+l2_list[4][54]=35
+l2_list[4][57]=35
+l2_list[4][60]=35
+
+
+!=================================材質・線色コードリスト
+dim scode_list[]
+scode_list[10]=1
+scode_list[13]=2
+scode_list[16]=3
+scode_list[19]=4
+scode_list[22]=5
+scode_list[25]=6
+scode_list[29]=7
+scode_list[32]=8
+scode_list[35]=9
+scode_list[38]=10
+scode_list[41]=11
+
+
+!=================================外径リスト
+dim od_list[]
+od_list[10]=0.011 !d10
+od_list[13]=0.014 !d13
+od_list[16]=0.018 !d16
+od_list[19]=0.021 !d19
+od_list[22]=0.025 !d22
+od_list[25]=0.028 !d25
+od_list[29]=0.033 !d29
+od_list[32]=0.036 !d32
+od_list[35]=0.040 !d35
+od_list[38]=0.043 !d38
+od_list[41]=0.046 !d41
+
+
+!==================================================スラブ設定(一般部)
+values "slabThi" range[0,]
+values "topCover" range[0,]
+values "downCover" range[0,]
+
+
+!==================================================スラブ設定(キャピタル部)
+values "cslabX1" range[0,]
+values "cslabX2" range[0,]
+values "cslabY1" range[0,]
+values "cslabY2" range[0,]
+values "cslabThi" range[0,]
+values "cdownCover" range[0,]
+values "csideCover" range[0,]
+values{2} "columnDir" 1,"下",2,"右",3,"上",4,"左"
+
+if switchColumn=0 then hideparameter "columnDir","columnPos","columnSize","columnTopAnchorLen","columnDownAnchorLen","columnTopAnchorMul","columnDownAnchorMul"
+
+!parameters \
+!cslabX1=cslabX1,
+!cslabX2=cslabX2,
+!cslabY1=cslabY1,
+!cslabY2=cslabY2
+
+
+!=================================================================配筋設定
+values "SDresol" range[3,]
+
+values{2} "conFc" 18,"18 N/㎟",21,"21 N/㎟",24,"24 N/㎟",27,"27 N/㎟",30,"30 N/㎟",33,"33 N/㎟",36,"36 N/㎟",39,"39 N/㎟",42,"42 N/㎟",45,"45 N/㎟",\
+				  48,"48 N/㎟",51,"51 N/㎟",54,"54 N/㎟",57,"57 N/㎟",60,"60 N/㎟"
+
+if conFc=18 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345"
+if conFc=21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390"
+if conFc>21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390",4,"SD490"
+
+parameters l1=l1_list[sdType][conFc]
+parameters l2=l2_list[sdType][conFc]
+lock "L1","L2"
+values "anchorLenCeil" range[0.01,]
+values "edgeBarAnchorLen" range(0,]
+
+values{2} "mbarDir" 1,"Y方向",2,"X方向"
+values{2} "topBarArrangePos" 1,"主筋が上",2,"配力筋が上"
+values{2} "downBarArrangePos" 1,"主筋が上",2,"配力筋が上"
+
+values{2} "neighborObj" 1,"スラブ(L2定着)",2,"梁",3,"端部(コの字筋)",6,"端部(重ね継手)",4,"キャピタル",5,"スラブ(180°フック)"
+values{2} "topAnchorType" 1,"L1/2",2,"端部に止める",3,"L1"
+values "linkBarLines" range[1,]
+
+
+!=================================================================呼び径・ピッチ設定
+values{2} "upperMbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "upperDbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "lowerMbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "lowerDbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "edgeHorNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "edgeBarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "linkBarTopNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "linkBarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+
+values "upperMbarPitch" range[0.05,]
+values "upperDbarPitch" range[0.05,]
+values "lowerMbarPitch" range[0.05,]
+values "lowerDbarPitch" range[0.05,]
+values "slabRebarPitch" range[0.05,]
+
+
+!=================================================================配筋情報
+!縦横判定
+if mbarDir=1 then
+    upperVerNd=upperMbarNd
+    upperVerPitch=max(upperMbarPitch,0.05)
+    upperHorNd=upperDbarNd
+    upperHorPitch=max(upperDbarPitch,0.05)
+    lowerVerNd=lowerMbarNd
+    lowerVerPitch=max(lowerMbarPitch,0.05)
+    lowerHorNd=lowerDbarNd
+    lowerHorPitch=max(lowerDbarPitch,0.05)
+    upperVerOffset=upperMbarOffset
+    upperHorOffset=upperDbarOffset
+    lowerVerOffset=lowerMbarOffset
+    lowerHorOffset=lowerDbarOffset
+else
+    upperVerNd=upperDbarNd
+    upperVerPitch=max(upperDbarPitch,0.05)
+    upperHorNd=upperMbarNd
+    upperHorPitch=max(upperMbarPitch,0.05)
+    lowerVerNd=lowerDbarNd
+    lowerVerPitch=max(lowerDbarPitch,0.05)
+    lowerHorNd=lowerMbarNd
+    lowerHorPitch=max(lowerMbarPitch,0.05)
+    upperVerOffset=upperDbarOffset
+    upperHorOffset=upperMbarOffset
+    lowerVerOffset=lowerDbarOffset
+    lowerHorOffset=lowerMbarOffset
+endif
+
+upperVerOd=od_list[upperVerNd]
+upperHorOd=od_list[upperHorNd]
+lowerVerOd=od_list[lowerVerNd]
+lowerHorOd=od_list[lowerHorNd]
+
+
+!=================================================================上端縦筋
+upperVerNum=0
+dim _upperVerX[]
+dim _upperVerPoint[]
+dim _upperVerPos[][]
+_upperVerX[1]=0
+_upperVerPoint[1]=0
+_upperVerPos[1][1]=0
+_upperVerPos[1][2]=0
+
+!Z座標
+if mbarDir+topBarArrangePos=3 then
+    upperVerZ=-topCover-upperHorOd-upperVerOd/2
+else
+    upperVerZ=-topCover-upperVerOd/2
+endif
+
+!X座標
+upperVerXnum=ceil((cslabX1+cslabX2-rebarStartPosL-rebarStartPosR)/upperVerPitch)+1
+upperVerPitch=(cslabX1+cslabX2-rebarStartPosL-rebarStartPosR)/(upperVerXnum-1)
+for i=1 to upperVerXnum
+    _upperVerX[i]=-cslabX1+rebarStartPosL+(i-1)*upperVerPitch+upperVerOffset
+next i
+
+for i=1 to upperVerXnum
+    !下端座標
+    if neighborObj[1]=1 or neighborObj[1]=4 or neighborObj[1]=5 then !スラブ・キャピタル
+        if topAnchorType=1 then
+            upperVerY1=-cslabY1-ceil(((L1+L1Plus)/2*upperVerNd/1000)/anchorLenCeil)*anchorLenCeil
+        endif
+
+        if topAnchorType=2 then
+            upperVerY1=-cslabY1
+        endif
+
+        if topAnchorType=3 then
+            upperVerY1=-cslabY1-ceil(((L1+L1Plus)*upperVerNd/1000)/anchorLenCeil)*anchorLenCeil
+        endif
+    endif
+
+    if neighborObj[1]=2 then !梁
+        upperVerY1=-cslabY1-topAnchorLen[1]+upperVerOd/2
+    endif
+
+    if neighborObj[1]=3 then !端部(コの字筋)
+        upperVerY1=-cslabY1+csideCover
+    endif
+
+    if neighborObj[1]=6 then !端部(重ね継手)
+        upperVerY1=-cslabY1+csideCover+upperVerOd/2
+    endif
+
+    columnFlag1=0
+    if switchColumn and columnDir=1 then !柱
+        if _upperVerX[i]>columnPos-columnSize/2+columnCover+upperVerOd/2 and _upperVerX[i]<columnPos+columnSize/2-columnCover-upperVerOd/2 then
+            columnFlag1=1
+            upperVerY1=-cslabY1-columnTopAnchorLen+upperVerOd/2
+        endif
+    endif
+
+    !上端座標
+    if neighborObj[3]=1 or neighborObj[3]=4 or neighborObj[3]=5 then !スラブ・キャピタル
+        if topAnchorType=1 then
+            upperVerY2=cslabY2+ceil(((L1+L1Plus)/2*upperVerNd/1000)/anchorLenCeil)*anchorLenCeil
+        endif
+
+        if topAnchorType=2 then
+            upperVerY2=cslabY2
+        endif
+
+        if topAnchorType=3 then
+            upperVerY2=cslabY2+ceil(((L1+L1Plus)*upperVerNd/1000)/anchorLenCeil)*anchorLenCeil
+        endif
+    endif
+
+    if neighborObj[3]=2 then !梁
+        upperVerY2=cslabY2+topAnchorLen[3]-upperVerOd/2
+    endif
+
+    if neighborObj[3]=3 then !端部(コの字筋)
+        upperVerY2=cslabY2-csideCover
+    endif
+
+    if neighborObj[3]=6 then !端部(重ね継手)
+        upperVerY2=cslabY2-csideCover-upperVerOd/2
+    endif
+
+    columnFlag2=0
+    if switchColumn and columnDir=3 then !柱
+        if _upperVerX[i]>columnPos-columnSize/2+columnCover+upperVerOd/2 and _upperVerX[i]<columnPos+columnSize/2-columnCover-upperVerOd/2 then
+            columnFlag2=1
+            upperVerY2=cslabY2+columnTopAnchorLen-upperVerOd/2
+        endif
+    endif
+
+    !頂点数・頂点座標インプット
+    if switchUpperY then
+        if switchCentColumn and _upperVerX[i]>centColumnPos[1][1]-centColumnX/2-centColumnSidePos-upperHorOd/2+eps and \
+            _upperVerX[i]<centColumnPos[1][1]+centColumnX/2+centColumnSidePos+upperHorOd/2-eps then
+            upperVerNum=upperVerNum+1
+            _upperVerPoint[upperVerNum]=3
+
+            if neighborObj[1]=2 or neighborObj[1]=6 or columnFlag1 then
+                _upperVerPoint[upperVerNum]=_upperVerPoint[upperVerNum]+1
+                put _upperVerX[i]
+                put upperVerY1
+                if columnFlag1=0 then
+                    if neighborObj[1]=2 then put upperVerZ-topAnchorMul[1]*upperVerNd/1000
+                    if neighborObj[1]=6 then put -cslabThi+cdownCover
+                else
+                    put upperVerZ-columnTopAnchorMul*upperVerNd/1000
+                endif
+            endif
+
+            put _upperVerX[i]
+            put upperVerY1
+            put upperVerZ
+
+            put _upperVerX[i]
+            put centColumnPos[1][2]-centColumnY/2-centColumnSidePos
+            put upperVerZ
+
+            put _upperVerX[i]
+            put centColumnPos[1][2]-centColumnY/2-centColumnSidePos
+            put -centColumnThi-(L2+L2Plus)*upperVerNd/1000
+
+            for j=1 to _upperVerPoint[upperVerNum]
+                _upperVerPos[upperVerNum][3*j-2]=get(1)
+                _upperVerPos[upperVerNum][3*j-1]=get(1)
+                _upperVerPos[upperVerNum][3*j]=get(1)
+            next j
+
+            upperVerNum=upperVerNum+1
+            _upperVerPoint[upperVerNum]=3
+
+            put _upperVerX[i]
+            put centColumnPos[1][2]+centColumnY/2+centColumnSidePos
+            put -centColumnThi-(L2+L2Plus)*upperVerNd/1000
+
+            put _upperVerX[i]
+            put centColumnPos[1][2]+centColumnY/2+centColumnSidePos
+            put upperVerZ
+
+            put _upperVerX[i]
+            put upperVerY2
+            put upperVerZ
+
+            if neighborObj[3]=2 or neighborObj[3]=6 or columnFlag2 then
+                _upperVerPoint[upperVerNum]=_upperVerPoint[upperVerNum]+1
+                put _upperVerX[i]
+                put upperVerY2
+                if columnFlag2=0 then
+                    if neighborObj[3]=2 then put upperVerZ-topAnchorMul[3]*upperVerNd/1000
+                    if neighborObj[3]=6 then put -cslabThi+cdownCover
+                else
+                    put upperVerZ-columnTopAnchorMul*upperVerNd/1000
+                endif
+            endif
+
+            for j=1 to _upperVerPoint[upperVerNum]
+                _upperVerPos[upperVerNum][3*j-2]=get(1)
+                _upperVerPos[upperVerNum][3*j-1]=get(1)
+                _upperVerPos[upperVerNum][3*j]=get(1)
+            next j
+        else
+            upperVerNum=upperVerNum+1
+            _upperVerPoint[upperVerNum]=2
+
+            if neighborObj[1]=2 or neighborObj[1]=6 or columnFlag1 then
+                _upperVerPoint[upperVerNum]=_upperVerPoint[upperVerNum]+1
+                put _upperVerX[i]
+                put upperVerY1
+                if columnFlag1=0 then
+                    if neighborObj[1]=2 then put upperVerZ-topAnchorMul[1]*upperVerNd/1000
+                    if neighborObj[1]=6 then put -cslabThi+cdownCover
+                else
+                    put upperVerZ-columnTopAnchorMul*upperVerNd/1000
+                endif
+            endif
+
+            put _upperVerX[i]
+            put upperVerY1
+            put upperVerZ
+
+            put _upperVerX[i]
+            put upperVerY2
+            put upperVerZ
+
+            if neighborObj[3]=2 or neighborObj[3]=6 or columnFlag2 then
+                _upperVerPoint[upperVerNum]=_upperVerPoint[upperVerNum]+1
+                put _upperVerX[i]
+                put upperVerY2
+                if columnFlag2=0 then
+                    if neighborObj[3]=2 then put upperVerZ-topAnchorMul[3]*upperVerNd/1000
+                    if neighborObj[3]=6 then put -cslabThi+cdownCover
+                else
+                    put upperVerZ-columnTopAnchorMul*upperVerNd/1000
+                endif
+            endif
+
+            for j=1 to _upperVerPoint[upperVerNum]
+                _upperVerPos[upperVerNum][3*j-2]=get(1)
+                _upperVerPos[upperVerNum][3*j-1]=get(1)
+                _upperVerPos[upperVerNum][3*j]=get(1)
+            next j
+        endif
+    endif
+next i
+
+!中央柱下端筋
+if switchCentColumn then
+    centColumnVerNum=ceil((centColumnX+2*centColumnSidePos+upperHorOd+upperVerOd)/upperVerPitch)+1
+    centColumnVerPitch=(centColumnX+2*centColumnSidePos+upperHorOd+upperVerOd)/(centColumnVerNum-1)
+    
+    for i=1 to centColumnVerNum
+        upperVerNum=upperVerNum+1
+        _upperVerPoint[upperVerNum]=2
+
+        put centColumnPos[1][1]-(centColumnX+2*centColumnSidePos+upperHorOd+upperVerOd)/2+(i-1)*centColumnVerPitch
+        put centColumnPos[1][2]-centColumnY/2-(L2+L2Plus)*upperVerNd/1000
+        put upperVerZ-centColumnThi
+
+        put centColumnPos[1][1]-(centColumnX+2*centColumnSidePos+upperHorOd+upperVerOd)/2+(i-1)*centColumnVerPitch
+        put centColumnPos[1][2]+centColumnY/2+(L2+L2Plus)*upperVerNd/1000
+        put upperVerZ-centColumnThi
+
+        for j=1 to _upperVerPoint[upperVerNum]
+            _upperVerPos[upperVerNum][3*j-2]=get(1)
+            _upperVerPos[upperVerNum][3*j-1]=get(1)
+            _upperVerPos[upperVerNum][3*j]=get(1)
+        next j
+    next i
+endif
+
+
+!=================================================================上端横筋
+upperHorNum=0
+dim _upperHorY[]
+dim _upperHorPoint[]
+dim _upperHorPos[][]
+_upperHorY[1]=0
+_upperHorPoint[1]=0
+_upperHorPos[1][1]=0
+_upperHorPos[1][2]=0
+
+!Z座標
+if mbarDir+topBarArrangePos=3 then
+    upperHorZ=-topCover-upperHorOd/2
+else
+    upperHorZ=-topCover-upperVerOd-upperHorOd/2
+endif
+
+!Y座標
+upperHorYnum=ceil((cslabY1+cslabY2-rebarStartPosD-rebarStartPosT)/upperHorPitch)+1
+upperHorPitch=(cslabY1+cslabY2-rebarStartPosD-rebarStartPosT)/(upperHorYnum-1)
+for i=1 to upperHorYnum
+    _upperHorY[i]=-cslabY1+rebarStartPosD+(i-1)*upperHorPitch+upperHorOffset
+next i
+
+for i=1 to upperHorYnum
+    !左端座標
+    if neighborObj[4]=1 or neighborObj[4]=4 or neighborObj[4]=5 then !スラブ・キャピタル
+        if topAnchorType=1 then
+            upperHorX1=-cslabX1-ceil(((L1+L1Plus)/2*upperHorNd/1000)/anchorLenCeil)*anchorLenCeil
+        endif
+
+        if topAnchorType=2 then
+            upperHorX1=-cslabX1
+        endif
+
+        if topAnchorType=3 then
+            upperHorX1=-cslabX1-ceil(((L1+L1Plus)*upperHorNd/1000)/anchorLenCeil)*anchorLenCeil
+        endif
+    endif
+
+    if neighborObj[4]=2 then !梁
+        upperHorX1=-cslabX1-topAnchorLen[4]+upperHorOd/2
+    endif
+
+    if neighborObj[4]=3 then !端部(コの字筋)
+        upperHorX1=-cslabX1+csideCover
+    endif
+
+    if neighborObj[4]=6 then !端部(重ね継手)
+        upperHorX1=-cslabX1+csideCover+upperHorOd/2
+    endif
+
+    columnFlag1=0
+    if switchColumn and columnDir=4 then !柱
+        if _upperHorY[i]>columnPos-columnSize/2+columnCover+upperHorOd/2 and _upperHorY[i]<columnPos+columnSize/2-columnCover-upperHorOd/2 then
+            columnFlag1=1
+            upperHorX1=-cslabX1-columnTopAnchorLen+upperHorOd/2
+        endif
+    endif
+
+    !右端座標
+    if neighborObj[2]=1 or neighborObj[2]=4 or neighborObj[2]=5 then !スラブ・キャピタル
+        if topAnchorType=1 then
+            upperHorX2=cslabX2+ceil(((L1+L1Plus)/2*upperHorNd/1000)/anchorLenCeil)*anchorLenCeil
+        endif
+
+        if topAnchorType=2 then
+            upperHorX2=cslabX2
+        endif
+
+        if topAnchorType=3 then
+            upperHorX2=cslabX2+ceil(((L1+L1Plus)*upperHorNd/1000)/anchorLenCeil)*anchorLenCeil
+        endif
+    endif
+
+    if neighborObj[2]=2 then !梁
+        upperHorX2=cslabX2+topAnchorLen[2]-upperHorOd/2
+    endif
+
+    if neighborObj[2]=3 then !端部(コの字筋)
+        upperHorX2=cslabX2-csideCover
+    endif
+
+    if neighborObj[2]=6 then !端部(重ね継手)
+        upperHorX2=cslabX2-csideCover-upperHorOd/2
+    endif
+
+    columnFlag2=0
+    if switchColumn and columnDir=2 then !柱
+        if _upperHorY[i]>columnPos-columnSize/2+columnCover+upperHorOd/2 and _upperHorY[i]<columnPos+columnSize/2-columnCover-upperHorOd/2 then
+            columnFlag2=1
+            upperHorX2=cslabX2+columnTopAnchorLen-upperHorOd/2
+        endif
+    endif
+
+    !頂点数・頂点座標インプット
+    if switchUpperX then
+        if switchCentColumn and _upperHorY[i]>centColumnPos[1][2]-centColumnY/2-centColumnSidePos-upperVerOd/2+eps and \
+            _upperHorY[i]<centColumnPos[1][2]+centColumnY/2+centColumnSidePos+upperVerOd/2-eps then
+            upperHorNum=upperHorNum+1
+            _upperHorPoint[upperHorNum]=3
+
+            if neighborObj[4]=2 or neighborObj[4]=6 or columnFlag1 then
+                _upperHorPoint[upperHorNum]=_upperHorPoint[upperHorNum]+1
+                put upperHorX1
+                put _upperHorY[i]
+                if columnFlag1=0 then
+                    if neighborObj[4]=2 then put upperHorZ-topAnchorMul[4]*upperHorNd/1000
+                    if neighborObj[4]=6 then put -cslabThi+cdownCover
+                else
+                    put upperHorZ-columnTopAnchorMul*upperHorNd/1000
+                endif
+            endif
+
+            put upperHorX1
+            put _upperHorY[i]
+            put upperHorZ
+
+            put centColumnPos[1][1]-centColumnX/2-centColumnSidePos
+            put _upperHorY[i]
+            put upperHorZ
+
+            put centColumnPos[1][1]-centColumnX/2-centColumnSidePos
+            put _upperHorY[i]
+            put -centColumnThi-(L2+L2Plus)*upperHorNd/1000
+
+            for j=1 to _upperHorPoint[upperHorNum]
+                _upperHorPos[upperHorNum][3*j-2]=get(1)
+                _upperHorPos[upperHorNum][3*j-1]=get(1)
+                _upperHorPos[upperHorNum][3*j]=get(1)
+            next j
+
+            upperHorNum=upperHorNum+1
+            _upperHorPoint[upperHorNum]=3
+
+            put centColumnPos[1][1]+centColumnX/2+centColumnSidePos
+            put _upperHorY[i]
+            put -centColumnThi-(L2+L2Plus)*upperHorNd/1000
+
+            put centColumnPos[1][1]+centColumnX/2+centColumnSidePos
+            put _upperHorY[i]
+            put upperHorZ
+
+            put upperHorX2
+            put _upperHorY[i]
+            put upperHorZ
+
+            if neighborObj[2]=2 or neighborObj[2]=6 or columnFlag2 then
+                _upperHorPoint[upperHorNum]=_upperHorPoint[upperHorNum]+1
+                put upperHorX2
+                put _upperHorY[i]
+                if columnFlag2=0 then
+                    if neighborObj[2]=2 then put upperHorZ-topAnchorMul[2]*upperHorNd/1000
+                    if neighborObj[2]=6 then put -cslabThi+cdownCover
+                else
+                    put upperHorZ-columnTopAnchorMul*upperHorNd/1000
+                endif
+            endif
+
+            for j=1 to _upperHorPoint[upperHorNum]
+                _upperHorPos[upperHorNum][3*j-2]=get(1)
+                _upperHorPos[upperHorNum][3*j-1]=get(1)
+                _upperHorPos[upperHorNum][3*j]=get(1)
+            next j
+        else
+            upperHorNum=upperHorNum+1
+            _upperHorPoint[upperHorNum]=2
+
+            if neighborObj[4]=2 or neighborObj[4]=6 or columnFlag1 then
+                _upperHorPoint[upperHorNum]=_upperHorPoint[upperHorNum]+1
+                put upperHorX1
+                put _upperHorY[i]
+                if columnFlag1=0 then
+                    if neighborObj[4]=2 then put upperHorZ-topAnchorMul[4]*upperHorNd/1000
+                    if neighborObj[4]=6 then put -cslabThi+cdownCover
+                else
+                    put upperHorZ-columnTopAnchorMul*upperHorNd/1000
+                endif
+            endif
+
+            put upperHorX1
+            put _upperHorY[i]
+            put upperHorZ
+
+            put upperHorX2
+            put _upperHorY[i]
+            put upperHorZ
+
+            if neighborObj[2]=2 or neighborObj[2]=6 or columnFlag2 then
+                _upperHorPoint[upperHorNum]=_upperHorPoint[upperHorNum]+1
+                put upperHorX2
+                put _upperHorY[i]
+                if columnFlag2=0 then
+                    if neighborObj[2]=2 then put upperHorZ-topAnchorMul[2]*upperHorNd/1000
+                    if neighborObj[2]=6 then put -cslabThi+cdownCover
+                else
+                    put upperHorZ-columnTopAnchorMul*upperHorNd/1000
+                endif
+            endif
+
+            for j=1 to _upperHorPoint[upperHorNum]
+                _upperHorPos[upperHorNum][3*j-2]=get(1)
+                _upperHorPos[upperHorNum][3*j-1]=get(1)
+                _upperHorPos[upperHorNum][3*j]=get(1)
+            next j
+        endif
+    endif
+next i
+
+if switchCentColumn then
+    centColumnHorNum=ceil((centColumnY+2*centColumnSidePos+upperHorOd+upperVerOd)/upperVerPitch)+1
+    centColumnHorPitch=(centColumnY+2*centColumnSidePos+upperHorOd+upperVerOd)/(centColumnHorNum-1)
+
+    for i=1 to centColumnHorNum
+        upperHorNum=upperHorNum+1
+        _upperHorPoint[upperHorNum]=2
+
+        put centColumnPos[1][1]-centColumnX/2-(L2+L2Plus)*upperHorNd/1000
+        put centColumnPos[1][2]-(centColumnY+2*centColumnSidePos+upperHorOd+upperVerOd)/2+(i-1)*centColumnHorPitch
+        put upperHorZ-centColumnThi
+
+        put centColumnPos[1][1]+centColumnX/2+(L2+L2Plus)*upperHorNd/1000
+        put centColumnPos[1][2]-(centColumnY+2*centColumnSidePos+upperHorOd+upperVerOd)/2+(i-1)*centColumnHorPitch
+        put upperHorZ-centColumnThi
+
+        for j=1 to _upperHorPoint[upperHorNum]
+            _upperHorPos[upperHorNum][3*j-2]=get(1)
+            _upperHorPos[upperHorNum][3*j-1]=get(1)
+            _upperHorPos[upperHorNum][3*j]=get(1)
+        next j
+    next i
+endif
+
+
+!=================================================================下端縦筋
+lowerSlabAnchorLen=slabThi-topCover-upperVerOd-upperHorOd-od_list[upperDandoriBarNd]-od_list[umaBarNd]-lowerVerOd/2
+
+lowerVerNum=0
+dim _lowerVerX[]
+dim _lowerVerPoint[]
+dim _lowerVerPos[][]
+_lowerVerX[1]=0
+_lowerVerPoint[1]=0
+_lowerVerPos[1][1]=0
+_lowerVerPos[1][2]=0
+
+!交差配筋判断
+if lowerVerPitch<slabRebarPitch then
+    crossRebar=1
+else
+    crossRebar=0
+endif
+
+!Z座標
+if mbarDir+downBarArrangePos=3 then
+    lowerVerZ=-cslabThi+cdownCover+lowerVerOd/2
+    lowerVerZoffset=0
+else
+    lowerVerZ=-cslabThi+cdownCover+lowerHorOd+lowerVerOd/2
+    lowerVerZoffset=-lowerHorOd/2-lowerVerOd/2
+endif
+
+!X座標
+lowerVerXnum=ceil((cslabX1+cslabX2-rebarStartPosL-rebarStartPosR)/lowerVerPitch)+1
+lowerVerPitch=(cslabX1+cslabX2-rebarStartPosL-rebarStartPosR)/(lowerVerXnum-1)
+for i=1 to lowerVerXnum
+    _lowerVerX[i]=-cslabX1+rebarStartPosL+(i-1)*lowerVerPitch+lowerVerOffset
+next i
+
+if mbarDir+downBarArrangePos=3 then
+    yOffset=0
+else
+    yOffset=lowerVerOd
+endif
+
+for i=1 to lowerVerXnum
+    !下端座標
+    if neighborObj[1]=1 or neighborObj[1]=5 then !スラブ/180°フック
+        if crossRebar and fra(i/2)=0 then
+            lowerVerY1=-cslabY1+csideCover
+        else
+            lowerVerY1=-cslabY1+csideCover+lowerVerOd/2+yOffset
+        endif
+    endif
+
+    if neighborObj[1]=2 then !梁
+        lowerVerY1=-cslabY1-downAnchorLen[1]+lowerVerOd/2
+    endif
+
+    if neighborObj[1]=3 then !端部(コの字筋)
+        lowerVerY1=-cslabY1+csideCover
+    endif
+
+    if neighborObj[1]=6 then !端部(重ね継手)
+        lowerVerY1=-cslabY1+csideCover+upperVerOd+lowerVerOd/2
+    endif
+
+    if neighborObj[1]=4 then !キャピタル
+        lowerVerY1=-cslabY1-(L1+L1Plus)/2*lowerVerNd/1000
+    endif
+
+    if switchLowerY then
+        lowerVerNum=lowerVerNum+1
+
+        columnFlag1=0
+        if switchColumn and columnDir=1 then !柱
+            if _lowerVerX[lowerVerNum]>columnPos-columnSize/2+columnCover+lowerVerOd/2 and _lowerVerX[lowerVerNum]<columnPos+columnSize/2-columnCover-lowerVerOd/2 then
+                columnFlag1=1
+                lowerVerY1=-cslabY1-columnDownAnchorLen+lowerVerOd/2
+            endif
+        endif
+
+        !上端座標
+        if neighborObj[3]=1 or neighborObj[3]=5 then !スラブ/180°フック
+            if crossRebar and fra(i/2)=0 then
+                lowerVerY2=cslabY2-csideCover
+            else
+                lowerVerY2=cslabY2-csideCover-lowerVerOd/2-yOffset
+            endif
+        endif
+
+        if neighborObj[3]=2 then !梁
+            lowerVerY2=cslabY2+downAnchorLen[3]-lowerVerOd/2
+        endif
+
+        if neighborObj[3]=3 then !端部(コの字筋)
+            lowerVerY2=cslabY2-csideCover
+        endif
+
+        if neighborObj[3]=6 then !端部(重ね継手)
+            lowerVerY2=cslabY2-csideCover-upperVerOd-lowerVerOd/2
+        endif
+
+        if neighborObj[3]=4 then !キャピタル
+            lowerVerY2=cslabY2+(L1+L1Plus)/2*lowerVerNd/1000
+        endif
+
+        columnFlag2=0
+        if switchColumn and columnDir=3 then !柱
+            if _lowerVerX[lowerVerNum]>columnPos-columnSize/2+columnCover+lowerVerOd/2 and _lowerVerX[lowerVerNum]<columnPos+columnSize/2-columnCover-lowerVerOd/2 then
+                columnFlag2=1
+                lowerVerY2=cslabY2+columnDownAnchorLen-lowerVerOd/2
+            endif
+        endif
+
+        !頂点数・頂点座標インプット
+        _lowerVerPoint[lowerVerNum]=2
+
+        if columnFlag1 then !柱へ定着
+            _lowerVerPoint[lowerVerNum]=_lowerVerPoint[lowerVerNum]+1
+            put _lowerVerX[lowerVerNum]
+            put lowerVerY1
+            put lowerVerZ+columnDownAnchorMul*lowerVerNd/1000
+        else
+            if neighborObj[1]=1 or neighborObj[1]=5 then !スラブ/180°フック
+                if crossRebar=0 or fra(i/2)<>0 then
+                    if neighborObj[1]=1 then
+                        _lowerVerPoint[lowerVerNum]=_lowerVerPoint[lowerVerNum]+1
+                        put _lowerVerX[lowerVerNum]
+                        put lowerVerY1-((L2+L2Plus)*lowerVerNd/1000+2*elbow90R*lowerVerOd-lowerSlabAnchorLen-lowerVerZoffset)
+                        put -(slabThi-lowerSlabAnchorLen-lowerVerZoffset)
+
+                        _lowerVerPoint[lowerVerNum]=_lowerVerPoint[lowerVerNum]+1
+                        put _lowerVerX[lowerVerNum]
+                        put lowerVerY1
+                        put -(slabThi-lowerSlabAnchorLen-lowerVerZoffset)
+                    else
+                        _lowerVerPoint[lowerVerNum]=_lowerVerPoint[lowerVerNum]+1
+                        put _lowerVerX[lowerVerNum]
+                        put lowerVerY1+2*elbow180R*lowerVerOd
+                        put upperHorZ+upperHorOd/2+lowerVerOd/2-elbow180R*lowerVerOd-elbow180FraLen
+
+                        _lowerVerPoint[lowerVerNum]=_lowerVerPoint[lowerVerNum]+1
+                        put _lowerVerX[lowerVerNum]
+                        put lowerVerY1+2*elbow180R*lowerVerOd
+                        put upperHorZ+upperHorOd/2+lowerVerOd/2
+
+                        _lowerVerPoint[lowerVerNum]=_lowerVerPoint[lowerVerNum]+1
+                        put _lowerVerX[lowerVerNum]
+                        put lowerVerY1
+                        put upperHorZ+upperHorOd/2+lowerVerOd/2
+                    endif
+                endif
+            endif
+
+            if neighborObj[1]=2 then !梁
+                _lowerVerPoint[lowerVerNum]=_lowerVerPoint[lowerVerNum]+1
+                put _lowerVerX[lowerVerNum]
+                put lowerVerY1
+                put lowerVerZ+downAnchorMul[1]*lowerVerNd/1000
+            endif
+
+            if neighborObj[1]=6 then !端部(重ね継手)
+                _lowerVerPoint[lowerVerNum]=_lowerVerPoint[lowerVerNum]+1
+                put _lowerVerX[lowerVerNum]
+                put lowerVerY1
+                put lowerVerZ+elbow90R*lowerVerOd+(L1+L1Plus)*lowerVerNd/1000
+            endif
+        endif
+
+        put _lowerVerX[lowerVerNum]
+        put lowerVerY1
+        put lowerVerZ
+
+        put _lowerVerX[lowerVerNum]
+        put lowerVerY2
+        put lowerVerZ
+
+        if columnFlag2 then !柱へ定着
+            _lowerVerPoint[lowerVerNum]=_lowerVerPoint[lowerVerNum]+1
+            put _lowerVerX[lowerVerNum]
+            put lowerVerY2
+            put lowerVerZ+columnDownAnchorMul*lowerVerNd/1000
+        else
+            if neighborObj[3]=1 or neighborObj[3]=5 then !スラブ/180°フック
+                if crossRebar=0 or fra(i/2)<>0 then
+                    if neighborObj[3]=1 then
+                        _lowerVerPoint[lowerVerNum]=_lowerVerPoint[lowerVerNum]+1
+                        put _lowerVerX[lowerVerNum]
+                        put lowerVerY2
+                        put -(slabThi-lowerSlabAnchorLen-lowerVerZoffset)
+
+                        _lowerVerPoint[lowerVerNum]=_lowerVerPoint[lowerVerNum]+1
+                        put _lowerVerX[lowerVerNum]
+                        put lowerVerY2+((L2+L2Plus)*lowerVerNd/1000+2*elbow90R*lowerVerOd-lowerSlabAnchorLen-lowerVerZoffset)
+                        put -(slabThi-lowerSlabAnchorLen-lowerVerZoffset)
+                    else
+                        _lowerVerPoint[lowerVerNum]=_lowerVerPoint[lowerVerNum]+1
+                        put _lowerVerX[lowerVerNum]
+                        put lowerVerY2
+                        put upperHorZ+upperHorOd/2+lowerVerOd/2
+
+                        _lowerVerPoint[lowerVerNum]=_lowerVerPoint[lowerVerNum]+1
+                        put _lowerVerX[lowerVerNum]
+                        put lowerVerY2-2*elbow180R*lowerVerOd
+                        put upperHorZ+upperHorOd/2+lowerVerOd/2
+
+                        _lowerVerPoint[lowerVerNum]=_lowerVerPoint[lowerVerNum]+1
+                        put _lowerVerX[lowerVerNum]
+                        put lowerVerY2-2*elbow180R*lowerVerOd
+                        put upperHorZ+upperHorOd/2+lowerVerOd/2-elbow180R*lowerVerOd-elbow180FraLen
+                    endif
+                endif
+            endif
+
+            if neighborObj[3]=2 then !梁
+                _lowerVerPoint[lowerVerNum]=_lowerVerPoint[lowerVerNum]+1
+                put _lowerVerX[lowerVerNum]
+                put lowerVerY2
+                put lowerVerZ+downAnchorMul[3]*lowerVerNd/1000
+            endif
+
+            if neighborObj[3]=6 then !端部(重ね継手)
+                _lowerVerPoint[lowerVerNum]=_lowerVerPoint[lowerVerNum]+1
+                put _lowerVerX[lowerVerNum]
+                put lowerVerY2
+                put lowerVerZ+elbow90R*lowerVerOd+(L1+L1Plus)*lowerVerNd/1000
+            endif
+        endif
+
+        for j=1 to _lowerVerPoint[lowerVerNum]
+            _lowerVerPos[lowerVerNum][3*j-2]=get(1)
+            _lowerVerPos[lowerVerNum][3*j-1]=get(1)
+            _lowerVerPos[lowerVerNum][3*j]=get(1)
+        next j
+    endif
+next i
+
+
+!=================================================================下端横筋
+lowerHorNum=0
+dim _lowerHorY[]
+dim _lowerHorPoint[]
+dim _lowerHorPos[][]
+_lowerHorY[1]=0
+_lowerHorPoint[1]=0
+_lowerHorPos[1][1]=0
+_lowerHorPos[1][2]=0
+
+!交差配筋判断
+if lowerHorPitch<slabRebarPitch then
+    crossRebar=1
+else
+    crossRebar=0
+endif
+
+!Z座標
+if mbarDir+downBarArrangePos=3 then
+    lowerHorZ=-cslabThi+cdownCover+lowerVerOd+lowerHorOd/2
+    lowerHorZoffset=-lowerVerOd/2-lowerHorOd/2
+else
+
+    lowerHorZ=-cslabThi+cdownCover+lowerHorOd/2
+    lowerHorZoffset=0
+endif
+
+!Y座標
+lowerHorYnum=ceil((cslabY1+cslabY2-rebarStartPosD-rebarStartPosT)/lowerHorPitch)+1
+lowerHorPitch=(cslabY1+cslabY2-rebarStartPosD-rebarStartPosT)/(lowerHorYnum-1)
+for i=1 to lowerHorYnum
+    _lowerHorY[i]=-cslabY1+rebarStartPosD+(i-1)*lowerHorPitch+lowerHorOffset
+next i
+
+if mbarDir+downBarArrangePos=3 then
+    xOffset=lowerHorOd
+else
+    xOffset=0
+endif
+
+for i=1 to lowerHorYnum
+    !左端座標
+    if neighborObj[4]=1 or neighborObj[4]=5 then !スラブ/180°フック
+        if crossRebar and fra(i/2)=0 then
+            lowerHorX1=-cslabX1+csideCover
+        else
+            lowerHorX1=-cslabX1+csideCover+lowerHorOd/2+xOffset
+        endif
+    endif
+
+    if neighborObj[4]=2 then !梁
+        lowerHorX1=-cslabX1-downAnchorLen[4]+lowerHorOd/2
+    endif
+
+    if neighborObj[4]=3 then !端部(コの字筋)
+        lowerHorX1=-cslabX1+csideCover
+    endif
+
+    if neighborObj[4]=6 then !端部(重ね継手)
+        lowerHorX1=-cslabX1+csideCover+upperHorOd+lowerHorOd/2
+    endif
+
+    if neighborObj[4]=4 then !キャピタル
+        lowerHorX1=-cslabX1-(L1+L1Plus)/2*lowerHorNd/1000
+    endif
+
+    if switchLowerX then
+        lowerHorNum=lowerHorNum+1
+
+        columnFlag1=0
+        if switchColumn and columnDir=4 then !柱
+            if _lowerHorY[lowerHorNum]>columnPos-columnSize/2+columnCover+lowerHorOd/2 and _lowerHorY[lowerHorNum]<columnPos+columnSize/2-columnCover-lowerHorOd/2 then
+                columnFlag1=1
+                lowerHorX1=-cslabX1-columnDownAnchorLen+lowerHorOd/2
+            endif
+        endif
+
+        !右端座標
+        if neighborObj[2]=1 or neighborObj[2]=5 then !スラブ/180°フック
+            if crossRebar and fra(i/2)=0 then
+                lowerHorX2=cslabX2-csideCover
+            else
+                lowerHorX2=cslabX2-csideCover-lowerHorOd/2-xOffset
+            endif
+        endif
+
+        if neighborObj[2]=2 then !梁
+            lowerHorX2=cslabX2+downAnchorLen[2]-lowerHorOd/2
+        endif
+
+        if neighborObj[2]=3 then !端部(コの字筋)
+            lowerHorX2=cslabX2-csideCover
+        endif
+
+        if neighborObj[2]=6 then !端部(重ね継手)
+            lowerHorX2=cslabX2-csideCover-upperHorOd-lowerHorOd/2
+        endif
+
+        if neighborObj[2]=4 then !キャピタル
+            lowerHorX2=cslabX2+(L1+L1Plus)/2*lowerHorNd/1000
+        endif
+
+        columnFlag2=0
+        if switchColumn and columnDir=2 then !柱
+            if _lowerHorY[lowerHorNum]>columnPos-columnSize/2+columnCover+lowerHorOd/2 and _lowerHorY[lowerHorNum]<columnPos+columnSize/2-columnCover-lowerHorOd/2 then
+                columnFlag2=1
+                lowerHorX2=cslabX2+columnDownAnchorLen-lowerHorOd/2
+            endif
+        endif
+
+        !頂点数・頂点座標インプット
+        _lowerHorPoint[lowerHorNum]=2
+
+        if columnFlag1 then !柱へ定着
+            _lowerHorPoint[lowerHorNum]=_lowerHorPoint[lowerHorNum]+1
+            put lowerHorX1
+            put _lowerHorY[lowerHorNum]
+            put lowerHorZ+columnDownAnchorMul*lowerHorNd/1000
+        else
+            if neighborObj[4]=1 or neighborObj[4]=5 then !スラブ/180°フック
+                if crossRebar=0 or fra(i/2)<>0 then
+                    if neighborObj[4]=1 then
+                        _lowerHorPoint[lowerHorNum]=_lowerHorPoint[lowerHorNum]+1
+                        put lowerHorX1-((L2+L2Plus)*lowerHorNd/1000+2*elbow90R*lowerVerOd-lowerSlabAnchorLen-lowerHorZoffset)
+                        put _lowerHorY[lowerHorNum]
+                        put -(slabThi-lowerSlabAnchorLen-lowerHorZoffset)
+
+                        _lowerHorPoint[lowerHorNum]=_lowerHorPoint[lowerHorNum]+1
+                        put lowerHorX1
+                        put _lowerHorY[lowerHorNum]
+                        put -(slabThi-lowerSlabAnchorLen-lowerHorZoffset)
+                    else
+                        _lowerHorPoint[lowerHorNum]=_lowerHorPoint[lowerHorNum]+1
+                        put lowerHorX1+2*elbow180R*lowerHorOd
+                        put _lowerHorY[lowerHorNum]
+                        put upperVerZ+upperVerOd/2+lowerHorOd/2-elbow180R*lowerHorOd-elbow180FraLen
+
+                        _lowerHorPoint[lowerHorNum]=_lowerHorPoint[lowerHorNum]+1
+                        put lowerHorX1+2*elbow180R*lowerHorOd
+                        put _lowerHorY[lowerHorNum]
+                        put upperVerZ+upperVerOd/2+lowerHorOd/2
+
+                        _lowerHorPoint[lowerHorNum]=_lowerHorPoint[lowerHorNum]+1
+                        put lowerHorX1
+                        put _lowerHorY[lowerHorNum]
+                        put upperVerZ+upperVerOd/2+lowerHorOd/2
+                    endif
+                endif
+            endif
+
+            if neighborObj[4]=2 then !梁
+                _lowerHorPoint[lowerHorNum]=_lowerHorPoint[lowerHorNum]+1
+                put lowerHorX1
+                put _lowerHorY[lowerHorNum]
+                put lowerHorZ+downAnchorMul[4]*lowerHorNd/1000
+            endif
+
+            if neighborObj[4]=6 then !端部(重ね継手)
+                _lowerHorPoint[lowerHorNum]=_lowerHorPoint[lowerHorNum]+1
+                put lowerHorX1
+                put _lowerHorY[lowerHorNum]
+                put lowerHorZ+elbow90R*lowerHorOd+(L1+L1Plus)*lowerHorNd/1000
+            endif
+        endif
+
+        put lowerHorX1
+        put _lowerHorY[lowerHorNum]
+        put lowerHorZ
+
+        put lowerHorX2
+        put _lowerHorY[lowerHorNum]
+        put lowerHorZ
+
+        if columnFlag2 then !柱へ定着
+            _lowerHorPoint[lowerHorNum]=_lowerHorPoint[lowerHorNum]+1
+            put lowerHorX2
+            put _lowerHorY[lowerHorNum]
+            put lowerHorZ+columnDownAnchorMul*lowerHorNd/1000
+        else
+            if neighborObj[2]=1 or neighborObj[2]=5 then !スラブ/180°フック
+                if crossRebar=0 or fra(i/2)<>0 then
+                    if neighborObj[2]=1 then
+                        _lowerHorPoint[lowerHorNum]=_lowerHorPoint[lowerHorNum]+1
+                        put lowerHorX2
+                        put _lowerHorY[lowerHorNum]
+                        put -(slabThi-lowerSlabAnchorLen-lowerHorZoffset)
+
+                        _lowerHorPoint[lowerHorNum]=_lowerHorPoint[lowerHorNum]+1
+                        put lowerHorX2+((L2+L2Plus)*lowerHorNd/1000+2*elbow90R*lowerHorOd-lowerSlabAnchorLen-lowerHorZoffset)
+                        put _lowerHorY[lowerHorNum]
+                        put -(slabThi-lowerSlabAnchorLen-lowerHorZoffset)
+                    else
+                        _lowerHorPoint[lowerHorNum]=_lowerHorPoint[lowerHorNum]+1
+                        put lowerHorX2
+                        put _lowerHorY[lowerHorNum]
+                        put upperVerZ+upperVerOd/2+lowerHorOd/2
+
+                        _lowerHorPoint[lowerHorNum]=_lowerHorPoint[lowerHorNum]+1
+                        put lowerHorX2-2*elbow180R*lowerHorOd
+                        put _lowerHorY[lowerHorNum]
+                        put upperVerZ+upperVerOd/2+lowerHorOd/2
+
+                        _lowerHorPoint[lowerHorNum]=_lowerHorPoint[lowerHorNum]+1
+                        put lowerHorX2-2*elbow180R*lowerHorOd
+                        put _lowerHorY[lowerHorNum]
+                        put upperVerZ+upperVerOd/2+lowerHorOd/2-elbow180R*lowerHorOd-elbow180FraLen
+                    endif
+                endif
+            endif
+
+            if neighborObj[2]=2 then !梁
+                _lowerHorPoint[lowerHorNum]=_lowerHorPoint[lowerHorNum]+1
+                put lowerHorX2
+                put _lowerHorY[lowerHorNum]
+                put lowerHorZ+downAnchorMul[2]*lowerHorNd/1000
+            endif
+
+            if neighborObj[2]=6 then !端部(重ね継手)
+                _lowerHorPoint[lowerHorNum]=_lowerHorPoint[lowerHorNum]+1
+                put lowerHorX2
+                put _lowerHorY[lowerHorNum]
+                put lowerHorZ+elbow90R*lowerHorOd+(L1+L1Plus)*lowerHorNd/1000
+            endif
+        endif
+
+        for j=1 to _lowerHorPoint[lowerHorNum]
+            _lowerHorPos[lowerHorNum][3*j-2]=get(1)
+            _lowerHorPos[lowerHorNum][3*j-1]=get(1)
+            _lowerHorPos[lowerHorNum][3*j]=get(1)
+        next j
+    endif
+next i
+
+
+!=================================================================つなぎ筋
+!parameters \
+!linkBarOd=od_list[lowerHorNd],
+!linkBarPen=SDpen[scode_list[lowerHorNd]],
+!linkBarMat=SDmat[scode_list[lowerHorNd]]
+
+linkBarNum=0
+dim _linkBarOd[]
+dim _linkBarPen[]
+dim _linkBarMat[]
+dim _linkBarPoint[]
+dim _linkBarPos[][]
+_linkBarOd[1]=0
+_linkBarPen[1]=0
+_linkBarMat[1]=0
+_linkBarPoint[1]=0
+_linkBarPos[1][1]=0
+_linkBarPos[1][2]=0
+
+linkBarPitch=(cslabThi-slabThi+downCover-cdownCover)/linkBarLines
+
+!===============================下
+if mbarDir+downBarArrangePos=3 then
+    zoffsetFlag=0
+else
+    zoffsetFlag=1
+endif
+
+if switchLowerX then
+if neighborObj[1]=1 or neighborObj[1]=5 then
+    for i=1 to linkBarLines
+        linkBarNum=linkBarNum+1
+        _linkBarPoint[linkBarNum]=2
+
+        if i=1 then 
+            tempNd=linkBarTopNd
+        else
+            tempNd=linkBarNd
+        endif
+
+        _linkBarOd[linkBarNum]=od_list[tempNd]
+        _linkBarPen[linkBarNum]=SDpen[scode_list[tempNd]]
+        _linkBarMat[linkBarNum]=SDmat[scode_list[tempNd]]
+
+        if mbarDir+downBarArrangePos=3 then
+            xOffset=_linkBarOd[linkBarNum]
+            yOffset=0
+        else
+            xOffset=0
+            yOffset=_linkBarOd[linkBarNum]
+        endif
+
+        !左端座標X1
+        if neighborObj[4]=4 then
+            linkBarX1=-cslabX1-(L1+L1Plus)/2*tempNd/1000
+        else
+            linkBarX1=-cslabX1+csideCover+_linkBarOd[linkBarNum]/2+(lowerHorOd-xOffset)
+        endif
+
+        !右端座標X2
+        if neighborObj[2]=4 then
+            linkBarX2=cslabX2+(L1+L1Plus)/2*tempNd/1000
+        else
+            linkBarX2=cslabX2-csideCover-_linkBarOd[linkBarNum]/2-(lowerHorOd-xOffset)
+        endif
+
+        if neighborObj[4]=1 or neighborObj[4]=5 then
+            _linkBarPoint[linkBarNum]=_linkBarPoint[linkBarNum]+1
+            put linkBarX1
+            put -cslabY1+csideCover+_linkBarOd[linkBarNum]/2+(lowerVerOd-yOffset)+elbow90R*_linkBarOd[linkBarNum]+(L1+L1Plus)*tempNd/1000
+            put -slabThi+downCover+lowerHorOd/2-(i-1)*linkBarPitch+zoffsetFlag*_linkBarOd[linkBarNum]+linkBarOffset
+        endif
+
+        put linkBarX1
+        put -cslabY1+csideCover+_linkBarOd[linkBarNum]/2+(lowerVerOd-yOffset)
+        put -slabThi+downCover+lowerHorOd/2-(i-1)*linkBarPitch+zoffsetFlag*_linkBarOd[linkBarNum]+linkBarOffset
+
+        put linkBarX2
+        put -cslabY1+csideCover+_linkBarOd[linkBarNum]/2+(lowerVerOd-yOffset)
+        put -slabThi+downCover+lowerHorOd/2-(i-1)*linkBarPitch+zoffsetFlag*_linkBarOd[linkBarNum]+linkBarOffset
+
+        if neighborObj[2]=1 or neighborObj[2]=5 then
+            _linkBarPoint[linkBarNum]=_linkBarPoint[linkBarNum]+1
+            put linkBarX2
+            put -cslabY1+csideCover+_linkBarOd[linkBarNum]/2+(lowerVerOd-yOffset)+elbow90R*_linkBarOd[linkBarNum]+(L1+L1Plus)*tempNd/1000
+            put -slabThi+downCover+lowerHorOd/2-(i-1)*linkBarPitch+zoffsetFlag*_linkBarOd[linkBarNum]+linkBarOffset
+        endif
+
+        for j=1 to _linkBarPoint[linkBarNum]
+            _linkBarPos[linkBarNum][3*j-2]=get(1)
+            _linkBarPos[linkBarNum][3*j-1]=get(1)
+            _linkBarPos[linkBarNum][3*j]=get(1)
+        next j
+    next i
+endif
+endif
+
+!===============================上
+if switchLowerX then
+if neighborObj[3]=1 or neighborObj[3]=5 then
+    for i=1 to linkBarLines
+        linkBarNum=linkBarNum+1
+        _linkBarPoint[linkBarNum]=2
+
+        if i=1 then 
+            tempNd=linkBarTopNd
+        else
+            tempNd=linkBarNd
+        endif
+
+        _linkBarOd[linkBarNum]=od_list[tempNd]
+        _linkBarPen[linkBarNum]=SDpen[scode_list[tempNd]]
+        _linkBarMat[linkBarNum]=SDmat[scode_list[tempNd]]
+
+        if mbarDir+downBarArrangePos=3 then
+            xOffset=_linkBarOd[linkBarNum]
+            yOffset=0
+        else
+            xOffset=0
+            yOffset=_linkBarOd[linkBarNum]
+        endif
+
+        !左端座標X1
+        if neighborObj[4]=4 then
+            linkBarX1=-cslabX1-(L1+L1Plus)/2*tempNd/1000
+        else
+            linkBarX1=-cslabX1+csideCover+_linkBarOd[linkBarNum]/2+(lowerHorOd-xOffset)
+        endif
+
+        !右端座標X2
+        if neighborObj[2]=4 then
+            linkBarX2=cslabX2+(L1+L1Plus)/2*tempNd/1000
+        else
+            linkBarX2=cslabX2-csideCover-_linkBarOd[linkBarNum]/2-(lowerHorOd-xOffset)
+        endif
+
+        if neighborObj[4]=1 or neighborObj[4]=5 then
+            _linkBarPoint[linkBarNum]=_linkBarPoint[linkBarNum]+1
+            put linkBarX1
+            put cslabY2-csideCover-_linkBarOd[linkBarNum]/2-(lowerVerOd-yOffset)-elbow90R*_linkBarOd[linkBarNum]-(L1+L1Plus)*tempNd/1000
+            put -slabThi+downCover+lowerHorOd/2-(i-1)*linkBarPitch+zoffsetFlag*_linkBarOd[linkBarNum]+linkBarOffset
+        endif
+
+        put linkBarX1
+        put cslabY2-csideCover-_linkBarOd[linkBarNum]/2-(lowerVerOd-yOffset)
+        put -slabThi+downCover+lowerHorOd/2-(i-1)*linkBarPitch+zoffsetFlag*_linkBarOd[linkBarNum]+linkBarOffset
+
+        put linkBarX2
+        put cslabY2-csideCover-_linkBarOd[linkBarNum]/2-(lowerVerOd-yOffset)
+        put -slabThi+downCover+lowerHorOd/2-(i-1)*linkBarPitch+zoffsetFlag*_linkBarOd[linkBarNum]+linkBarOffset
+
+        if neighborObj[2]=1 or neighborObj[2]=5 then
+            _linkBarPoint[linkBarNum]=_linkBarPoint[linkBarNum]+1
+            put linkBarX2
+            put cslabY2-csideCover-_linkBarOd[linkBarNum]/2-(lowerVerOd-yOffset)-elbow90R*_linkBarOd[linkBarNum]-(L1+L1Plus)*tempNd/1000
+            put -slabThi+downCover+lowerHorOd/2-(i-1)*linkBarPitch+zoffsetFlag*_linkBarOd[linkBarNum]+linkBarOffset
+        endif
+
+        for j=1 to _linkBarPoint[linkBarNum]
+            _linkBarPos[linkBarNum][3*j-2]=get(1)
+            _linkBarPos[linkBarNum][3*j-1]=get(1)
+            _linkBarPos[linkBarNum][3*j]=get(1)
+        next j
+    next i
+endif
+endif
+
+!===============================左
+if mbarDir+downBarArrangePos=3 then
+    zoffsetFlag=1
+else
+    zoffsetFlag=0
+endif
+
+if switchLowerY then
+if neighborObj[4]=1 or neighborObj[4]=5 then
+    for i=1 to linkBarLines
+        linkBarNum=linkBarNum+1
+        _linkBarPoint[linkBarNum]=2
+
+        if i=1 then 
+            tempNd=linkBarTopNd
+        else
+            tempNd=linkBarNd
+        endif
+
+        _linkBarOd[linkBarNum]=od_list[tempNd]
+        _linkBarPen[linkBarNum]=SDpen[scode_list[tempNd]]
+        _linkBarMat[linkBarNum]=SDmat[scode_list[tempNd]]
+
+        if mbarDir+downBarArrangePos=3 then
+            xOffset=_linkBarOd[linkBarNum]
+            yOffset=0
+        else
+            xOffset=0
+            yOffset=_linkBarOd[linkBarNum]
+        endif
+
+        !下端座標Y1
+        if neighborObj[1]=4 then
+            linkBarY1=-cslabY1-(L1+L1Plus)/2*tempNd/1000
+        else
+!            linkBarY1=-cslabY1+csideCover+_linkBarOd[linkBarNum]/2+(lowerVerOd-yOffset)
+            linkBarY1=-cslabY1+csideCover+(lowerVerOd-yOffset)
+        endif
+
+        !上端座標Y2
+        if neighborObj[3]=4 then
+            linkBarY2=cslabY2+(L1+L1Plus)/2*tempNd/1000
+        else
+!            linkBarY2=cslabY2-csideCover-_linkBarOd[linkBarNum]/2-(lowerVerOd-yOffset)
+            linkBarY2=cslabY2-csideCover-(lowerVerOd-yOffset)
+        endif
+
+!        if neighborObj[1]<>4 then
+!            _linkBarPoint[linkBarNum]=_linkBarPoint[linkBarNum]+1
+!            put -cslabX1+csideCover+_linkBarOd[linkBarNum]/2+(lowerHorOd-xOffset)+(L1+L1Plus)/2*tempNd/1000
+!            put linkBarY1
+!            put -slabThi+downCover+lowerHorOd/2-(i-1)*linkBarPitch+zoffsetFlag*_linkBarOd[linkBarNum]+linkBarOffset
+!        endif
+
+        put -cslabX1+csideCover+_linkBarOd[linkBarNum]/2+(lowerHorOd-xOffset)
+        put linkBarY1
+        put -slabThi+downCover+lowerHorOd/2-(i-1)*linkBarPitch+zoffsetFlag*_linkBarOd[linkBarNum]+linkBarOffset
+
+        put -cslabX1+csideCover+_linkBarOd[linkBarNum]/2+(lowerHorOd-xOffset)
+        put linkBarY2
+        put -slabThi+downCover+lowerHorOd/2-(i-1)*linkBarPitch+zoffsetFlag*_linkBarOd[linkBarNum]+linkBarOffset
+
+!        if neighborObj[3]<>4 then
+!            _linkBarPoint[linkBarNum]=_linkBarPoint[linkBarNum]+1
+!            put -cslabX1+csideCover+_linkBarOd[linkBarNum]/2+(lowerHorOd-xOffset)+(L1+L1Plus)/2*tempNd/1000
+!            put linkBarY2
+!            put -slabThi+downCover+lowerHorOd/2-(i-1)*linkBarPitch+zoffsetFlag*_linkBarOd[linkBarNum]+linkBarOffset
+!        endif
+
+        for j=1 to _linkBarPoint[linkBarNum]
+            _linkBarPos[linkBarNum][3*j-2]=get(1)
+            _linkBarPos[linkBarNum][3*j-1]=get(1)
+            _linkBarPos[linkBarNum][3*j]=get(1)
+        next j
+    next i
+endif
+endif
+
+!===============================右
+if switchLowerY then
+if neighborObj[2]=1 or neighborObj[2]=5 then
+    for i=1 to linkBarLines
+        linkBarNum=linkBarNum+1
+        _linkBarPoint[linkBarNum]=2
+
+        if i=1 then 
+            tempNd=linkBarTopNd
+        else
+            tempNd=linkBarNd
+        endif
+
+        _linkBarOd[linkBarNum]=od_list[tempNd]
+        _linkBarPen[linkBarNum]=SDpen[scode_list[tempNd]]
+        _linkBarMat[linkBarNum]=SDmat[scode_list[tempNd]]
+
+        if mbarDir+downBarArrangePos=3 then
+            xOffset=_linkBarOd[linkBarNum]
+            yOffset=0
+        else
+            xOffset=0
+            yOffset=_linkBarOd[linkBarNum]
+        endif
+
+        !下端座標Y1
+        if neighborObj[1]=4 then
+            linkBarY1=-cslabY1-(L1+L1Plus)/2*tempNd/1000
+        else
+!            linkBarY1=-cslabY1+csideCover+_linkBarOd[linkBarNum]/2+(lowerVerOd-yOffset)
+            linkBarY1=-cslabY1+csideCover+(lowerVerOd-yOffset)
+        endif
+
+        !上端座標Y2
+        if neighborObj[3]=4 then
+            linkBarY2=cslabY2+(L1+L1Plus)/2*tempNd/1000
+        else
+!            linkBarY2=cslabY2-csideCover-_linkBarOd[linkBarNum]/2-(lowerVerOd-yOffset)
+            linkBarY2=cslabY2-csideCover-(lowerVerOd-yOffset)
+        endif
+
+!        if neighborObj[1]<>4 then
+!            _linkBarPoint[linkBarNum]=_linkBarPoint[linkBarNum]+1
+!            put cslabX2-csideCover-_linkBarOd[linkBarNum]/2-(lowerHorOd-xOffset)-(L1+L1Plus)/2*tempNd/1000
+!            put linkBarY1
+!            put -slabThi+downCover+lowerHorOd/2-(i-1)*linkBarPitch+zoffsetFlag*_linkBarOd[linkBarNum]+linkBarOffset
+!        endif
+
+        put cslabX2-csideCover-_linkBarOd[linkBarNum]/2-(lowerHorOd-xOffset)
+        put linkBarY1
+        put -slabThi+downCover+lowerHorOd/2-(i-1)*linkBarPitch+zoffsetFlag*_linkBarOd[linkBarNum]+linkBarOffset
+
+        put cslabX2-csideCover-_linkBarOd[linkBarNum]/2-(lowerHorOd-xOffset)
+        put linkBarY2
+        put -slabThi+downCover+lowerHorOd/2-(i-1)*linkBarPitch+zoffsetFlag*_linkBarOd[linkBarNum]+linkBarOffset
+
+!        if neighborObj[3]<>4 then
+!            _linkBarPoint[linkBarNum]=_linkBarPoint[linkBarNum]+1
+!            put cslabX2-csideCover-_linkBarOd[linkBarNum]/2-(lowerHorOd-xOffset)-(L1+L1Plus)/2*tempNd/1000
+!            put linkBarY2
+!            put -slabThi+downCover+lowerHorOd/2-(i-1)*linkBarPitch+zoffsetFlag*_linkBarOd[linkBarNum]+linkBarOffset
+!        endif
+
+        for j=1 to _linkBarPoint[linkBarNum]
+            _linkBarPos[linkBarNum][3*j-2]=get(1)
+            _linkBarPos[linkBarNum][3*j-1]=get(1)
+            _linkBarPos[linkBarNum][3*j]=get(1)
+        next j
+    next i
+endif
+endif
+
+parameters \
+linkBarNum=linkBarNum,
+linkBarOd=_linkBarOd,
+linkBarPen=_linkBarPen,
+linkBarMat=_linkBarMat,
+linkBarPoint=_linkBarPoint,
+linkBarPos=_linkBarPos
+
+
+!=================================================================端部コの字筋
+parameters \
+edgeBarOd=od_list[edgeBarNd],
+edgeBarPen=SDpen[scode_list[edgeBarNd]],
+edgeBarMat=SDmat[scode_list[edgeBarNd]]
+
+lock "edgeBarOd","edgeBarPen","edgeBarMat"
+
+edgeBarNum=0
+dim _edgeBarPoint[]
+dim _edgeBarPos[][]
+_edgeBarPoint[1]=0
+_edgeBarPos[1][1]=0
+_edgeBarPos[1][2]=0
+
+!下
+if switchLowerY then
+if neighborObj[1]=3 then
+    for i=1 to lowerVerNum
+        edgeBarNum=edgeBarNum+1
+        _edgeBarPoint[edgeBarNum]=4
+
+        put _lowerVerX[i]+lowerVerOd/2+edgeBarOd/2
+        put -cslabY1+rebarStartPosD-edgeBarOd+edgeBarAnchorLen*edgeBarNd/1000
+        put lowerVerZ
+
+        put _lowerVerX[i]+lowerVerOd/2+edgeBarOd/2
+        put -cslabY1+rebarStartPosD-edgeBarOd
+        put lowerVerZ
+
+        put _lowerVerX[i]+lowerVerOd/2+edgeBarOd/2
+        put -cslabY1+rebarStartPosD-edgeBarOd
+        put upperVerZ
+
+        put _lowerVerX[i]+lowerVerOd/2+edgeBarOd/2
+        put -cslabY1+rebarStartPosD-edgeBarOd+edgeBarAnchorLen*edgeBarNd/1000
+        put upperVerZ
+
+        for j=1 to _edgeBarPoint[edgeBarNum]
+            _edgeBarPos[edgeBarNum][3*j-2]=get(1)
+            _edgeBarPos[edgeBarNum][3*j-1]=get(1)
+            _edgeBarPos[edgeBarNum][3*j]=get(1)
+        next j
+    next i
+endif
+endif
+
+!上
+if switchLowerY then
+if neighborObj[3]=3 then
+    for i=1 to lowerVerNum
+        edgeBarNum=edgeBarNum+1
+        _edgeBarPoint[edgeBarNum]=4
+
+        put _lowerVerX[i]+lowerVerOd/2+edgeBarOd/2
+        put cslabY2-rebarStartPosT+edgeBarOd-edgeBarAnchorLen*edgeBarNd/1000
+        put lowerVerZ
+
+        put _lowerVerX[i]+lowerVerOd/2+edgeBarOd/2
+        put cslabY2-rebarStartPosT+edgeBarOd
+        put lowerVerZ
+
+        put _lowerVerX[i]+lowerVerOd/2+edgeBarOd/2
+        put cslabY2-rebarStartPosT+edgeBarOd
+        put upperVerZ
+
+        put _lowerVerX[i]+lowerVerOd/2+edgeBarOd/2
+        put cslabY2-rebarStartPosT+edgeBarOd-edgeBarAnchorLen*edgeBarNd/1000
+        put upperVerZ
+
+        for j=1 to _edgeBarPoint[edgeBarNum]
+            _edgeBarPos[edgeBarNum][3*j-2]=get(1)
+            _edgeBarPos[edgeBarNum][3*j-1]=get(1)
+            _edgeBarPos[edgeBarNum][3*j]=get(1)
+        next j
+    next i
+endif
+endif
+
+!左
+if switchLowerX then
+if neighborObj[4]=3 then
+    for i=1 to lowerHorNum
+        edgeBarNum=edgeBarNum+1
+        _edgeBarPoint[edgeBarNum]=4
+
+        put -cslabX1+rebarStartPosL-edgeBarOd+edgeBarAnchorLen*edgeBarNd/1000
+        put _lowerHorY[i]+lowerVerOd/2+edgeBarOd/2
+        put lowerHorZ
+
+        put -cslabX1+rebarStartPosL-edgeBarOd
+        put _lowerHorY[i]+lowerVerOd/2+edgeBarOd/2
+        put lowerHorZ
+
+        put -cslabX1+rebarStartPosL-edgeBarOd
+        put _lowerHorY[i]+lowerVerOd/2+edgeBarOd/2
+        put upperHorZ
+
+        put -cslabX1+rebarStartPosL-edgeBarOd+edgeBarAnchorLen*edgeBarNd/1000
+        put _lowerHorY[i]+lowerVerOd/2+edgeBarOd/2
+        put upperHorZ
+
+        for j=1 to _edgeBarPoint[edgeBarNum]
+            _edgeBarPos[edgeBarNum][3*j-2]=get(1)
+            _edgeBarPos[edgeBarNum][3*j-1]=get(1)
+            _edgeBarPos[edgeBarNum][3*j]=get(1)
+        next j
+    next i
+endif
+endif
+
+!右
+if switchLowerX then
+if neighborObj[2]=3 then
+    for i=1 to lowerHorNum
+        edgeBarNum=edgeBarNum+1
+        _edgeBarPoint[edgeBarNum]=4
+
+        put cslabX2-rebarStartPosR+edgeBarOd-edgeBarAnchorLen*edgeBarNd/1000
+        put _lowerHorY[i]+lowerVerOd/2+edgeBarOd/2
+        put lowerHorZ
+
+        put cslabX2-rebarStartPosR+edgeBarOd
+        put _lowerHorY[i]+lowerVerOd/2+edgeBarOd/2
+        put lowerHorZ
+
+        put cslabX2-rebarStartPosR+edgeBarOd
+        put _lowerHorY[i]+lowerVerOd/2+edgeBarOd/2
+        put upperHorZ
+
+        put cslabX2-rebarStartPosR+edgeBarOd-edgeBarAnchorLen*edgeBarNd/1000
+        put _lowerHorY[i]+lowerVerOd/2+edgeBarOd/2
+        put upperHorZ
+
+        for j=1 to _edgeBarPoint[edgeBarNum]
+            _edgeBarPos[edgeBarNum][3*j-2]=get(1)
+            _edgeBarPos[edgeBarNum][3*j-1]=get(1)
+            _edgeBarPos[edgeBarNum][3*j]=get(1)
+        next j
+    next i
+endif
+endif
+
+parameters \
+edgeBarNum=edgeBarNum,
+edgeBarPoint=_edgeBarPoint,
+edgeBarPos=_edgeBarPos
+
+
+!=================================================================端部横筋
+values "edgeHorLines" range[1,]
+
+parameters \
+edgeHorOd=od_list[edgeHorNd],
+edgeHorPen=SDpen[scode_list[edgeHorNd]],
+edgeHorMat=SDmat[scode_list[edgeHorNd]]
+
+lock "edgeHorOd","edgeHorPen","edgeHorMat"
+
+edgeHorNum=0
+dim _edgeHorZ[]
+dim _edgeHorPoint[]
+dim _edgeHorPos[][]
+_edgeHorZ[1]=0
+_edgeHorPoint[1]=0
+_edgeHorPos[1][1]=0
+_edgeHorPos[1][2]=0
+
+!Z座標
+edgeHorPitch=(cslabThi-topCover-cdownCover-2*edgeHorOd)/(edgeHorLines+1)
+for i=1 to edgeHorLines
+    _edgeHorZ[i]=-topCover-edgeHorOd-i*edgeHorPitch+edgeHorOffset
+next i
+
+if mbarDir+downBarArrangePos=3 then
+    verZoffsetFlag=1
+    horZoffsetFlag=-1
+else
+    verZoffsetFlag=-1
+    horZoffsetFlag=1
+endif
+
+!下
+if switchLowerX then
+if neighborObj[1]=3 or neighborObj[1]=6 then
+    for i=1 to edgeHorLines
+        edgeHorNum=edgeHorNum+1
+        _edgeHorPoint[edgeHorNum]=2
+
+        if neighborObj[4]=3 or neighborObj[4]=6 then
+            _edgeHorPoint[edgeHorNum]=_edgeHorPoint[edgeHorNum]+1
+            put -cslabX1+rebarStartPosL
+            put -cslabY1+rebarStartPosD+elbow90R*edgeHorOd+(L1+L1Plus)*edgeHorNd/1000
+            put _edgeHorZ[i]+horZoffsetFlag*edgeHorOd/2
+        endif
+
+        if neighborObj[4]<>4 then
+            put -cslabX1+rebarStartPosL
+        else
+            put -cslabX1-(L1+L1Plus)/2*edgeHorNd/1000
+        endif
+        put -cslabY1+rebarStartPosD
+        put _edgeHorZ[i]+horZoffsetFlag*edgeHorOd/2
+
+        if neighborObj[2]<>4 then
+            put cslabX2-rebarStartPosR
+        else
+            put cslabX2+(L1+L1Plus)/2*edgeHorNd/1000
+        endif
+        put -cslabY1+rebarStartPosD
+        put _edgeHorZ[i]+horZoffsetFlag*edgeHorOd/2
+
+        if neighborObj[2]=3 or neighborObj[2]=6 then
+            _edgeHorPoint[edgeHorNum]=_edgeHorPoint[edgeHorNum]+1
+            put cslabX2-rebarStartPosR
+            put -cslabY1+rebarStartPosD+elbow90R*edgeHorOd+(L1+L1Plus)*edgeHorNd/1000
+            put _edgeHorZ[i]+horZoffsetFlag*edgeHorOd/2
+        endif
+
+        for j=1 to _edgeHorPoint[edgeHorNum]
+            _edgeHorPos[edgeHorNum][3*j-2]=get(1)
+            _edgeHorPos[edgeHorNum][3*j-1]=get(1)
+            _edgeHorPos[edgeHorNum][3*j]=get(1)
+        next j
+    next i
+endif
+endif
+
+!上
+if switchLowerX then
+if neighborObj[3]=3 or neighborObj[3]=6 then
+    for i=1 to edgeHorLines
+        edgeHorNum=edgeHorNum+1
+        _edgeHorPoint[edgeHorNum]=2
+
+        if neighborObj[4]=3 or neighborObj[4]=6 then
+            _edgeHorPoint[edgeHorNum]=_edgeHorPoint[edgeHorNum]+1
+            put -cslabX1+rebarStartPosL
+            put cslabY2-rebarStartPosT-elbow90R*edgeHorOd-(L1+L1Plus)*edgeHorNd/1000
+            put _edgeHorZ[i]+horZoffsetFlag*edgeHorOd/2
+        endif
+
+        if neighborObj[4]<>4 then
+            put -cslabX1+rebarStartPosL
+        else
+            put -cslabX1-(L1+L1Plus)/2*edgeHorNd/1000
+        endif
+        put cslabY2-rebarStartPosT
+        put _edgeHorZ[i]+horZoffsetFlag*edgeHorOd/2
+
+        if neighborObj[2]<>4 then
+            put cslabX2-rebarStartPosR
+        else
+            put cslabX2+(L1+L1Plus)/2*edgeHorNd/1000
+        endif
+        put cslabY2-rebarStartPosT
+        put _edgeHorZ[i]+horZoffsetFlag*edgeHorOd/2
+
+        if neighborObj[2]=3 or neighborObj[2]=6 then
+            _edgeHorPoint[edgeHorNum]=_edgeHorPoint[edgeHorNum]+1
+            put cslabX2-rebarStartPosR
+            put cslabY2-rebarStartPosT-elbow90R*edgeHorOd-(L1+L1Plus)*edgeHorNd/1000
+            put _edgeHorZ[i]+horZoffsetFlag*edgeHorOd/2
+        endif
+
+        for j=1 to _edgeHorPoint[edgeHorNum]
+            _edgeHorPos[edgeHorNum][3*j-2]=get(1)
+            _edgeHorPos[edgeHorNum][3*j-1]=get(1)
+            _edgeHorPos[edgeHorNum][3*j]=get(1)
+        next j
+    next i
+endif
+endif
+
+!左
+if switchLowerY then
+if neighborObj[4]=3 or neighborObj[4]=6 then
+    for i=1 to edgeHorLines
+        edgeHorNum=edgeHorNum+1
+        _edgeHorPoint[edgeHorNum]=2
+
+!        if neighborObj[1]<>4 then
+!            _edgeHorPoint[edgeHorNum]=_edgeHorPoint[edgeHorNum]+1
+!            put -cslabX1+rebarStartPosL+(L1+L1Plus)/2*edgeHorNd/1000
+!            put -cslabY1+rebarStartPosD
+!            put _edgeHorZ[i]+verZoffsetFlag*edgeHorOd/2
+!        endif
+
+        put -cslabX1+rebarStartPosL
+        if neighborObj[1]<>4 then
+            put -cslabY1+rebarStartPosD
+        else
+            put -cslabY1-(L1+L1Plus)/2*edgeHorNd/1000
+        endif
+        put _edgeHorZ[i]+verZoffsetFlag*edgeHorOd/2
+
+        put -cslabX1+rebarStartPosL
+        if neighborObj[3]<>4 then
+            put cslabY2-rebarStartPosT
+        else
+            put cslabY2+(L1+L1Plus)/2*edgeHorNd/1000
+        endif
+        put _edgeHorZ[i]+verZoffsetFlag*edgeHorOd/2
+
+!        if neighborObj[3]<>4 then
+!            _edgeHorPoint[edgeHorNum]=_edgeHorPoint[edgeHorNum]+1
+!            put -cslabX1+rebarStartPosL+(L1+L1Plus)/2*edgeHorNd/1000
+!            put cslabY2-rebarStartPosT
+!            put _edgeHorZ[i]+verZoffsetFlag*edgeHorOd/2
+!        endif
+
+        for j=1 to _edgeHorPoint[edgeHorNum]
+            _edgeHorPos[edgeHorNum][3*j-2]=get(1)
+            _edgeHorPos[edgeHorNum][3*j-1]=get(1)
+            _edgeHorPos[edgeHorNum][3*j]=get(1)
+        next j
+    next i
+endif
+endif
+
+!右
+if switchLowerY then
+if neighborObj[2]=3 or neighborObj[2]=6 then
+    for i=1 to edgeHorLines
+        edgeHorNum=edgeHorNum+1
+        _edgeHorPoint[edgeHorNum]=2
+
+!        if neighborObj[1]<>4 then
+!            _edgeHorPoint[edgeHorNum]=_edgeHorPoint[edgeHorNum]+1
+!            put cslabX2-rebarStartPosR-(L1+L1Plus)/2*edgeHorNd/1000
+!            put -cslabY1+rebarStartPosD
+!            put _edgeHorZ[i]+verZoffsetFlag*edgeHorOd/2
+!        endif
+
+        put cslabX2-rebarStartPosR
+        if neighborObj[1]<>4 then
+            put -cslabY1+rebarStartPosD
+        else
+            put -cslabY1-(L1+L1Plus)/2*edgeHorNd/1000
+        endif
+        put _edgeHorZ[i]+verZoffsetFlag*edgeHorOd/2
+
+        put cslabX2-rebarStartPosR
+        if neighborObj[3]<>4 then
+            put cslabY2-rebarStartPosT
+        else
+            put cslabY2+(L1+L1Plus)/2*edgeHorNd/1000
+        endif
+        put _edgeHorZ[i]+verZoffsetFlag*edgeHorOd/2
+
+!        if neighborObj[3]<>4 then
+!            _edgeHorPoint[edgeHorNum]=_edgeHorPoint[edgeHorNum]+1
+!            put cslabX2-rebarStartPosR-(L1+L1Plus)/2*edgeHorNd/1000
+!            put cslabY2-rebarStartPosT
+!            put _edgeHorZ[i]+verZoffsetFlag*edgeHorOd/2
+!        endif
+
+        for j=1 to _edgeHorPoint[edgeHorNum]
+            _edgeHorPos[edgeHorNum][3*j-2]=get(1)
+            _edgeHorPos[edgeHorNum][3*j-1]=get(1)
+            _edgeHorPos[edgeHorNum][3*j]=get(1)
+        next j
+    next i
+endif
+endif
+
+parameters \
+edgeHorNum=edgeHorNum,
+edgeHorPoint=_edgeHorPoint,
+edgeHorPos=_edgeHorPos
+
+
+!=================================================================段取り筋
+values{2} "dandoriBarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values "dandoriBarPitch" range[0.05,]
+
+parameters \
+dandoriBarOd=od_list[dandoriBarNd],
+dandoriBarPen=SDpen[scode_list[dandoriBarNd]],
+dandoriBarMat=SDmat[scode_list[dandoriBarNd]]
+
+lock "dandoriBarOd","dandoriBarPen","dandoriBarMat"
+
+dandoriBarNum=0
+dim _dandoriBarPoint[]
+dim _dandoriBarPos[][]
+_dandoriBarPoint[1]=0
+_dandoriBarPos[1][1]=0
+_dandoriBarPos[1][2]=0
+
+if mbarDir+downBarArrangePos=3 then
+    dandoriBarDir=2 !X方向
+else
+    dandoriBarDir=1 !Y方向
+endif
+
+!Z座標
+dandoriBarZ=-cslabThi+cdownCover-dandoriBarOd/2
+
+if switchDandoriBar then
+    if dandoriBarDir=1 then
+        dandoriBarNum=ceil((cslabX1+cslabX2-2*dandoriBarStartPos)/dandoriBarPitch)+1
+        dandoriBarPitch=(cslabX1+cslabX2-2*dandoriBarStartPos)/(dandoriBarNum-1)
+
+        for i=1 to dandoriBarNum
+            _dandoriBarPoint[i]=2
+
+            put -cslabX1+dandoriBarStartPos+(i-1)*dandoriBarPitch
+            put -cslabY1+csideCover
+            put dandoriBarZ
+
+            put -cslabX1+dandoriBarStartPos+(i-1)*dandoriBarPitch
+            put cslabY2-csideCover
+            put dandoriBarZ
+
+            for j=1 to _dandoriBarPoint[i]
+                _dandoriBarPos[i][3*j-2]=get(1)
+                _dandoriBarPos[i][3*j-1]=get(1)
+                _dandoriBarPos[i][3*j]=get(1)
+            next j
+        next i
+    else
+        dandoriBarNum=ceil((cslabY1+cslabY2-2*dandoriBarStartPos)/dandoriBarPitch)+1
+        dandoriBarPitch=(cslabY1+cslabY2-2*dandoriBarStartPos)/(dandoriBarNum-1)
+
+        for i=1 to dandoriBarNum
+            _dandoriBarPoint[i]=2
+
+            put -cslabX1+csideCover
+            put -cslabY1+dandoriBarStartPos+(i-1)*dandoriBarPitch
+            put dandoriBarZ
+
+            put cslabX2-csideCover
+            put -cslabY1+dandoriBarStartPos+(i-1)*dandoriBarPitch
+            put dandoriBarZ
+
+            for j=1 to _dandoriBarPoint[i]
+                _dandoriBarPos[i][3*j-2]=get(1)
+                _dandoriBarPos[i][3*j-1]=get(1)
+                _dandoriBarPos[i][3*j]=get(1)
+            next j
+        next i
+    endif
+endif
+
+parameters \
+dandoriBarNum=dandoriBarNum,
+dandoriBarPoint=_dandoriBarPoint,
+dandoriBarPos=_dandoriBarPos
+
+
+!=================================================================支持材：ウマ筋と上端段取り筋
+values{2} "umaBarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "upperDandoriBarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values "umaBarPitch" range[0.05,]
+
+parameters \
+umaBarOd=od_list[umaBarNd],
+umaBarPen=SDpen[scode_list[umaBarNd]],
+umaBarMat=SDmat[scode_list[umaBarNd]],
+upperDandoriBarOd=od_list[upperDandoriBarNd],
+upperDandoriBarPen=SDpen[scode_list[upperDandoriBarNd]],
+upperDandoriBarMat=SDmat[scode_list[upperDandoriBarNd]]
+
+lock "umaBarOd","umaBarPen","umaBarMat","upperDandoriBarOd","upperDandoriBarPen","upperDandoriBarMat"
+
+umaBarNum=0
+dim _umaBarPoint[]
+dim _umaBarPos[][]
+_umaBarPoint[1]=0
+_umaBarPos[1][1]=0
+_umaBarPos[1][2]=0
+
+upperDandoriBarNum=0
+dim _upperDandoriBarPoint[]
+dim _upperDandoriBarPos[][]
+_upperDandoriBarPoint[1]=0
+_upperDandoriBarPos[1][1]=0
+_upperDandoriBarPos[1][2]=0
+
+!向き判定
+if mbarDir+topBarArrangePos=3 then
+    umaBarDir=1 !Y方向
+    upperDandoriBarDir=1 !X方向
+else
+    umaBarDir=2 !X方向
+    upperDandoriBarDir=2 !Y方向
+endif
+
+!ウマ筋X行数・座標
+umaBarXNum=ceil((cslabX1+cslabX2)/umaBarPitch)
+umaBarXPitch=(cslabX1+cslabX2)/umaBarXNum
+
+dim _umaBarXpos[]
+for i=1 to umaBarXNum
+    _umaBarXpos[i]=-cslabX1+umaBarXPitch/2+(i-1)*umaBarXPitch
+next i
+
+!ウマ筋Y行数・座標
+umaBarYNum=ceil((cslabY1+cslabY2)/umaBarPitch)
+umaBarYPitch=(cslabY1+cslabY2)/umaBarYNum
+
+dim _umaBarYpos[]
+for i=1 to umaBarYNum
+    _umaBarYpos[i]=-cslabY1+umaBarYPitch/2+(i-1)*umaBarYPitch
+next i
+
+!ウマ筋Z座標
+umaBarZ1=-topCover-upperVerOd-upperHorOd-upperDandoriBarOd-umaBarOd/2
+umaBarZ2=-cslabThi+cdownCover+lowerVerOd+lowerHorOd+umaBarOd/2
+
+!ウマ筋
+if switchSupport then
+    for i=1 to umaBarXNum
+        for j=1 to umaBarYNum
+            disFlag=1
+
+            if switchCentColumn then
+                if umaBarDir=1 then
+                    if _umaBarXpos[i]>centColumnPos[1][1]-centColumnX/2-centColumnSidePos and _umaBarXpos[i]<centColumnPos[1][1]+centColumnX/2+centColumnSidePos then
+                        if _umaBarYpos[j]+umaWid/2>centColumnPos[1][2]-centColumnY/2-centColumnSidePos and _umaBarYpos[j]-umaWid/2<centColumnPos[1][2]+centColumnY/2+centColumnSidePos then
+                            disFlag=0
+                        endif
+                    endif
+                else
+                    if _umaBarYpos[j]>centColumnPos[1][2]-centColumnY/2-centColumnSidePos and _umaBarYpos[j]<centColumnPos[1][2]+centColumnY/2+centColumnSidePos then
+                        if _umaBarXpos[i]+umaWid/2>centColumnPos[1][1]-centColumnX/2-centColumnSidePos and _umaBarXpos[i]-umaWid/2<centColumnPos[1][1]+centColumnX/2+centColumnSidePos then
+                            disFlag=0
+                        endif
+                    endif
+                endif
+            endif
+
+            if disFlag=1 then
+                if umaBarDir=1 then !Y方向
+                    put _umaBarXpos[i]-umaAnchorLen
+                    put _umaBarYpos[j]-umaWid/2
+                    put umaBarZ2
+                    
+                    put _umaBarXpos[i]
+                    put _umaBarYpos[j]-umaWid/2
+                    put umaBarZ2
+
+                    put _umaBarXpos[i]
+                    put _umaBarYpos[j]-umaWid/2
+                    put umaBarZ1
+
+                    put _umaBarXpos[i]
+                    put _umaBarYpos[j]+umaWid/2
+                    put umaBarZ1
+
+                    put _umaBarXpos[i]
+                    put _umaBarYpos[j]+umaWid/2
+                    put umaBarZ2
+
+                    put _umaBarXpos[i]+umaAnchorLen
+                    put _umaBarYpos[j]+umaWid/2
+                    put umaBarZ2
+                else !X方向
+
+                    put _umaBarXpos[i]-umaWid/2
+                    put _umaBarYpos[j]-umaAnchorLen
+                    put umaBarZ2
+                    
+                    put _umaBarXpos[i]-umaWid/2
+                    put _umaBarYpos[j]
+                    put umaBarZ2
+
+                    put _umaBarXpos[i]-umaWid/2
+                    put _umaBarYpos[j]
+                    put umaBarZ1
+
+                    put _umaBarXpos[i]+umaWid/2
+                    put _umaBarYpos[j]
+                    put umaBarZ1
+
+                    put _umaBarXpos[i]+umaWid/2
+                    put _umaBarYpos[j]
+                    put umaBarZ2
+
+                    put _umaBarXpos[i]+umaWid/2
+                    put _umaBarYpos[j]+umaAnchorLen
+                    put umaBarZ2
+                endif
+
+                umaBarNum=umaBarNum+1
+                _umaBarPoint[umaBarNum]=6
+
+                for n=1 to _umaBarPoint[umaBarNum]
+                    _umaBarPos[umaBarNum][3*n-2]=get(1)
+                    _umaBarPos[umaBarNum][3*n-1]=get(1)
+                    _umaBarPos[umaBarNum][3*n]=get(1)
+                next n
+            endif
+        next j
+    next i
+endif
+
+!上端段取り筋Z座標
+upperDandoriBarZ=-topCover-upperVerOd-upperHorOd-upperDandoriBarOd/2
+
+if switchSupport then
+    !上端段取り筋
+    if upperDandoriBarDir=1 then !X方向
+        for i=1 to umaBarYNum
+            upperDandoriBarY=_umaBarYpos[i]
+
+            if switchCentColumn and upperDandoriBarY>centColumnPos[1][2]-centColumnY/2-centColumnSidePos and upperDandoriBarY<centColumnPos[1][2]+centColumnY/2+centColumnSidePos then
+                upperDandoriBarNum=upperDandoriBarNum+1
+                _upperDandoriBarPoint[upperDandoriBarNum]=2
+
+                put -cslabX1+csideCover
+                put upperDandoriBarY
+                put upperDandoriBarZ
+
+                put centColumnPos[1][1]-centColumnX/2-centColumnSidePos
+                put upperDandoriBarY
+                put upperDandoriBarZ
+
+                for j=1 to _upperDandoriBarPoint[upperDandoriBarNum]
+                    _upperDandoriBarPos[upperDandoriBarNum][3*j-2]=get(1)
+                    _upperDandoriBarPos[upperDandoriBarNum][3*j-1]=get(1)
+                    _upperDandoriBarPos[upperDandoriBarNum][3*j]=get(1)
+                next j
+
+                upperDandoriBarNum=upperDandoriBarNum+1
+                _upperDandoriBarPoint[upperDandoriBarNum]=2
+
+                put centColumnPos[1][1]+centColumnX/2+centColumnSidePos
+                put upperDandoriBarY
+                put upperDandoriBarZ
+
+                put cslabX2-csideCover
+                put upperDandoriBarY
+                put upperDandoriBarZ
+
+                for j=1 to _upperDandoriBarPoint[upperDandoriBarNum]
+                    _upperDandoriBarPos[upperDandoriBarNum][3*j-2]=get(1)
+                    _upperDandoriBarPos[upperDandoriBarNum][3*j-1]=get(1)
+                    _upperDandoriBarPos[upperDandoriBarNum][3*j]=get(1)
+                next j
+            else
+                upperDandoriBarNum=upperDandoriBarNum+1
+                _upperDandoriBarPoint[upperDandoriBarNum]=2
+
+                put -cslabX1+csideCover
+                put upperDandoriBarY
+                put upperDandoriBarZ
+
+                put cslabX2-csideCover
+                put upperDandoriBarY
+                put upperDandoriBarZ
+
+                for j=1 to _upperDandoriBarPoint[upperDandoriBarNum]
+                    _upperDandoriBarPos[upperDandoriBarNum][3*j-2]=get(1)
+                    _upperDandoriBarPos[upperDandoriBarNum][3*j-1]=get(1)
+                    _upperDandoriBarPos[upperDandoriBarNum][3*j]=get(1)
+                next j
+            endif
+        next i
+    else !Y方向
+        for i=1 to umaBarXNum
+            upperDandoriBarX=_umaBarXpos[i]
+
+            if switchCentColumn and upperDandoriBarX>centColumnPos[1][1]-centColumnX/2-centColumnSidePos and upperDandoriBarX<centColumnPos[1][1]+centColumnX/2+centColumnSidePos then
+                upperDandoriBarNum=upperDandoriBarNum+1
+                _upperDandoriBarPoint[upperDandoriBarNum]=2
+
+                put upperDandoriBarX
+                put -cslabY1+csideCover
+                put upperDandoriBarZ
+
+                put upperDandoriBarX
+                put centColumnPos[1][2]-centColumnY/2-centColumnSidePos
+                put upperDandoriBarZ
+
+                for j=1 to _upperDandoriBarPoint[upperDandoriBarNum]
+                    _upperDandoriBarPos[upperDandoriBarNum][3*j-2]=get(1)
+                    _upperDandoriBarPos[upperDandoriBarNum][3*j-1]=get(1)
+                    _upperDandoriBarPos[upperDandoriBarNum][3*j]=get(1)
+                next j
+
+                upperDandoriBarNum=upperDandoriBarNum+1
+                _upperDandoriBarPoint[upperDandoriBarNum]=2
+
+                put upperDandoriBarX
+                put centColumnPos[1][2]+centColumnY/2+centColumnSidePos
+                put upperDandoriBarZ
+
+                put upperDandoriBarX
+                put cslabY2-csideCover
+                put upperDandoriBarZ
+
+                for j=1 to _upperDandoriBarPoint[upperDandoriBarNum]
+                    _upperDandoriBarPos[upperDandoriBarNum][3*j-2]=get(1)
+                    _upperDandoriBarPos[upperDandoriBarNum][3*j-1]=get(1)
+                    _upperDandoriBarPos[upperDandoriBarNum][3*j]=get(1)
+                next j
+            else
+                upperDandoriBarNum=upperDandoriBarNum+1
+                _upperDandoriBarPoint[upperDandoriBarNum]=2
+
+                put upperDandoriBarX
+                put -cslabY1+csideCover
+                put upperDandoriBarZ
+
+                put upperDandoriBarX
+                put cslabY2-csideCover
+                put upperDandoriBarZ
+
+                for j=1 to _upperDandoriBarPoint[upperDandoriBarNum]
+                    _upperDandoriBarPos[upperDandoriBarNum][3*j-2]=get(1)
+                    _upperDandoriBarPos[upperDandoriBarNum][3*j-1]=get(1)
+                    _upperDandoriBarPos[upperDandoriBarNum][3*j]=get(1)
+                next j
+            endif
+        next i
+    endif
+endif
+
+parameters \
+umaBarNum=umaBarNum,
+umaBarPoint=_umaBarPoint,
+umaBarPos=_umaBarPos,
+upperDandoriBarNum=upperDandoriBarNum,
+upperDandoriBarPoint=_upperDandoriBarPoint,
+upperDandoriBarPos=_upperDandoriBarPos
+
+
+
+!=================================================================鉄筋情報
+parameters \
+upperMbarOd=od_list[upperMbarNd],
+upperMbarMat=SDmat[scode_list[upperMbarNd]],
+upperMbarPen=SDpen[scode_list[upperMbarNd]],
+upperDbarOd=od_list[upperDbarNd],
+upperDbarMat=SDmat[scode_list[upperDbarNd]],
+upperDbarPen=SDpen[scode_list[upperDbarNd]],
+lowerMbarOd=od_list[lowerMbarNd],
+lowerMbarMat=SDmat[scode_list[lowerMbarNd]],
+lowerMbarPen=SDpen[scode_list[lowerMbarNd]],
+lowerDbarOd=od_list[lowerDbarNd],
+lowerDbarMat=SDmat[scode_list[lowerDbarNd]],
+lowerDbarPen=SDpen[scode_list[lowerDbarNd]]
+
+lock "upperMbarOd","upperMbarMat","upperMbarPen","upperDbarOd","upperDbarMat","upperDbarPen","lowerMbarOd","lowerMbarMat","lowerMbarPen","lowerDbarOd","lowerDbarMat","lowerDbarPen"
+
+if mbarDir=1 then
+    !上端主筋
+    parameters \
+    upperMbarNum=upperVerNum,
+    upperMbarPoint=_upperVerPoint,
+    upperMbarPos=_upperVerPos
+
+    !上端配力筋
+    parameters \
+    upperDbarNum=upperHorNum,
+    upperDbarPoint=_upperHorPoint,
+    upperDbarPos=_upperHorPos
+
+    !下端主筋
+    parameters \
+    lowerMbarNum=lowerVerNum,
+    lowerMbarPoint=_lowerVerPoint,
+    lowerMbarPos=_lowerVerPos
+
+    !下端配力筋
+    parameters \
+    lowerDbarNum=lowerHorNum,
+    lowerDbarPoint=_lowerHorPoint,
+    lowerDbarPos=_lowerHorPos
+else
+    !上端主筋
+    parameters \
+    upperMbarNum=upperHorNum,
+    upperMbarPoint=_upperHorPoint,
+    upperMbarPos=_upperHorPos
+
+    !上端配力筋
+    parameters \
+    upperDbarNum=upperVerNum,
+    upperDbarPoint=_upperVerPoint,
+    upperDbarPos=_upperVerPos
+
+    !下端主筋
+    parameters \
+    lowerMbarNum=lowerHorNum,
+    lowerMbarPoint=_lowerHorPoint,
+    lowerMbarPos=_lowerHorPos
+
+    !下端配力筋
+    parameters \
+    lowerDbarNum=lowerVerNum,
+    lowerDbarPoint=_lowerVerPoint,
+    lowerDbarPos=_lowerVerPos
+endif
+
+

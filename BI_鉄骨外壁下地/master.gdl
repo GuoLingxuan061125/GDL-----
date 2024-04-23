@@ -1,0 +1,31 @@
+call "BI_function_hotkey" parameters all returned_parameters GATE 
+if GATE=0 then end
+
+eps=1e-4
+esp=1e-4
+td=1e3
+unid=1
+
+U=1
+D=2
+L=3
+R=4
+
+x=1
+y=2
+z=3
+B=4
+H=5
+
+iRtz=1
+iRty=2
+iLength=3
+
+dim empty2D[][]
+
+tempPos=empty2D
+steelPos=empty2D
+
+update=1
+
+

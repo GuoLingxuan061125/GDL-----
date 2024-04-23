@@ -1,0 +1,389 @@
+!==============================================壁設定
+wall_len=sqr((wall_pos[2][1]-wall_pos[1][1])^2+(wall_pos[2][2]-wall_pos[1][2])^2)
+parameters wall_len=wall_len
+lock "wall_len"
+
+
+if wall_pos[2][2]=wall_pos[1][2] then
+	if wall_pos[2][1]>=wall_pos[1][1] then
+		wall_rtz=0
+	else
+		wall_rtz=180
+	endif
+endif
+
+if wall_pos[2][2]>wall_pos[1][2] then
+	wall_rtz=acs((wall_pos[2][1]-wall_pos[1][1])/wall_len)
+endif
+
+if wall_pos[2][2]<wall_pos[1][2] then
+	wall_rtz=-acs((wall_pos[2][1]-wall_pos[1][1])/wall_len)
+endif
+
+parameters wall_rtz=wall_rtz
+lock "wall_rtz"
+
+!==============================================開口
+values "op_num" range[0,]
+
+if op_num=0 then
+	hideparameter "op_pos","op_wid","op_hei","fin_op_side","fin_op_top","fin_op_down","op_type"
+else
+	for i=1 to op_num
+		op_pos[i][1]=op_pos[i][1]
+		op_pos[i][2]=op_pos[i][2]
+		op_wid[i]=op_wid[i]
+		op_hei[i]=op_hei[i]
+		fin_op_side[i]=fin_op_side[i]
+		fin_op_top[i]=fin_op_top[i]
+		fin_op_down[i]=fin_op_down[i]
+		switch_seal_op_side[i]=switch_seal_op_side[i]
+		switch_seal_op_down[i]=switch_seal_op_down[i]
+		switch_seal_op_top[i]=switch_seal_op_top[i]
+		switch_seal_op_rat[i]=switch_seal_op_rat[i]
+
+		if op_pos[i][1]<0 then op_pos[i][1]=0
+		if op_pos[i][1]>wall_len then op_pos[i][1]=wall_len
+		if op_pos[i][2]>wall_hei then op_pos[i][2]=wall_hei
+
+		if op_wid[i]<0 then op_wid[i]=0
+		if op_wid[i]>wall_len-op_pos[i][1] then op_wid[i]=wall_len-op_pos[i][1]
+
+		if op_hei[i]<0 then op_hei[i]=0
+		if op_hei[i]>wall_hei-op_pos[i][2] then op_hei[i]=wall_hei-op_pos[i][2]
+	next i
+endif
+
+parameters op_pos=op_pos
+parameters op_wid=op_wid
+parameters op_hei=op_hei
+parameters fin_op_side=fin_op_side
+parameters fin_op_top=fin_op_top
+parameters fin_op_down=fin_op_down
+parameters switch_seal_op_side=switch_seal_op_side
+parameters switch_seal_op_down=switch_seal_op_down
+parameters switch_seal_op_top=switch_seal_op_top
+parameters switch_seal_op_rat=switch_seal_op_rat
+
+values{2} "op_type" 101,"AW バルコニー",102,"AW ルーフバルコニー",103,"AW サービスバルコニー",104,"AW 妻面バルコニー",105,"AW 妻壁",\
+		         106,"AW 開放廊下",107,"AW 吹抜",108,"AW 内部階段",109,"AW メールコーナー",\
+		         201,"SD 玄関扉",202,"SD トランクルーム扉",203,"SD 共用扉",204,"SD MB扉",205,"SD エントランス廻り",206,"SD EV三方枠(露出)",\
+		         207,"SD 集会室扉",208,"SD 屋上点検扉",209,"SD ルーフバルコニー点検扉",210,"SD 門扉 二方",211,"SD 階段扉 三方",212,"SD 管理室扉",\
+		         213,"SD ゴミ置場扉",214,"SD 電気室扉",215,"SD ポンプ室扉"
+
+if op_num>0 then
+	for i=1 to op_num
+		parameters op_type[i]=op_type[i]
+		parameters op_type_text[i]=op_type_text_list[op_type[i]]
+		parameters op_text[i]=""
+		parameters op_text[i]=op_text[i]
+		parameters op_part_text[i]=""
+		parameters op_part_text[i]=op_part_text[i]
+	next i
+endif
+
+values "op_rat" range[0,100]
+values "op_rat_offset" range[0,]
+values "op_offset_s" range[0,]
+values "op_offset_t" range[0,]
+values "op_offset_d" range[0,]
+
+values{2} "dis_op_detail" 0,"表示しない",1,"リストから選択",2,"手入力"
+if dis_op_detail<>1 then hideparameter "op_type"
+if dis_op_detail<>2 then hideparameter "op_text","op_part_text"
+
+
+!===========================================================================裁断多角形設定
+if switch_polygon=0 then
+	hideparameter "num_polygon","coo_polygon"
+endif
+
+values "num_polygon" range[0,]
+
+if num_polygon>0 then
+	for i=1 to num_polygon
+		parameters coo_polygon[1][i]=coo_polygon[1][i]
+		parameters coo_polygon[2][i]=coo_polygon[2][i]
+		parameters coo_polygon[3][i]=coo_polygon[3][i]
+		parameters coo_polygon[4][i]=coo_polygon[4][i]
+		parameters coo_polygon[5][i]=coo_polygon[5][i]
+		parameters coo_polygon[6][i]=coo_polygon[6][i]
+	next i
+endif
+
+!if num_polygon>0 then
+!	for i=1 to num_polygon
+!		if coo_polygon[1][i]>wid_wall+wid_seal then parameters coo_polygon[1][i]=wid_wall+wid_seal
+!		if coo_polygon[3][i]>wid_wall+wid_seal then parameters coo_polygon[3][i]=wid_wall+wid_seal
+!		if coo_polygon[5][i]>wid_wall+wid_seal then parameters coo_polygon[5][i]=wid_wall+wid_seal
+!		if coo_polygon[2][i]>hei_wall+wid_seal then parameters coo_polygon[2][i]=hei_wall+wid_seal
+!		if coo_polygon[4][i]>hei_wall+wid_seal then parameters coo_polygon[4][i]=hei_wall+wid_seal
+!		if coo_polygon[6][i]>hei_wall+wid_seal then parameters coo_polygon[6][i]=hei_wall+wid_seal
+!	next i
+!endif
+
+
+!==============================================上端傾斜
+if switch_slope=0 then
+	hideparameter "lt_x","lt_z","rt_x","rt_z"
+endif
+
+values "lt_x" range[0,wall_len-rt_x]
+values "rt_x" range[0,wall_len-lt_x]
+values "lt_z" range[0,wall_hei]
+values "rt_z" range[0,wall_hei]
+
+
+!==============================================壁目地
+values "joint_wid" range(0,]
+values "joint_ver_num" range[0,]
+values "joint_hor_num" range[0,]
+
+if joint_ver_num>0 then
+	for i=1 to joint_ver_num
+		joint_ver_pos[i]=joint_ver_pos[i]
+
+		if joint_ver_pos[i]<0.01 then joint_ver_pos[i]=0.01
+		if joint_ver_pos[i]>wall_len-0.01 then joint_ver_pos[i]=wall_len-0.01
+	next i
+endif
+parameters joint_ver_pos=joint_ver_pos
+
+if joint_hor_num>0 then
+	for i=1 to joint_hor_num
+		joint_hor_pos[i]=joint_hor_pos[i]
+
+		if joint_hor_pos[i]<0.01 then joint_hor_pos[i]=0.01
+		if joint_hor_pos[i]>wall_hei-0.01 then joint_hor_pos[i]=wall_hei-0.01
+	next i
+endif
+parameters joint_hor_pos=joint_hor_pos
+
+
+!==============================================端部シーリング
+values "seal_wid" range(0,)
+
+
+!==============================================積算
+!壁仕上げ材面積
+fin_area=wall_len*wall_hei
+
+if op_num>0 then
+	for i=1 to op_num
+		fin_area=fin_area-op_wid[i]*op_hei[i]
+	next i
+endif
+
+if switch_slope then
+	fin_area=fin_area-lt_x*lt_z/2-rt_x*rt_z/2
+endif
+
+parameters fin_area=fin_area
+
+
+!開口役物仕上げ材面積
+fin_op_area=0
+
+if op_num>0 then
+	for i=1 to op_num
+		if fin_op_side[i] then
+			fin_op_area=fin_op_area+2*op_hei[i]*fin_op_dep
+		endif
+
+		if fin_op_down[i] then
+			fin_op_area=fin_op_area+op_wid[i]*fin_op_dep
+		endif
+
+		if fin_op_top[i] then
+			fin_op_area=fin_op_area+op_wid[i]*fin_op_dep
+		endif
+	next i
+endif
+
+parameters fin_op_area=fin_op_area
+
+
+!端部シール長さ
+seal_len=0
+
+if switch_seal_left then
+	if switch_slope then
+		seal_len=seal_len+wall_hei-lt_z
+	else
+		seal_len=seal_len+wall_hei
+	endif
+endif
+
+if switch_seal_right then
+	if switch_slope then
+		seal_len=seal_len+wall_hei-rt_z
+	else
+		seal_len=seal_len+wall_hei
+	endif
+endif
+
+if switch_seal_down then
+	seal_len=seal_len+wall_len
+endif
+
+if switch_seal_top then
+	if switch_slope then
+		seal_len=seal_len+(wall_len-lt_x-rt_x)+sqr(lt_x^2+lt_z^2)+sqr(rt_x^2+rt_z^2)
+	else
+		seal_len=seal_len+wall_len
+	endif
+endif
+
+parameters seal_len=seal_len
+
+
+!開口シール長さ・開口内法面積
+if op_num>0 then
+	for i=1 to op_num
+		op_seal_len_1_0=0 !上横
+		op_seal_len_2_0=0 !下
+		op_rat_len_0=0 !水切り
+
+		if switch_seal_op_side[i] then
+			if fin_op_side[i] then
+				op_seal_len_1_0=op_seal_len_1_0+2*(op_hei[i]-fin_op_dep*op_rat/100)+2*sqr(fin_op_dep^2+(fin_op_dep*op_rat/100)^2)
+			else
+				op_seal_len_1_0=op_seal_len_1_0+2*op_hei[i]
+			endif
+		endif
+
+		if switch_seal_op_top[i] then
+			op_seal_len_1_0=op_seal_len_1_0+op_wid[i]
+		endif
+
+		if switch_seal_op_down[i] then
+			op_seal_len_2_0=op_seal_len_2_0+op_wid[i]
+		endif
+
+		if switch_seal_op_rat[i] then
+			op_rat_len_0=op_rat_len_0+op_wid[i]
+		endif
+
+		parameters op_seal_len_1[i]=op_seal_len_1_0
+		parameters op_seal_len_2[i]=op_seal_len_2_0
+		parameters op_rat_len[i]=op_rat_len_0
+		parameters op_area[i]=(op_wid[i]-2*op_offset_s)*(op_hei[i]-op_offset_t-op_offset_d)
+	next i
+else
+	parameters op_seal_len_1[1]=0
+	parameters op_seal_len_2[1]=0
+	parameters op_rat_len[1]=0
+	parameters op_area[1]=0
+endif
+
+
+!縦目地長さ
+joint_ver_len=0
+
+if joint_ver_num>0 then
+	for i=1 to joint_ver_num
+		joint_ver_len=joint_ver_len+wall_hei
+
+		if op_num>0 then
+			for j=1 to op_num
+				if joint_ver_pos[i]>=op_pos[j][1]-joint_wid/2 and joint_ver_pos[i]<=op_pos[j][1]+op_wid[j]+joint_wid/2 then
+					joint_ver_len=joint_ver_len-op_hei[j]
+				endif
+			next j
+		endif
+	next i
+endif
+
+parameters joint_ver_len=joint_ver_len
+
+
+!横目地長さ
+joint_hor_len=0
+
+if joint_hor_num>0 then
+	for i=1 to joint_hor_num
+		joint_hor_len=joint_hor_len+wall_len
+
+		if op_num>0 then
+			for j=1 to op_num
+				if joint_hor_pos[i]>=op_pos[j][2]-joint_wid/2 and joint_hor_pos[i]<=op_pos[j][2]+op_hei[j]+joint_wid/2 then
+					joint_hor_len=joint_hor_len-op_wid[j]
+				endif
+			next j
+		endif
+	next i
+endif
+
+parameters joint_hor_len=joint_hor_len
+
+
+
+values{2} "use_part" 1,"塔屋",2,"屋上",3,"ルーフバルコニー",4,"バルコニー",12,"妻面バルコニー",13,"サービスバルコニー",5,"開放廊下",6,"階段",7,"エントランス",8,"外壁",9,"庇",10,"外構",11,"付属棟"
+
+if use_part=1 then
+	values{2} "use_place" 101,"塔屋マンサード斜壁",102,"塔屋壁",103,"塔屋階段",104,"塔屋パラペット天端・見付"
+endif
+
+if use_part=2 then
+	values{2} "use_place" 201,"屋上パラペット斜壁",202,"屋上パラペット壁",203,"屋上壁",204,"屋上パラペット天端・見付",205,"屋上設備基礎立上り壁"
+endif
+
+if use_part=3 then
+	values{2} "use_place" 301,"ルーフバルコニー壁",302,"ルーフバルコニーパラペット斜壁",303,"ルーフバルコニー梁",304,"ルーフバルコニーパラペット",305,"ルーフバルコニーパラペット天端・見付",\
+			306,"ルーフバルコニー溝・立上り（防水面）",307,"ルーフバルコニー大庇（床面）",308,"ルーフバルコニー大庇立上り",309,"ルーフバルコニー設備基礎立上壁"
+endif
+
+if use_part=4 then
+	values{2} "use_place" 401,"バルコニー壁",402,"バルコニー梁",403,"バルコニー手摺壁　外部",404,"バルコニー手摺壁　内部",405,"バルコニー壁（スリット横）",406,"バルコニー壁（スリット縦）",407,"バルコニー手摺壁　天端",\
+			408,"バルコニー溝・立上り（防水面）",409,"バルコニー笠木天端",410,"バルコニー笠木見付ボーダー",411,"バルコニー大庇（床面）",412,"バルコニー大庇立上り",\
+			413,"バルコニーマリオン壁",414,"バルコニー戸境壁",415,"バルコニー袖壁",416,"バルコニーGRC手摺壁"
+endif
+
+if use_part=12 then
+	values{2} "use_place" 1201,"妻面バルコニー壁",1202,"妻面バルコニー梁",1203,"妻面バルコニー手摺壁　外部",1204,"妻面バルコニー手摺壁　内部",1205,"妻面バルコニー壁（スリット横）",\
+			1206,"妻面バルコニー手摺壁　天端",1207,"妻面バルコニー溝・立上り（防水面）",1208,"妻面バルコニー笠木天端",1209,"妻面バルコニー笠木見付ボーダー",\
+			1210,"妻面バルコニー大庇（床面）",1211,"妻面バルコニー大庇立上り"
+endif
+
+if use_part=13 then
+	values{2} "use_place" 1301,"サービスバルコニー壁",1302,"サービスバルコニー梁",1303,"サービスバルコニー手摺壁　外部",1304,"サービスバルコニー手摺壁　内部",1305,"サービスバルコニー壁（スリット横）",\
+			1306,"サービスバルコニー手摺壁　天端",1307,"サービスバルコニー溝・立上り",1308,"サービスバルコニー笠木天端",1309,"サービスバルコニー笠木見付ボーダー",\
+			1310,"サービスバルコニー大庇（床面）",1311,"サービスバルコニー大庇立上り"
+endif
+
+if use_part=5 then
+	values{2} "use_place" 501,"開放廊下壁",502,"開放廊下梁",503,"開放廊下手摺壁　外部",504,"開放廊下手摺壁　内部",505,"開放廊下手摺壁（スリット横）",506,"開放廊下手摺壁（スリット縦）",507,"開放廊下手摺壁　天端",508,"開放廊下溝・立上り",\
+			509,"開放廊下笠木天端",510,"開放廊下笠木見付",511,"開放廊下大庇（床面）",512,"開放廊下大庇立上り",513,"開放廊下室外機置場天井",514,"開放廊下マリオン壁",515,"開放廊下門扉袖壁",\
+			516,"開放廊下消火栓BOX置場天端",517,"開放廊下消火栓BOX置場壁外部",518,"開放廊下消火栓BOX置場壁内部"
+endif
+
+if use_part=6 then
+	values{2} "use_place" 601,"外部階段　手摺壁　外部",602,"外部階段　手摺壁　内部",603,"外部階段　中壁",604,"外部階段　壁",605,"内部階段　壁",606,"鉄骨階段",607,"外部階段手摺壁　天端"
+endif
+
+if use_part=7 then
+	values{2} "use_place" 701,"エントランス壁　外部",702,"エントランス壁　内部",703,"メールコーナー壁"
+endif
+
+if use_part=8 then
+	values{2} "use_place" 801,"妻壁",802,"EVシャフト",803,"出窓",804,"ビロティ",805,"吹抜",806,"駐輪場",807,"駐車場",808,"その他外壁"
+endif
+
+if use_part=9 then
+	values{2} "use_place" 903,"塔屋小庇",904,"EV機械室出入口庇",905,"バルコニー庇立上り",906,"バルコニー庇見付",907,"サービスバルコニー庇立上り",908,"サービスバルコニー庇見付",\
+			909,"妻面バルコニー庇立上り",910,"妻面バルコニー庇見付",911,"ルーフバルコニー庇立上り",912,"ルーフバルコニー庇見付",913,"開放廊下庇立上り",914,"開放廊下庇見付"
+endif
+
+if use_part=10 then
+	values{2} "use_place" 1001,"外構"
+endif
+
+if use_part=11 then
+	values{2} "use_place" 1101,"ゴミ置場",1102,"電気室",1103,"ポンプ室"
+endif
+
+values{2} "wall_base" 1,"RC",2,"ALC",3,"ECP",4,"CB",5,"PC",6,"ケイカル",99,"その他"
+
+
+
+

@@ -1,0 +1,51 @@
+project2{3} 3,270,1,1+2+4+8+16,parameters disPoint=0,disCL=1,disSD=1,disSmooth=0
+
+for i=1 to wallPoint
+    hotspot2 wallPos[i][x],wallPos[i][y]
+    hotspot2 _wallNewPos[i][x],_wallNewPos[i][y]
+
+    !x
+    hotspot2 0            ,wallPos[i][y],code,wallPos[i][x],1+128:code=code+1
+    hotspot2 wallPos[i][x],wallPos[i][y],code,wallPos[i][x],2    :code=code+1
+    hotspot2 -1           ,wallPos[i][y],code,wallPos[i][x],3    :code=code+1
+
+    !y
+    hotspot2 wallPos[i][x],0            ,code,wallPos[i][y],1+128:code=code+1
+    hotspot2 wallPos[i][x],wallPos[i][y],code,wallPos[i][y],2    :code=code+1
+    hotspot2 wallPos[i][x],-1           ,code,wallPos[i][y],3    :code=code+1
+next i
+
+for i=1 to wallPoint-1
+    i2=i+1
+
+    line2 wallPos[i][x],wallPos[i][y],wallPos[i2][x],wallPos[i2][y]
+next i
+
+!端部折り曲げ定着ホットスポット
+if closeFlag=0 then
+    if startAnchor=5 then
+        add2 _wallNewPos[1][x],_wallNewPos[1][y]
+        rot2 _wallRtz[1]
+            hotspot2 0              ,0,code,startAnchorLen,1+128:code=code+1
+            hotspot2 -startAnchorLen,0,code,startAnchorLen,2    :code=code+1
+            hotspot2 1              ,0,code,startAnchorLen,3    :code=code+1
+
+            hotspot2 -startAnchorLen+0.1                      ,0                        ,code,startAnchorAngle,4+128:code=code+1
+            hotspot2 -startAnchorLen+0.1*cos(startAnchorAngle),0.1*sin(startAnchorAngle),code,startAnchorAngle,5    :code=code+1
+            hotspot2 -startAnchorLen                          ,0                        ,code,startAnchorAngle,6    :code=code+1
+        del 2
+    endif
+
+    if endAnchor=5 then
+        add2 _wallNewPos[wallPoint][x],_wallNewPos[wallPoint][y]
+        rot2 _wallRtz[wallPoint-1]
+            hotspot2 0           ,0,code,endAnchorLen,1+128:code=code+1
+            hotspot2 endAnchorLen,0,code,endAnchorLen,2    :code=code+1
+            hotspot2 -1          ,0,code,endAnchorLen,3    :code=code+1
+            
+            hotspot2 endAnchorLen-0.1                    ,0                      ,code,endAnchorAngle,4+128:code=code+1
+            hotspot2 endAnchorLen-0.1*cos(endAnchorAngle),0.1*sin(endAnchorAngle),code,endAnchorAngle,5    :code=code+1
+            hotspot2 endAnchorLen                        ,0                      ,code,endAnchorAngle,6+512:code=code+1
+        del 2
+    endif
+endif

@@ -1,0 +1,1237 @@
+code=1
+eps=1e-5
+x=1
+y=2
+c=3
+
+
+!=================================L1継ぎ手定着係数
+dim l1_list[][]
+l1_list[1][18]=45
+l1_list[1][21]=40
+l1_list[1][24]=35
+l1_list[1][27]=35
+l1_list[1][30]=35
+l1_list[1][33]=35
+l1_list[1][36]=35
+l1_list[1][39]=30
+l1_list[1][42]=30
+l1_list[1][45]=30
+l1_list[1][48]=30
+l1_list[1][51]=30
+l1_list[1][54]=30
+l1_list[1][57]=30
+l1_list[1][60]=30
+l1_list[2][18]=50
+l1_list[2][21]=45
+l1_list[2][24]=40
+l1_list[2][27]=40
+l1_list[2][30]=35
+l1_list[2][33]=35
+l1_list[2][36]=35
+l1_list[2][39]=35
+l1_list[2][42]=35
+l1_list[2][45]=35
+l1_list[2][48]=30
+l1_list[2][51]=30
+l1_list[2][54]=30
+l1_list[2][57]=30
+l1_list[2][60]=30
+l1_list[3][18]=0
+l1_list[3][21]=50
+l1_list[3][24]=45
+l1_list[3][27]=45
+l1_list[3][30]=40
+l1_list[3][33]=40
+l1_list[3][36]=40
+l1_list[3][39]=40
+l1_list[3][42]=40
+l1_list[3][45]=40
+l1_list[3][48]=35
+l1_list[3][51]=35
+l1_list[3][54]=35
+l1_list[3][57]=35
+l1_list[3][60]=35
+l1_list[4][18]=0
+l1_list[4][21]=0
+l1_list[4][24]=55
+l1_list[4][27]=55
+l1_list[4][30]=50
+l1_list[4][33]=50
+l1_list[4][36]=50
+l1_list[4][39]=45
+l1_list[4][42]=45
+l1_list[4][45]=45
+l1_list[4][48]=40
+l1_list[4][51]=40
+l1_list[4][54]=40
+l1_list[4][57]=40
+l1_list[4][60]=40
+
+
+!=================================L2定着係数
+dim l2_list[][]
+l2_list[1][18]=40
+l2_list[1][21]=35
+l2_list[1][24]=30
+l2_list[1][27]=30
+l2_list[1][30]=30
+l2_list[1][33]=30
+l2_list[1][36]=30
+l2_list[1][39]=25
+l2_list[1][42]=25
+l2_list[1][45]=25
+l2_list[1][48]=25
+l2_list[1][51]=25
+l2_list[1][54]=25
+l2_list[1][57]=25
+l2_list[1][60]=25
+l2_list[2][18]=40
+l2_list[2][21]=35
+l2_list[2][24]=35
+l2_list[2][27]=35
+l2_list[2][30]=30
+l2_list[2][33]=30
+l2_list[2][36]=30
+l2_list[2][39]=30
+l2_list[2][42]=30
+l2_list[2][45]=30
+l2_list[2][48]=25
+l2_list[2][51]=25
+l2_list[2][54]=25
+l2_list[2][57]=25
+l2_list[2][60]=25
+l2_list[3][18]=0
+l2_list[3][21]=40
+l2_list[3][24]=40
+l2_list[3][27]=40
+l2_list[3][30]=35
+l2_list[3][33]=35
+l2_list[3][36]=35
+l2_list[3][39]=35
+l2_list[3][42]=35
+l2_list[3][45]=35
+l2_list[3][48]=30
+l2_list[3][51]=30
+l2_list[3][54]=30
+l2_list[3][57]=30
+l2_list[3][60]=30
+l2_list[4][18]=0
+l2_list[4][21]=0
+l2_list[4][24]=45
+l2_list[4][27]=45
+l2_list[4][30]=40
+l2_list[4][33]=40
+l2_list[4][36]=40
+l2_list[4][39]=40
+l2_list[4][42]=40
+l2_list[4][45]=40
+l2_list[4][48]=35
+l2_list[4][51]=35
+l2_list[4][54]=35
+l2_list[4][57]=35
+l2_list[4][60]=35
+
+
+!=================================材質・線色コードリスト
+dim scode_list[]
+scode_list[10]=1
+scode_list[13]=2
+scode_list[16]=3
+scode_list[19]=4
+scode_list[22]=5
+scode_list[25]=6
+scode_list[29]=7
+scode_list[32]=8
+scode_list[35]=9
+scode_list[38]=10
+scode_list[41]=11
+
+
+!=================================外径リスト
+dim od_list[]
+od_list[10]=0.011 !d10
+od_list[13]=0.014 !d13
+od_list[16]=0.018 !d16
+od_list[19]=0.021 !d19
+od_list[22]=0.025 !d22
+od_list[25]=0.028 !d25
+od_list[29]=0.033 !d29
+od_list[32]=0.036 !d32
+od_list[35]=0.040 !d35
+od_list[38]=0.043 !d38
+od_list[41]=0.046 !d41
+
+
+!=====================================================================スラブ設定=====================================================================!
+values "slabPoint" range[3,]
+
+dim _slabPos[][]
+_slabPos[1][x]=0
+_slabPos[1][y]=0
+
+for i=1 to slabPoint
+    _slabPos[i][x]=slabPos[i][x]
+    _slabPos[i][y]=slabPos[i][y]
+next i
+
+parameters slabPos=_slabPos
+
+
+!最小値・最大値
+for i=1 to slabPoint
+    put _slabPos[i][x]
+next i
+
+minx=min(use(nsp))
+maxx=max(get(nsp))
+slabX=maxx-minx
+
+for i=1 to slabPoint
+    put _slabPos[i][y]
+next i
+
+miny=min(use(nsp))
+maxy=max(get(nsp))
+slabY=maxy-miny
+
+
+!長さ・回転角・方程式
+dim _slabLen[]
+dim _slabRtz[]
+dim _equationA[]
+dim _equationB[]
+dim _equationC[]
+_slabLen[1]=0
+_slabRtz[1]=0
+_equationA[1]=0
+_equationB[1]=0
+_equationC[1]=0
+
+for i=1 to slabPoint
+    if i<slabPoint then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    !長さ
+    _slabLen[i]=sqr((_slabPos[i2][x]-_slabPos[i][x])^2+(_slabPos[i2][y]-_slabPos[i][y])^2)+eps
+
+    !回転角
+    if _slabPos[i2][y]>_slabPos[i][y]+eps then
+        _slabRtz[i]=acs((_slabPos[i2][x]-_slabPos[i][x])/_slabLen[i])
+    endif
+
+    if _slabPos[i2][y]<=_slabPos[i][y]+eps and _slabPos[i2][y]>=_slabPos[i][y]-eps then
+        if _slabPos[i2][x]>=_slabPos[i][x] then
+            _slabRtz[i]=0
+        else
+            _slabRtz[i]=180
+        endif
+    endif
+
+    if _slabPos[i2][y]<_slabPos[i][y]-eps then
+        _slabRtz[i]=360-acs((_slabPos[i2][x]-_slabPos[i][x])/_slabLen[i])
+    endif
+
+    !方程式
+    _equationA[i]=_slabPos[i2][y]-_slabPos[i][y]
+    _equationB[i]=_slabPos[i][x]-_slabPos[i2][x]
+    _equationC[i]=_slabPos[i2][x]*_slabPos[i][y]-_slabPos[i][x]*_slabPos[i2][y]
+next i
+
+
+!=====================================================================スラブ設定=====================================================================!
+values "sdResol" range[3,]
+
+values{2} "conFc" 18,"18 N/㎟",21,"21 N/㎟",24,"24 N/㎟",27,"27 N/㎟",30,"30 N/㎟",33,"33 N/㎟",36,"36 N/㎟",39,"39 N/㎟",42,"42 N/㎟",45,"45 N/㎟",\
+				  48,"48 N/㎟",51,"51 N/㎟",54,"54 N/㎟",57,"57 N/㎟",60,"60 N/㎟"
+
+if conFc=18 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345"
+if conFc=21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390"
+if conFc>21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390",4,"SD490"
+
+parameters L1=L1_list[sdType][conFc]
+parameters L2=L2_list[sdType][conFc]
+lock "L1","L2"
+
+values "L1PLus" range[0,]
+values "L2PLus" range[0,]
+
+values{2} "mbarDir" 1,"Y方向",2,"X方向"
+values{2} "topBarArrangePos" 1,"主筋が上",2,"配力筋が上"
+values{2} "downBarArrangePos" 1,"主筋が上",2,"配力筋が上"
+values "connectLen" range[3,]
+values{2} "supportType" 1,"幅止め筋",2,"ウマ筋"
+
+dim _topAnchorType[]
+dim _downAnchorType[]
+_topAnchorType[1]=0
+_downAnchorType[1]=0
+
+for i=1 to slabPoint
+    _topAnchorType[i]=topAnchorType[i]
+    _downAnchorType[i]=downAnchorType[i]
+next i
+
+parameters topAnchorType=_topAnchorType
+parameters downAnchorType=_downAnchorType
+values{2} "topAnchorType" 0,"端部に止める",1,"L1/2",2,"L1",3,"L2直線",4,"下アンカー",5,"端部"
+values{2} "downAnchorType" 0,"端部に止める",1,"L1/2",2,"L1",3,"L2直線",4,"下アンカー",5,"端部"
+
+
+!=====================================================================呼び径・ピッチ設定=====================================================================!
+values{2} "upperMbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "upperDbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "lowerMbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "lowerDbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "edgeHorNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+
+values "upperMbarPitch" range[0.05,]
+values "upperDbarPitch" range[0.05,]
+values "lowerMbarPitch" range[0.05,]
+values "lowerDbarPitch" range[0.05,]
+
+
+!=====================================================================配筋情報=====================================================================!
+!縦横判定
+if mbarDir=1 then
+    upperVerNd=upperMbarNd
+    upperVerPitch=max(upperMbarPitch,0.05)
+    upperHorNd=upperDbarNd
+    upperHorPitch=max(upperDbarPitch,0.05)
+    lowerVerNd=lowerMbarNd
+    lowerVerPitch=max(lowerMbarPitch,0.05)
+    lowerHorNd=lowerDbarNd
+    lowerHorPitch=max(lowerDbarPitch,0.05)
+    upperVerOffset=upperMbarOffset
+    upperHorOffset=upperDbarOffset
+    lowerVerOffset=lowerMbarOffset
+    lowerHorOffset=lowerDbarOffset
+else
+    upperVerNd=upperDbarNd
+    upperVerPitch=max(upperDbarPitch,0.05)
+    upperHorNd=upperMbarNd
+    upperHorPitch=max(upperMbarPitch,0.05)
+    lowerVerNd=lowerDbarNd
+    lowerVerPitch=max(lowerDbarPitch,0.05)
+    lowerHorNd=lowerMbarNd
+    lowerHorPitch=max(lowerMbarPitch,0.05)
+    upperVerOffset=upperDbarOffset
+    upperHorOffset=upperMbarOffset
+    lowerVerOffset=lowerDbarOffset
+    lowerHorOffset=lowerMbarOffset
+endif
+
+upperVerOd=od_list[upperVerNd]
+upperHorOd=od_list[upperHorNd]
+lowerVerOd=od_list[lowerVerNd]
+lowerHorOd=od_list[lowerHorNd]
+
+!縦横筋z座標
+if mbarDir+topBarArrangePos=3 then
+    upperVerZ=-(topCover+upperHorOd+upperVerOd/2)
+    upperHorZ=-(topCover+upperHorOd/2)
+else
+    upperVerZ=-(topCover+upperVerOd/2)
+    upperHorZ=-(topCover+upperVerOd+upperHorOd/2)
+endif
+
+if mbarDir+downBarArrangePos=3 then
+    lowerVerZ=-slabThi+(downCover+lowerVerOd/2)
+    lowerHorZ=-slabThi+(downCover+lowerVerOd+lowerHorOd/2)
+else
+    lowerVerZ=-slabThi+(downCover+lowerHorOd+lowerVerOd/2)
+    lowerHorZ=-slabThi+(downCover+lowerHorOd/2)
+endif
+
+
+!=================================上端縦筋(端部コの字筋)
+upperVerNum=0
+dim _upperVerPoint[]
+dim _upperVerPos[][]
+_upperVerPoint[1]=0
+_upperVerPos[1][1]=0
+_upperVerPos[1][2]=0
+
+edgeBarNum=0
+dim _edgeBarOd[]
+dim _edgeBarPen[]
+dim _edgeBarMat[]
+dim _edgeBarPoint[]
+dim _edgeBarPos[][]
+_edgeBarOd[1]=0
+_edgeBarPen[1]=0
+_edgeBarMat[1]=0
+_edgeBarPoint[1]=0
+_upperVerPos[1][1]=0
+_upperVerPos[1][2]=0
+
+upperVerXnum=ceil((slabX-2*rebarStartPos)/upperVerPitch)+1
+upperVerPitch=(slabX-2*rebarStartPos)/(upperVerXnum-1)
+
+dim _upperVerIntNum[][]
+dim _upperVerIntPos[][]
+_upperVerIntNum[1][1]=0
+_upperVerIntNum[1][2]=0
+_upperVerIntPos[1][1]=0
+_upperVerIntPos[1][2]=0
+
+for i=1 to upperVerXnum
+    !x座標
+    upperVerX=minx+rebarStartPos+(i-1)*upperVerPitch+upperVerOffset
+
+    !スラブとの交点
+    intCount=0
+
+    for j=1 to slabPoint
+        if j<slabPoint then
+            j2=j+1
+        else
+            j2=1
+        endif
+
+        if upperVerX>min(_slabPos[j][x],_slabPos[j2][x]) and upperVerX<=max(_slabPos[j][x],_slabPos[j2][x]) then
+            intCount=intCount+1
+            _upperVerIntNum[i][intCount]=j
+            _upperVerIntPos[i][intCount]=-(_equationA[j]*upperVerX+_equationC[j])/_equationB[j]
+        endif
+    next j
+
+    !交点順位付け
+    for n=1 to intCount-1
+        for j=1 to intCount-1
+            if _upperVerIntPos[i][j]>_upperVerIntPos[i][j+1] then
+                tempNum=_upperVerIntNum[i][j]
+                _upperVerIntNum[i][j]=_upperVerIntNum[i][j+1]
+                _upperVerIntNum[i][j+1]=tempNum
+                tempPos=_upperVerIntPos[i][j]
+                _upperVerIntPos[i][j]=_upperVerIntPos[i][j+1]
+                _upperVerIntPos[i][j+1]=tempPos
+            endif
+        next j
+    next n
+
+    for j=1 to intCount/2
+        upperVerEdgeNum1=_upperVerIntNum[i][2*j-1]
+        upperVerEdgeNum2=_upperVerIntNum[i][2*j]
+        upperVerEdgePos1=_upperVerIntPos[i][2*j-1]
+        upperVerEdgePos2=_upperVerIntPos[i][2*j]
+
+        !y1座標
+        if topAnchorType[upperVerEdgeNum1]=0 then !端部に止める
+            upperVerEdgeY1=upperVerEdgePos1
+        endif
+
+        if topAnchorType[upperVerEdgeNum1]=1 then !L1/2
+            upperVerEdgeY1=upperVerEdgePos1-(L1+L1PLus)/2*upperVerNd/1000
+        endif
+
+        if topAnchorType[upperVerEdgeNum1]=2 then !L1
+            upperVerEdgeY1=upperVerEdgePos1-(L1+L1PLus)*upperVerNd/1000
+        endif
+
+        if topAnchorType[upperVerEdgeNum1]=3 then !L2直線
+            upperVerEdgeY1=upperVerEdgePos1-(L2+L2PLus)*upperVerNd/1000
+        endif
+
+        if topAnchorType[upperVerEdgeNum1]=4 then !下アンカー
+            upperVerEdgeY1=upperVerEdgePos1-(topAnchorLen-upperVerOd/2)
+        endif
+
+        if topAnchorType[upperVerEdgeNum1]=5 then !端部
+            upperVerEdgeY1=upperVerEdgePos1+sideCover
+        endif
+
+        !y2座標
+        if topAnchorType[upperVerEdgeNum2]=0 then !端部に止める
+            upperVerEdgeY2=upperVerEdgePos2
+        endif
+
+        if topAnchorType[upperVerEdgeNum2]=1 then !L1/2
+            upperVerEdgeY2=upperVerEdgePos2+(L1+L1PLus)/2*upperVerNd/1000
+        endif
+
+        if topAnchorType[upperVerEdgeNum2]=2 then !L1
+            upperVerEdgeY2=upperVerEdgePos2+(L1+L1PLus)*upperVerNd/1000
+        endif
+
+        if topAnchorType[upperVerEdgeNum2]=3 then !L2直線
+            upperVerEdgeY2=upperVerEdgePos2+(L2+L2PLus)*upperVerNd/1000
+        endif
+
+        if topAnchorType[upperVerEdgeNum2]=4 then !下アンカー
+            upperVerEdgeY2=upperVerEdgePos2+(topAnchorLen-upperVerOd/2)
+        endif
+
+        if topAnchorType[upperVerEdgeNum2]=5 then !端部
+            upperVerEdgeY2=upperVerEdgePos2-sideCover
+        endif
+
+        if upperVerEdgeY2-upperVerEdgeY1>=minimumLen then
+            connectCount=ceil(abs(upperVerEdgeY2-upperVerEdgeY1)/connectLen)
+            connectCount=ceil((abs(upperVerEdgeY2-upperVerEdgeY1)+(connectCount-1)*(L1+L1PLus)*upperVerNd/1000)/connectLen)
+
+            connectShiftFlag=1
+
+            for n=1 to connectCount
+                connectShiftFlag=1-connectShiftFlag
+
+                if n=1 then 
+                    upperVerY1=upperVerEdgeY1
+                else
+                    upperVerY1=upperVerEdgeY1+(upperVerEdgeY2-upperVerEdgeY1)*(n-1)/connectCount-(L1+L1PLus)/2*upperVerNd/1000
+                endif
+
+                if n=connectCount then
+                    upperVerY2=upperVerEdgeY2
+                else
+                    upperVerY2=upperVerEdgeY1+(upperVerEdgeY2-upperVerEdgeY1)*n/connectCount+(L1+L1PLus)/2*upperVerNd/1000
+                endif
+
+                !座標インプット
+                upperVerNum=upperVerNum+1
+                _upperVerPoint[upperVerNum]=2
+
+                if n=1 and topAnchorType[upperVerEdgeNum1]=4 then
+                    _upperVerPoint[upperVerNum]=_upperVerPoint[upperVerNum]+1
+                    put upperVerX+connectShiftFlag*upperVerOd
+                    put upperVerY1
+                    put upperVerZ-elbow90R*upperHorOd-topAnchorFra
+                endif
+
+                put upperVerX+connectShiftFlag*upperVerOd
+                put upperVerY1
+                put upperVerZ
+
+                put upperVerX+connectShiftFlag*upperVerOd
+                put upperVerY2
+                put upperVerZ
+
+                if n=connectCount and topAnchorType[upperVerEdgeNum2]=4 then
+                    _upperVerPoint[upperVerNum]=_upperVerPoint[upperVerNum]+1
+                    put upperVerX+connectShiftFlag*upperVerOd
+                    put upperVerY2
+                    put upperVerZ-elbow90R*upperHorOd-topAnchorFra
+                endif
+
+                for q=1 to _upperVerPoint[upperVerNum]
+                    _upperVerPos[upperVerNum][3*q-2]=get(1)
+                    _upperVerPos[upperVerNum][3*q-1]=get(1)
+                    _upperVerPos[upperVerNum][3*q]=get(1)
+                next q
+            next n
+
+            !端部コの字筋
+            if topAnchorType[upperVerEdgeNum1]=5 and downAnchorType[upperVerEdgeNum1]=5 then
+                edgeBarNum=edgeBarNum+1
+                _edgeBarOd[edgeBarNum]=upperVerOd
+                _edgeBarPen[edgeBarNum]=sdPen[scode_list[upperVerNd]]
+                _edgeBarMat[edgeBarNum]=sdMat[scode_list[upperVerNd]]
+                _edgeBarPoint[edgeBarNum]=4
+
+                put upperVerX+upperVerOd
+                put upperVerEdgeY1+upperVerOd/2+(elbow90R*upperVerOd+edgeBarAnchorFra)
+                put upperVerZ
+
+                put upperVerX+upperVerOd
+                put upperVerEdgeY1+upperVerOd/2
+                put upperVerZ
+
+                put upperVerX+upperVerOd
+                put upperVerEdgeY1+upperVerOd/2
+                put lowerVerZ
+
+                put upperVerX+upperVerOd
+                put upperVerEdgeY1+upperVerOd/2+(elbow90R*upperVerOd+edgeBarAnchorFra)
+                put lowerVerZ
+
+                for q=1 to _edgeBarPoint[edgeBarNum]
+                    _edgeBarPos[edgeBarNum][3*q-2]=get(1)
+                    _edgeBarPos[edgeBarNum][3*q-1]=get(1)
+                    _edgeBarPos[edgeBarNum][3*q]=get(1)
+                next q
+            endif
+
+            if topAnchorType[upperVerEdgeNum2]=5 and downAnchorType[upperVerEdgeNum2]=5 then
+                edgeBarNum=edgeBarNum+1
+                _edgeBarOd[edgeBarNum]=upperVerOd
+                _edgeBarPen[edgeBarNum]=sdPen[scode_list[upperVerNd]]
+                _edgeBarMat[edgeBarNum]=sdMat[scode_list[upperVerNd]]
+                _edgeBarPoint[edgeBarNum]=4
+
+                put upperVerX+(1-connectShiftFlag)*upperVerOd
+                put upperVerEdgeY2-upperVerOd/2-(elbow90R*upperVerOd+edgeBarAnchorFra)
+                put upperVerZ
+
+                put upperVerX+(1-connectShiftFlag)*upperVerOd
+                put upperVerEdgeY2-upperVerOd/2
+                put upperVerZ
+
+                put upperVerX+(1-connectShiftFlag)*upperVerOd
+                put upperVerEdgeY2-upperVerOd/2
+                put lowerVerZ
+
+                put upperVerX+(1-connectShiftFlag)*upperVerOd
+                put upperVerEdgeY2-upperVerOd/2-(elbow90R*upperVerOd+edgeBarAnchorFra)
+                put lowerVerZ
+
+                for q=1 to _edgeBarPoint[edgeBarNum]
+                    _edgeBarPos[edgeBarNum][3*q-2]=get(1)
+                    _edgeBarPos[edgeBarNum][3*q-1]=get(1)
+                    _edgeBarPos[edgeBarNum][3*q]=get(1)
+                next q
+            endif
+        endif
+    next j
+next i
+
+
+!=================================上端横筋(端部コの字筋)
+upperHorNum=0
+dim _upperHorPoint[]
+dim _upperHorPos[][]
+_upperHorPoint[1]=0
+_upperHorPos[1][1]=0
+_upperHorPos[1][2]=0
+
+upperHorYnum=ceil((slabY-2*rebarStartPos)/upperHorPitch)+1
+upperHorPitch=(slabY-2*rebarStartPos)/(upperHorYnum-1)
+
+dim _upperHorIntNum[][]
+dim _upperHorIntPos[][]
+_upperHorIntNum[1][1]=0
+_upperHorIntNum[1][2]=0
+_upperHorIntPos[1][1]=0
+_upperHorIntPos[1][2]=0
+
+for i=1 to upperHorYnum
+    !y座標
+    upperHorY=miny+rebarStartPos+(i-1)*upperHorPitch+upperHorOffset
+
+    !スラブとの交点
+    intCount=0
+
+    for j=1 to slabPoint
+        if j<slabPoint then
+            j2=j+1
+        else
+            j2=1
+        endif
+
+        if upperHorY>min(_slabPos[j][y],_slabPos[j2][y]) and upperHorY<=max(_slabPos[j][y],_slabPos[j2][y]) then
+            intCount=intCount+1
+            _upperHorIntNum[i][intCount]=j
+            _upperHorIntPos[i][intCount]=-(_equationB[j]*upperHorY+_equationC[j])/_equationA[j]
+        endif
+    next j
+
+    !交点順位付け
+    for n=1 to intCount-1
+        for j=1 to intCount-1
+            if _upperHorIntPos[i][j]>_upperHorIntPos[i][j+1] then
+                tempNum=_upperHorIntNum[i][j]
+                _upperHorIntNum[i][j]=_upperHorIntNum[i][j+1]
+                _upperHorIntNum[i][j+1]=tempNum
+                tempPos=_upperHorIntPos[i][j]
+                _upperHorIntPos[i][j]=_upperHorIntPos[i][j+1]
+                _upperHorIntPos[i][j+1]=tempPos
+            endif
+        next j
+    next n
+
+    for j=1 to intCount/2
+        upperHorEdgeNum1=_upperHorIntNum[i][2*j-1]
+        upperHorEdgeNum2=_upperHorIntNum[i][2*j]
+        upperHorEdgePos1=_upperHorIntPos[i][2*j-1]
+        upperHorEdgePos2=_upperHorIntPos[i][2*j]
+
+        !y1座標
+        if topAnchorType[upperHorEdgeNum1]=0 then !端部に止める
+            upperHorEdgeX1=upperHorEdgePos1
+        endif
+
+        if topAnchorType[upperHorEdgeNum1]=1 then !L1/2
+            upperHorEdgeX1=upperHorEdgePos1-(L1+L1PLus)/2*upperHorNd/1000
+        endif
+
+        if topAnchorType[upperHorEdgeNum1]=2 then !L1
+            upperHorEdgeX1=upperHorEdgePos1-(L1+L1PLus)*upperHorNd/1000
+        endif
+
+        if topAnchorType[upperHorEdgeNum1]=3 then !L2直線
+            upperHorEdgeX1=upperHorEdgePos1-(L2+L2PLus)*upperHorNd/1000
+        endif
+
+        if topAnchorType[upperHorEdgeNum1]=4 then !下アンカー
+            upperHorEdgeX1=upperHorEdgePos1-(topAnchorLen-upperHorOd/2)
+        endif
+
+        if topAnchorType[upperHorEdgeNum1]=5 then !端部
+            upperHorEdgeX1=upperHorEdgePos1+sideCover
+        endif
+
+        !y2座標
+        if topAnchorType[upperHorEdgeNum2]=0 then !端部に止める
+            upperHorEdgeX2=upperHorEdgePos2
+        endif
+
+        if topAnchorType[upperHorEdgeNum2]=1 then !L1/2
+            upperHorEdgeX2=upperHorEdgePos2+(L1+L1PLus)/2*upperHorNd/1000
+        endif
+
+        if topAnchorType[upperHorEdgeNum2]=2 then !L1
+            upperHorEdgeX2=upperHorEdgePos2+(L1+L1PLus)*upperHorNd/1000
+        endif
+
+        if topAnchorType[upperHorEdgeNum2]=3 then !L2直線
+            upperHorEdgeX2=upperHorEdgePos2+(L2+L2PLus)*upperHorNd/1000
+        endif
+
+        if topAnchorType[upperHorEdgeNum2]=4 then !下アンカー
+            upperHorEdgeX2=upperHorEdgePos2+(topAnchorLen-upperHorOd/2)
+        endif
+
+        if topAnchorType[upperHorEdgeNum2]=5 then !端部
+            upperHorEdgeX2=upperHorEdgePos2-sideCover
+        endif
+
+        if upperHorEdgeX2-upperHorEdgeX1>=minimumLen then
+            connectCount=ceil(abs(upperHorEdgeX2-upperHorEdgeX1)/connectLen)
+            connectCount=ceil((abs(upperHorEdgeX2-upperHorEdgeX1)+(connectCount-1)*(L1+L1PLus)*upperHorNd/1000)/connectLen)
+
+            connectShiftFlag=1
+
+            for n=1 to connectCount
+                connectShiftFlag=1-connectShiftFlag
+
+                if n=1 then 
+                    upperHorX1=upperHorEdgeX1
+                else
+                    upperHorX1=upperHorEdgeX1+(upperHorEdgeX2-upperHorEdgeX1)*(n-1)/connectCount-(L1+L1PLus)/2*upperHorNd/1000
+                endif
+
+                if n=connectCount then
+                    upperHorX2=upperHorEdgeX2
+                else
+                    upperHorX2=upperHorEdgeX1+(upperHorEdgeX2-upperHorEdgeX1)*n/connectCount+(L1+L1PLus)/2*upperHorNd/1000
+                endif
+
+                !座標インプット
+                upperHorNum=upperHorNum+1
+                _upperHorPoint[upperHorNum]=2
+
+                if n=1 and topAnchorType[upperHorEdgeNum1]=4 then
+                    _upperHorPoint[upperHorNum]=_upperHorPoint[upperHorNum]+1
+                    put upperHorX1
+                    put upperHorY+connectShiftFlag*upperHorOd
+                    put upperHorZ-elbow90R*upperHorOd-topAnchorFra
+                endif
+
+                put upperHorX1
+                put upperHorY+connectShiftFlag*upperHorOd
+                put upperHorZ
+
+                put upperHorX2
+                put upperHorY+connectShiftFlag*upperHorOd
+                put upperHorZ
+
+                if n=connectCount and topAnchorType[upperHorEdgeNum2]=4 then
+                    _upperHorPoint[upperHorNum]=_upperHorPoint[upperHorNum]+1
+                    put upperHorX2
+                    put upperHorY+connectShiftFlag*upperHorOd
+                    put upperHorZ-elbow90R*upperHorOd-topAnchorFra
+                endif
+
+                for q=1 to _upperHorPoint[upperHorNum]
+                    _upperHorPos[upperHorNum][3*q-2]=get(1)
+                    _upperHorPos[upperHorNum][3*q-1]=get(1)
+                    _upperHorPos[upperHorNum][3*q]=get(1)
+                next q
+            next n
+
+            !端部コの字筋
+            if topAnchorType[upperHorEdgeNum1]=5 and downAnchorType[upperHorEdgeNum1]=5 then
+                edgeBarNum=edgeBarNum+1
+                _edgeBarOd[edgeBarNum]=upperHorOd
+                _edgeBarPen[edgeBarNum]=sdPen[scode_list[upperHorNd]]
+                _edgeBarMat[edgeBarNum]=sdMat[scode_list[upperHorNd]]
+                _edgeBarPoint[edgeBarNum]=4
+
+                put upperHorEdgeX1+upperHorOd/2+(elbow90R*upperHorOd+edgeBarAnchorFra)
+                put upperHorY+upperHorOd
+                put upperHorZ
+
+                put upperHorEdgeX1+upperHorOd/2
+                put upperHorY+upperHorOd
+                put upperHorZ
+
+                put upperHorEdgeX1+upperHorOd/2
+                put upperHorY+upperHorOd
+                put lowerHorZ
+
+                put upperHorEdgeX1+upperHorOd/2+(elbow90R*upperHorOd+edgeBarAnchorFra)
+                put upperHorY+upperHorOd
+                put lowerHorZ
+
+                for q=1 to _edgeBarPoint[edgeBarNum]
+                    _edgeBarPos[edgeBarNum][3*q-2]=get(1)
+                    _edgeBarPos[edgeBarNum][3*q-1]=get(1)
+                    _edgeBarPos[edgeBarNum][3*q]=get(1)
+                next q
+            endif
+
+            if topAnchorType[upperHorEdgeNum2]=5 and downAnchorType[upperHorEdgeNum2]=5 then
+                edgeBarNum=edgeBarNum+1
+                _edgeBarOd[edgeBarNum]=upperHorOd
+                _edgeBarPen[edgeBarNum]=sdPen[scode_list[upperHorNd]]
+                _edgeBarMat[edgeBarNum]=sdMat[scode_list[upperHorNd]]
+                _edgeBarPoint[edgeBarNum]=4
+
+                put upperHorEdgeX2-upperHorOd/2-(elbow90R*upperHorOd+edgeBarAnchorFra)
+                put upperHorY+(1-connectShiftFlag)*upperHorOd
+                put upperHorZ
+
+                put upperHorEdgeX2-upperHorOd/2
+                put upperHorY+(1-connectShiftFlag)*upperHorOd
+                put upperHorZ
+
+                put upperHorEdgeX2-upperHorOd/2
+                put upperHorY+(1-connectShiftFlag)*upperHorOd
+                put lowerHorZ
+
+                put upperHorEdgeX2-upperHorOd/2-(elbow90R*upperHorOd+edgeBarAnchorFra)
+                put upperHorY+(1-connectShiftFlag)*upperHorOd
+                put lowerHorZ
+
+                for q=1 to _edgeBarPoint[edgeBarNum]
+                    _edgeBarPos[edgeBarNum][3*q-2]=get(1)
+                    _edgeBarPos[edgeBarNum][3*q-1]=get(1)
+                    _edgeBarPos[edgeBarNum][3*q]=get(1)
+                next q
+            endif
+        endif
+    next j
+next i
+
+
+
+
+!=================================下端縦筋
+lowerVerNum=0
+dim _lowerVerPoint[]
+dim _lowerVerPos[][]
+_lowerVerPoint[1]=0
+_lowerVerPos[1][1]=0
+_lowerVerPos[1][2]=0
+
+lowerVerXnum=ceil((slabX-2*rebarStartPos)/lowerVerPitch)+1
+lowerVerPitch=(slabX-2*rebarStartPos)/(lowerVerXnum-1)
+
+dim _lowerVerIntNum[][]
+dim _lowerVerIntPos[][]
+_lowerVerIntNum[1][1]=0
+_lowerVerIntNum[1][2]=0
+_lowerVerIntPos[1][1]=0
+_lowerVerIntPos[1][2]=0
+
+!z座標
+if mbarDir+downBarArrangePos=3 then
+    lowerVerZ=-slabThi+(downCover+lowerVerOd/2)
+else
+    lowerVerZ=-slabThi+(downCover+lowerHorOd+lowerVerOd/2)
+endif
+
+for i=1 to lowerVerXnum
+    !x座標
+    lowerVerX=minx+rebarStartPos+(i-1)*lowerVerPitch+lowerVerOffset
+
+    !スラブとの交点
+    intCount=0
+
+    for j=1 to slabPoint
+        if j<slabPoint then
+            j2=j+1
+        else
+            j2=1
+        endif
+
+        if lowerVerX>min(_slabPos[j][x],_slabPos[j2][x]) and lowerVerX<=max(_slabPos[j][x],_slabPos[j2][x]) then
+            intCount=intCount+1
+            _lowerVerIntNum[i][intCount]=j
+            _lowerVerIntPos[i][intCount]=-(_equationA[j]*lowerVerX+_equationC[j])/_equationB[j]
+        endif
+    next j
+
+    !交点順位付け
+    for n=1 to intCount-1
+        for j=1 to intCount-1
+            if _lowerVerIntPos[i][j]>_lowerVerIntPos[i][j+1] then
+                tempNum=_lowerVerIntNum[i][j]
+                _lowerVerIntNum[i][j]=_lowerVerIntNum[i][j+1]
+                _lowerVerIntNum[i][j+1]=tempNum
+                tempPos=_lowerVerIntPos[i][j]
+                _lowerVerIntPos[i][j]=_lowerVerIntPos[i][j+1]
+                _lowerVerIntPos[i][j+1]=tempPos
+            endif
+        next j
+    next n
+
+    for j=1 to intCount/2
+        lowerVerEdgeNum1=_lowerVerIntNum[i][2*j-1]
+        lowerVerEdgeNum2=_lowerVerIntNum[i][2*j]
+        lowerVerEdgePos1=_lowerVerIntPos[i][2*j-1]
+        lowerVerEdgePos2=_lowerVerIntPos[i][2*j]
+
+        !y1座標
+        if downAnchorType[lowerVerEdgeNum1]=0 then !端部に止める
+            lowerVerEdgeY1=lowerVerEdgePos1
+        endif
+
+        if downAnchorType[lowerVerEdgeNum1]=1 then !L1/2
+            lowerVerEdgeY1=lowerVerEdgePos1-(L1+L1PLus)/2*lowerVerNd/1000
+        endif
+
+        if downAnchorType[lowerVerEdgeNum1]=2 then !L1
+            lowerVerEdgeY1=lowerVerEdgePos1-(L1+L1PLus)*lowerVerNd/1000
+        endif
+
+        if downAnchorType[lowerVerEdgeNum1]=3 then !L2直線
+            lowerVerEdgeY1=lowerVerEdgePos1-(L2+L2PLus)*lowerVerNd/1000
+        endif
+
+        if downAnchorType[lowerVerEdgeNum1]=4 then !下アンカー
+            lowerVerEdgeY1=lowerVerEdgePos1-(downAnchorLen-lowerVerOd/2)
+        endif
+
+        if downAnchorType[lowerVerEdgeNum1]=5 then !端部
+            lowerVerEdgeY1=lowerVerEdgePos1+sideCover
+        endif
+
+        !y2座標
+        if downAnchorType[lowerVerEdgeNum2]=0 then !端部に止める
+            lowerVerEdgeY2=lowerVerEdgePos2
+        endif
+
+        if downAnchorType[lowerVerEdgeNum2]=1 then !L1/2
+            lowerVerEdgeY2=lowerVerEdgePos2+(L1+L1PLus)/2*lowerVerNd/1000
+        endif
+
+        if downAnchorType[lowerVerEdgeNum2]=2 then !L1
+            lowerVerEdgeY2=lowerVerEdgePos2+(L1+L1PLus)*lowerVerNd/1000
+        endif
+
+        if downAnchorType[lowerVerEdgeNum2]=3 then !L2直線
+            lowerVerEdgeY2=lowerVerEdgePos2+(L2+L2PLus)*lowerVerNd/1000
+        endif
+
+        if downAnchorType[lowerVerEdgeNum2]=4 then !下アンカー
+            lowerVerEdgeY2=lowerVerEdgePos2+(downAnchorLen-lowerVerOd/2)
+        endif
+
+        if downAnchorType[lowerVerEdgeNum2]=5 then !端部
+            lowerVerEdgeY2=lowerVerEdgePos2-sideCover
+        endif
+
+        if lowerVerEdgeY2-lowerVerEdgeY1>=minimumLen then
+            connectCount=ceil(abs(lowerVerEdgeY2-lowerVerEdgeY1)/connectLen)
+            connectCount=ceil((abs(lowerVerEdgeY2-lowerVerEdgeY1)+(connectCount-1)*(L1+L1PLus)*lowerVerNd/1000)/connectLen)
+
+            connectShiftFlag=1
+
+            for n=1 to connectCount
+                connectShiftFlag=1-connectShiftFlag
+
+                if n=1 then 
+                    lowerVerY1=lowerVerEdgeY1
+                else
+                    lowerVerY1=lowerVerEdgeY1+(lowerVerEdgeY2-lowerVerEdgeY1)*(n-1)/connectCount-(L1+L1PLus)/2*lowerVerNd/1000
+                endif
+
+                if n=connectCount then
+                    lowerVerY2=lowerVerEdgeY2
+                else
+                    lowerVerY2=lowerVerEdgeY1+(lowerVerEdgeY2-lowerVerEdgeY1)*n/connectCount+(L1+L1PLus)/2*lowerVerNd/1000
+                endif
+
+                !座標インプット
+                lowerVerNum=lowerVerNum+1
+                _lowerVerPoint[lowerVerNum]=2
+
+                if n=1 and downAnchorType[lowerVerEdgeNum1]=4 then
+                    _lowerVerPoint[lowerVerNum]=_lowerVerPoint[lowerVerNum]+1
+                    put lowerVerX+connectShiftFlag*lowerVerOd
+                    put lowerVerY1
+                    put lowerVerZ-elbow90R*lowerHorOd-downAnchorFra
+                endif
+
+                put lowerVerX+connectShiftFlag*lowerVerOd
+                put lowerVerY1
+                put lowerVerZ
+
+                put lowerVerX+connectShiftFlag*lowerVerOd
+                put lowerVerY2
+                put lowerVerZ
+
+                if n=connectCount and downAnchorType[lowerVerEdgeNum2]=4 then
+                    _lowerVerPoint[lowerVerNum]=_lowerVerPoint[lowerVerNum]+1
+                    put lowerVerX+connectShiftFlag*lowerVerOd
+                    put lowerVerY2
+                    put lowerVerZ-elbow90R*lowerHorOd-downAnchorFra
+                endif
+
+                for q=1 to _lowerVerPoint[lowerVerNum]
+                    _lowerVerPos[lowerVerNum][3*q-2]=get(1)
+                    _lowerVerPos[lowerVerNum][3*q-1]=get(1)
+                    _lowerVerPos[lowerVerNum][3*q]=get(1)
+                next q
+            next n
+        endif
+    next j
+next i
+
+
+!=================================下端横筋
+lowerHorNum=0
+dim _lowerHorPoint[]
+dim _lowerHorPos[][]
+_lowerHorPoint[1]=0
+_lowerHorPos[1][1]=0
+_lowerHorPos[1][2]=0
+
+lowerHorYnum=ceil((slabY-2*rebarStartPos)/lowerHorPitch)+1
+lowerHorPitch=(slabY-2*rebarStartPos)/(lowerHorYnum-1)
+
+dim _lowerHorIntNum[][]
+dim _lowerHorIntPos[][]
+_lowerHorIntNum[1][1]=0
+_lowerHorIntNum[1][2]=0
+_lowerHorIntPos[1][1]=0
+_lowerHorIntPos[1][2]=0
+
+for i=1 to lowerHorYnum
+    !y座標
+    lowerHorY=miny+rebarStartPos+(i-1)*lowerHorPitch+lowerHorOffset
+
+    !スラブとの交点
+    intCount=0
+
+    for j=1 to slabPoint
+        if j<slabPoint then
+            j2=j+1
+        else
+            j2=1
+        endif
+
+        if lowerHorY>min(_slabPos[j][y],_slabPos[j2][y]) and lowerHorY<=max(_slabPos[j][y],_slabPos[j2][y]) then
+            intCount=intCount+1
+            _lowerHorIntNum[i][intCount]=j
+            _lowerHorIntPos[i][intCount]=-(_equationB[j]*lowerHorY+_equationC[j])/_equationA[j]
+        endif
+    next j
+
+    !交点順位付け
+    for n=1 to intCount-1
+        for j=1 to intCount-1
+            if _lowerHorIntPos[i][j]>_lowerHorIntPos[i][j+1] then
+                tempNum=_lowerHorIntNum[i][j]
+                _lowerHorIntNum[i][j]=_lowerHorIntNum[i][j+1]
+                _lowerHorIntNum[i][j+1]=tempNum
+                tempPos=_lowerHorIntPos[i][j]
+                _lowerHorIntPos[i][j]=_lowerHorIntPos[i][j+1]
+                _lowerHorIntPos[i][j+1]=tempPos
+            endif
+        next j
+    next n
+
+    for j=1 to intCount/2
+        lowerHorEdgeNum1=_lowerHorIntNum[i][2*j-1]
+        lowerHorEdgeNum2=_lowerHorIntNum[i][2*j]
+        lowerHorEdgePos1=_lowerHorIntPos[i][2*j-1]
+        lowerHorEdgePos2=_lowerHorIntPos[i][2*j]
+
+        !y1座標
+        if downAnchorType[lowerHorEdgeNum1]=0 then !端部に止める
+            lowerHorEdgeX1=lowerHorEdgePos1
+        endif
+
+        if downAnchorType[lowerHorEdgeNum1]=1 then !L1/2
+            lowerHorEdgeX1=lowerHorEdgePos1-(L1+L1PLus)/2*lowerHorNd/1000
+        endif
+
+        if downAnchorType[lowerHorEdgeNum1]=2 then !L1
+            lowerHorEdgeX1=lowerHorEdgePos1-(L1+L1PLus)*lowerHorNd/1000
+        endif
+
+        if downAnchorType[lowerHorEdgeNum1]=3 then !L2直線
+            lowerHorEdgeX1=lowerHorEdgePos1-(L2+L2PLus)*lowerHorNd/1000
+        endif
+
+        if downAnchorType[lowerHorEdgeNum1]=4 then !下アンカー
+            lowerHorEdgeX1=lowerHorEdgePos1-(downAnchorLen-lowerHorOd/2)
+        endif
+
+        if downAnchorType[lowerHorEdgeNum1]=5 then !端部
+            lowerHorEdgeX1=lowerHorEdgePos1+sideCover
+        endif
+
+        !y2座標
+        if downAnchorType[lowerHorEdgeNum2]=0 then !端部に止める
+            lowerHorEdgeX2=lowerHorEdgePos2
+        endif
+
+        if downAnchorType[lowerHorEdgeNum2]=1 then !L1/2
+            lowerHorEdgeX2=lowerHorEdgePos2+(L1+L1PLus)/2*lowerHorNd/1000
+        endif
+
+        if downAnchorType[lowerHorEdgeNum2]=2 then !L1
+            lowerHorEdgeX2=lowerHorEdgePos2+(L1+L1PLus)*lowerHorNd/1000
+        endif
+
+        if downAnchorType[lowerHorEdgeNum2]=3 then !L2直線
+            lowerHorEdgeX2=lowerHorEdgePos2+(L2+L2PLus)*lowerHorNd/1000
+        endif
+
+        if downAnchorType[lowerHorEdgeNum2]=4 then !下アンカー
+            lowerHorEdgeX2=lowerHorEdgePos2+(downAnchorLen-lowerHorOd/2)
+        endif
+
+        if downAnchorType[lowerHorEdgeNum2]=5 then !端部
+            lowerHorEdgeX2=lowerHorEdgePos2-sideCover
+        endif
+
+        if lowerHorEdgeX2-lowerHorEdgeX1>=minimumLen then
+            connectCount=ceil(abs(lowerHorEdgeX2-lowerHorEdgeX1)/connectLen)
+            connectCount=ceil((abs(lowerHorEdgeX2-lowerHorEdgeX1)+(connectCount-1)*(L1+L1PLus)*lowerHorNd/1000)/connectLen)
+
+            connectShiftFlag=1
+
+            for n=1 to connectCount
+                connectShiftFlag=1-connectShiftFlag
+
+                if n=1 then 
+                    lowerHorX1=lowerHorEdgeX1
+                else
+                    lowerHorX1=lowerHorEdgeX1+(lowerHorEdgeX2-lowerHorEdgeX1)*(n-1)/connectCount-(L1+L1PLus)/2*lowerHorNd/1000
+                endif
+
+                if n=connectCount then
+                    lowerHorX2=lowerHorEdgeX2
+                else
+                    lowerHorX2=lowerHorEdgeX1+(lowerHorEdgeX2-lowerHorEdgeX1)*n/connectCount+(L1+L1PLus)/2*lowerHorNd/1000
+                endif
+
+                !座標インプット
+                lowerHorNum=lowerHorNum+1
+                _lowerHorPoint[lowerHorNum]=2
+
+                if n=1 and downAnchorType[lowerHorEdgeNum1]=4 then
+                    _lowerHorPoint[lowerHorNum]=_lowerHorPoint[lowerHorNum]+1
+                    put lowerHorX1
+                    put lowerHorY+connectShiftFlag*lowerHorOd
+                    put lowerHorZ-elbow90R*lowerHorOd-downAnchorFra
+                endif
+
+                put lowerHorX1
+                put lowerHorY+connectShiftFlag*lowerHorOd
+                put lowerHorZ
+
+                put lowerHorX2
+                put lowerHorY+connectShiftFlag*lowerHorOd
+                put lowerHorZ
+
+                if n=connectCount and downAnchorType[lowerHorEdgeNum2]=4 then
+                    _lowerHorPoint[lowerHorNum]=_lowerHorPoint[lowerHorNum]+1
+                    put lowerHorX2
+                    put lowerHorY+connectShiftFlag*lowerHorOd
+                    put lowerHorZ-elbow90R*lowerHorOd-downAnchorFra
+                endif
+
+                for q=1 to _lowerHorPoint[lowerHorNum]
+                    _lowerHorPos[lowerHorNum][3*q-2]=get(1)
+                    _lowerHorPos[lowerHorNum][3*q-1]=get(1)
+                    _lowerHorPos[lowerHorNum][3*q]=get(1)
+                next q
+            next n
+        endif
+    next j
+next i
+
+
+!=================================端部コの字筋
+parameters \
+edgeBarNum=edgeBarNum,
+edgeBarOd=_edgeBarOd,
+edgeBarPen=_edgeBarPen,
+edgeBarMat=_edgeBarMat,
+edgeBarPoint=_edgeBarPoint,
+edgeBarPos=_edgeBarPos
+
+
+!=====================================================================鉄筋情報=====================================================================!
+parameters \
+upperMbarOd=od_list[upperMbarNd],
+upperMbarMat=SDmat[scode_list[upperMbarNd]],
+upperMbarPen=SDpen[scode_list[upperMbarNd]],
+upperDbarOd=od_list[upperDbarNd],
+upperDbarMat=SDmat[scode_list[upperDbarNd]],
+upperDbarPen=SDpen[scode_list[upperDbarNd]],
+lowerMbarOd=od_list[lowerMbarNd],
+lowerMbarMat=SDmat[scode_list[lowerMbarNd]],
+lowerMbarPen=SDpen[scode_list[lowerMbarNd]],
+lowerDbarOd=od_list[lowerDbarNd],
+lowerDbarMat=SDmat[scode_list[lowerDbarNd]],
+lowerDbarPen=SDpen[scode_list[lowerDbarNd]]
+
+lock "upperMbarOd","upperMbarMat","upperMbarPen","upperDbarOd","upperDbarMat","upperDbarPen","lowerMbarOd","lowerMbarMat","lowerMbarPen","lowerDbarOd","lowerDbarMat","lowerDbarPen"
+
+if mbarDir=1 then
+    !上端主筋
+    parameters \
+    upperMbarNum=upperVerNum,
+    upperMbarPoint=_upperVerPoint,
+    upperMbarPos=_upperVerPos
+
+    !上端配力筋
+    parameters \
+    upperDbarNum=upperHorNum,
+    upperDbarPoint=_upperHorPoint,
+    upperDbarPos=_upperHorPos
+
+    !下端主筋
+    parameters \
+    lowerMbarNum=lowerVerNum,
+    lowerMbarPoint=_lowerVerPoint,
+    lowerMbarPos=_lowerVerPos
+
+    !下端配力筋
+    parameters \
+    lowerDbarNum=lowerHorNum,
+    lowerDbarPoint=_lowerHorPoint,
+    lowerDbarPos=_lowerHorPos
+else
+    !上端主筋
+    parameters \
+    upperMbarNum=upperHorNum,
+    upperMbarPoint=_upperHorPoint,
+    upperMbarPos=_upperHorPos
+
+    !上端配力筋
+    parameters \
+    upperDbarNum=upperVerNum,
+    upperDbarPoint=_upperVerPoint,
+    upperDbarPos=_upperVerPos
+
+    !下端主筋
+    parameters \
+    lowerMbarNum=lowerHorNum,
+    lowerMbarPoint=_lowerHorPoint,
+    lowerMbarPos=_lowerHorPos
+
+    !下端配力筋
+    parameters \
+    lowerDbarNum=lowerVerNum,
+    lowerDbarPoint=_lowerVerPoint,
+    lowerDbarPos=_lowerVerPos
+endif

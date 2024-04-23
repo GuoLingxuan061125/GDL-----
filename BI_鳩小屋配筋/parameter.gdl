@@ -1,0 +1,839 @@
+!==============================================================================配筋設定
+values{2} "conFc" 18,"18 N/㎟",21,"21 N/㎟",24,"24 N/㎟",27,"27 N/㎟",30,"30 N/㎟",33,"33 N/㎟",36,"36 N/㎟",39,"39 N/㎟",42,"42 N/㎟",45,"45 N/㎟",\
+				  48,"48 N/㎟",51,"51 N/㎟",54,"54 N/㎟",57,"57 N/㎟",60,"60 N/㎟"
+
+if conFc=18 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345"
+if conFc=21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390"
+if conFc>21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390",4,"SD490"
+
+parameters l2=l2_list[sdType][conFc]
+parameters l2h=l2h_list[sdType][conFc]
+
+values "SDresol" range[3,]
+
+values{2} "foundation_pattern" 1,"シングル",2,"ダブル"
+values{2} "roof_pattern" 1,"シングル",2,"ダブル"
+
+
+!==============================================================================立上り横筋
+values{2} "fhor_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+values "fhor_start_pos" range[0,]
+values "fhor_pitch" range[0.05,]
+values "fhor_corner_fra" range[0,]
+
+fhor_r=dr_list[fhor_steel]
+fhor_nd=nd_list[fhor_steel]
+fhor_mat=SDmat[scode_list[fhor_steel]]
+fhor_pen=SDpen[scode_list[fhor_steel]]
+
+parameters fhor_r=fhor_r,
+    fhor_nd=fhor_nd,
+    fhor_mat=fhor_mat,
+    fhor_pen=fhor_pen
+
+fhor_num=0
+dim _fhor_point[]
+dim _fhor_pos[][]
+
+fhor_z_num=ceil(((down_z+eaves_z1+eaves_z2+top_z+roof_z1/2)-fhor_start_pos-2*fhor_r)/fhor_pitch)+1
+
+dim fhor_z_pos[]
+for i=1 to fhor_z_num
+	if i<fhor_z_num then
+		fhor_z_pos[i]=fhor_start_pos+(i-1)*fhor_pitch
+	else
+		fhor_z_pos[i]=down_z+eaves_z1+eaves_z2+top_z+roof_z1/2
+	endif
+next i
+
+for i=1 to fhor_z_num
+	!下
+	fhor_num=fhor_num+1
+	_fhor_point[fhor_num]=3
+
+	put down_x/2-wall_side_cover-fhor_r-2*fhor_nd
+	put -down_y/2+wall_side_cover+fhor_r
+	put fhor_z_pos[i]+fhor_r
+
+	put -down_x/2+wall_side_cover+fhor_r
+	put -down_y/2+wall_side_cover+fhor_r
+	put fhor_z_pos[i]+fhor_r
+
+	put -down_x/2+wall_side_cover+fhor_r
+	put -down_y/2+wall_side_cover+fhor_r+(2*fhor_nd+fhor_corner_fra*fhor_nd)
+	put fhor_z_pos[i]+fhor_r
+
+	for n=1 to 3*_fhor_point[fhor_num]
+		_fhor_pos[fhor_num][n]=get(1)
+	next n
+
+	!上
+	fhor_num=fhor_num+1
+	_fhor_point[fhor_num]=3
+
+	put -down_x/2+wall_side_cover+fhor_r+2*fhor_nd
+	put down_y/2-wall_side_cover-fhor_r
+	put fhor_z_pos[i]+fhor_r
+
+	put down_x/2-wall_side_cover-fhor_r
+	put down_y/2-wall_side_cover-fhor_r
+	put fhor_z_pos[i]+fhor_r
+
+	put down_x/2-wall_side_cover-fhor_r
+	put down_y/2-wall_side_cover-fhor_r-(2*fhor_nd+fhor_corner_fra*fhor_nd)
+	put fhor_z_pos[i]+fhor_r
+
+	for n=1 to 3*_fhor_point[fhor_num]
+		_fhor_pos[fhor_num][n]=get(1)
+	next n
+
+	!左
+	fhor_num=fhor_num+1
+	_fhor_point[fhor_num]=3
+
+	put -down_x/2+wall_side_cover+fhor_r
+	put -down_y/2+wall_side_cover+fhor_r+2*fhor_nd
+	put fhor_z_pos[i]-fhor_r
+
+	put -down_x/2+wall_side_cover+fhor_r
+	put down_y/2-wall_side_cover-fhor_r
+	put fhor_z_pos[i]-fhor_r
+
+	put -down_x/2+wall_side_cover+fhor_r+(2*fhor_nd+fhor_corner_fra*fhor_nd)
+	put down_y/2-wall_side_cover-fhor_r
+	put fhor_z_pos[i]-fhor_r
+
+	for n=1 to 3*_fhor_point[fhor_num]
+		_fhor_pos[fhor_num][n]=get(1)
+	next n
+
+	!右
+	fhor_num=fhor_num+1
+	_fhor_point[fhor_num]=3
+
+	put down_x/2-wall_side_cover-fhor_r
+	put down_y/2-wall_side_cover-fhor_r-2*fhor_nd
+	put fhor_z_pos[i]-fhor_r
+
+	put down_x/2-wall_side_cover-fhor_r
+	put -down_y/2+wall_side_cover+fhor_r
+	put fhor_z_pos[i]-fhor_r
+
+	put down_x/2-wall_side_cover-fhor_r-(2*fhor_nd+fhor_corner_fra*fhor_nd)
+	put -down_y/2+wall_side_cover+fhor_r
+	put fhor_z_pos[i]-fhor_r
+
+	for n=1 to 3*_fhor_point[fhor_num]
+		_fhor_pos[fhor_num][n]=get(1)
+	next n
+next i
+
+!ダブル
+if foundation_pattern=2 then
+	for i=1 to fhor_z_num
+		!下
+		fhor_num=fhor_num+1
+		_fhor_point[fhor_num]=3
+
+		put down_x/2-thi+wall_side_cover-fhor_r-2*fhor_nd
+		put -down_y/2+thi-wall_side_cover-fhor_r
+		put fhor_z_pos[i]+fhor_r
+
+		put -down_x/2+thi-wall_side_cover-fhor_r
+		put -down_y/2+thi-wall_side_cover-fhor_r
+		put fhor_z_pos[i]+fhor_r
+
+		put -down_x/2+thi-wall_side_cover-fhor_r
+		put -down_y/2+thi-wall_side_cover-fhor_r+(2*fhor_nd+fhor_corner_fra*fhor_nd)
+		put fhor_z_pos[i]+fhor_r
+
+		for n=1 to 3*_fhor_point[fhor_num]
+			_fhor_pos[fhor_num][n]=get(1)
+		next n
+
+		!上
+		fhor_num=fhor_num+1
+		_fhor_point[fhor_num]=3
+
+		put -down_x/2+thi-wall_side_cover+fhor_r+2*fhor_nd
+		put down_y/2-thi+wall_side_cover+fhor_r
+		put fhor_z_pos[i]+fhor_r
+
+		put down_x/2-thi+wall_side_cover+fhor_r
+		put down_y/2-thi+wall_side_cover+fhor_r
+		put fhor_z_pos[i]+fhor_r
+
+		put down_x/2-thi+wall_side_cover+fhor_r
+		put down_y/2-thi+wall_side_cover+fhor_r-(2*fhor_nd+fhor_corner_fra*fhor_nd)
+		put fhor_z_pos[i]+fhor_r
+
+		for n=1 to 3*_fhor_point[fhor_num]
+			_fhor_pos[fhor_num][n]=get(1)
+		next n
+
+		!左
+		fhor_num=fhor_num+1
+		_fhor_point[fhor_num]=3
+
+		put -down_x/2+thi-wall_side_cover-fhor_r
+		put -down_y/2+thi-wall_side_cover+fhor_r+2*fhor_nd
+		put fhor_z_pos[i]-fhor_r
+
+		put -down_x/2+thi-wall_side_cover-fhor_r
+		put down_y/2-thi+wall_side_cover+fhor_r
+		put fhor_z_pos[i]-fhor_r
+
+		put -down_x/2+thi-wall_side_cover-fhor_r+(2*fhor_nd+fhor_corner_fra*fhor_nd)
+		put down_y/2-thi+wall_side_cover+fhor_r
+		put fhor_z_pos[i]-fhor_r
+
+		for n=1 to 3*_fhor_point[fhor_num]
+			_fhor_pos[fhor_num][n]=get(1)
+		next n
+
+		!右
+		fhor_num=fhor_num+1
+		_fhor_point[fhor_num]=3
+
+		put down_x/2-thi+wall_side_cover+fhor_r
+		put down_y/2-thi+wall_side_cover-fhor_r-2*fhor_nd
+		put fhor_z_pos[i]-fhor_r
+
+		put down_x/2-thi+wall_side_cover+fhor_r
+		put -down_y/2+thi-wall_side_cover-fhor_r
+		put fhor_z_pos[i]-fhor_r
+
+		put down_x/2-thi+wall_side_cover+fhor_r-(2*fhor_nd+fhor_corner_fra*fhor_nd)
+		put -down_y/2+thi-wall_side_cover-fhor_r
+		put fhor_z_pos[i]-fhor_r
+
+		for n=1 to 3*_fhor_point[fhor_num]
+			_fhor_pos[fhor_num][n]=get(1)
+		next n
+	next i
+endif
+
+parameters fhor_num=fhor_num,
+	fhor_point=_fhor_point,
+	fhor_pos=_fhor_pos
+
+
+!==============================================================================立上り縦筋
+values{2} "fver_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+values "fver_pitch" range[0.05,]
+values "fver_anchor_fra" range[0,]
+
+fver_r=dr_list[fver_steel]
+fver_nd=nd_list[fver_steel]
+fver_mat=SDmat[scode_list[fver_steel]]
+fver_pen=SDpen[scode_list[fver_steel]]
+
+parameters fver_r=fver_r,
+    fver_nd=fver_nd,
+    fver_mat=fver_mat,
+    fver_pen=fver_pen
+
+fver_num=0
+dim _fver_point[]
+dim _fver_pos[][]
+
+fver_x1_num=int((down_x-2*wall_side_cover-4*fhor_r-2*fver_r)/fver_pitch)+1
+
+dim fver_x1_pos[]
+for i=1 to fver_x1_num
+	fver_x1_pos[i]=-down_x/2+(down_x-(fver_x1_num-1)*fver_pitch)/2+(i-1)*fver_pitch
+next i
+
+for i=1 to fver_x1_num
+	!下
+	fver_num=fver_num+1
+	_fver_point[fver_num]=3
+
+	put fver_x1_pos[i]
+	put -down_y/2+wall_side_cover+2*fhor_r+fver_r
+	put (down_z+eaves_z1+eaves_z2+top_z+roof_z1)-wall_top_cover
+
+	put fver_x1_pos[i]
+	put -down_y/2+wall_side_cover+2*fhor_r+fver_r
+	put wall_down_cover+fver_r
+
+	put fver_x1_pos[i]
+	put -down_y/2+wall_side_cover+2*fhor_r+fver_r-(2*fver_nd+fver_anchor_fra*fver_nd)
+	put wall_down_cover+fver_r
+
+	for n=1 to 3*_fver_point[fver_num]
+		_fver_pos[fver_num][n]=get(1)
+	next n
+
+	!上
+	fver_num=fver_num+1
+	_fver_point[fver_num]=3
+
+	put fver_x1_pos[i]
+	put down_y/2-wall_side_cover-2*fhor_r-fver_r
+	put (down_z+eaves_z1+eaves_z2+top_z+roof_z1)-wall_top_cover
+
+	put fver_x1_pos[i]
+	put down_y/2-wall_side_cover-2*fhor_r-fver_r
+	put wall_down_cover+fver_r
+
+	put fver_x1_pos[i]
+	put down_y/2-wall_side_cover-2*fhor_r-fver_r+(2*fver_nd+fver_anchor_fra*fver_nd)
+	put wall_down_cover+fver_r
+
+	for n=1 to 3*_fver_point[fver_num]
+		_fver_pos[fver_num][n]=get(1)
+	next n
+next i
+
+
+fver_y1_num=int((down_y-2*wall_side_cover-4*fhor_r-2*fver_r)/fver_pitch)+1
+
+dim fver_y1_pos[]
+for i=1 to fver_y1_num
+	fver_y1_pos[i]=-down_y/2+(down_y-(fver_y1_num-1)*fver_pitch)/2+(i-1)*fver_pitch
+next i
+
+for i=1 to fver_y1_num
+	!左
+	fver_num=fver_num+1
+	_fver_point[fver_num]=3
+
+	put -down_x/2+wall_side_cover+2*fhor_r+fver_r
+	put fver_y1_pos[i]
+	put (down_z+eaves_z1+eaves_z2+top_z+roof_z1)-wall_top_cover
+
+	put -down_x/2+wall_side_cover+2*fhor_r+fver_r
+	put fver_y1_pos[i]
+	put wall_down_cover+fver_r
+
+	put -down_x/2+wall_side_cover+2*fhor_r+fver_r-(2*fver_nd+fver_anchor_fra*fver_nd)
+	put fver_y1_pos[i]
+	put wall_down_cover+fver_r
+
+	for n=1 to 3*_fver_point[fver_num]
+		_fver_pos[fver_num][n]=get(1)
+	next n
+
+	!右
+	fver_num=fver_num+1
+	_fver_point[fver_num]=3
+
+	put down_x/2-wall_side_cover-2*fhor_r-fver_r
+	put fver_y1_pos[i]
+	put (down_z+eaves_z1+eaves_z2+top_z+roof_z1)-wall_top_cover
+
+	put down_x/2-wall_side_cover-2*fhor_r-fver_r
+	put fver_y1_pos[i]
+	put wall_down_cover+fver_r
+
+	put down_x/2-wall_side_cover-2*fhor_r-fver_r+(2*fver_nd+fver_anchor_fra*fver_nd)
+	put fver_y1_pos[i]
+	put wall_down_cover+fver_r
+
+	for n=1 to 3*_fver_point[fver_num]
+		_fver_pos[fver_num][n]=get(1)
+	next n
+next i
+
+
+if foundation_pattern=2 then
+	fver_x2_num=fver_x1_num-1
+
+	dim fver_x2_pos[]
+	for i=1 to fver_x2_num
+		fver_x2_pos[i]=fver_x1_pos[i]+fver_pitch/2
+	next i
+
+	for i=1 to fver_x2_num
+		!下
+		fver_num=fver_num+1
+		_fver_point[fver_num]=3
+
+		put fver_x2_pos[i]
+		put -down_y/2+thi-wall_side_cover-2*fhor_r-fver_r
+		put (down_z+eaves_z1+eaves_z2+top_z+roof_z1)-wall_top_cover
+
+		put fver_x2_pos[i]
+		put -down_y/2+thi-wall_side_cover-2*fhor_r-fver_r
+		put wall_down_cover+fver_r
+
+		put fver_x2_pos[i]
+		put -down_y/2+thi-wall_side_cover-2*fhor_r-fver_r-(2*fver_nd+fver_anchor_fra*fver_nd)
+		put wall_down_cover+fver_r
+
+		for n=1 to 3*_fver_point[fver_num]
+			_fver_pos[fver_num][n]=get(1)
+		next n
+
+		!上
+		fver_num=fver_num+1
+		_fver_point[fver_num]=3
+
+		put fver_x2_pos[i]
+		put down_y/2-thi+wall_side_cover+2*fhor_r+fver_r
+		put (down_z+eaves_z1+eaves_z2+top_z+roof_z1)-wall_top_cover
+
+		put fver_x2_pos[i]
+		put down_y/2-thi+wall_side_cover+2*fhor_r+fver_r
+		put wall_down_cover+fver_r
+
+		put fver_x2_pos[i]
+		put down_y/2-thi+wall_side_cover+2*fhor_r+fver_r+(2*fver_nd+fver_anchor_fra*fver_nd)
+		put wall_down_cover+fver_r
+
+		for n=1 to 3*_fver_point[fver_num]
+			_fver_pos[fver_num][n]=get(1)
+		next n
+	next i
+
+
+	fver_y2_num=fver_y1_num-1
+
+	dim fver_y2_pos[]
+	for i=1 to fver_y2_num
+		fver_y2_pos[i]=fver_y1_pos[i]+fver_pitch/2
+	next i
+
+	for i=1 to fver_y2_num
+		!下
+		fver_num=fver_num+1
+		_fver_point[fver_num]=3
+
+		put -down_x/2+thi-wall_side_cover-2*fhor_r-fver_r
+		put fver_y2_pos[i]
+		put (down_z+eaves_z1+eaves_z2+top_z+roof_z1)-wall_top_cover
+
+		put -down_x/2+thi-wall_side_cover-2*fhor_r-fver_r
+		put fver_y2_pos[i]
+		put wall_down_cover+fver_r
+
+		put -down_x/2+thi-wall_side_cover-2*fhor_r-fver_r-(2*fver_nd+fver_anchor_fra*fver_nd)
+		put fver_y2_pos[i]
+		put wall_down_cover+fver_r
+
+		for n=1 to 3*_fver_point[fver_num]
+			_fver_pos[fver_num][n]=get(1)
+		next n
+
+		!上
+		fver_num=fver_num+1
+		_fver_point[fver_num]=3
+
+		put down_x/2-thi+wall_side_cover+2*fhor_r+fver_r
+		put fver_y2_pos[i]
+		put (down_z+eaves_z1+eaves_z2+top_z+roof_z1)-wall_top_cover
+
+		put down_x/2-thi+wall_side_cover+2*fhor_r+fver_r
+		put fver_y2_pos[i]
+		put wall_down_cover+fver_r
+
+		put down_x/2-thi+wall_side_cover+2*fhor_r+fver_r+(2*fver_nd+fver_anchor_fra*fver_nd)
+		put fver_y2_pos[i]
+		put wall_down_cover+fver_r
+
+		for n=1 to 3*_fver_point[fver_num]
+			_fver_pos[fver_num][n]=get(1)
+		next n
+	next i
+endif
+
+parameters fver_num=fver_num,
+	fver_point=_fver_point,
+	fver_pos=_fver_pos
+
+
+!==============================================================================あご部配筋
+!L型縦筋
+values{2} "ever_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+values "ever_pitch" range[0.05,]
+values "ever_straight_fra" range[0,]
+
+ever_r=dr_list[ever_steel]
+ever_nd=nd_list[ever_steel]
+ever_mat=SDmat[scode_list[ever_steel]]
+ever_pen=SDpen[scode_list[ever_steel]]
+
+parameters ever_r=ever_r,
+    ever_nd=ever_nd,
+    ever_mat=ever_mat,
+    ever_pen=ever_pen
+
+ever_num=0
+dim _ever_point[]
+dim _ever_pos[][]
+
+ever_x_num=int((down_x-2*wall_side_cover-2*ever_r)/ever_pitch)+1
+
+dim ever_x_pos[]
+for i=1 to ever_x_num
+	ever_x_pos[i]=-down_x/2+(down_x-(ever_x_num-1)*ever_pitch)/2+(i-1)*ever_pitch+ever_x_offset
+next i
+
+for i=1 to ever_x_num
+	!下
+	ever_num=ever_num+1
+	_ever_point[ever_num]=4
+
+	put ever_x_pos[i]
+	put -eaves_y/2+wall_side_cover
+	put down_z+eaves_z1-wall_top_cover-ever_r
+
+	put ever_x_pos[i]
+	put -down_y/2
+	put down_z+eaves_z1+eaves_z2-wall_top_cover-ever_r
+
+	put ever_x_pos[i]
+	put -down_y/2+thi-wall_side_cover-2*fhor_r-ever_r
+	put down_z+eaves_z1+eaves_z2-wall_top_cover-ever_r
+
+	put ever_x_pos[i]
+	put -down_y/2+thi-wall_side_cover-2*fhor_r-ever_r
+	put down_z+eaves_z1+eaves_z2-wall_top_cover-ever_r-(2*ever_nd+ever_straight_fra*ever_nd)
+
+	for n=1 to 3*_ever_point[ever_num]
+		_ever_pos[ever_num][n]=get(1)
+	next n
+
+	!上
+	ever_num=ever_num+1
+	_ever_point[ever_num]=4
+
+	put ever_x_pos[i]
+	put eaves_y/2-wall_side_cover
+	put down_z+eaves_z1-wall_top_cover-ever_r
+
+	put ever_x_pos[i]
+	put down_y/2
+	put down_z+eaves_z1+eaves_z2-wall_top_cover-ever_r
+
+	put ever_x_pos[i]
+	put down_y/2-thi+wall_side_cover+2*fhor_r+ever_r
+	put down_z+eaves_z1+eaves_z2-wall_top_cover-ever_r
+
+	put ever_x_pos[i]
+	put down_y/2-thi+wall_side_cover+2*fhor_r+ever_r
+	put down_z+eaves_z1+eaves_z2-wall_top_cover-ever_r-(2*ever_nd+ever_straight_fra*ever_nd)
+
+	for n=1 to 3*_ever_point[ever_num]
+		_ever_pos[ever_num][n]=get(1)
+	next n
+next i
+
+ever_y_num=int((down_y-2*wall_side_cover-2*ever_r)/ever_pitch)+1
+
+dim ever_y_pos[]
+for i=1 to ever_y_num
+	ever_y_pos[i]=-down_y/2+(down_y-(ever_y_num-1)*ever_pitch)/2+(i-1)*ever_pitch+ever_y_offset
+next i
+
+for i=1 to ever_y_num
+	!左
+	ever_num=ever_num+1
+	_ever_point[ever_num]=4
+
+	put -eaves_x/2+wall_side_cover 
+	put ever_y_pos[i]
+	put down_z+eaves_z1-wall_top_cover-ever_r
+
+	put -down_x/2 
+	put ever_y_pos[i]
+	put down_z+eaves_z1+eaves_z2-wall_top_cover-ever_r
+
+	put -down_x/2+thi-wall_side_cover-2*fhor_r-ever_r 
+	put ever_y_pos[i]
+	put down_z+eaves_z1+eaves_z2-wall_top_cover-ever_r
+
+	put -down_x/2+thi-wall_side_cover-2*fhor_r-ever_r 
+	put ever_y_pos[i]
+	put down_z+eaves_z1+eaves_z2-wall_top_cover-ever_r-(2*ever_nd+ever_straight_fra*ever_nd)
+
+	for n=1 to 3*_ever_point[ever_num]
+		_ever_pos[ever_num][n]=get(1)
+	next n
+
+	!右
+	ever_num=ever_num+1
+	_ever_point[ever_num]=4
+
+	put -eaves_x/2+wall_side_cover 
+	put ever_y_pos[i]
+	put down_z+eaves_z1-wall_top_cover-ever_r
+
+	put -down_x/2 
+	put ever_y_pos[i]
+	put down_z+eaves_z1+eaves_z2-wall_top_cover-ever_r
+
+	put -down_x/2+thi-wall_side_cover-2*fhor_r-ever_r 
+	put ever_y_pos[i]
+	put down_z+eaves_z1+eaves_z2-wall_top_cover-ever_r
+
+	put -down_x/2+thi-wall_side_cover-2*fhor_r-ever_r 
+	put ever_y_pos[i]
+	put down_z+eaves_z1+eaves_z2-wall_top_cover-ever_r-(2*ever_nd+ever_straight_fra*ever_nd)
+
+	for n=1 to 3*_ever_point[ever_num]
+		_ever_pos[ever_num][n]=get(1)
+	next n
+next i
+
+parameters ever_num=ever_num,
+	ever_point=_ever_point,
+	ever_pos=_ever_pos
+
+
+!横筋
+values{2} "ehor_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+values "ever_anchor_fra" range[0,]
+
+ehor_r=dr_list[ehor_steel]
+ehor_nd=nd_list[ehor_steel]
+ehor_mat=SDmat[scode_list[ehor_steel]]
+ehor_pen=SDpen[scode_list[ehor_steel]]
+
+parameters ehor_r=ehor_r,
+    ehor_nd=ehor_nd,
+    ehor_mat=ehor_mat,
+    ehor_pen=ehor_pen
+
+ehor_num=0
+dim _ehor_point[]
+dim _ehor_pos[][]
+
+!下
+ehor_num=ehor_num+1
+_ehor_point[ehor_num]=3
+
+put eaves_x/2-wall_side_cover-ehor_r-2*ehor_nd
+put -eaves_y/2+wall_side_cover+ehor_r
+put down_z+eaves_z1-wall_top_cover-2*ever_r+ehor_r*slope_bot/100-ehor_r
+
+put -eaves_x/2+wall_side_cover+ehor_r
+put -eaves_y/2+wall_side_cover+ehor_r
+put down_z+eaves_z1-wall_top_cover-2*ever_r+ehor_r*slope_bot/100-ehor_r
+
+put -eaves_x/2+wall_side_cover+ehor_r
+put -eaves_y/2+wall_side_cover+ehor_r+(2*ehor_nd+ever_anchor_fra*ehor_nd)
+put down_z+eaves_z1-wall_top_cover-2*ever_r+ehor_r*slope_bot/100-ehor_r
+
+for n=1 to 3*_ehor_point[ehor_num]
+	_ehor_pos[ehor_num][n]=get(1)
+next n
+
+!上
+ehor_num=ehor_num+1
+_ehor_point[ehor_num]=3
+
+put -eaves_x/2+wall_side_cover+ehor_r+2*ehor_nd
+put eaves_y/2-wall_side_cover-ehor_r
+put down_z+eaves_z1-wall_top_cover-2*ever_r+ehor_r*slope_bot/100-ehor_r
+
+put eaves_x/2-wall_side_cover-ehor_r
+put eaves_y/2-wall_side_cover-ehor_r
+put down_z+eaves_z1-wall_top_cover-2*ever_r+ehor_r*slope_bot/100-ehor_r
+
+put eaves_x/2-wall_side_cover-ehor_r
+put eaves_y/2-wall_side_cover-ehor_r-(2*ehor_nd+ever_anchor_fra*ehor_nd)
+put down_z+eaves_z1-wall_top_cover-2*ever_r+ehor_r*slope_bot/100-ehor_r
+
+for n=1 to 3*_ehor_point[ehor_num]
+	_ehor_pos[ehor_num][n]=get(1)
+next n
+
+!左
+ehor_num=ehor_num+1
+_ehor_point[ehor_num]=3
+
+put -eaves_x/2+wall_side_cover+ehor_r
+put -eaves_y/2+wall_side_cover+ehor_r+2*ehor_nd
+put down_z+eaves_z1-wall_top_cover-2*ever_r+ehor_r*slope_bot/100-3*ehor_r
+
+put -eaves_x/2+wall_side_cover+ehor_r
+put eaves_y/2-wall_side_cover-ehor_r
+put down_z+eaves_z1-wall_top_cover-2*ever_r+ehor_r*slope_bot/100-3*ehor_r
+
+put -eaves_x/2+wall_side_cover+ehor_r+(2*ehor_nd+ever_anchor_fra*ehor_nd)
+put eaves_y/2-wall_side_cover-ehor_r
+put down_z+eaves_z1-wall_top_cover-2*ever_r+ehor_r*slope_bot/100-3*ehor_r
+
+for n=1 to 3*_ehor_point[ehor_num]
+	_ehor_pos[ehor_num][n]=get(1)
+next n
+
+!右
+ehor_num=ehor_num+1
+_ehor_point[ehor_num]=3
+
+put eaves_x/2-wall_side_cover-ehor_r
+put eaves_y/2-wall_side_cover-ehor_r-2*ehor_nd
+put down_z+eaves_z1-wall_top_cover-2*ever_r+ehor_r*slope_bot/100-3*ehor_r
+
+put eaves_x/2-wall_side_cover-ehor_r
+put -eaves_y/2+wall_side_cover+ehor_r
+put down_z+eaves_z1-wall_top_cover-2*ever_r+ehor_r*slope_bot/100-3*ehor_r
+
+put eaves_x/2-wall_side_cover-ehor_r-(2*ehor_nd+ever_anchor_fra*ehor_nd)
+put -eaves_y/2+wall_side_cover+ehor_r
+put down_z+eaves_z1-wall_top_cover-2*ever_r+ehor_r*slope_bot/100-3*ehor_r
+
+for n=1 to 3*_ehor_point[ehor_num]
+	_ehor_pos[ehor_num][n]=get(1)
+next n
+
+parameters ehor_num=ehor_num,
+	ehor_point=_ehor_point,
+	ehor_pos=_ehor_pos
+
+
+!==============================================================================天端配筋
+values{2} "rver_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+values{2} "rhor_steel" 10,"D10",13,"D13",16,"D16",19,"D19"
+values "rver_pitch" range[0.05,]
+values "rhor_pitch" range[0.05,]
+
+!縦筋
+rver_r=dr_list[rver_steel]
+rver_nd=nd_list[rver_steel]
+rver_mat=SDmat[scode_list[rver_steel]]
+rver_pen=SDpen[scode_list[rver_steel]]
+
+parameters rver_r=rver_r,
+    rver_nd=rver_nd,
+    rver_mat=rver_mat,
+    rver_pen=rver_pen
+
+rver_num=0
+dim _rver_point[]
+dim _rver_pos[][]
+
+rver_x_num=int((roof_x-2*wall_side_cover-2*rver_r)/rver_pitch)+1
+
+dim rver_x_pos[]
+for i=1 to rver_x_num
+	rver_x_pos[i]=-roof_x/2+(roof_x-(rver_x_num-1)*rver_pitch)/2+(i-1)*rver_pitch
+next i
+
+dim rver_z_pos[]
+rver_z_pos[1]=down_z+eaves_z1+eaves_z2+top_z+roof_z1-wall_top_cover-rver_r
+rver_z_pos[2]=down_z+eaves_z1+eaves_z2+top_z+wall_top_cover+rver_r
+
+for i=1 to rver_x_num
+	for j=1 to roof_pattern
+		rver_num=rver_num+1
+		_rver_point[rver_num]=2
+
+		put rver_x_pos[i]
+		put -roof_y/2+wall_side_cover
+		put rver_z_pos[j]
+
+		put rver_x_pos[i]
+		put roof_y/2-wall_side_cover
+		put rver_z_pos[j]
+
+		for n=1 to 3*_rver_point[rver_num]
+			_rver_pos[rver_num][n]=get(1)
+		next n
+	next j
+next i
+
+parameters rver_num=rver_num,
+    rver_point=_rver_point,
+    rver_pos=_rver_pos
+
+!横筋
+rhor_r=dr_list[rhor_steel]
+rhor_nd=nd_list[rhor_steel]
+rhor_mat=SDmat[scode_list[rhor_steel]]
+rhor_pen=SDpen[scode_list[rhor_steel]]
+
+parameters rhor_r=rhor_r,
+    rhor_nd=rhor_nd,
+    rhor_mat=rhor_mat,
+    rhor_pen=rhor_pen
+
+rhor_num=0
+dim _rhor_point[]
+dim _rhor_pos[][]
+
+rhor_y_num=int((roof_y-2*wall_side_cover-2*rhor_r)/rhor_pitch)+1
+
+dim rhor_y_pos[]
+for i=1 to rhor_y_num
+	rhor_y_pos[i]=-roof_y/2+(roof_y-(rhor_y_num-1)*rhor_pitch)/2+(i-1)*rhor_pitch
+next i
+
+dim rhor_z_pos[]
+rhor_z_pos[1]=down_z+eaves_z1+eaves_z2+top_z+roof_z1-wall_top_cover-2*rver_r-rhor_r
+rhor_z_pos[2]=down_z+eaves_z1+eaves_z2+top_z+wall_top_cover+2*rver_r+rhor_r
+
+for i=1 to rhor_y_num
+	for j=1 to roof_pattern
+		rhor_num=rhor_num+1
+		_rhor_point[rhor_num]=2
+
+		put -roof_x/2+wall_side_cover
+		put rhor_y_pos[i]
+		put rhor_z_pos[j]
+
+		put roof_x/2-wall_side_cover
+		put rhor_y_pos[i]
+		put rhor_z_pos[j]
+
+		for n=1 to 3*_rhor_point[rhor_num]
+			_rhor_pos[rhor_num][n]=get(1)
+		next n
+	next j
+next i
+
+parameters rhor_num=rhor_num,
+    rhor_point=_rhor_point,
+    rhor_pos=_rhor_pos
+
+
+!==============================================================================型枠集計
+area_board=0
+
+if dis_board then
+	area_board=area_board+2*(down_x+2*board_thi)*(down_z-offset_cemb)+2*down_y*(down_z-offset_cemb) !下部の外周
+	area_board=area_board+(eaves_x+2*board_thi)*(eaves_y+2*board_thi)-(down_x+2*board_thi)*(down_y+2*board_thi) !中間あごの下端
+	area_board=area_board+2*(eaves_x+2*board_thi)*eaves_z1+2*eaves_y*eaves_z1 !中間あごの外周
+	area_board=area_board+2*(top_x+2*board_thi)*top_z+2*top_y*top_z !上部の外周
+	area_board=area_board+2*(down_x-2*thi)*(hei_top-roof_z2-offset_cemb-board_thi)+2*(down_y-2*thi-2*board_thi)*(hei_top-roof_z2-offset_cemb-board_thi) !内側
+	area_board=area_board+(top_x-2*thi)*(top_y-2*thi) !内側の天端
+	area_board=area_board+(roof_x+2*board_thi)*(roof_y+2*board_thi)-(top_x+2*board_thi)*(top_y+2*board_thi) !天端あごの下端
+
+	!天端あごの外周
+	if roof_type=1 then !片流れ
+		area_board=area_board+(roof_x+2*board_thi)*roof_z1+(roof_x+2*board_thi)*(2*roof_z2-roof_z1)+2*roof_y*roof_z2
+	endif
+
+	if roof_type=2 then !切妻
+		area_board=area_board+2*(roof_x+2*board_thi)*roof_z1+2*roof_y*(roof_z1+roof_z2)/2
+	endif
+
+	if roof_type=3 then !寄棟
+		area_board=area_board+2*(roof_x+2*board_thi)*roof_z1+2*roof_y*roof_z1
+	endif
+endif
+
+parameters area_board=area_board
+lock "area_board"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,1048 @@
+code=1
+eps=1e-5
+
+beamCrossSectionZ=15*rebarline_size/10
+values "beamNum" range[1,]
+
+
+!==========================================================立面図設定
+!梁長さリスト
+dim _beamLen[]
+_beamLen[1]=0
+dim _beamPartLen[][]
+_beamPartLen[1][1]=0
+_beamPartLen[1][2]=0
+
+for i=1 to beamNum
+    _beamLen[i]=beamLen[i]
+
+    _beamPartLen[i][1]=ceil(_beamLen[i]*1000/4)/1000
+    _beamPartLen[i][3]=ceil(_beamLen[i]*1000/4)/1000
+    _beamPartLen[i][2]= _beamLen[i]-2*ceil(_beamLen[i]*1000/4)/1000
+next i
+
+parameters \
+beamLen=_beamLen,
+beamPartLen=_beamPartLen
+
+
+!梁UniqueIDリスト
+dim _beamUnID[]
+_beamUnID[1]=""
+
+for i=1 to beamNum
+    _beamUnID[i]=beamUnID[i]
+next i
+
+parameters beamUnID=_beamUnID
+
+
+!柱寸法
+dim _columnSize[]
+_columnSize[1]=0
+
+for i=1 to beamNum+1
+    _columnSize[i]=columnSize[i]
+next i
+
+parameters columnSize=_columnSize
+values "columnSize" range[0,]
+
+
+!梁輪郭線位置
+dim _beamPos[][]
+_beamPos[1][1]=0
+_beamPos[1][2]=0
+
+tempPos=0
+for i=1 to beamNum
+    _beamPos[i][1]=tempPos
+    tempPos=tempPos+_beamLen[i]
+    _beamPos[i][2]=tempPos
+    tempPos=tempPos+_columnSize[i+1]
+next i
+
+parameters beamPos=_beamPos
+
+
+!柱輪郭線位置
+dim _columnPos[][]
+_columnPos[1][1]=0
+_columnPos[1][2]=0
+
+for i=1 to beamNum+1
+    !左端
+    if i=1 then
+        _columnPos[i][1]=-_columnSize[1] !左端
+    else
+        _columnPos[i][1]=_beamPos[i-1][2] !左端
+    endif
+
+    !右端
+    _columnPos[i][2]=_columnPos[i][1]+_columnSize[i]
+next i
+
+parameters columnPos=_columnPos
+
+
+!区切り線位置
+dividingNum=4*beamNum+2
+dim _dividingPos[]
+
+_dividingPos[1]=-_columnSize[1]
+for i=1 to beamNum
+    _dividingPos[1+(i-1)*4+1]=_dividingPos[1+(i-1)*4]+_columnSize[i]
+    _dividingPos[1+(i-1)*4+2]=_dividingPos[1+(i-1)*4+1]+_beamPartLen[i][1]
+    _dividingPos[1+(i-1)*4+3]=_dividingPos[1+(i-1)*4+2]+_beamPartLen[i][2]
+    _dividingPos[1+(i-1)*4+4]=_dividingPos[1+(i-1)*4+3]+_beamPartLen[i][3]
+next i
+_dividingPos[dividingNum]=_dividingPos[dividingNum-1]+_columnSize[beamNum+1]
+
+
+!==========================================================梁配筋設定
+!梁番号リスト
+dim _beamTypeNum[]
+_beamTypeNum[1]=""
+
+for i=1 to beamNum
+    _beamTypeNum[i]=beamTypeNum[i]
+next i
+
+parameters beamTypeNum=_beamTypeNum
+
+
+!梁レベルリスト
+dim _beamLevel[]
+_beamLevel[1]=0
+
+for i=1 to beamNum
+    _beamLevel[i]=beamLevel[i]
+next i
+
+parameters beamLevel=_beamLevel
+
+
+!梁寸法リスト
+dim _beamSize[][]
+_beamSize[1][1]=0
+_beamSize[1][2]=0
+
+for i=1 to beamNum
+    _beamSize[i][1]=beamSize[i][1]
+    _beamSize[i][2]=beamSize[i][2]
+next i
+
+parameters beamSize=_beamSize
+values "beamSize" range[0,]
+
+
+!梁かぶり厚リスト
+dim _beamCover[][]
+_beamCover[1][1]=0
+_beamCover[1][2]=0
+
+for i=1 to beamNum
+    for j=1 to 4
+        _beamCover[i][j]=beamCover[i][j]
+    next j
+next i
+
+parameters beamCover=_beamCover
+
+
+!梁断面設定リスト
+dim _beamSectionType[]
+_beamSectionType[1]=0
+
+for i=1 to beamNum
+    _beamSectionType[i]=beamSectionType[i]
+next i
+
+parameters beamSectionType=_beamSectionType
+values{2} "beamSectionType" 1,"全断面一致",3,"部分別で設定"
+
+
+!梁配筋中央部本数リスト
+dim _beamCenterNum[][]
+_beamCenterNum[1][1]=0
+_beamCenterNum[1][2]=0
+
+for i=1 to beamNum
+    for j=1 to 6
+        _beamCenterNum[i][j]=beamCenterNum[i][j]
+    next j
+next i
+
+parameters beamCenterNum=_beamCenterNum
+values "beamCenterNum" range[0,]
+
+
+!梁配筋左端本数リスト
+dim _beamLeftNum[][]
+_beamLeftNum[1][1]=0
+_beamLeftNum[1][2]=0
+
+for i=1 to beamNum
+    for j=1 to 6
+        if _beamSectionType[i]=1 then
+            _beamLeftNum[i][j]=beamCenterNum[i][j]
+        else
+            _beamLeftNum[i][j]=beamLeftNum[i][j]
+        endif
+    next j
+next i
+
+parameters beamLeftNum=_beamLeftNum
+values "beamLeftNum" range[0,]
+
+
+!梁配筋右端本数リスト
+dim _beamRightNum[][]
+_beamRightNum[1][1]=0
+_beamRightNum[1][2]=0
+
+for i=1 to beamNum
+    for j=1 to 6
+        if _beamSectionType[i]=1 then
+            _beamRightNum[i][j]=beamCenterNum[i][j]
+        else
+            _beamRightNum[i][j]=beamRightNum[i][j]
+        endif
+    next j
+next i
+
+parameters beamRightNum=_beamRightNum
+values "beamRightNum" range[0,]
+
+
+!梁端部定着リスト
+dim _leftAnchorType[][]
+_leftAnchorType[1][1]=0
+_leftAnchorType[1][2]=0
+dim _rightAnchorType[][]
+_rightAnchorType[1][1]=0
+_rightAnchorType[1][2]=0
+
+for i=1 to beamNum
+    _leftAnchorType[i][1]=leftAnchorType[i][1]
+    _leftAnchorType[i][2]=leftAnchorType[i][2]
+    _rightAnchorType[i][1]=rightAnchorType[i][1]
+    _rightAnchorType[i][2]=rightAnchorType[i][2]
+next i
+
+parameters \
+leftAnchorType=_leftAnchorType,
+rightAnchorType=_rightAnchorType
+
+values{2} "leftAnchorType" 1,"連続端",2,"下アンカー",3,"上アンカー",0,"なし"
+values{2} "rightAnchorType" 1,"連続端",2,"下アンカー",3,"上アンカー",0,"なし"
+
+
+!梁端部定着逃げ寸法リスト
+dim _leftConCover[]
+_leftConCover[1]=0
+dim _rightConCover[]
+_rightConCover[1]=0
+
+for i=1 to beamNum
+    _leftConCover[i]=leftConCover[i]
+    _rightConCover[i]=rightConCover[i]
+next i
+
+parameters leftConCover=_leftConCover
+parameters rightConCover=_rightConCover
+
+
+!梁端部アンカー寸法リスト
+dim _leftAnchorLen[][]
+_leftAnchorLen[1][1]=0
+_leftAnchorLen[1][2]=0
+dim _rightAnchorLen[][]
+_rightAnchorLen[1][1]=0
+_rightAnchorLen[1][2]=0
+
+for i=1 to beamNum
+    for j=1 to 6
+        _leftAnchorLen[i][j]=leftAnchorLen[i][j]
+        _rightAnchorLen[i][j]=rightAnchorLen[i][j]
+    next j
+next i
+
+parameters \
+leftAnchorLen=_leftAnchorLen,
+rightAnchorLen=_rightAnchorLen
+
+
+!腹筋各リスト
+dim _nSideBar[]
+_nSideBar[1]=0
+dim _SideBarDia[]
+_SideBarDia[1]=0
+dim _sideBarAnchorLen[][]
+_sideBarAnchorLen[1][1]=0
+_sideBarAnchorLen[1][2]=0
+
+for i=1 to beamNum
+    _nSideBar[i]=nSideBar[i]
+    _SideBarDia[i]=SideBarDia[i]
+    _sideBarAnchorLen[i][1]=0.3
+    _sideBarAnchorLen[i][2]=0.3
+next i
+
+parameters \
+nSideBar=_nSideBar,
+SideBarDia=_SideBarDia,
+sideBarAnchorLen=_sideBarAnchorLen
+
+values{2} "SideBarDia" iSDsize,SDsizeStr
+
+
+!スタラップ各リスト
+dim _nStp[]
+_nStp[1]=0
+dim _stpShape[]
+_stpShape[1]=0
+dim _stpDia[]
+_stpDia[1]=0
+dim _stpPitch[]
+_stpPitch[1]=0
+dim _stpSize[][]
+_stpSize[1][1]=0
+_stpSize[1][2]=0
+
+for i=1 to beamNum
+    _nStp[i]=nStp[i]
+    _stpShape[i]=stpShape[i]
+    _stpDia[i]=stpDia[i]
+    _stpPitch[i]=stpPitch[i]
+    _stpSize[i][1]=_beamSize[i][1]-_beamCover[i][3]-_beamCover[i][4]
+    _stpSize[i][2]=_beamSize[i][2]-_beamCover[i][1]-_beamCover[i][2]
+next i
+
+parameters \
+nStp=_nStp,
+stpShape=_stpShape,
+stpDia=_stpDia,
+stpPitch=_stpPitch,
+stpSize=_stpSize
+values "nStp" range[2,]
+values{2} "stpShape" 0,"溶接",1,"上部フック(両側)"
+values{2} "stpDia" iSDsize,SDsizeStr
+values "LenRoundUnit" range[0.5,]
+values "lenCeilUnit" range[0.1,]
+
+
+!幅止め筋各リスト
+dim _widthbarDia[]
+_widthbarDia[1]=0
+dim _widthbarPitch[]
+_widthbarPitch[1]=0
+
+for i=1 to beamNum
+    _widthbarDia[i]=widthbarDia[i]
+    _widthbarPitch[i]=widthbarPitch[i]
+next i
+
+parameters \
+widthbarDia=_widthbarDia,
+widthbarPitch=_widthbarPitch
+values{2} "widthbarDia" iSDsize,SDsizeStr
+
+
+!==========================================================圧接設定
+values{2} "upperConnectPattern" 1,"梁中央部",2,"梁端部"
+values{2} "lowerConnectPattern" 1,"梁中央部",2,"梁端部"
+
+if changeConnectLen=0 then
+    beamLenTotal=0
+    for i=1 to beamNum
+        beamLenTotal=beamLenTotal+_beamLen[i]
+    next i
+    beamLenAverage=beamLenTotal/max(beamNum,1)
+
+    columnSizeTotal=0
+    for i=1 to beamNum+1
+        columnSizeTotal=columnSizeTotal+_columnSize[i]
+    next i
+    columnSizeAverage=columnSizeTotal/max(beamNum+1,1)
+
+    connectLen=ceil((beamLenAverage+columnSizeAverage+connectShift)/lenCeilUnit)*lenCeilUnit
+    parameters connectLen=connectLen
+    lock "connectLen"
+else
+    values "connectLen" range[5,]
+endif
+
+
+!====================================================================================================================主筋情報
+dim _diaCode[]
+_diaCode[10]=1
+_diaCode[13]=2
+_diaCode[16]=3
+_diaCode[19]=4
+_diaCode[22]=5
+_diaCode[25]=6
+_diaCode[29]=7
+_diaCode[32]=8
+_diaCode[35]=9
+_diaCode[38]=10
+_diaCode[41]=11
+
+lineGap=1.2*rebarline_size/10 !文字高さ
+values "rebar1GapScale" range[1,]
+values "rebar2GapScale" range[1,]
+values "rebar3GapScale" range[1,]
+values "rebar4GapScale" range[1,]
+values "rebar5GapScale" range[1,]
+values "rebar6GapScale" range[1,]
+dim _rebarLineGap[]
+_rebarLineGap[1]=rebar1gapScale*lineGap
+_rebarLineGap[2]=rebar2gapScale*lineGap
+_rebarLineGap[3]=rebar3gapScale*lineGap
+_rebarLineGap[4]=rebar4gapScale*lineGap
+_rebarLineGap[5]=rebar5gapScale*lineGap
+_rebarLineGap[6]=rebar6gapScale*lineGap
+
+!sub用変数(input)
+subRebarNum=0
+dim _subRebarDia[]
+_subRebarDia[1]=0
+dim _subRebarPoint[]
+_subRebarPoint[1]=0
+dim _subRebarPos[][]
+_subRebarPos[1][1]=0
+_subRebarPos[1][2]=0
+
+!sub用変数(output)
+subUseCount=0
+dim _tempLineNum[]
+_tempLineNum[1]=0
+dim _tempLineZ[][]
+_tempLineZ[1][1]=0
+_tempLineZ[1][2]=0
+dim _tempSpace[]
+_tempSpace[1]=0
+
+subRebarLineNum=0
+dim _subRebarLineDia[]
+_subRebarLineDia[1]=0
+dim _subRebarLinePen[]
+_subRebarLinePen[1]=0
+dim _subRebarLinePoint[]
+_subRebarLinePoint[1]=0
+dim _subRebarLinePos[][]
+_subRebarLinePos[1][1]=0
+_subRebarLinePos[1][2]=0
+dim _subRebarLineLen[]
+_subRebarLineLen[1]=0
+dim _connectNum[]
+_connectNum[1]=0
+dim _connectPos[][]
+_connectPos[1][1]=0
+_connectPos[1][2]=0
+
+
+!==========================================================上端1段筋
+dim _rebar1Dia[]
+_rebar1Dia[1]=0
+dim _rebar1Point[]
+_rebar1Point[1]=0
+dim _rebar1Pos[][]
+_rebar1Pos[1][1]=0
+_rebar1Pos[1][2]=0
+
+if rebar1Num>0 then
+    for i=1 to rebar1Num
+        _rebar1Dia[i]=max(rebar1Dia[i],10)
+        _rebar1Point[i]=max(rebar1Point[i],2)
+        for j=1 to 3*_rebar1Point[i]
+            _rebar1Pos[i][j]=rebar1Pos[i][j]
+        next j
+    next i
+endif
+
+parameters \
+rebar1Dia=_rebar1Dia,
+rebar1Point=_rebar1Point,
+rebar1Pos=_rebar1Pos
+values{2} "rebar1Dia" iSDsize,SDsizeStr
+values "rebar1Point" range[2,]
+
+subRebarNum=rebar1Num
+_subRebarDia=_rebar1Dia
+_subRebarPoint=_rebar1Point
+_subRebarPos=_rebar1Pos
+
+gosub "rebar_line_arrangement_sub"
+
+parameters \
+rebar1LineNum=subRebarLineNum,
+rebar1LineDia=_subRebarLineDia,
+rebar1LinePen=_subRebarLinePen,
+rebar1LinePoint=_subRebarLinePoint,
+rebar1LinePos=_subRebarLinePos,
+rebar1LineLen=_subRebarLineLen
+
+
+!==========================================================上端2段筋
+dim _rebar2Dia[]
+_rebar2Dia[1]=0
+dim _rebar2Point[]
+_rebar2Point[1]=0
+dim _rebar2Pos[][]
+_rebar2Pos[1][1]=0
+_rebar2Pos[1][2]=0
+
+if rebar2Num>0 then
+    for i=1 to rebar2Num
+        _rebar2Dia[i]=max(rebar2Dia[i],10)
+        _rebar2Point[i]=max(rebar2Point[i],2)
+        for j=1 to 3*_rebar2Point[i]
+            _rebar2Pos[i][j]=rebar2Pos[i][j]
+        next j
+    next i
+endif
+
+parameters \
+rebar2Dia=_rebar2Dia,
+rebar2Point=_rebar2Point,
+rebar2Pos=_rebar2Pos
+values{2} "rebar2Dia" iSDsize,SDsizeStr
+values "rebar2Point" range[2,]
+
+subRebarNum=rebar2Num
+_subRebarDia=_rebar2Dia
+_subRebarPoint=_rebar2Point
+_subRebarPos=_rebar2Pos
+
+gosub "rebar_line_arrangement_sub"
+
+parameters \
+rebar2LineNum=subRebarLineNum,
+rebar2LineDia=_subRebarLineDia,
+rebar2LinePen=_subRebarLinePen,
+rebar2LinePoint=_subRebarLinePoint,
+rebar2LinePos=_subRebarLinePos,
+rebar2LineLen=_subRebarLineLen
+
+
+!==========================================================上端3段筋
+dim _rebar3Dia[]
+_rebar3Dia[1]=0
+dim _rebar3Point[]
+_rebar3Point[1]=0
+dim _rebar3Pos[][]
+_rebar3Pos[1][1]=0
+_rebar3Pos[1][2]=0
+
+if rebar3Num>0 then
+    for i=1 to rebar3Num
+        _rebar3Dia[i]=max(rebar3Dia[i],10)
+        _rebar3Point[i]=max(rebar3Point[i],2)
+        for j=1 to 3*_rebar3Point[i]
+            _rebar3Pos[i][j]=rebar3Pos[i][j]
+        next j
+    next i
+endif
+
+parameters \
+rebar3Dia=_rebar3Dia,
+rebar3Point=_rebar3Point,
+rebar3Pos=_rebar3Pos
+values{2} "rebar3Dia" iSDsize,SDsizeStr
+values "rebar3Point" range[2,]
+
+subRebarNum=rebar3Num
+_subRebarDia=_rebar3Dia
+_subRebarPoint=_rebar3Point
+_subRebarPos=_rebar3Pos
+
+gosub "rebar_line_arrangement_sub"
+
+parameters \
+rebar3LineNum=subRebarLineNum,
+rebar3LineDia=_subRebarLineDia,
+rebar3LinePen=_subRebarLinePen,
+rebar3LinePoint=_subRebarLinePoint,
+rebar3LinePos=_subRebarLinePos,
+rebar3LineLen=_subRebarLineLen
+
+
+!==========================================================下端3段筋
+dim _rebar4Dia[]
+_rebar4Dia[1]=0
+dim _rebar4Point[]
+_rebar4Point[1]=0
+dim _rebar4Pos[][]
+_rebar4Pos[1][1]=0
+_rebar4Pos[1][2]=0
+
+if rebar4Num>0 then
+    for i=1 to rebar4Num
+        _rebar4Dia[i]=max(rebar4Dia[i],10)
+        _rebar4Point[i]=max(rebar4Point[i],2)
+        for j=1 to 3*_rebar4Point[i]
+            _rebar4Pos[i][j]=rebar4Pos[i][j]
+        next j
+    next i
+endif
+
+parameters \
+rebar4Dia=_rebar4Dia,
+rebar4Point=_rebar4Point,
+rebar4Pos=_rebar4Pos
+values{2} "rebar4Dia" iSDsize,SDsizeStr
+values "rebar4Point" range[2,]
+
+subRebarNum=rebar4Num
+_subRebarDia=_rebar4Dia
+_subRebarPoint=_rebar4Point
+_subRebarPos=_rebar4Pos
+
+gosub "rebar_line_arrangement_sub"
+
+parameters \
+rebar4LineNum=subRebarLineNum,
+rebar4LineDia=_subRebarLineDia,
+rebar4LinePen=_subRebarLinePen,
+rebar4LinePoint=_subRebarLinePoint,
+rebar4LinePos=_subRebarLinePos,
+rebar4LineLen=_subRebarLineLen
+
+
+!==========================================================下端2段筋
+dim _rebar5Dia[]
+_rebar5Dia[1]=0
+dim _rebar5Point[]
+_rebar5Point[1]=0
+dim _rebar5Pos[][]
+_rebar5Pos[1][1]=0
+_rebar5Pos[1][2]=0
+
+if rebar5Num>0 then
+    for i=1 to rebar5Num
+        _rebar5Dia[i]=max(rebar5Dia[i],10)
+        _rebar5Point[i]=max(rebar5Point[i],2)
+        for j=1 to 3*_rebar5Point[i]
+            _rebar5Pos[i][j]=rebar5Pos[i][j]
+        next j
+    next i
+endif
+
+parameters \
+rebar5Dia=_rebar5Dia,
+rebar5Point=_rebar5Point,
+rebar5Pos=_rebar5Pos
+values{2} "rebar5Dia" iSDsize,SDsizeStr
+values "rebar5Point" range[2,]
+
+subRebarNum=rebar5Num
+_subRebarDia=_rebar5Dia
+_subRebarPoint=_rebar5Point
+_subRebarPos=_rebar5Pos
+
+gosub "rebar_line_arrangement_sub"
+
+parameters \
+rebar5LineNum=subRebarLineNum,
+rebar5LineDia=_subRebarLineDia,
+rebar5LinePen=_subRebarLinePen,
+rebar5LinePoint=_subRebarLinePoint,
+rebar5LinePos=_subRebarLinePos,
+rebar5LineLen=_subRebarLineLen
+
+           
+!==========================================================下端1段筋
+dim _rebar6Dia[]
+_rebar6Dia[1]=0
+dim _rebar6Point[]
+_rebar6Point[1]=0
+dim _rebar6Pos[][]
+_rebar6Pos[1][1]=0
+_rebar6Pos[1][2]=0
+
+if rebar6Num>0 then
+    for i=1 to rebar6Num
+        _rebar6Dia[i]=max(rebar6Dia[i],10)
+        _rebar6Point[i]=max(rebar6Point[i],2)
+        for j=1 to 3*_rebar6Point[i]
+            _rebar6Pos[i][j]=rebar6Pos[i][j]
+        next j
+    next i
+endif
+
+parameters \
+rebar6Dia=_rebar6Dia,
+rebar6Point=_rebar6Point,
+rebar6Pos=_rebar6Pos
+values{2} "rebar6Dia" iSDsize,SDsizeStr
+values "rebar6Point" range[2,]
+
+subRebarNum=rebar6Num
+_subRebarDia=_rebar6Dia
+_subRebarPoint=_rebar6Point
+_subRebarPos=_rebar6Pos
+
+gosub "rebar_line_arrangement_sub"
+
+parameters \
+rebar6LineNum=subRebarLineNum,
+rebar6LineDia=_subRebarLineDia,
+rebar6LinePen=_subRebarLinePen,
+rebar6LinePoint=_subRebarLinePoint,
+rebar6LinePos=_subRebarLinePos,
+rebar6LineLen=_subRebarLineLen
+
+
+!==========================================================腹筋情報
+sideBarLineNum=0
+dim _sideBarLinePen[]
+_sideBarLinePen[1]=0
+dim _sideBarLinePoint[]
+_sideBarLinePoint[1]=0
+dim _sideBarLinePos[][]
+_sideBarLinePos[1][1]=0
+_sideBarLinePos[1][2]=0
+
+zShiftFlag=0
+
+for i=1 to beamNum
+    if nSideBar[i]>0 then
+        sideBarLineNum=sideBarLineNum+1
+        _sideBarLinePen[sideBarLineNum]=SDpen[_diaCode[SideBarDia[i]]]
+        _sideBarLinePoint[sideBarLineNum]=2
+        
+        sideBarX1=columnPos[i][2]-sideBarAnchorLen[i][1]
+        sideBarX2=columnPos[i+1][1]+sideBarAnchorLen[i][2]
+
+        if i=1 then
+            sideBarZ=-lineGap
+        else
+            if zShiftFlag=0 then
+                if nSideBar[i-1]>0 and sideBarX1<columnPos[i][1]+sideBarAnchorLen[i-1][2] then
+                    zShiftFlag=1-zShiftFlag
+                    sideBarZ=-lineGap-zShiftFlag*lineGap
+                else
+                    sideBarZ=-lineGap
+                endif
+            else
+                zShiftFlag=0
+                sideBarZ=-lineGap
+            endif
+        endif
+
+        put sideBarX1
+        put sideBarZ
+
+        put sideBarX2
+        put sideBarZ
+
+        for j=1 to 2*_sideBarLinePoint[sideBarLineNum]
+            _sideBarLinePos[sideBarLineNum][j]=get(1)
+        next j
+    endif
+next i
+
+parameters \
+sideBarLineNum=sideBarLineNum,
+sideBarLinePen=_sideBarLinePen,
+sideBarLinePoint=_sideBarLinePoint,
+sideBarLinePos=_sideBarLinePos
+
+
+
+
+goto "master_end"
+
+
+
+
+
+!====================================================================================================================sub program
+"rebar_line_arrangement_sub":
+    subUseCount=subUseCount+1
+
+    !output変数初期化
+    _tempLineNum[subUseCount]=0
+    _tempSpace[subUseCount]=0
+    _connectNum[subUseCount]=0
+    _connectPos[subUseCount][1]=0
+    _connectPos[subUseCount][2]=0
+    subRebarLineNum=0
+    for i=1 to vardim1 (_subRebarLinePen)
+        _subRebarLinePen[i]=0
+    next i
+    for i=1 to vardim1 (_subRebarLinePoint)
+        _subRebarLinePoint[i]=0
+    next i
+    for i=1 to vardim1 (_subRebarLinePos)
+        for j=1 to vardim2 (_subRebarLinePos)
+            _subRebarLinePos[i][j]=0
+        next j
+    next i
+    for i=1 to vardim1 (_subRebarLineLen)
+        _subRebarLineLen[i]=0
+    next i
+
+    for i=1 to subRebarNum
+        if i=1 then
+            _tempLineNum[subUseCount]=_tempLineNum[subUseCount]+1
+            _tempLineZ[subUseCount][_tempLineNum[subUseCount]]=_subRebarPos[i][5]
+        else
+            tempLinePlusFlag=1
+
+            for j=1 to _tempLineNum[subUseCount]
+                if abs(_subRebarPos[i][5]-_tempLineZ[subUseCount][j])<=eps then
+                    tempLinePlusFlag=0
+                endif
+            next j
+
+            if tempLinePlusFlag=1 then
+                _tempLineNum[subUseCount]=_tempLineNum[subUseCount]+1
+                _tempLineZ[subUseCount][_tempLineNum[subUseCount]]=_subRebarPos[i][5]
+            endif
+        endif
+    next i
+
+    for i=1 to _tempLineNum[subUseCount]-1
+        for j=1 to _tempLineNum[subUseCount]-1
+            if _tempLineZ[subUseCount][j+1]<_tempLineZ[subUseCount][j] then
+                tempValue=_tempLineZ[subUseCount][j]
+                _tempLineZ[subUseCount][j]=_tempLineZ[subUseCount][j+1]
+                _tempLineZ[subUseCount][j+1]=tempValue
+            endif
+        next j
+    next i
+
+    !行間隔
+    for i=1 to subRebarNum
+        put abs(_subRebarPos[i][3*2]-_subRebarPos[i][3*1])
+        put abs(_subRebarPos[i][3*(_subRebarPoint[i]-1)]-_subRebarPos[i][3*_subRebarPoint[i]])
+    next i
+
+    if nsp>0 then
+        _tempSpace[subUseCount]=max(get(nsp))+_rebarLineGap[subUseCount]
+    else
+        _tempSpace[subUseCount]=0
+    endif
+
+    for i=1 to subRebarNum
+        tempLineDia=0
+        tempLinePen=0
+        tempLinePoint=0
+        dim _tempLinePos[]
+        _tempLinePos[1]=0
+
+        tempLineDia=_subRebarDia[i]
+        tempLinePen=SDpen[_diaCode[_subRebarDia[i]]]
+        tempLinePoint=_subRebarPoint[i]
+
+        !x座標
+        for n=1 to tempLinePoint
+            _tempLinePos[2*n-1]=_subRebarPos[i][3*n-2]
+        next n
+
+        !z座標
+        zLineCount=0
+        for j=1 to _tempLineNum[subUseCount]
+            if abs(_subRebarPos[i][5]-_tempLineZ[subUseCount][j])<=eps then
+                zLineCount=j
+            endif
+        next j
+
+        for j=1 to tempLinePoint
+            _tempLinePos[2*j]=_subRebarPos[i][3*j]-_subRebarPos[i][6]-zLineCount*_tempSpace[subUseCount]
+        next j
+
+        if switchConnect=0 then
+            subRebarLineNum=subRebarLineNum+1
+            _subRebarLineDia[subRebarLineNum]=tempLineDia
+            _subRebarLinePen[subRebarLineNum]=tempLinePen
+            _subRebarLinePoint[subRebarLineNum]=tempLinePoint
+            for n=1 to 2*tempLinePoint
+                _subRebarLinePos[subRebarLineNum][n]=_tempLinePos[n]
+            next n
+        else
+            startLen=abs(_tempLinePos[2*1]-_tempLinePos[2*2]) !始点側アンカー長さ
+            endLen=abs(_tempLinePos[2*tempLinePoint]-_tempLinePos[2*(tempLinePoint-1)]) !終点側アンカー長さ
+
+            for j=1 to tempLinePoint
+                put _tempLinePos[2*j-1]
+            next j
+
+            startPos=min(use(nsp))-startLen
+            endPos=max(get(nsp))+endLen
+
+            tempCount=1
+            dim _tempLenList[]
+            _tempLenList[1]=0
+
+            loopCount=0
+            tempStartPos=startPos
+            tempEndPos=endPos
+            while endPos-tempStartPos>connectLen and loopCount<20 do
+                loopCount=loopCount+1
+
+                !仮終点位置
+                tempEndPos=tempStartPos+(connectLen-connectShift)
+
+                !仮終点位置の区間を判断する
+                tempStopFlag=1
+                for n=1 to dividingNum
+                    if tempEndPos-_dividingPos[n]>eps then
+                        tempStopFlag=n
+                    endif
+                next n
+
+                !点位置の区間を調整する
+                if subUseCount<=3 then !上端筋
+                    if upperConnectPattern=1 then !梁中央部
+                        tempStopFlag=max(tempStopFlag,3)
+                        tempStopFlag=min(tempStopFlag,dividingNum-1)
+                        if fra((tempStopFlag+1)/4)=0 then
+                            tempEndPos=tempEndPos
+                            if tempEndPos<_dividingPos[tempStopFlag]+(connectShift+0.1) then tempEndPos=_dividingPos[tempStopFlag]+(connectShift+0.1)
+                            if tempEndPos>_dividingPos[tempStopFlag+1]-(connectShift+0.1) then tempEndPos=_dividingPos[tempStopFlag+1]-(connectShift+0.1)
+                        else
+                            tempEndPos=_dividingPos[4*int((tempStopFlag+1)/4)]-(connectShift+0.1)
+                        endif
+                    else !梁端部
+                        tempStopFlag=max(tempStopFlag,2)
+                        tempStopFlag=min(tempStopFlag,dividingNum-1)
+                        if fra(tempStopFlag/2)=0 then
+                            tempEndPos=tempEndPos
+                            if tempEndPos<_dividingPos[tempStopFlag]+(connectShift+0.1) then tempEndPos=_dividingPos[tempStopFlag]+(connectShift+0.1)
+                            if tempEndPos>_dividingPos[tempStopFlag+1]-(connectShift+0.1) then tempEndPos=_dividingPos[tempStopFlag+1]-(connectShift+0.1)
+                        else
+                            tempEndPos=_dividingPos[tempStopFlag]-(connectShift+0.1)
+                        endif
+                    endif
+                else !下端筋
+                    if lowerConnectPattern=1 then !梁中央部
+                        tempStopFlag=max(tempStopFlag,3)
+                        tempStopFlag=min(tempStopFlag,dividingNum-1)
+                        if fra((tempStopFlag+1)/4)=0 then
+                            tempEndPos=tempEndPos
+                            if tempEndPos<_dividingPos[tempStopFlag]+(connectShift+0.1) then tempEndPos=_dividingPos[tempStopFlag]+(connectShift+0.1)
+                            if tempEndPos>_dividingPos[tempStopFlag+1]-(connectShift+0.1) then tempEndPos=_dividingPos[tempStopFlag+1]-(connectShift+0.1)
+                        else
+                            tempEndPos=_dividingPos[4*int((tempStopFlag+1)/4)]-(connectShift+0.1)
+                        endif
+                    else !梁端部
+                        tempStopFlag=max(tempStopFlag,2)
+                        tempStopFlag=min(tempStopFlag,dividingNum-1)
+                        if fra(tempStopFlag/2)=0 then
+                            tempEndPos=tempEndPos
+                            if tempEndPos<_dividingPos[tempStopFlag]+(connectShift+0.1) then tempEndPos=_dividingPos[tempStopFlag]+(connectShift+0.1)
+                            if tempEndPos>_dividingPos[tempStopFlag+1]-(connectShift+0.1) then tempEndPos=_dividingPos[tempStopFlag+1]-(connectShift+0.1)
+                        else
+                            tempEndPos=_dividingPos[tempStopFlag]-(connectShift+0.1)
+                        endif
+                    endif
+                endif
+
+                _tempLenList[tempCount]=tempEndPos-tempStartPos
+                tempStartPos=tempEndPos
+                tempCount=tempCount+1
+            endwhile
+
+            _tempLenList[tempCount]=endPos-tempStartPos
+
+            if fra(zLineCount/2)=0 then
+                _tempLenList[1]=_tempLenList[1]-connectShift
+                _tempLenList[tempCount]=_tempLenList[tempCount]+connectShift
+            endif
+
+
+            !座標インプット
+            dim _startX[]
+            _startX[1]=0
+            dim _startZ[]
+            _startZ[1]=0
+            dim _endX[]
+            _endX[1]=0
+            dim _endZ[]
+            _endZ[1]=0
+
+            usedPointCount=0
+
+            for j=1 to tempCount
+                subRebarLineNum=subRebarLineNum+1
+                _subRebarLineDia[subRebarLineNum]=tempLineDia
+                _subRebarLinePen[subRebarLineNum]=tempLinePen
+
+                !始点
+                if j=1 then 
+                    usedPointCount=usedPointCount+1
+                    _startX[j]=_tempLinePos[2*usedPointCount-1]
+                    _startZ[j]=_tempLinePos[2*usedPointCount]
+                else
+                    _startX[j]=_endX[j-1]
+                    _startZ[j]=_endZ[j-1]
+                endif
+
+                _subRebarLinePoint[subRebarLineNum]=1
+                _subRebarLinePos[subRebarLineNum][2*_subRebarLinePoint[subRebarLineNum]-1]=_startX[j]
+                _subRebarLinePos[subRebarLineNum][2*_subRebarLinePoint[subRebarLineNum]]=_startZ[j]
+
+                tempAddLen=sqr((_tempLinePos[2*(usedPointCount+1)-1]-_startX[j])^2+(_tempLinePos[2*(usedPointCount+1)]-_startZ[j])^2)
+                while _tempLenList[j]-tempAddLen>eps do 
+                    usedPointCount=usedPointCount+1
+                    _subRebarLinePoint[subRebarLineNum]=_subRebarLinePoint[subRebarLineNum]+1
+                    _subRebarLinePos[subRebarLineNum][2*_subRebarLinePoint[subRebarLineNum]-1]=_tempLinePos[2*usedPointCount-1]
+                    _subRebarLinePos[subRebarLineNum][2*_subRebarLinePoint[subRebarLineNum]]=_tempLinePos[2*usedPointCount]
+
+                    tempAddLen=tempAddLen+sqr((_tempLinePos[2*(usedPointCount+1)-1]-_tempLinePos[2*usedPointCount-1])^2+(_tempLinePos[2*(usedPointCount+1)]-_tempLinePos[2*usedPointCount])^2)
+                endwhile
+
+                !終点
+                if abs(_tempLenList[j]-tempAddLen)<=eps then
+                    usedPointCount=usedPointCount+1
+                    _subRebarLinePoint[subRebarLineNum]=_subRebarLinePoint[subRebarLineNum]+1
+                    _subRebarLinePos[subRebarLineNum][2*_subRebarLinePoint[subRebarLineNum]-1]=_tempLinePos[2*usedPointCount-1]
+                    _subRebarLinePos[subRebarLineNum][2*_subRebarLinePoint[subRebarLineNum]]=_tempLinePos[2*usedPointCount]
+                endif
+
+                if tempAddLen-_tempLenList[j]>eps then
+                    tempFra=sqr((_tempLinePos[2*(usedPointCount+1)-1]-_subRebarLinePos[subRebarLineNum][2*_subRebarLinePoint[subRebarLineNum]-1])^2+\
+                        (_tempLinePos[2*(usedPointCount+1)]-_subRebarLinePos[subRebarLineNum][2*_subRebarLinePoint[subRebarLineNum]])^2)
+                    _subRebarLinePoint[subRebarLineNum]=_subRebarLinePoint[subRebarLineNum]+1
+                    _subRebarLinePos[subRebarLineNum][2*_subRebarLinePoint[subRebarLineNum]-1]=_tempLinePos[2*(usedPointCount+1)-1]-\
+                        (_tempLinePos[2*(usedPointCount+1)-1]-_subRebarLinePos[subRebarLineNum][2*(_subRebarLinePoint[subRebarLineNum]-1)-1])*(tempAddLen-_tempLenList[j])/tempFra
+                    _subRebarLinePos[subRebarLineNum][2*_subRebarLinePoint[subRebarLineNum]]=_tempLinePos[2*(usedPointCount+1)]-\
+                        (_tempLinePos[2*(usedPointCount+1)]-_subRebarLinePos[subRebarLineNum][2*(_subRebarLinePoint[subRebarLineNum]-1)])*(tempAddLen-_tempLenList[j])/tempFra
+                endif
+
+                _endX[j]=_subRebarLinePos[subRebarLineNum][2*_subRebarLinePoint[subRebarLineNum]-1]
+                _endZ[j]=_subRebarLinePos[subRebarLineNum][2*_subRebarLinePoint[subRebarLineNum]]
+
+                if tempCount>1 and j<tempCount then
+                    _connectNum[subUseCount]=_connectNum[subUseCount]+1
+                    _connectPos[subUseCount][2*_connectNum[subUseCount]-1]=_endX[j]
+                    _connectPos[subUseCount][2*_connectNum[subUseCount]]=_endZ[j]
+                endif
+            next j
+        endif
+
+        for j=1 to subRebarLineNum
+            _subRebarLineLen[j]=0
+            for n=1 to _subRebarLinePoint[j]-1
+                _subRebarLineLen[j]=_subRebarLineLen[j]+sqr((_subRebarLinePos[j][2*(n+1)-1]-_subRebarLinePos[j][2*n-1])^2+(_subRebarLinePos[j][2*(n+1)]-_subRebarLinePos[j][2*n])^2)
+            next n
+
+            !長さ切り上げ処理
+            if switchLenCeil then
+                _subRebarLineLen[j]=ceil(_subRebarLineLen[j]/lenCeilUnit)*lenCeilUnit
+            endif
+        next j
+    next i
+    
+return
+
+
+"master_end":
+parameters \
+connectNum=_connectNum,
+connectPos=_connectPos,
+tempLineNum=_tempLineNum,
+tempSpace=_tempSpace

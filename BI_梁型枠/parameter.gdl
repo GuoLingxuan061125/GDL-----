@@ -1,0 +1,512 @@
+!========================================================================================積算
+!============================================ピーコン数
+pcon_num=0
+
+if switch_pcon_z1 then
+	for i=1 to pcon_x_num
+		_flag=1
+		if sbeam_out_num>0 then
+			for j=1 to sbeam_out_num
+				if pcon_x_pos[i]>=sbeam_out_pos[j]-sbeam_out_wid[j]/2 and pcon_x_pos[i]<=sbeam_out_pos[j]+sbeam_out_wid[j]/2 then
+					if -beam_hei-beam_down_thi+pcon_z_offset>=sbeam_out_offset[j]-sbeam_out_hei[j]-form_thi*switch_sbeam_normal_form_offset then
+						_flag=0
+					endif
+				endif
+			next j
+		endif
+		
+		if sbeam_in_num>0 then
+			for j=1 to sbeam_in_num
+				if pcon_x_pos[i]>=sbeam_in_pos[j]-sbeam_in_wid[j]/2 and pcon_x_pos[i]<=sbeam_in_pos[j]+sbeam_in_wid[j]/2 then
+					if -beam_hei-beam_down_thi+pcon_z_offset>=sbeam_in_offset[j]-sbeam_in_hei[j]-form_thi*switch_sbeam_normal_form_offset then
+						_flag=0
+					endif
+				endif
+			next j
+		endif
+
+		if orthwall_out_num>0 then
+			for j=1 to orthwall_out_num
+				if pcon_x_pos[i]>=orthwall_out_pos[j]-orthwall_out_thi[j]/2 and pcon_x_pos[i]<=orthwall_out_pos[j]+orthwall_out_thi[j]/2 then
+					_flag=0
+				endif
+			next j
+		endif
+
+		if orthwall_in_num>0 then
+			for j=1 to orthwall_in_num
+				if pcon_x_pos[i]>=orthwall_in_pos[j]-orthwall_in_thi[j]/2 and pcon_x_pos[i]<=orthwall_in_pos[j]+orthwall_in_thi[j]/2 then
+					_flag=0
+				endif
+			next j
+		endif
+	
+		pcon_num=pcon_num+_flag
+	next i
+endif
+
+
+for i=1 to pcon_x_num
+	_flag=1
+	if sbeam_out_num>0 then
+		for j=1 to sbeam_out_num
+			if pcon_x_pos[i]>=sbeam_out_pos[j]-sbeam_out_wid[j]/2 and pcon_x_pos[i]<=sbeam_out_pos[j]+sbeam_out_wid[j]/2 then
+				_flag=0
+			endif
+		next j
+	endif
+	
+	if sbeam_in_num>0 then
+		for j=1 to sbeam_in_num
+			if pcon_x_pos[i]>=sbeam_in_pos[j]-sbeam_in_wid[j]/2 and pcon_x_pos[i]<=sbeam_in_pos[j]+sbeam_in_wid[j]/2 then
+				_flag=0
+			endif
+		next j
+	endif
+
+	if orthwall_out_num>0 then
+		for j=1 to orthwall_out_num
+			if pcon_x_pos[i]>=orthwall_out_pos[j]-orthwall_out_thi[j]/2 and pcon_x_pos[i]<=orthwall_out_pos[j]+orthwall_out_thi[j]/2 then
+				_flag=0
+			endif
+		next j
+	endif
+
+	if orthwall_in_num>0 then
+		for j=1 to orthwall_in_num
+			if pcon_x_pos[i]>=orthwall_in_pos[j]-orthwall_in_thi[j]/2 and pcon_x_pos[i]<=orthwall_in_pos[j]+orthwall_in_thi[j]/2 then
+				_flag=0
+			endif
+		next j
+	endif
+
+	if switch_pcon_z2 then
+		pcon_num=pcon_num+_flag
+	endif
+
+	if switch_link then
+		pcon_num=pcon_num+_flag
+	endif
+next i
+
+
+parameters pcon_num=pcon_num
+lock "pcon_num"
+
+
+!============================================型枠面積
+form_full_area=0
+form_foundation_area=0
+form_column_area=0
+form_wall_area=0
+form_slab_area=0
+form_sbeam_area=0
+form_orthwall_area=0
+form_area=0
+form_area_out=0
+form_area_in=0
+form_area_down=0
+form_area_top=0
+form_theo_area=0
+form_theo_area_out=0
+form_theo_area_in=0
+form_theo_area_down=0
+form_theo_area_top=0
+
+haunch_area_out=switch_haunch[1]*((2*form_out_start_offset+haunch_x[1])*haunch_z[1]/2)+switch_haunch[2]*((2*form_out_end_offset+haunch_x[2])*haunch_z[2]/2)
+haunch_area_in=switch_haunch[1]*((2*form_in_start_offset+haunch_x[1])*haunch_z[1]/2)+switch_haunch[2]*((2*form_in_end_offset+haunch_x[2])*haunch_z[2]/2)
+
+!下端
+if switch_form_down then
+	form_area=form_area+(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)*(beam_len_xyz+form_down_start_offset+form_down_end_offset)
+	form_area_down=form_area_down+(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)*(beam_len_xyz+form_down_start_offset+form_down_end_offset)
+	form_theo_area=form_theo_area+(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)*(beam_len_xyz+form_down_start_offset+form_down_end_offset)
+	form_theo_area_down=form_theo_area_down+(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)*(beam_len_xyz+form_down_start_offset+form_down_end_offset)
+endif
+
+!上端
+if switch_form_top then
+	form_area=form_area+(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)*(beam_len_xyz+form_top_start_offset+form_top_end_offset)
+	form_area_top=form_area_top+(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)*(beam_len_xyz+form_top_start_offset+form_top_end_offset)
+	form_theo_area=form_theo_area+(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)*(beam_len_xyz+form_top_start_offset+form_top_end_offset)
+	form_theo_area_top=form_theo_area_top+(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)*(beam_len_xyz+form_top_start_offset+form_top_end_offset)
+endif
+
+!外側
+if switch_form_out then
+	form_area=form_area+(beam_hei+beam_down_thi+beam_top_thi)*(beam_len+form_out_start_offset+form_out_end_offset)+haunch_area_out
+	form_area_out=form_area_out+(beam_hei+beam_down_thi+beam_top_thi)*(beam_len+form_out_start_offset+form_out_end_offset)+haunch_area_out
+	form_theo_area=form_theo_area+(beam_hei+beam_down_thi+beam_top_thi)*(beam_len+form_out_start_offset+form_out_end_offset)+haunch_area_out
+	form_theo_area_out=form_theo_area_out+(beam_hei+beam_down_thi+beam_top_thi)*(beam_len+form_out_start_offset+form_out_end_offset)+haunch_area_out
+endif
+
+!内側
+if switch_form_in then
+	form_area=form_area+(beam_hei+beam_down_thi+beam_top_thi)*(beam_len+form_in_start_offset+form_in_end_offset)+haunch_area_in
+	form_area_in=form_area_in+(beam_hei+beam_down_thi+beam_top_thi)*(beam_len+form_in_start_offset+form_in_end_offset)+haunch_area_in
+	form_theo_area=form_theo_area+(beam_hei+beam_down_thi+beam_top_thi)*(beam_len+form_in_start_offset+form_in_end_offset)+haunch_area_in
+	form_theo_area_in=form_theo_area_in+(beam_hei+beam_down_thi+beam_top_thi)*(beam_len+form_in_start_offset+form_in_end_offset)+haunch_area_in
+endif
+
+!始点側小口
+if switch_form_start then
+	form_area=form_area+(beam_wid+beam_out_thi+beam_in_thi+(switch_form_out+switch_form_in)*form_thi)*\
+		(beam_hei+beam_down_thi+beam_top_thi+(switch_form_down+switch_form_top)*form_thi+form_start_top_offset-form_start_down_offset)
+	form_theo_area=form_theo_area+(beam_wid+beam_out_thi+beam_in_thi+(switch_form_out+switch_form_in)*form_thi)*\
+		(beam_hei+beam_down_thi+beam_top_thi+(switch_form_down+switch_form_top)*form_thi+form_start_top_offset-form_start_down_offset)
+endif
+
+!終点側小口
+
+
+form_full_area=form_area
+
+!基礎との接続部
+if switch_foun[1] then
+	if switch_form_down then
+		form_area=form_area-(max(foun_x[1],foun_y[1])/2+form_down_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		form_area_down=form_area_down-(max(foun_x[1],foun_y[1])/2+form_down_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		form_theo_area=form_theo_area-(max(foun_x[1],foun_y[1])/2+form_down_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		form_theo_area_down=form_theo_area_down-(max(foun_x[1],foun_y[1])/2+form_down_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		form_foundation_area=form_foundation_area+(max(foun_x[1],foun_y[1])/2+form_down_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+	endif
+
+	if switch_form_top and foun_z[1]>=(beam_hei+beam_down_thi+beam_top_thi) then
+		form_area=form_area-(max(foun_x[1],foun_y[1])/2+form_top_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		form_area_top=form_area_top-(max(foun_x[1],foun_y[1])/2+form_top_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		form_theo_area=form_theo_area-(max(foun_x[1],foun_y[1])/2+form_top_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		form_theo_area_top=form_theo_area_top-(max(foun_x[1],foun_y[1])/2+form_top_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		form_foundation_area=form_foundation_area+(max(foun_x[1],foun_y[1])/2+form_top_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+	endif
+
+	if switch_form_out then
+		form_area=form_area-(max(foun_x[1],foun_y[1])/2+form_out_start_offset)*min(foun_z[1],(beam_hei+beam_down_thi+beam_top_thi))
+		form_area_out=form_area_out-(max(foun_x[1],foun_y[1])/2+form_out_start_offset)*min(foun_z[1],(beam_hei+beam_down_thi+beam_top_thi))
+		form_theo_area=form_theo_area-(max(foun_x[1],foun_y[1])/2+form_out_start_offset)*min(foun_z[1],(beam_hei+beam_down_thi+beam_top_thi))
+		form_theo_area_out=form_theo_area_out-(max(foun_x[1],foun_y[1])/2+form_out_start_offset)*min(foun_z[1],(beam_hei+beam_down_thi+beam_top_thi))
+		form_foundation_area=form_foundation_area+(max(foun_x[1],foun_y[1])/2+form_out_start_offset)*min(foun_z[1],(beam_hei+beam_down_thi+beam_top_thi))
+	endif
+
+	if switch_form_in then
+		form_area=form_area-(max(foun_x[1],foun_y[1])/2+form_in_start_offset)*min(foun_z[1],(beam_hei+beam_down_thi+beam_top_thi))
+		form_area_in=form_area_in-(max(foun_x[1],foun_y[1])/2+form_in_start_offset)*min(foun_z[1],(beam_hei+beam_down_thi+beam_top_thi))
+		form_theo_area=form_theo_area-(max(foun_x[1],foun_y[1])/2+form_in_start_offset)*min(foun_z[1],(beam_hei+beam_down_thi+beam_top_thi))
+		form_theo_area_in=form_theo_area_in-(max(foun_x[1],foun_y[1])/2+form_in_start_offset)*min(foun_z[1],(beam_hei+beam_down_thi+beam_top_thi))
+		form_foundation_area=form_foundation_area+(max(foun_x[1],foun_y[1])/2+form_in_start_offset)*min(foun_z[1],(beam_hei+beam_down_thi+beam_top_thi))
+	endif
+endif
+
+if switch_foun[2] then
+	if switch_form_down then
+		form_area=form_area-(max(foun_x[2],foun_y[2])/2+form_down_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		form_area_down=form_area_down-(max(foun_x[2],foun_y[2])/2+form_down_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		form_theo_area=form_theo_area-(max(foun_x[2],foun_y[2])/2+form_down_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		form_theo_area_down=form_theo_area_down-(max(foun_x[2],foun_y[2])/2+form_down_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		form_foundation_area=form_foundation_area+(max(foun_x[2],foun_y[2])/2+form_down_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+	endif
+
+	if switch_form_top and foun_z[2]>=(beam_hei+beam_down_thi+beam_top_thi) then
+		form_area=form_area-(max(foun_x[2],foun_y[2])/2+form_top_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		form_area_top=form_area_top-(max(foun_x[2],foun_y[2])/2+form_top_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		form_theo_area=form_theo_area-(max(foun_x[2],foun_y[2])/2+form_top_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		form_theo_area_top=form_theo_area_top-(max(foun_x[2],foun_y[2])/2+form_top_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		form_foundation_area=form_foundation_area+(max(foun_x[2],foun_y[2])/2+form_top_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+	endif
+
+	if switch_form_out then
+		form_area=form_area-(max(foun_x[2],foun_y[2])/2+form_out_end_offset)*min(foun_z[2],(beam_hei+beam_down_thi+beam_top_thi))
+		form_area_out=form_area_out-(max(foun_x[2],foun_y[2])/2+form_out_end_offset)*min(foun_z[2],(beam_hei+beam_down_thi+beam_top_thi))
+		form_theo_area=form_theo_area-(max(foun_x[2],foun_y[2])/2+form_out_end_offset)*min(foun_z[2],(beam_hei+beam_down_thi+beam_top_thi))
+		form_theo_area_out=form_theo_area_out-(max(foun_x[2],foun_y[2])/2+form_out_end_offset)*min(foun_z[2],(beam_hei+beam_down_thi+beam_top_thi))
+		form_foundation_area=form_foundation_area+(max(foun_x[2],foun_y[2])/2+form_out_end_offset)*min(foun_z[2],(beam_hei+beam_down_thi+beam_top_thi))
+	endif
+
+	if switch_form_in then
+		form_area=form_area-(max(foun_x[2],foun_y[2])/2+form_in_end_offset)*min(foun_z[2],(beam_hei+beam_down_thi+beam_top_thi))
+		form_area_in=form_area_in-(max(foun_x[2],foun_y[2])/2+form_in_end_offset)*min(foun_z[2],(beam_hei+beam_down_thi+beam_top_thi))
+		form_theo_area=form_theo_area-(max(foun_x[2],foun_y[2])/2+form_in_end_offset)*min(foun_z[2],(beam_hei+beam_down_thi+beam_top_thi))
+		form_theo_area_in=form_theo_area_in-(max(foun_x[2],foun_y[2])/2+form_in_end_offset)*min(foun_z[2],(beam_hei+beam_down_thi+beam_top_thi))
+		form_foundation_area=form_foundation_area+(max(foun_x[2],foun_y[2])/2+form_in_end_offset)*min(foun_z[2],(beam_hei+beam_down_thi+beam_top_thi))
+	endif
+endif
+
+!柱との接続部
+if sgn(switch_column[1]*column_x[1]*column_y[1]) then
+	if switch_form_down then
+		if switch_foun[1]=0 then
+			form_area=form_area-(max(column_x[1],column_y[1])/2+form_down_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+			form_area_down=form_area_down-(max(column_x[1],column_y[1])/2+form_down_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+			form_theo_area=form_theo_area-(max(column_x[1],column_y[1])/2+form_down_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+			form_theo_area_down=form_theo_area_down-(max(column_x[1],column_y[1])/2+form_down_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+			form_column_area=form_column_area+(max(column_x[1],column_y[1])/2+form_down_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		endif
+	endif
+
+	if switch_form_top then
+		if switch_foun[1]=0 then
+			form_area=form_area-(max(column_x[1],column_y[1])/2+form_top_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+			form_area_top=form_area_top-(max(column_x[1],column_y[1])/2+form_top_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+			form_theo_area=form_theo_area-(max(column_x[1],column_y[1])/2+form_top_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+			form_theo_area_top=form_theo_area_top-(max(column_x[1],column_y[1])/2+form_top_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+			form_column_area=form_column_area+(max(column_x[1],column_y[1])/2+form_top_start_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		endif
+	endif
+
+	if switch_form_out then
+		form_area=form_area-(max(column_x[1],column_y[1])/2+form_out_start_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[1]*foun_z[1]))
+		form_area_out=form_area_out-(max(column_x[1],column_y[1])/2+form_out_start_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[1]*foun_z[1]))
+		form_theo_area=form_theo_area-(max(column_x[1],column_y[1])/2+form_out_start_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[1]*foun_z[1]))
+		form_theo_area_out=form_theo_area_out-(max(column_x[1],column_y[1])/2+form_out_start_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[1]*foun_z[1]))
+		form_column_area=form_column_area+(max(column_x[1],column_y[1])/2+form_out_start_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[1]*foun_z[1]))
+	endif
+
+	if switch_form_in then
+		form_area=form_area-(max(column_x[1],column_y[1])/2+form_in_start_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[1]*foun_z[1]))
+		form_area_in=form_area_in-(max(column_x[1],column_y[1])/2+form_in_start_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[1]*foun_z[1]))
+		form_theo_area=form_theo_area-(max(column_x[1],column_y[1])/2+form_in_start_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[1]*foun_z[1]))
+		form_theo_area_in=form_theo_area_in-(max(column_x[1],column_y[1])/2+form_in_start_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[1]*foun_z[1]))
+		form_column_area=form_column_area+(max(column_x[1],column_y[1])/2+form_in_start_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[1]*foun_z[1]))
+	endif
+endif
+
+if sgn(switch_column[2]*column_x[2]*column_y[2]) then
+	if switch_form_down then
+		if switch_foun[2]=0 then
+			form_area=form_area-(max(column_x[1],column_y[1])/2+form_down_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+			form_area_down=form_area_down-(max(column_x[1],column_y[1])/2+form_down_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+			form_theo_area=form_theo_area-(max(column_x[1],column_y[1])/2+form_down_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+			form_theo_area_down=form_theo_area_down-(max(column_x[1],column_y[1])/2+form_down_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+			form_column_area=form_column_area+(max(column_x[1],column_y[1])/2+form_down_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		endif
+	endif
+
+	if switch_form_top then
+		if switch_foun[2]=0 then
+			form_area=form_area-(max(column_x[1],column_y[1])/2+form_top_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+			form_area_top=form_area_top-(max(column_x[1],column_y[1])/2+form_top_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+			form_theo_area=form_theo_area-(max(column_x[1],column_y[1])/2+form_top_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+			form_theo_area_top=form_theo_area_top-(max(column_x[1],column_y[1])/2+form_top_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+			form_column_area=form_column_area+(max(column_x[1],column_y[1])/2+form_top_end_offset)*(beam_wid+beam_out_thi+beam_in_thi+2*form_thi)
+		endif
+	endif
+
+	if switch_form_out then
+		form_area=form_area-(max(column_x[1],column_y[1])/2+form_out_end_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[2]*foun_z[2]))
+		form_area_out=form_area_out-(max(column_x[1],column_y[1])/2+form_out_end_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[2]*foun_z[2]))
+		form_theo_area=form_theo_area-(max(column_x[1],column_y[1])/2+form_out_end_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[2]*foun_z[2]))
+		form_theo_area_out=form_theo_area_out-(max(column_x[1],column_y[1])/2+form_out_end_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[2]*foun_z[2]))
+		form_column_area=form_column_area+(max(column_x[1],column_y[1])/2+form_out_end_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[2]*foun_z[2]))
+	endif
+
+	if switch_form_in then
+		form_area=form_area-(max(column_x[1],column_y[1])/2+form_in_end_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[2]*foun_z[2]))
+		form_area_in=form_area_in-(max(column_x[1],column_y[1])/2+form_in_end_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[2]*foun_z[2]))
+		form_theo_area=form_theo_area-(max(column_x[1],column_y[1])/2+form_in_end_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[2]*foun_z[2]))
+		form_theo_area_in=form_theo_area_in-(max(column_x[1],column_y[1])/2+form_in_end_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[2]*foun_z[2]))
+		form_column_area=form_column_area+(max(column_x[1],column_y[1])/2+form_in_end_offset)*max(0,(beam_hei+beam_down_thi+beam_top_thi-switch_foun[2]*foun_z[2]))
+	endif
+endif
+
+!壁との接続部
+if switch_wall[1] then
+	if switch_form_down then
+		form_area=form_area-(wall_thi[1]+2*form_thi*switch_wall_form_offset)*(beam_len-max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-\
+			max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))/beam_len*(beam_len_xyz+form_down_start_offset+form_down_end_offset)
+		form_area_down=form_area_down-(wall_thi[1]+2*form_thi*switch_wall_form_offset)*(beam_len-max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-\
+			max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))/beam_len*(beam_len_xyz+form_down_start_offset+form_down_end_offset)
+
+		if (wall_thi[1]+2*form_thi*switch_wall_form_offset)*(beam_len-max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-\
+			max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))/beam_len*(beam_len_xyz+form_down_start_offset+form_down_end_offset)>=1 then
+			form_theo_area=form_theo_area-(wall_thi[1]+2*form_thi*switch_wall_form_offset)*(beam_len-max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-\
+				max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))/beam_len*(beam_len_xyz+form_down_start_offset+form_down_end_offset)
+			form_theo_area_down=form_theo_area_down-(wall_thi[1]+2*form_thi*switch_wall_form_offset)*(beam_len-max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-\
+				max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))/beam_len*(beam_len_xyz+form_down_start_offset+form_down_end_offset)
+		endif
+
+		form_wall_area=form_wall_area+(wall_thi[1]+2*form_thi*switch_wall_form_offset)*(beam_len-max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-\
+			max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))/beam_len*(beam_len_xyz+form_down_start_offset+form_down_end_offset)
+	endif
+endif
+
+if switch_wall[2] then
+	if switch_form_top then
+		form_area=form_area-(wall_thi[2]+2*form_thi*switch_wall_form_offset)*(beam_len-max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-\
+			max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))/beam_len*(beam_len_xyz+form_top_start_offset+form_top_end_offset)
+		form_area_top=form_area_top-(wall_thi[2]+2*form_thi*switch_wall_form_offset)*(beam_len-max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-\
+			max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))/beam_len*(beam_len_xyz+form_top_start_offset+form_top_end_offset)
+
+		if (wall_thi[2]+2*form_thi*switch_wall_form_offset)*(beam_len-max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-\
+			max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))/beam_len*(beam_len_xyz+form_top_start_offset+form_top_end_offset)>=1 then
+			form_theo_area=form_theo_area-(wall_thi[2]+2*form_thi*switch_wall_form_offset)*(beam_len-max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-\
+				max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))/beam_len*(beam_len_xyz+form_top_start_offset+form_top_end_offset)
+			form_theo_area_top=form_theo_area_top-(wall_thi[2]+2*form_thi*switch_wall_form_offset)*(beam_len-max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-\
+				max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))/beam_len*(beam_len_xyz+form_top_start_offset+form_top_end_offset)
+		endif
+
+		form_wall_area=form_wall_area+(wall_thi[2]+2*form_thi*switch_wall_form_offset)*(beam_len-max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-\
+			max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))/beam_len*(beam_len_xyz+form_top_start_offset+form_top_end_offset)
+	endif
+endif
+
+!スラブとの接続部
+form_thi=form_thi/cos(rat)
+
+if switch_slab[1] then
+	if switch_form_out then
+		form_area=form_area-(slab_thi[1]+(form_thi+min(form_thi,abs(slab_offset[1])))*switch_slab_form_offset)*(beam_len+form_out_start_offset+form_out_end_offset-\
+			max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))
+		form_area_out=form_area_out-(slab_thi[1]+(form_thi+min(form_thi,abs(slab_offset[1])))*switch_slab_form_offset)*(beam_len+form_out_start_offset+form_out_end_offset-\
+			max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))
+		form_theo_area=form_theo_area-(slab_thi[1]+(form_thi+min(form_thi,abs(slab_offset[1])))*switch_slab_form_offset)*(beam_len+form_out_start_offset+form_out_end_offset-\
+			max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))
+		form_theo_area_out=form_theo_area_out-(slab_thi[1]+(form_thi+min(form_thi,abs(slab_offset[1])))*switch_slab_form_offset)*(beam_len+form_out_start_offset+form_out_end_offset-\
+			max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))
+		form_slab_area=form_slab_area+(slab_thi[1]+(form_thi+min(form_thi,abs(slab_offset[1])))*switch_slab_form_offset)*(beam_len+form_out_start_offset+form_out_end_offset-\
+			max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))
+	endif
+endif
+
+if switch_slab[2] then
+	if switch_form_in then
+		form_area=form_area-(slab_thi[2]+(form_thi+min(form_thi,abs(slab_offset[2])))*switch_slab_form_offset)*(beam_len+form_in_start_offset+form_in_end_offset-\
+			max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))
+		form_area_in=form_area_in-(slab_thi[2]+(form_thi+min(form_thi,abs(slab_offset[2])))*switch_slab_form_offset)*(beam_len+form_in_start_offset+form_in_end_offset-\
+			max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))
+		form_theo_area=form_theo_area-(slab_thi[2]+(form_thi+min(form_thi,abs(slab_offset[2])))*switch_slab_form_offset)*(beam_len+form_in_start_offset+form_in_end_offset-\
+			max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))
+		form_theo_area_in=form_theo_area_in-(slab_thi[2]+(form_thi+min(form_thi,abs(slab_offset[2])))*switch_slab_form_offset)*(beam_len+form_in_start_offset+form_in_end_offset-\
+			max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))
+		form_slab_area=form_slab_area+(slab_thi[2]+(form_thi+min(form_thi,abs(slab_offset[2])))*switch_slab_form_offset)*(beam_len+form_in_start_offset+form_in_end_offset-\
+			max(column_x[1],column_y[1])/2*sgn(switch_column[1]*column_x[1]*column_y[1])-max(column_x[2],column_y[2])/2*sgn(switch_column[2]*column_x[2]*column_y[2]))
+	endif
+endif
+
+form_thi=form_thi*cos(rat)
+
+!直交壁
+for i=1 to orthwall_out_num
+	if switch_form_out then
+		form_area=form_area-(beam_hei+beam_down_thi+beam_top_thi+orthwall_out_top_offset[i]-orthwall_out_down_offset[i])*orthwall_out_thi[i]
+		form_theo_area=form_theo_area-(beam_hei+beam_down_thi+beam_top_thi+orthwall_out_top_offset[i]-orthwall_out_down_offset[i])*orthwall_out_thi[i]
+		form_area_out=form_area_out-(beam_hei+beam_down_thi+beam_top_thi+orthwall_out_top_offset[i]-orthwall_out_down_offset[i])*orthwall_out_thi[i]
+		form_theo_area_out=form_theo_area_out-(beam_hei+beam_down_thi+beam_top_thi+orthwall_out_top_offset[i]-orthwall_out_down_offset[i])*orthwall_out_thi[i]
+		form_orthwall_area=form_orthwall_area+(beam_hei+beam_down_thi+beam_top_thi+orthwall_out_top_offset[i]-orthwall_out_down_offset[i])*orthwall_out_thi[i]
+	endif
+next i
+
+for i=1 to orthwall_in_num
+	if switch_form_in then
+		form_area=form_area-(beam_hei+beam_down_thi+beam_top_thi+orthwall_in_top_offset[i]-orthwall_in_down_offset[i])*orthwall_in_thi[i]
+		form_theo_area=form_theo_area-(beam_hei+beam_down_thi+beam_top_thi+orthwall_in_top_offset[i]-orthwall_in_down_offset[i])*orthwall_in_thi[i]
+		form_area_in=form_area_in-(beam_hei+beam_down_thi+beam_top_thi+orthwall_in_top_offset[i]-orthwall_in_down_offset[i])*orthwall_in_thi[i]
+		form_theo_area_in=form_theo_area_in-(beam_hei+beam_down_thi+beam_top_thi+orthwall_in_top_offset[i]-orthwall_in_down_offset[i])*orthwall_in_thi[i]
+		form_orthwall_area=form_orthwall_area+(beam_hei+beam_down_thi+beam_top_thi+orthwall_in_top_offset[i]-orthwall_in_down_offset[i])*orthwall_in_thi[i]
+	endif
+next i
+
+!小梁との接続部
+if sbeam_out_num>0 then
+if switch_form_out then
+	for i=1 to sbeam_out_num
+		form_area=form_area-(sbeam_out_wid[i]+2*form_thi*switch_sbeam_normal_form_offset)*\
+			max((sbeam_out_hei[i]+form_thi*switch_sbeam_normal_form_offset-(slab_thi[1]+(form_thi+min(form_thi,abs(slab_offset[1])))*switch_slab_form_offset)*switch_slab[1]),0)
+		form_area_out=form_area_out-(sbeam_out_wid[i]+2*form_thi*switch_sbeam_normal_form_offset)*\
+			max((sbeam_out_hei[i]+form_thi*switch_sbeam_normal_form_offset-(slab_thi[1]+(form_thi+min(form_thi,abs(slab_offset[1])))*switch_slab_form_offset)*switch_slab[1]),0)
+
+		if (sbeam_out_wid[i]+2*form_thi*switch_sbeam_normal_form_offset)*\
+			max((sbeam_out_hei[i]+form_thi*switch_sbeam_normal_form_offset-(slab_thi[1]+(form_thi+min(form_thi,abs(slab_offset[1])))*switch_slab_form_offset)*switch_slab[1]),0)>=1 then
+			form_theo_area=form_theo_area-(sbeam_out_wid[i]+2*form_thi*switch_sbeam_normal_form_offset)*\
+					max((sbeam_out_hei[i]+form_thi*switch_sbeam_normal_form_offset-(slab_thi[1]+(form_thi+min(form_thi,abs(slab_offset[1])))*switch_slab_form_offset)*switch_slab[1]),0)
+			form_theo_area_out=form_theo_area_out-(sbeam_out_wid[i]+2*form_thi*switch_sbeam_normal_form_offset)*\
+					max((sbeam_out_hei[i]+form_thi*switch_sbeam_normal_form_offset-(slab_thi[1]+(form_thi+min(form_thi,abs(slab_offset[1])))*switch_slab_form_offset)*switch_slab[1]),0)
+		endif
+
+		form_sbeam_area=form_sbeam_area+(sbeam_out_wid[i]+2*form_thi*switch_sbeam_normal_form_offset)*\
+			max((sbeam_out_hei[i]+form_thi*switch_sbeam_normal_form_offset-(slab_thi[1]+(form_thi+min(form_thi,abs(slab_offset[1])))*switch_slab_form_offset)*switch_slab[1]),0)
+	next i
+endif
+endif
+
+if sbeam_in_num>0 then
+if switch_form_in then
+	for i=1 to sbeam_in_num
+		form_area=form_area-(sbeam_in_wid[i]+2*form_thi*switch_sbeam_normal_form_offset)*\
+			max((sbeam_in_hei[i]+form_thi*switch_sbeam_normal_form_offset-(slab_thi[2]+(form_thi+min(form_thi,abs(slab_offset[2])))*switch_slab_form_offset)*switch_slab[2]),0)
+		form_area_in=form_area_in-(sbeam_in_wid[i]+2*form_thi*switch_sbeam_normal_form_offset)*\
+			max((sbeam_in_hei[i]+form_thi*switch_sbeam_normal_form_offset-(slab_thi[2]+(form_thi+min(form_thi,abs(slab_offset[2])))*switch_slab_form_offset)*switch_slab[2]),0)
+
+		if (sbeam_in_wid[i]+2*form_thi*switch_sbeam_normal_form_offset)*\
+			max((sbeam_in_hei[i]+form_thi*switch_sbeam_normal_form_offset-(slab_thi[2]+(form_thi+min(form_thi,abs(slab_offset[2])))*switch_slab_form_offset)*switch_slab[2]),0)>=1 then
+			form_theo_area=form_theo_area-(sbeam_in_wid[i]+2*form_thi*switch_sbeam_normal_form_offset)*\
+					max((sbeam_in_hei[i]+form_thi*switch_sbeam_normal_form_offset-(slab_thi[2]+(form_thi+min(form_thi,abs(slab_offset[2])))*switch_slab_form_offset)*switch_slab[2]),0)
+			form_theo_area_in=form_theo_area_in-(sbeam_in_wid[i]+2*form_thi*switch_sbeam_normal_form_offset)*\
+					max((sbeam_in_hei[i]+form_thi*switch_sbeam_normal_form_offset-(slab_thi[2]+(form_thi+min(form_thi,abs(slab_offset[2])))*switch_slab_form_offset)*switch_slab[2]),0)
+		endif
+
+		form_sbeam_area=form_sbeam_area+(sbeam_in_wid[i]+2*form_thi*switch_sbeam_normal_form_offset)*\
+			max((sbeam_in_hei[i]+form_thi*switch_sbeam_normal_form_offset-(slab_thi[2]+(form_thi+min(form_thi,abs(slab_offset[2])))*switch_slab_form_offset)*switch_slab[2]),0)
+	next i
+endif
+endif
+
+!タイプ別の数量集計
+form1_area=0
+form2_area=0
+form3_area=0
+form4_area=0
+
+if form_out_type=1 then form1_area=form1_area+form_area_out
+if form_out_type=2 then form2_area=form2_area+form_area_out
+if form_out_type=3 then form3_area=form3_area+form_area_out
+if form_out_type=4 then form4_area=form4_area+form_area_out
+
+if form_in_type=1 then form1_area=form1_area+form_area_in
+if form_in_type=2 then form2_area=form2_area+form_area_in
+if form_in_type=3 then form3_area=form3_area+form_area_in
+if form_in_type=4 then form4_area=form4_area+form_area_in
+
+if form_down_type=1 then form1_area=form1_area+form_area_down
+if form_down_type=2 then form2_area=form2_area+form_area_down
+if form_down_type=3 then form3_area=form3_area+form_area_down
+if form_down_type=4 then form4_area=form4_area+form_area_down
+
+if form_top_type=1 then form1_area=form1_area+form_area_top
+if form_top_type=2 then form2_area=form2_area+form_area_top
+if form_top_type=3 then form3_area=form3_area+form_area_top
+if form_top_type=4 then form4_area=form4_area+form_area_top
+
+parameters \
+	form_full_area=form_full_area,
+	form_foundation_area=form_foundation_area,
+	form_column_area=form_column_area,
+	form_wall_area=form_wall_area,
+	form_slab_area=form_slab_area,
+	form_sbeam_area=form_sbeam_area,
+	form_orthwall_area=form_orthwall_area,
+	form_area=form_area,
+	form_area_out=form_area_out,
+	form_area_in=form_area_in,
+	form_area_down=form_area_down,
+	form_area_top=form_area_top,
+	form_theo_area=form_theo_area,
+	form_theo_area_out=form_theo_area_out,
+	form_theo_area_in=form_theo_area_in,
+	form_theo_area_down=form_theo_area_down,
+	form_theo_area_top=form_theo_area_top,
+	form1_area=form1_area,
+	form2_area=form2_area,
+	form3_area=form3_area,
+	form4_area=form4_area
+
+lock "form_full_area","form_foundation_area","form_column_area","form_wall_area","form_slab_area","form_sbeam_area","form_orthwall_area","form_area",\
+	"form_area_out","form_area_in","form_area_down","form_area_top","form_theo_area","form_theo_area_out","form_theo_area_in","form_theo_area_down","form_theo_area_top",\
+	"form1_area","form2_area","form3_area","form4_area"
+
+
+
+
+
+
+
+
+

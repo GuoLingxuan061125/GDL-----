@@ -1,0 +1,78 @@
+!========================================================================積算
+!スラブ面積(減算前)
+slabFullArea=0
+
+for i=1 to slabVertexNum
+    if i<slabVertexNum then
+        i2=i+1
+    else
+        i2=1
+    endif
+
+    slabFullArea=slabFullArea+(slabVertexPos[i][y]+slabVertexPos[i2][y])*(slabVertexPos[i2][x]-slabVertexPos[i][x])/2
+next i
+
+slabFullArea=abs(slabFullArea)
+parameters slabFullArea=slabFullArea
+
+
+!開口面積
+slabOpArea=0
+
+for i=1 to opNum
+    for j=1 to opVertexNum[i]
+        if j<opVertexNum[i] then
+            j2=j+1
+        else
+            j2=1
+        endif
+
+        slabOpArea=slabOpArea+(opVertexPos[i][2*j]+opVertexPos[i][2*j2])*(opVertexPos[i][2*j2-1]-opVertexPos[i][2*j-1])/2
+    next j
+next i
+
+slabOpArea=abs(slabOpArea)
+parameters slabOpArea=slabOpArea
+
+
+!スラブ面積
+slabArea=slabFullArea-slabOpArea
+parameters slabArea=slabArea
+
+
+!フローリング枚数
+boardNum=slabArea/(boardSize1*boardSize2)
+parameters boardNum=boardNum
+
+lock "slabFullArea","slabOpArea","slabArea","boardNum"
+
+
+!フルサイズ板・役物板枚数
+fullCount=0
+trimCount=0
+fullArea=0
+fullPercentage=0
+
+if paintBoard then
+    for i=1 to boardProvNum
+        if _boardAreaPercentage1[i]>eps then
+            if _boardAreaPercentage1[i]>=threshold-eps then
+                fullCount=fullCount+1
+                fullArea=fullArea+_boardAreaPercentage1[i]*boardSize1*boardSize2
+            else
+                trimCount=trimCount+1
+            endif
+        endif
+    next i
+
+    fullPercentage=fullArea/slabArea*100
+else
+    hideparameter "fullCount","trimCount","fullPercentage"
+endif
+
+parameters \
+fullCount=fullCount,
+trimCount=trimCount,
+fullPercentage=fullPercentage
+
+lock "fullCount","trimCount","fullPercentage"

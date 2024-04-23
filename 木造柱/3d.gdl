@@ -1,0 +1,142 @@
+hotspot 0.105/2,0.105/2,0
+hotspot -0.105/2,0.105/2,0
+hotspot 0.105/2,-0.105/2,0
+hotspot -0.105/2,-0.105/2,0
+
+material mw
+
+if col=1 then!間柱
+    hotspot 0,0,0      ,unID,col_hei,1+128:unID=unID+1
+    hotspot 0,0,-1     ,unID,col_hei,3    :unID=unID+1
+    hotspot 0,0,col_hei,unID,col_hei,2    :unID=unID+1
+
+    hotspot 0.105/2 ,0.105/2 ,col_hei
+    hotspot -0.105/2,-0.105/2,col_hei
+    hotspot 0.105/2 ,-0.105/2,col_hei
+    hotspot -0.105/2,0.105/2 ,col_hei
+
+    hotspot 0,0,col_hei               ,unID,col_hei_offset,1+128:unID=unID+1
+    hotspot 0,0,col_hei+1             ,unID,col_hei_offset,3	:unID=unID+1
+    hotspot 0,0,col_hei-col_hei_offset,unID,col_hei_offset,2	:unID=unID+1
+
+    hotspot 0,0,col_hei                   ,unID,col_hei_offset_rep,1+128:unID=unID+1
+    hotspot 0,0,col_hei+1                 ,unID,col_hei_offset_rep,3	:unID=unID+1
+    hotspot 0,0,col_hei-col_hei_offset_rep,unID,col_hei_offset_rep,2	:unID=unID+1
+
+
+    add -0.045/2,-0.105/2,-0.01
+        block 0.045,0.105,col_hei+0.02-col_hei_offset
+
+        if col_hei_offset<>0 then
+            addz col_hei+0.01-col_hei_offset_rep
+                block 0.045,0.105,col_hei_offset_rep
+            del 1
+        endif
+    del 1
+endif
+
+
+if col=2 then!管柱
+    hotspot 0,0,0      ,unID,col_hei,1+128:unID=unID+1
+    hotspot 0,0,-1     ,unID,col_hei,3	  :unID=unID+1
+    hotspot 0,0,col_hei,unID,col_hei,2	  :unID=unID+1
+
+    hotspot 0.105/2 ,0.105/2 ,col_hei
+    hotspot -0.105/2,-0.105/2,col_hei
+    hotspot 0.105/2 ,-0.105/2,col_hei
+    hotspot -0.105/2,0.105/2 ,col_hei
+
+    roty 180
+    add -0.090/2,-0.030/2,0
+        gosub"judge_D"
+    del 2
+
+    add -0.090/2,-0.030/2,col_hei
+        gosub"judge_U"
+    del 1
+
+    add -0.105/2,-0.105/2,0
+        block 0.105,0.105,col_hei
+    del 1
+endif
+
+
+if col=3 then!通し柱
+    hotspot 0,0,0       ,unID,Btop_ele,1+128:unID=unID+1
+    hotspot 0,0,-1      ,unID,Btop_ele,3	:unID=unID+1
+    hotspot 0,0,Btop_hei,unID,Btop_ele,2	:unID=unID+1
+
+    hotspot 0,0,0             ,unID,col_hei_corner,1+128:unID=unID+1
+    hotspot 0,0,-1            ,unID,col_hei_corner,3	:unID=unID+1
+    hotspot 0,0,col_hei_corner,unID,col_hei_corner,2	:unID=unID+1
+
+    hotspot 0.105/2 ,0.105/2 ,Btop_ele
+    hotspot 0.105/2 ,-0.105/2,Btop_ele
+    hotspot -0.105/2,0.105/2 ,Btop_ele
+    hotspot -0.105/2,-0.105/2,Btop_ele
+
+    hotspot 0.105/2 ,0.105/2 ,col_hei_corner
+    hotspot -0.105/2,-0.105/2,col_hei_corner
+    hotspot 0.105/2 ,-0.105/2,col_hei_corner
+    hotspot -0.105/2,0.105/2 ,col_hei_corner
+
+    group "p1"
+        add -0.105/2,0,Btop_ele
+        mul 1,1,-B_hei1/105
+            call "wood_connection" parameters connection_type=10,mw=mw,mm=mm
+        del 2
+
+        rotz -90
+        add -0.105/2,0,Btop_ele
+        mul 1,1,-B_hei2/105
+            call "wood_connection" parameters connection_type=10,mw=mw,mm=mm
+        del 3
+    endgroup
+	
+	
+    group "p2"
+        roty 180
+        add -0.090/2,-0.030/2,0
+            gosub"judge_D"
+        del 2
+
+        add -0.090/2,-0.030/2,col_hei_corner
+            gosub"judge_U"
+        del 1
+
+        add -0.105/2,-0.105/2,0
+            block 0.105,0.105,col_hei_corner
+        del 1
+    endgroup
+	
+    placegroup(subgroup("p2","p1"))
+endif
+
+
+end
+!===========================================================subroutine================================================================
+"judge_U":
+    if tenon_type_U=1 then gosub"短ほぞ"
+    if tenon_type_U=2 then gosub"長ほぞ"
+    if tenon_type_U=3 then gosub"扇ほぞ"
+return
+
+"judge_D":
+    if tenon_type_D=1 then gosub"短ほぞ"
+    if tenon_type_D=2 then gosub"長ほぞ"
+    if tenon_type_D=3 then gosub"扇ほぞ"
+return
+
+
+"短ほぞ":
+    block 0.090,0.030,0.045
+return
+
+
+"長ほぞ":
+    block 0.090,0.030,0.09
+return
+
+"扇ほぞ":
+    block 0.090,0.030,0.09
+return

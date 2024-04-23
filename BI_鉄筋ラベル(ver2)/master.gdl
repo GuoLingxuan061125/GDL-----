@@ -1,0 +1,317 @@
+code=1
+eps=1e-5
+x=1
+y=2
+z=3
+s=3
+fontSize=fontSize/10
+
+
+!=========================================vip_pipeの頂点数と座標を抽出
+vertexNum=0
+stSize=0 !外半径
+elbowRadius=0 !エルボ半径
+dim _vertexPos[][]
+_vertexPos[1][1]=0 : _vertexPos[1][2]=0 : _vertexPos[1][3]=0
+
+tempDim1=0
+tempDim2=0
+dim _tempPos[]
+_tempPos[1]=0
+
+n = REQUEST ("ASSOCLP_PARVALUE", "st_size", name_or_index, type, flags, dim1, dim2, stSize)
+n = REQUEST ("ASSOCLP_PARVALUE", "elbow_radius", name_or_index, type, flags, dim1, dim2, elbowRadius)
+n = REQUEST ("ASSOCLP_PARVALUE", "vert_count", name_or_index, type, flags, dim1, dim2, vertexNum)
+n = REQUEST ("ASSOCLP_PARVALUE", "vert_coord3D", name_or_index, type, flags, tempDim1, tempDim2, _tempPos)
+
+for i=1 to vertexNum
+    _vertexPos[i][x]=_tempPos[(i-1)*tempDim2+x]
+    _vertexPos[i][y]=_tempPos[(i-1)*tempDim2+y]
+    _vertexPos[i][z]=_tempPos[(i-1)*tempDim2+z]
+next i
+
+vertexNum=max(vertexNum,1)
+vertexPos=_vertexPos
+
+parameters \
+stSize=stSize,
+elbowRadius=elbowRadius,
+vertexNum=vertexNum,
+vertexPos=_vertexPos
+
+
+!=========================================2D座標に変換
+!-------------------中心線
+for i=1 to vertexNum
+    put _vertexPos[i][x]
+next i
+
+minx=min(use(nsp))
+maxx=max(get(nsp))
+
+for i=1 to vertexNum
+    put _vertexPos[i][y]
+next i
+
+miny=min(use(nsp)) 
+maxy=max(get(nsp))
+
+for i=1 to vertexNum
+    put _vertexPos[i][z]
+next i
+
+minz=min(use(nsp))
+maxz=max(get(nsp))
+
+sizeX=maxx-minx
+sizeY=maxy-miny
+sizeZ=maxz-minz
+
+posDelete=0
+if min(sizeX,sizeY,sizeZ)=sizeX then posDelete=1
+if min(sizeX,sizeY,sizeZ)=sizeY then posDelete=2
+if min(sizeX,sizeY,sizeZ)=sizeZ then posDelete=3
+
+dim _vertexPos2D[][]
+_vertexPos2D[1][1]=0 : _vertexPos2D[1][2]=0
+
+for i=1 to vertexNum
+    if posDelete<>1 then put _vertexPos[i][x]-minx
+    if posDelete<>2 then put _vertexPos[i][y]-miny
+    if posDelete<>3 then put _vertexPos[i][z]-minz
+next i
+
+for i=1 to vertexNum
+    _vertexPos2D[i][x]=get(1)
+    _vertexPos2D[i][y]=get(1)
+next i
+
+vertexPos2D=_vertexPos2D
+
+parameters \
+vertexPos2D=_vertexPos2D
+
+!-------------------輪郭線
+!回転角
+dim _rtz[]
+_rtz[1]=0
+
+for i=1 to vertexNum-1
+    _rtz[i]=0
+    tempX1=_vertexPos2D[i][x]
+    tempX2=_vertexPos2D[i+1][x]
+    tempY1=_vertexPos2D[i][y]
+    tempY2=_vertexPos2D[i+1][y]
+
+    if tempX1<>tempX2 or tempY1<>tempY2 then
+        tempLen=sqr((tempX2-tempX1)^2+(tempY2-tempY1)^2)
+
+        if tempY2>tempY1+eps then
+            _rtz[i]=acs((tempX2-tempX1)/tempLen)
+        endif
+
+        if tempY2<=tempY1+eps and tempY2>=tempY1-eps then
+            if tempX2>=tempX1 then
+                _rtz[i]=0
+            else
+                _rtz[i]=180
+            endif
+        endif
+
+        if tempY2<tempY1-eps then
+            _rtz[i]=360-acs((tempX2-tempX1)/tempLen)
+        endif
+    endif
+next i
+
+newNum=0
+dim _newPos[][],_framePos1[][],_framePos2[][],_framePos3[][],_framePos4[][]
+_newPos[1][x]=0    : _newPos[1][y]=0    : _newPos[1][s]=0   
+_framePos1[1][x]=0 : _framePos1[1][y]=0 : _framePos1[1][s]=0
+_framePos2[1][x]=0 : _framePos2[1][y]=0 : _framePos2[1][s]=0
+_framePos3[1][x]=0 : _framePos3[1][y]=0 : _framePos3[1][s]=0
+_framePos4[1][x]=0 : _framePos4[1][y]=0 : _framePos4[1][s]=0
+
+angleNum=0
+dim _includedAngle[]
+_includedAngle[1]=0
+
+for i=1 to vertexNum
+    !始点
+    if i=1 then
+        newNum=newNum+1
+        _newPos[newNum][x]=_vertexPos2D[i][x]
+        _newPos[newNum][y]=_vertexPos2D[i][y]
+        _newPos[newNum][s]=1
+
+        _framePos1[newNum][x]=_vertexPos2D[i][x]+stSize/2*cos(_rtz[i]+90)
+        _framePos1[newNum][y]=_vertexPos2D[i][y]+stSize/2*sin(_rtz[i]+90)
+        _framePos1[newNum][s]=1
+
+        _framePos2[newNum][x]=_vertexPos2D[i][x]+stSize/2*cos(_rtz[i]-90)
+        _framePos2[newNum][y]=_vertexPos2D[i][y]+stSize/2*sin(_rtz[i]-90)
+        _framePos2[newNum][s]=1
+
+        _framePos3[newNum][x]=_vertexPos2D[i][x]+fontSize/4*cos(_rtz[i]+90)
+        _framePos3[newNum][y]=_vertexPos2D[i][y]+fontSize/4*sin(_rtz[i]+90)
+        _framePos3[newNum][s]=1
+
+        _framePos4[newNum][x]=_vertexPos2D[i][x]+fontSize/4*cos(_rtz[i]-90)
+        _framePos4[newNum][y]=_vertexPos2D[i][y]+fontSize/4*sin(_rtz[i]-90)
+        _framePos4[newNum][s]=1
+    endif
+
+    !中間
+    if i>1 and i<vertexNum then
+        if _rtz[i]>=_rtz[i-1]-eps and _rtz[i]<=_rtz[i-1]+eps then
+            newNum=newNum+1
+            _newPos[newNum][x]=_vertexPos2D[i][x]
+            _newPos[newNum][y]=_vertexPos2D[i][y]
+            _newPos[newNum][s]=1
+
+            _framePos1[newNum][x]=_vertexPos2D[i][x]+stSize/2*cos(_rtz[i-1]+90)
+            _framePos1[newNum][y]=_vertexPos2D[i][y]+stSize/2*sin(_rtz[i-1]+90)
+            _framePos1[newNum][s]=1
+
+            _framePos2[newNum][x]=_vertexPos2D[i][x]+stSize/2*cos(_rtz[i-1]-90)
+            _framePos2[newNum][y]=_vertexPos2D[i][y]+stSize/2*sin(_rtz[i-1]-90)
+            _framePos2[newNum][s]=1
+
+            _framePos3[newNum][x]=_vertexPos2D[i][x]+fontSize/4*cos(_rtz[i-1]+90)
+            _framePos3[newNum][y]=_vertexPos2D[i][y]+fontSize/4*sin(_rtz[i-1]+90)
+            _framePos3[newNum][s]=1
+
+            _framePos4[newNum][x]=_vertexPos2D[i][x]+fontSize/4*cos(_rtz[i-1]-90)
+            _framePos4[newNum][y]=_vertexPos2D[i][y]+fontSize/4*sin(_rtz[i-1]-90)
+            _framePos4[newNum][s]=1
+
+            newNum=newNum+1
+            _newPos[newNum][x]=_vertexPos2D[i][x]
+            _newPos[newNum][y]=_vertexPos2D[i][y]
+            _newPos[newNum][s]=1
+
+            _framePos1[newNum][x]=_vertexPos2D[i][x]+stSize/2*cos(_rtz[i-1]+90)
+            _framePos1[newNum][y]=_vertexPos2D[i][y]+stSize/2*sin(_rtz[i-1]+90)
+            _framePos1[newNum][s]=1
+
+            _framePos2[newNum][x]=_vertexPos2D[i][x]+stSize/2*cos(_rtz[i-1]-90)
+            _framePos2[newNum][y]=_vertexPos2D[i][y]+stSize/2*sin(_rtz[i-1]-90)
+            _framePos2[newNum][s]=1
+
+            _framePos3[newNum][x]=_vertexPos2D[i][x]+fontSize/4*cos(_rtz[i-1]+90)
+            _framePos3[newNum][y]=_vertexPos2D[i][y]+fontSize/4*sin(_rtz[i-1]+90)
+            _framePos3[newNum][s]=1
+
+            _framePos4[newNum][x]=_vertexPos2D[i][x]+fontSize/4*cos(_rtz[i-1]-90)
+            _framePos4[newNum][y]=_vertexPos2D[i][y]+fontSize/4*sin(_rtz[i-1]-90)
+            _framePos4[newNum][s]=1
+        else
+            tempX1=_vertexPos2D[i][x]
+            tempX2=_vertexPos2D[i-1][x]
+            tempX3=_vertexPos2D[i+1][x]
+            tempY1=_vertexPos2D[i][y]
+            tempY2=_vertexPos2D[i-1][y]
+            tempY3=_vertexPos2D[i+1][y]
+            len1to2=sqr((tempX2-tempX1)^2+(tempY2-tempY1)^2)
+            len1to3=sqr((tempX3-tempX1)^2+(tempY3-tempY1)^2)
+
+            angleNum=angleNum+1
+            _includedAngle[angleNum]=acs(((tempX2-tempX1)*(tempX3-tempX1)+(tempY2-tempY1)*(tempY3-tempY1))/(len1to2*len1to3))
+            offsetLen=elbowRadius/tan(_includedAngle[angleNum]/2)
+
+            newNum=newNum+1
+            _newPos[newNum][x]=_vertexPos2D[i][x]+offsetLen*cos(_rtz[i-1]-180)
+            _newPos[newNum][y]=_vertexPos2D[i][y]+offsetLen*sin(_rtz[i-1]-180)
+            _newPos[newNum][s]=1
+
+            _framePos1[newNum][x]=_newPos[newNum][x]+stSize/2*cos(_rtz[i-1]+90)
+            _framePos1[newNum][y]=_newPos[newNum][y]+stSize/2*sin(_rtz[i-1]+90)
+            _framePos1[newNum][s]=1
+
+            _framePos2[newNum][x]=_newPos[newNum][x]+stSize/2*cos(_rtz[i-1]-90)
+            _framePos2[newNum][y]=_newPos[newNum][y]+stSize/2*sin(_rtz[i-1]-90)
+            _framePos2[newNum][s]=1000+1
+
+            _framePos3[newNum][x]=_newPos[newNum][x]+fontSize/4*cos(_rtz[i-1]+90)
+            _framePos3[newNum][y]=_newPos[newNum][y]+fontSize/4*sin(_rtz[i-1]+90)
+            _framePos3[newNum][s]=1
+
+            _framePos4[newNum][x]=_newPos[newNum][x]+fontSize/4*cos(_rtz[i-1]-90)
+            _framePos4[newNum][y]=_newPos[newNum][y]+fontSize/4*sin(_rtz[i-1]-90)
+            _framePos4[newNum][s]=1000+1
+
+            newNum=newNum+1
+            _newPos[newNum][x]=_vertexPos2D[i][x]+offsetLen*cos(_rtz[i])
+            _newPos[newNum][y]=_vertexPos2D[i][y]+offsetLen*sin(_rtz[i])
+            _newPos[newNum][s]=1000+1
+
+            _framePos1[newNum][x]=_newPos[newNum][x]+stSize/2*cos(_rtz[i]+90)
+            _framePos1[newNum][y]=_newPos[newNum][y]+stSize/2*sin(_rtz[i]+90)
+            _framePos1[newNum][s]=1000+1
+
+            _framePos2[newNum][x]=_newPos[newNum][x]+stSize/2*cos(_rtz[i]-90)
+            _framePos2[newNum][y]=_newPos[newNum][y]+stSize/2*sin(_rtz[i]-90)
+            _framePos2[newNum][s]=1
+
+            _framePos3[newNum][x]=_newPos[newNum][x]+fontSize/4*cos(_rtz[i]+90)
+            _framePos3[newNum][y]=_newPos[newNum][y]+fontSize/4*sin(_rtz[i]+90)
+            _framePos3[newNum][s]=1000+1
+
+            _framePos4[newNum][x]=_newPos[newNum][x]+fontSize/4*cos(_rtz[i]-90)
+            _framePos4[newNum][y]=_newPos[newNum][y]+fontSize/4*sin(_rtz[i]-90)
+            _framePos4[newNum][s]=1
+        endif
+    endif
+
+    !終点
+    if i=vertexNum then
+        newNum=newNum+1
+        _newPos[newNum][x]=_vertexPos2D[i][x]
+        _newPos[newNum][y]=_vertexPos2D[i][y]
+        _newPos[newNum][s]=1
+
+        _framePos1[newNum][x]=_vertexPos2D[i][x]+stSize/2*cos(_rtz[max(i-1,1)]+90)
+        _framePos1[newNum][y]=_vertexPos2D[i][y]+stSize/2*sin(_rtz[max(i-1,1)]+90)
+        _framePos1[newNum][s]=1
+
+        _framePos2[newNum][x]=_vertexPos2D[i][x]+stSize/2*cos(_rtz[max(i-1,1)]-90)
+        _framePos2[newNum][y]=_vertexPos2D[i][y]+stSize/2*sin(_rtz[max(i-1,1)]-90)
+        _framePos2[newNum][s]=1
+
+        _framePos3[newNum][x]=_vertexPos2D[i][x]+fontSize/4*cos(_rtz[max(i-1,1)]+90)
+        _framePos3[newNum][y]=_vertexPos2D[i][y]+fontSize/4*sin(_rtz[max(i-1,1)]+90)
+        _framePos3[newNum][s]=1
+
+        _framePos4[newNum][x]=_vertexPos2D[i][x]+fontSize/4*cos(_rtz[max(i-1,1)]-90)
+        _framePos4[newNum][y]=_vertexPos2D[i][y]+fontSize/4*sin(_rtz[max(i-1,1)]-90)
+        _framePos4[newNum][s]=1
+    endif
+next i
+
+
+!=========================================枠線寸法
+for i=1 to newNum
+    put _newPos[i][x]
+next i
+
+minx2D=min(use(nsp))
+maxx2D=max(get(nsp))
+
+for i=1 to newNum
+    put _newPos[i][y]
+next i
+
+miny2D=min(use(nsp))
+maxy2D=max(get(nsp))
+
+sizeX2D=maxx2D-minx2D
+sizeY2D=maxy2D-miny2D
+
+frameX2D=sizeX2D+2*fontSize/2
+frameY2D=sizeY2D+2*fontSize/2
+
+
+!=========================================表示設定
+values "scaleRatio" range[0,1]
+values "roundUpUnit" range[0.01,]
+

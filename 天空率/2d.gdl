@@ -1,0 +1,65 @@
+fontSize2D=0.2
+
+define style "moji2D" textFont,fontSize2D*1000/GLOB_SCALE,5,0
+set style "moji2D"
+
+hotspot2 0,0
+
+line2 min(0,Apos[1][x],Bpos[1][x]),0,max(0,Apos[1][x],Bpos[1][x]),0
+line2 0,min(0,Apos[1][y],Bpos[1][y]),0,max(0,Apos[1][y],Bpos[1][y])
+
+
+!O
+hotspot2 0         ,Opos[1][y],code,Opos[1][x],1+128:code=code+1
+hotspot2 Opos[1][x],Opos[1][y],code,Opos[1][x],2    :code=code+1
+hotspot2 -1        ,Opos[1][y],code,Opos[1][x],3    :code=code+1
+
+hotspot2 Opos[1][x],0         ,code,Opos[1][y],1+128:code=code+1
+hotspot2 Opos[1][x],Opos[1][y],code,Opos[1][y],2    :code=code+1
+hotspot2 Opos[1][x],-1        ,code,Opos[1][y],3    :code=code+1
+
+text2 Opos[1][x],Opos[1][y]+fontSize2D/2,"O"
+
+
+!A
+hotspot2 0         ,Apos[1][y],code,Apos[1][x],1+128:code=code+1
+hotspot2 Apos[1][x],Apos[1][y],code,Apos[1][x],2    :code=code+1
+hotspot2 -1        ,Apos[1][y],code,Apos[1][x],3    :code=code+1
+
+hotspot2 Apos[1][x],0         ,code,Apos[1][y],1+128:code=code+1
+hotspot2 Apos[1][x],Apos[1][y],code,Apos[1][y],2    :code=code+1
+hotspot2 Apos[1][x],-1        ,code,Apos[1][y],3    :code=code+1
+
+text2 Apos[1][x],Apos[1][y]+fontSize2D/2,"A"
+
+
+!B
+hotspot2 0         ,Bpos[1][y],code,Bpos[1][x],1+128:code=code+1
+hotspot2 Bpos[1][x],Bpos[1][y],code,Bpos[1][x],2    :code=code+1
+hotspot2 -1        ,Bpos[1][y],code,Bpos[1][x],3    :code=code+1
+
+hotspot2 Bpos[1][x],0         ,code,Bpos[1][y],1+128:code=code+1
+hotspot2 Bpos[1][x],Bpos[1][y],code,Bpos[1][y],2    :code=code+1
+hotspot2 Bpos[1][x],-1        ,code,Bpos[1][y],3    :code=code+1
+
+text2 Bpos[1][x],Bpos[1][y]+fontSize2D/2,"B"
+
+
+!Oから直線ABの垂心F
+hotspot2 Fpos[1][x],Fpos[1][y]
+text2 Fpos[1][x],Fpos[1][y]+fontSize2D/2,"F"
+
+
+!楕円
+circle2 Opos[1][x],Opos[1][y],sphereRad
+project2{3} 3,270,1,1+2+4+8,parameters disSphere=0,disText3D=0
+
+hotspot2 A1pos[1][x],A1pos[1][y]
+text2 A1pos[1][x],A1pos[1][y]+fontSize2D/2,"A1"
+hotspot2 B1pos[1][x],B1pos[1][y]
+text2 B1pos[1][x],B1pos[1][y]+fontSize2D/2,"B1"
+
+hotspot2 A2pos[1][x],A2pos[1][y]
+text2 A2pos[1][x],A2pos[1][y]+fontSize2D/2,"A2"
+hotspot2 B2pos[1][x],B2pos[1][y]
+text2 B2pos[1][x],B2pos[1][y]+fontSize2D/2,"B2"

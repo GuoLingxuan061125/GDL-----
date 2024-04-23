@@ -1,0 +1,105 @@
+!使用場所
+    values{2} "usePlace" 1,"1.土台-柱(コーナー)",2,"2.土台-柱(十字交差)",3,"3.柱-梁",4,"4.柱-柱 継ぎ",5,"5.土台継手"
+
+
+!建材幅
+    values{2} "woodWid" 1,"105",2,"120"
+    if woodWid=1 then woodSize=0.105
+    if woodWid=2 then woodSize=0.120
+    driftPinL=woodSize-0.002
+    driftPinRad=0.006
+
+
+!ホールダウンパイプ種類
+    if usePlace<>3 then
+        hideparameter "switchHoldDownPipe"
+    endif
+
+    !values{2} "hardware2Type" 101,"HLP-10 (加工Φ22)",102,"HDP-10 (加工Φ22)",103,"HDP-10(+) (加工Φ22)",104,"HDP-15 (加工Φ22)",\
+    !                        105,"HDP-20 (加工Φ22)",106,"HDP-CC (加工Φ22)",107,"HMP-140 (加工Φ22)",108,"HMP-260 (加工Φ22)",\
+    !                        201,"GP-95 (加工Φ27)",202,"GP-95(+) (加工Φ27)",203,"GP-140 (加工Φ27)",204,"GP-190 (加工Φ27)",205,"GP-235 (加工Φ27)"
+
+    if usePlace=1 then
+        hideparameter "hardware2Type"
+    endif
+
+    if usePlace=2 then
+        values{2} "hardware2Type" 101,"HLP-10 (加工Φ22)",102,"HDP-10 (加工Φ22)",103,"HDP-10(+) (加工Φ22)",105,"HDP-20 (加工Φ22)",\
+                                201,"GP-95 (加工Φ27)",202,"GP-95(+) (加工Φ27)"
+    endif
+
+    if usePlace=3 then
+        values{2} "hardware2Type" 101,"HLP-10 (加工Φ22)",102,"HDP-10 (加工Φ22)",103,"HDP-10(+) (加工Φ22)",104,"HDP-15 (加工Φ22)",105,"HDP-20 (加工Φ22)",107,"HMP-140 (加工Φ22)",108,"HMP-260 (加工Φ22)",\
+                                201,"GP-95 (加工Φ27)",202,"GP-95(+) (加工Φ27)",203,"GP-140 (加工Φ27)",204,"GP-190 (加工Φ27)",205,"GP-235 (加工Φ27)"
+    endif
+
+    if usePlace=4 then
+        values{2} "hardware2Type" 101,"HLP-10 (加工Φ22)",102,"HDP-10 (加工Φ22)",103,"HDP-10(+) (加工Φ22)",106,"HDP-CC (加工Φ22)"
+    endif
+
+    if usePlace=5 then
+        hideparameter "hardware2Type"
+    endif
+
+
+!アゴ掛金具種類
+    values{2} "hardware3Type" 1,"TH (Tec-One P3)",2,"TCW (Tec-One TCW)",3,"TL (Tec-One 3S)"
+
+    if usePlace>3 then
+        hideparameter "hardware3Type"
+    endif
+
+
+!土台継手金具種類
+    values{2} "hardware5Type" 1,"GJ-10",2,"GJ-10Ⅱ"
+
+    if usePlace<>5 then
+        hideparameter "hardware5Type"
+    endif
+
+
+!金物向き
+    if usePlace=1 then
+        values{2} "hardwareDir" 1,"左",2,"右",3,"上",4,"下"
+    endif
+
+    if usePlace=2 then
+        values{2} "hardwareDir" 5,"x方向",6,"y方向"
+    endif
+
+    if usePlace=3 then
+        hideparameter "hardwareDir" 
+    endif
+
+    if usePlace=4 then
+        hideparameter "hardwareDir" 
+    endif
+
+    if usePlace=5 then
+        values{2} "hardwareDir" 5,"x方向",6,"y方向"
+    endif
+
+!隣接梁
+    if usePlace<>3 then
+        hideparameter "beamSwitch","beamHei"
+    endif
+
+    values "beamHei" 0.105,0.12,0.15,0.18,0.21,0.24,0.27,0.3,0.33,0.36,0.39,0.42
+
+
+!梁金物コード
+    dim hardwareBeamCode[]
+    hardwareBeamCode[105]=1
+    hardwareBeamCode[120]=1
+    hardwareBeamCode[150]=1
+    hardwareBeamCode[180]=2
+    hardwareBeamCode[210]=2
+    hardwareBeamCode[240]=3
+    hardwareBeamCode[270]=3
+    hardwareBeamCode[300]=3
+    hardwareBeamCode[330]=4
+    hardwareBeamCode[360]=4
+    hardwareBeamCode[390]=4
+    hardwareBeamCode[420]=4
+
+

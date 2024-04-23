@@ -1,0 +1,132 @@
+
+!==============================始点と終点
+hotspot2 0,wall_pos[1][2],code,wall_pos[1][1],1+128:code=code+1
+hotspot2 wall_pos[1][1],wall_pos[1][2],code,wall_pos[1][1],2:code=code+1
+hotspot2 -1,wall_pos[1][2],code,wall_pos[1][1],3:code=code+1
+
+hotspot2 wall_pos[1][1],0,code,wall_pos[1][2],1+128:code=code+1
+hotspot2 wall_pos[1][1],wall_pos[1][2],code,wall_pos[1][2],2:code=code+1
+hotspot2 wall_pos[1][1],-1,code,wall_pos[1][2],3:code=code+1
+
+hotspot2 0,wall_pos[2][2],code,wall_pos[2][1],1+128:code=code+1
+hotspot2 wall_pos[2][1],wall_pos[2][2],code,wall_pos[2][1],2:code=code+1
+hotspot2 -1,wall_pos[2][2],code,wall_pos[2][1],3:code=code+1
+
+hotspot2 wall_pos[2][1],0,code,wall_pos[2][2],1+128:code=code+1
+hotspot2 wall_pos[2][1],wall_pos[2][2],code,wall_pos[2][2],2:code=code+1
+hotspot2 wall_pos[2][1],-1,code,wall_pos[2][2],3:code=code+1
+
+
+!壁輪郭
+add2 wall_pos[1][1],wall_pos[1][2]
+rot2 wall_rtz
+    hotspot2 0,0
+    hotspot2 wall_len,0
+
+    hotspot2 0,-wall_thi/2
+    hotspot2 0,wall_thi/2
+
+    hotspot2 wall_len,-wall_thi/2
+    hotspot2 wall_len,wall_thi/2
+
+    rect2 0,-wall_thi/2,wall_len,wall_thi/2
+del 2
+
+
+!横筋端部自由調整hotspot
+add2 wall_pos[1][1],wall_pos[1][2]
+rot2 wall_rtz
+    if hor_l_pos=1 then
+        hor1_l_y_pos=wall_thi/2-(left_cover+dr_list[hor1_steel])
+        hor2_l_y_pos=wall_thi/2-(left_cover+2*dr_list[hor1_steel]+2*dr_list[ver1_steel]+dr_list[hor2_steel])
+        hor3_l_y_pos=wall_thi/2-(left_cover+2*dr_list[hor1_steel]+2*dr_list[ver1_steel]+2*dr_list[hor2_steel]+2*dr_list[ver2_steel]+dr_list[hor3_steel])
+    else
+        hor1_l_y_pos=wall_thi/2-(left_cover+2*dr_list[ver1_steel]+dr_list[hor1_steel])
+        hor2_l_y_pos=wall_thi/2-(left_cover+2*dr_list[ver1_steel]+2*dr_list[hor1_steel]+2*dr_list[ver2_steel]+dr_list[hor2_steel])
+        hor3_l_y_pos=wall_thi/2-(left_cover+2*dr_list[ver1_steel]+2*dr_list[hor1_steel]+2*dr_list[ver2_steel]+2*dr_list[hor2_steel]+2*dr_list[ver3_steel]+dr_list[hor3_steel])
+    endif
+
+    if hor_r_pos=1 then
+        hor1_r_y_pos=-wall_thi/2+(right_cover+dr_list[hor1_steel])
+        hor2_r_y_pos=-wall_thi/2+(right_cover+2*dr_list[hor1_steel]+2*dr_list[ver1_steel]+dr_list[hor2_steel])
+        hor3_r_y_pos=-wall_thi/2+(right_cover+2*dr_list[hor1_steel]+2*dr_list[ver1_steel]+2*dr_list[hor2_steel]+2*dr_list[ver2_steel]+dr_list[hor3_steel])
+    else
+        hor1_r_y_pos=-wall_thi/2+(right_cover+2*dr_list[ver1_steel]+dr_list[hor1_steel])
+        hor2_r_y_pos=-wall_thi/2+(right_cover+2*dr_list[ver1_steel]+2*dr_list[hor1_steel]+2*dr_list[ver2_steel]+dr_list[hor2_steel])
+        hor3_r_y_pos=-wall_thi/2+(right_cover+2*dr_list[ver1_steel]+2*dr_list[hor1_steel]+2*dr_list[ver2_steel]+2*dr_list[hor2_steel]+2*dr_list[ver3_steel]+dr_list[hor3_steel])
+    endif
+
+    if start_anc=3 then
+        if switch_rebar1=1 then !1段目配筋
+            hotspot2 0,hor1_l_y_pos,code,hor1_l_start_offset,1+128 : code=code+1
+            hotspot2 -hor1_l_start_offset,hor1_l_y_pos,code,hor1_l_start_offset,2 : code=code+1
+            hotspot2 1,hor1_l_y_pos,code,hor1_l_start_offset,3 : code=code+1
+
+            hotspot2 0,hor1_r_y_pos,code,hor1_r_start_offset,1+128 : code=code+1
+            hotspot2 -hor1_r_start_offset,hor1_r_y_pos,code,hor1_r_start_offset,2 : code=code+1
+            hotspot2 1,hor1_r_y_pos,code,hor1_r_start_offset,3 : code=code+1
+        endif
+
+        if switch_rebar2=1 then !2段目配筋
+            hotspot2 0,hor2_l_y_pos,code,hor2_l_start_offset,1+128 : code=code+1
+            hotspot2 -hor2_l_start_offset,hor2_l_y_pos,code,hor2_l_start_offset,2 : code=code+1
+            hotspot2 1,hor2_l_y_pos,code,hor2_l_start_offset,3 : code=code+1
+
+            hotspot2 0,hor2_r_y_pos,code,hor2_r_start_offset,1+128 : code=code+1
+            hotspot2 -hor2_r_start_offset,hor2_r_y_pos,code,hor2_r_start_offset,2 : code=code+1
+            hotspot2 1,hor2_r_y_pos,code,hor2_r_start_offset,3 : code=code+1
+        endif
+
+        if switch_rebar3=1 then !3段目配筋
+            hotspot2 0,hor3_l_y_pos,code,hor3_l_start_offset,1+128 : code=code+1
+            hotspot2 -hor3_l_start_offset,hor3_l_y_pos,code,hor3_l_start_offset,2 : code=code+1
+            hotspot2 1,hor3_l_y_pos,code,hor3_l_start_offset,3 : code=code+1
+
+            hotspot2 0,hor3_r_y_pos,code,hor3_r_start_offset,1+128 : code=code+1
+            hotspot2 -hor3_r_start_offset,hor3_r_y_pos,code,hor3_r_start_offset,2 : code=code+1
+            hotspot2 1,hor3_r_y_pos,code,hor3_r_start_offset,3 : code=code+1
+        endif
+    endif
+
+    if end_anc=3 then
+        if switch_rebar1=1 then !1段目配筋
+            hotspot2 wall_len,hor1_l_y_pos,code,hor1_l_end_offset,1+128 : code=code+1
+            hotspot2 wall_len+hor1_l_end_offset,hor1_l_y_pos,code,hor1_l_end_offset,2 : code=code+1
+            hotspot2 wall_len-1,hor1_l_y_pos,code,hor1_l_end_offset,3 : code=code+1
+
+            hotspot2 wall_len,hor1_r_y_pos,code,hor1_r_end_offset,1+128 : code=code+1
+            hotspot2 wall_len+hor1_r_end_offset,hor1_r_y_pos,code,hor1_r_end_offset,2 : code=code+1
+            hotspot2 wall_len-1,hor1_r_y_pos,code,hor1_r_end_offset,3 : code=code+1
+        endif
+
+        if switch_rebar2=1 then !2段目配筋
+            hotspot2 wall_len,hor2_l_y_pos,code,hor2_l_end_offset,1+128 : code=code+1
+            hotspot2 wall_len+hor2_l_end_offset,hor2_l_y_pos,code,hor2_l_end_offset,2 : code=code+1
+            hotspot2 wall_len-1,hor2_l_y_pos,code,hor2_l_end_offset,3 : code=code+1
+
+            hotspot2 wall_len,hor2_r_y_pos,code,hor2_r_end_offset,1+128 : code=code+1
+            hotspot2 wall_len+hor2_r_end_offset,hor2_r_y_pos,code,hor2_r_end_offset,2 : code=code+1
+            hotspot2 wall_len-1,hor2_r_y_pos,code,hor2_r_end_offset,3 : code=code+1
+        endif
+
+        if switch_rebar3=1 then !3段目配筋
+            hotspot2 wall_len,hor3_l_y_pos,code,hor3_l_end_offset,1+128 : code=code+1
+            hotspot2 wall_len+hor3_l_end_offset,hor3_l_y_pos,code,hor3_l_end_offset,2 : code=code+1
+            hotspot2 wall_len-1,hor3_l_y_pos,code,hor3_l_end_offset,3 : code=code+1
+
+            hotspot2 wall_len,hor3_r_y_pos,code,hor3_r_end_offset,1+128 : code=code+1
+            hotspot2 wall_len+hor3_r_end_offset,hor3_r_y_pos,code,hor3_r_end_offset,2 : code=code+1
+            hotspot2 wall_len-1,hor3_r_y_pos,code,hor3_r_end_offset,3 : code=code+1
+        endif
+    endif
+del 2
+
+
+!配筋線
+project2{3} 3,270,1,1+2+4+8+16+32,parameters disWall=0,disPOINT=0,disCL=1,disSD=disSD_2d
+
+
+
+
+
+

@@ -1,0 +1,533 @@
+!==================================================スラブ躯体
+!頂点
+for i=1 to 2
+    hotspot 0,0,0
+    hotspot -cslabX1,-cslabY1,0
+    hotspot cslabX2,-cslabY1,0
+    hotspot cslabX2,cslabY2,0
+    hotspot -cslabX1,cslabY2,0
+addz -cslabThi
+next i
+del 2
+
+
+group "slab_body"
+    material mSlab
+
+    add -cslabX1,-cslabY1,-cslabThi
+        block cslabX1+cslabX2,cslabY1+cslabY2,cslabThi
+    del 1
+endgroup
+
+group "centColumn_minus"
+    material mSlab
+
+    if switchCentColumn then
+        add centColumnPos[1][1]-centColumnX/2,centColumnPos[1][2]-centColumnY/2,-centColumnThi
+            block centColumnX,centColumnY,centColumnThi
+        del 1
+    endif
+endgroup
+
+slab_body1=subgroup("slab_body","centColumn_minus")
+
+if disSlab then
+    placegroup slab_body1
+endif
+
+
+!隣接柱ホットスポット
+if switchColumn then
+    if columnDir=1 then
+        hotspot 0,-cslabY1,0,code,columnPos,1+128:code=code+1
+        hotspot columnPos,-cslabY1,0,code,columnPos,2:code=code+1
+        hotspot -1,-cslabY1,0,code,columnPos,3:code=code+1
+
+        hotspot columnPos-columnSize/2,-cslabY1,0
+        hotspot columnPos+columnSize/2,-cslabY1,0
+    endif
+
+    if columnDir=2 then
+        hotspot cslabX2,0,0,code,columnPos,1+128:code=code+1
+        hotspot cslabX2,columnPos,0,code,columnPos,2:code=code+1
+        hotspot cslabX2,-1,0,code,columnPos,3:code=code+1
+
+        hotspot cslabX2,columnPos-columnSize/2,0
+        hotspot cslabX2,columnPos+columnSize/2,0
+    endif
+
+    if columnDir=3 then
+        hotspot 0,cslabY2,0,code,columnPos,1+128:code=code+1
+        hotspot columnPos,cslabY2,0,code,columnPos,2:code=code+1
+        hotspot -1,cslabY2,0,code,columnPos,3:code=code+1
+
+        hotspot columnPos-columnSize/2,cslabY2,0
+        hotspot columnPos+columnSize/2,cslabY2,0
+    endif
+
+    if columnDir=4 then
+        hotspot -cslabX1,0,0,code,columnPos,1+128:code=code+1
+        hotspot -cslabX1,columnPos,0,code,columnPos,2:code=code+1
+        hotspot -cslabX1,-1,0,code,columnPos,3:code=code+1
+
+        hotspot -cslabX1,columnPos-columnSize/2,0
+        hotspot -cslabX1,columnPos+columnSize/2,0
+    endif
+endif
+
+
+!中央柱ホットスポット
+if switchCentColumn then
+    hotspot 0,centColumnPos[1][2],0,code,centColumnPos[1][1],1+128:code=code+1
+    hotspot centColumnPos[1][1],centColumnPos[1][2],0,code,centColumnPos[1][1],2:code=code+1
+    hotspot -1,centColumnPos[1][2],0,code,centColumnPos[1][1],3:code=code+1
+
+    hotspot centColumnPos[1][1],0,0,code,centColumnPos[1][2],1+128:code=code+1
+    hotspot centColumnPos[1][1],centColumnPos[1][2],0,code,centColumnPos[1][2],2:code=code+1
+    hotspot centColumnPos[1][1],-1,0,code,centColumnPos[1][2],3:code=code+1
+
+    hotspot centColumnPos[1][1]-centColumnX/2,centColumnPos[1][2]-centColumnY/2,0
+    hotspot centColumnPos[1][1]+centColumnX/2,centColumnPos[1][2]-centColumnY/2,0
+    hotspot centColumnPos[1][1]+centColumnX/2,centColumnPos[1][2]+centColumnY/2,0
+    hotspot centColumnPos[1][1]-centColumnX/2,centColumnPos[1][2]+centColumnY/2,0
+endif
+
+
+!==================================================配筋
+!上端主筋
+if upperMbarNum>0 then
+    for i=1 to upperMbarNum
+        !頂点表示
+        if disPoint then 
+            for j=1 to upperMbarPoint[i]
+                hotspot upperMbarPos[i][3*j-2],upperMbarPos[i][3*j-1],upperMbarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen upperMbarPen
+
+            for j=1 to upperMbarPoint[i]-1
+                lin_ upperMbarPos[i][3*j-2],upperMbarPos[i][3*j-1],upperMbarPos[i][3*j],upperMbarPos[i][3*j+1],upperMbarPos[i][3*j+2],upperMbarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            material upperMbarMat
+
+            tube_r=upperMbarOd/2
+            gosub "鉄筋断面計算sub"
+
+            put 2*upperMbarPos[i][1]-upperMbarPos[i][4],2*upperMbarPos[i][2]-upperMbarPos[i][5],2*upperMbarPos[i][3]-upperMbarPos[i][6],0
+            for j=1 to upperMbarPoint[i]
+                put upperMbarPos[i][3*j-2],upperMbarPos[i][3*j-1],upperMbarPos[i][3*j],0
+            next j
+            put 2*upperMbarPos[i][3*upperMbarPoint[i]-2]-upperMbarPos[i][3*upperMbarPoint[i]-5],2*upperMbarPos[i][3*upperMbarPoint[i]-1]-upperMbarPos[i][3*upperMbarPoint[i]-4],\
+                2*upperMbarPos[i][3*upperMbarPoint[i]]-upperMbarPos[i][3*upperMbarPoint[i]-3],0
+
+            tube SDresol+1,upperMbarPoint[i]+2,1+2+16+32+64,
+            get (nsp)
+        endif
+    next i
+endif
+
+
+!上端配力筋
+if upperDbarNum>0 then
+    for i=1 to upperDbarNum
+        !頂点表示
+        if disPoint then 
+            for j=1 to upperDbarPoint[i]
+                hotspot upperDbarPos[i][3*j-2],upperDbarPos[i][3*j-1],upperDbarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen upperDbarPen
+
+            for j=1 to upperDbarPoint[i]-1
+                lin_ upperDbarPos[i][3*j-2],upperDbarPos[i][3*j-1],upperDbarPos[i][3*j],upperDbarPos[i][3*j+1],upperDbarPos[i][3*j+2],upperDbarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            material upperDbarMat
+
+            tube_r=upperDbarOd/2
+            gosub "鉄筋断面計算sub"
+
+            put 2*upperDbarPos[i][1]-upperDbarPos[i][4],2*upperDbarPos[i][2]-upperDbarPos[i][5],2*upperDbarPos[i][3]-upperDbarPos[i][6],0
+            for j=1 to upperDbarPoint[i]
+                put upperDbarPos[i][3*j-2],upperDbarPos[i][3*j-1],upperDbarPos[i][3*j],0
+            next j
+            put 2*upperDbarPos[i][3*upperDbarPoint[i]-2]-upperDbarPos[i][3*upperDbarPoint[i]-5],2*upperDbarPos[i][3*upperDbarPoint[i]-1]-upperDbarPos[i][3*upperDbarPoint[i]-4],\
+                2*upperDbarPos[i][3*upperDbarPoint[i]]-upperDbarPos[i][3*upperDbarPoint[i]-3],0
+
+            tube SDresol+1,upperDbarPoint[i]+2,1+2+16+32+64,
+            get (nsp)
+        endif
+    next i
+endif
+
+
+!下端主筋
+if lowerMbarNum>0 then
+    for i=1 to lowerMbarNum
+        !頂点表示
+        if disPoint then 
+            for j=1 to lowerMbarPoint[i]
+                hotspot lowerMbarPos[i][3*j-2],lowerMbarPos[i][3*j-1],lowerMbarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen lowerMbarPen
+
+            for j=1 to lowerMbarPoint[i]-1
+                lin_ lowerMbarPos[i][3*j-2],lowerMbarPos[i][3*j-1],lowerMbarPos[i][3*j],lowerMbarPos[i][3*j+1],lowerMbarPos[i][3*j+2],lowerMbarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            material lowerMbarMat
+
+            tube_r=lowerMbarOd/2
+            gosub "鉄筋断面計算sub"
+
+            put 2*lowerMbarPos[i][1]-lowerMbarPos[i][4],2*lowerMbarPos[i][2]-lowerMbarPos[i][5],2*lowerMbarPos[i][3]-lowerMbarPos[i][6],0
+            for j=1 to lowerMbarPoint[i]
+                put lowerMbarPos[i][3*j-2],lowerMbarPos[i][3*j-1],lowerMbarPos[i][3*j],0
+            next j
+            put 2*lowerMbarPos[i][3*lowerMbarPoint[i]-2]-lowerMbarPos[i][3*lowerMbarPoint[i]-5],2*lowerMbarPos[i][3*lowerMbarPoint[i]-1]-lowerMbarPos[i][3*lowerMbarPoint[i]-4],\
+                2*lowerMbarPos[i][3*lowerMbarPoint[i]]-lowerMbarPos[i][3*lowerMbarPoint[i]-3],0
+
+            tube SDresol+1,lowerMbarPoint[i]+2,1+2+16+32+64,
+            get (nsp)
+        endif
+    next i
+endif
+
+
+!下端配力筋
+if lowerDbarNum>0 then
+    for i=1 to lowerDbarNum
+        !頂点表示
+        if disPoint then 
+            for j=1 to lowerDbarPoint[i]
+                hotspot lowerDbarPos[i][3*j-2],lowerDbarPos[i][3*j-1],lowerDbarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen lowerDbarPen
+
+            for j=1 to lowerDbarPoint[i]-1
+                lin_ lowerDbarPos[i][3*j-2],lowerDbarPos[i][3*j-1],lowerDbarPos[i][3*j],lowerDbarPos[i][3*j+1],lowerDbarPos[i][3*j+2],lowerDbarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            material lowerDbarMat
+
+            tube_r=lowerDbarOd/2
+            gosub "鉄筋断面計算sub"
+
+            put 2*lowerDbarPos[i][1]-lowerDbarPos[i][4],2*lowerDbarPos[i][2]-lowerDbarPos[i][5],2*lowerDbarPos[i][3]-lowerDbarPos[i][6],0
+            for j=1 to lowerDbarPoint[i]
+                put lowerDbarPos[i][3*j-2],lowerDbarPos[i][3*j-1],lowerDbarPos[i][3*j],0
+            next j
+            put 2*lowerDbarPos[i][3*lowerDbarPoint[i]-2]-lowerDbarPos[i][3*lowerDbarPoint[i]-5],2*lowerDbarPos[i][3*lowerDbarPoint[i]-1]-lowerDbarPos[i][3*lowerDbarPoint[i]-4],\
+                2*lowerDbarPos[i][3*lowerDbarPoint[i]]-lowerDbarPos[i][3*lowerDbarPoint[i]-3],0
+
+            tube SDresol+1,lowerDbarPoint[i]+2,1+2+16+32+64,
+            get (nsp)
+        endif
+    next i
+endif
+
+
+!つなぎ筋
+if linkBarNum>0 then
+    for i=1 to linkBarNum
+        !頂点表示
+        if disPoint then 
+            for j=1 to linkBarPoint[i]
+                hotspot linkBarPos[i][3*j-2],linkBarPos[i][3*j-1],linkBarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen linkBarPen
+
+            for j=1 to linkBarPoint[i]-1
+                lin_ linkBarPos[i][3*j-2],linkBarPos[i][3*j-1],linkBarPos[i][3*j],linkBarPos[i][3*j+1],linkBarPos[i][3*j+2],linkBarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            material linkBarMat
+
+            tube_r=linkBarOd/2
+            gosub "鉄筋断面計算sub"
+
+            put 2*linkBarPos[i][1]-linkBarPos[i][4],2*linkBarPos[i][2]-linkBarPos[i][5],2*linkBarPos[i][3]-linkBarPos[i][6],0
+            for j=1 to linkBarPoint[i]
+                put linkBarPos[i][3*j-2],linkBarPos[i][3*j-1],linkBarPos[i][3*j],0
+            next j
+            put 2*linkBarPos[i][3*linkBarPoint[i]-2]-linkBarPos[i][3*linkBarPoint[i]-5],2*linkBarPos[i][3*linkBarPoint[i]-1]-linkBarPos[i][3*linkBarPoint[i]-4],\
+                2*linkBarPos[i][3*linkBarPoint[i]]-linkBarPos[i][3*linkBarPoint[i]-3],0
+
+            tube SDresol+1,linkBarPoint[i]+2,1+2+16+32+64,
+            get (nsp)
+        endif
+    next i
+endif
+
+
+!端部コの字筋
+if edgeBarNum>0 then
+    for i=1 to edgeBarNum
+        !頂点表示
+        if disPoint then 
+            for j=1 to edgeBarPoint[i]
+                hotspot edgeBarPos[i][3*j-2],edgeBarPos[i][3*j-1],edgeBarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen edgeBarPen
+
+            for j=1 to edgeBarPoint[i]-1
+                lin_ edgeBarPos[i][3*j-2],edgeBarPos[i][3*j-1],edgeBarPos[i][3*j],edgeBarPos[i][3*j+1],edgeBarPos[i][3*j+2],edgeBarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            material edgeBarMat
+
+            tube_r=edgeBarOd/2
+            gosub "鉄筋断面計算sub"
+
+            put 2*edgeBarPos[i][1]-edgeBarPos[i][4],2*edgeBarPos[i][2]-edgeBarPos[i][5],2*edgeBarPos[i][3]-edgeBarPos[i][6],0
+            for j=1 to edgeBarPoint[i]
+                put edgeBarPos[i][3*j-2],edgeBarPos[i][3*j-1],edgeBarPos[i][3*j],0
+            next j
+            put 2*edgeBarPos[i][3*edgeBarPoint[i]-2]-edgeBarPos[i][3*edgeBarPoint[i]-5],2*edgeBarPos[i][3*edgeBarPoint[i]-1]-edgeBarPos[i][3*edgeBarPoint[i]-4],\
+                2*edgeBarPos[i][3*edgeBarPoint[i]]-edgeBarPos[i][3*edgeBarPoint[i]-3],0
+
+            tube SDresol+1,edgeBarPoint[i]+2,1+2+16+32+64,
+            get (nsp)
+        endif
+    next i
+endif
+
+
+!端部横筋
+if edgeHorNum>0 then
+    for i=1 to edgeHorNum
+        !頂点表示
+        if disPoint then 
+            for j=1 to edgeHorPoint[i]
+                hotspot edgeHorPos[i][3*j-2],edgeHorPos[i][3*j-1],edgeHorPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen edgeHorPen
+
+            for j=1 to edgeHorPoint[i]-1
+                lin_ edgeHorPos[i][3*j-2],edgeHorPos[i][3*j-1],edgeHorPos[i][3*j],edgeHorPos[i][3*j+1],edgeHorPos[i][3*j+2],edgeHorPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            material edgeHorMat
+
+            tube_r=edgeHorOd/2
+            gosub "鉄筋断面計算sub"
+
+            put 2*edgeHorPos[i][1]-edgeHorPos[i][4],2*edgeHorPos[i][2]-edgeHorPos[i][5],2*edgeHorPos[i][3]-edgeHorPos[i][6],0
+            for j=1 to edgeHorPoint[i]
+                put edgeHorPos[i][3*j-2],edgeHorPos[i][3*j-1],edgeHorPos[i][3*j],0
+            next j
+            put 2*edgeHorPos[i][3*edgeHorPoint[i]-2]-edgeHorPos[i][3*edgeHorPoint[i]-5],2*edgeHorPos[i][3*edgeHorPoint[i]-1]-edgeHorPos[i][3*edgeHorPoint[i]-4],\
+                2*edgeHorPos[i][3*edgeHorPoint[i]]-edgeHorPos[i][3*edgeHorPoint[i]-3],0
+
+            tube SDresol+1,edgeHorPoint[i]+2,1+2+16+32+64,
+            get (nsp)
+        endif
+    next i
+endif
+
+
+!下端段取り筋
+if dandoriBarNum>0 then
+    for i=1 to dandoriBarNum
+        !頂点表示
+        if disPoint then 
+            for j=1 to dandoriBarPoint[i]
+                hotspot dandoriBarPos[i][3*j-2],dandoriBarPos[i][3*j-1],dandoriBarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen dandoriBarPen
+
+            for j=1 to dandoriBarPoint[i]-1
+                lin_ dandoriBarPos[i][3*j-2],dandoriBarPos[i][3*j-1],dandoriBarPos[i][3*j],dandoriBarPos[i][3*j+1],dandoriBarPos[i][3*j+2],dandoriBarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            material dandoriBarMat
+
+            tube_r=dandoriBarOd/2
+            gosub "鉄筋断面計算sub"
+
+            put 2*dandoriBarPos[i][1]-dandoriBarPos[i][4],2*dandoriBarPos[i][2]-dandoriBarPos[i][5],2*dandoriBarPos[i][3]-dandoriBarPos[i][6],0
+            for j=1 to dandoriBarPoint[i]
+                put dandoriBarPos[i][3*j-2],dandoriBarPos[i][3*j-1],dandoriBarPos[i][3*j],0
+            next j
+            put 2*dandoriBarPos[i][3*dandoriBarPoint[i]-2]-dandoriBarPos[i][3*dandoriBarPoint[i]-5],2*dandoriBarPos[i][3*dandoriBarPoint[i]-1]-dandoriBarPos[i][3*dandoriBarPoint[i]-4],\
+                2*dandoriBarPos[i][3*dandoriBarPoint[i]]-dandoriBarPos[i][3*dandoriBarPoint[i]-3],0
+
+            tube SDresol+1,dandoriBarPoint[i]+2,1+2+16+32+64,
+            get (nsp)
+        endif
+    next i
+endif
+
+
+!ウマ筋
+if umaBarNum>0 then
+    for i=1 to umaBarNum
+        !頂点表示
+        if disPoint then
+            for j=1 to umaBarPoint[i]
+                hotspot umaBarPos[i][3*j-2],umaBarPos[i][3*j-1],umaBarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen umaBarPen
+
+            for j=1 to umaBarPoint[i]-1
+                lin_ umaBarPos[i][3*j-2],umaBarPos[i][3*j-1],umaBarPos[i][3*j],umaBarPos[i][3*j+1],umaBarPos[i][3*j+2],umaBarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            material umaBarMat
+
+            tube_r=umaBarOd/2
+            gosub "鉄筋断面計算sub"
+
+            put 2*umaBarPos[i][1]-umaBarPos[i][4],2*umaBarPos[i][2]-umaBarPos[i][5],2*umaBarPos[i][3]-umaBarPos[i][6],0
+            for j=1 to umaBarPoint[i]
+                put umaBarPos[i][3*j-2],umaBarPos[i][3*j-1],umaBarPos[i][3*j],0
+            next j
+            put 2*umaBarPos[i][3*umaBarPoint[i]-2]-umaBarPos[i][3*umaBarPoint[i]-5],2*umaBarPos[i][3*umaBarPoint[i]-1]-umaBarPos[i][3*umaBarPoint[i]-4],\
+                2*umaBarPos[i][3*umaBarPoint[i]]-umaBarPos[i][3*umaBarPoint[i]-3],0
+
+            tube SDresol+1,umaBarPoint[i]+2,1+2+16+32+64,
+            get (nsp)
+        endif
+    next i
+endif
+
+
+!上端段取り筋
+if upperDandoriBarNum>0 then
+    for i=1 to upperDandoriBarNum
+        !頂点表示
+        if disPoint then
+            for j=1 to upperDandoriBarPoint[i]
+                hotspot upperDandoriBarPos[i][3*j-2],upperDandoriBarPos[i][3*j-1],upperDandoriBarPos[i][3*j]
+            next j
+        endif
+
+        !中心線表示
+        if disCL then
+            pen upperDandoriBarPen
+
+            for j=1 to upperDandoriBarPoint[i]-1
+                lin_ upperDandoriBarPos[i][3*j-2],upperDandoriBarPos[i][3*j-1],upperDandoriBarPos[i][3*j],upperDandoriBarPos[i][3*j+1],upperDandoriBarPos[i][3*j+2],upperDandoriBarPos[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋表示
+        if disSD then
+            material upperDandoriBarMat
+
+            tube_r=upperDandoriBarOd/2
+            gosub "鉄筋断面計算sub"
+
+            put 2*upperDandoriBarPos[i][1]-upperDandoriBarPos[i][4],2*upperDandoriBarPos[i][2]-upperDandoriBarPos[i][5],2*upperDandoriBarPos[i][3]-upperDandoriBarPos[i][6],0
+            for j=1 to upperDandoriBarPoint[i]
+                put upperDandoriBarPos[i][3*j-2],upperDandoriBarPos[i][3*j-1],upperDandoriBarPos[i][3*j],0
+            next j
+            put 2*upperDandoriBarPos[i][3*upperDandoriBarPoint[i]-2]-upperDandoriBarPos[i][3*upperDandoriBarPoint[i]-5],2*upperDandoriBarPos[i][3*upperDandoriBarPoint[i]-1]-upperDandoriBarPos[i][3*upperDandoriBarPoint[i]-4],\
+                2*upperDandoriBarPos[i][3*upperDandoriBarPoint[i]]-upperDandoriBarPos[i][3*upperDandoriBarPoint[i]-3],0
+
+            tube SDresol+1,upperDandoriBarPoint[i]+2,1+2+16+32+64,
+            get (nsp)
+        endif
+    next i
+endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+end
+
+
+!==========================================鉄筋断面座標リスト
+"鉄筋断面計算sub":
+
+	for t=1 to SDresol
+		put tube_r*cos((1-t)*360/SDresol),tube_r*sin((1-t)*360/SDresol),0
+	next t
+	
+	put tube_r,0,0
+
+return

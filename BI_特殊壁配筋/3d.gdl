@@ -1,0 +1,470 @@
+!==============================始点と終点
+hotspot 0,wall_pos[1][2],0,code,wall_pos[1][1],1+128:code=code+1
+hotspot wall_pos[1][1],wall_pos[1][2],0,code,wall_pos[1][1],2:code=code+1
+hotspot -1,wall_pos[1][2],0,code,wall_pos[1][1],3:code=code+1
+
+hotspot wall_pos[1][1],0,0,code,wall_pos[1][2],1+128:code=code+1
+hotspot wall_pos[1][1],wall_pos[1][2],0,code,wall_pos[1][2],2:code=code+1
+hotspot wall_pos[1][1],-1,0,code,wall_pos[1][2],3:code=code+1
+
+hotspot 0,wall_pos[2][2],0,code,wall_pos[2][1],1+128:code=code+1
+hotspot wall_pos[2][1],wall_pos[2][2],0,code,wall_pos[2][1],2:code=code+1
+hotspot -1,wall_pos[2][2],0,code,wall_pos[2][1],3:code=code+1
+
+hotspot wall_pos[2][1],0,0,code,wall_pos[2][2],1+128:code=code+1
+hotspot wall_pos[2][1],wall_pos[2][2],0,code,wall_pos[2][2],2:code=code+1
+hotspot wall_pos[2][1],-1,0,code,wall_pos[2][2],3:code=code+1
+
+add wall_pos[1][1],wall_pos[1][2],0
+rotz wall_rtz
+
+!==============================躯体
+group "wall_body"
+    material m_wall
+
+    addy -wall_thi/2
+        block wall_len,wall_thi,wall_hei
+    del 1
+endgroup
+
+
+!==============================開口
+group "op_1" !実寸
+    material m_wall
+
+    for i=1 to op_num
+        if op_shape[i]=1 then
+            add op_pos[i][1],-wall_thi/2,op_pos[i][2]
+                block op_wid[i],wall_thi,op_hei[i]
+            del 1
+        else
+            add op_pos[i][1]+op_wid[i]/2,0,op_pos[i][2]+op_wid[i]/2
+            rotx 90
+            addz -wall_thi/2
+                cylind wall_thi,op_wid[i]/2
+            del 3
+        endif
+    next i
+endgroup
+
+
+group "op_2" !実寸+開口かぶり厚さ
+    material m_wall
+
+    for i=1 to op_num
+        if op_shape[i]=1 then
+            add op_pos[i][1]-op_cover,-wall_thi/2,op_pos[i][2]-op_cover
+                block op_wid[i]+2*op_cover,wall_thi,op_hei[i]+2*op_cover
+            del 1
+        else
+            add op_pos[i][1]+op_wid[i]/2,0,op_pos[i][2]+op_wid[i]/2
+            rotx 90
+            addz -wall_thi/2
+                cylind wall_thi,op_wid[i]/2+op_cover
+            del 3
+        endif
+    next i
+endgroup
+
+
+wall_body_1=subgroup("wall_body","op_1")
+
+
+if disWall then
+    !躯体
+    placegroup wall_body_1
+
+    hotspot 0,wall_thi/2,0
+    hotspot 0,-wall_thi/2,0
+    hotspot wall_len,wall_thi/2,0
+    hotspot wall_len,-wall_thi/2,0
+        
+    hotspot 0,wall_thi/2,wall_hei
+    hotspot 0,-wall_thi/2,wall_hei
+    hotspot wall_len,wall_thi/2,wall_hei
+    hotspot wall_len,-wall_thi/2,wall_hei
+        
+    hotspot 0,0,0,code,wall_hei,1+128:code=code+1
+    hotspot 0,0,wall_hei,code,wall_hei,2:code=code+1
+    hotspot 0,0,-1,code,wall_hei,3:code=code+1
+        
+    hotspot wall_len,0,0,code,wall_hei,1+128:code=code+1
+    hotspot wall_len,0,wall_hei,code,wall_hei,2:code=code+1
+    hotspot wall_len,0,-1,code,wall_hei,3:code=code+1
+
+    !開口
+    for i=1 to op_num
+        hotspot 0,0,op_pos[i][2],code,op_pos[i][1],1+128:code=code+1
+        hotspot op_pos[i][1],0,op_pos[i][2],code,op_pos[i][1],2:code=code+1
+        hotspot -1,0,op_pos[i][2],code,op_pos[i][1],3:code=code+1
+        
+        hotspot op_pos[i][1],0,0,code,op_pos[i][2],1+128:code=code+1
+        hotspot op_pos[i][1],0,op_pos[i][2],code,op_pos[i][2],2:code=code+1
+        hotspot op_pos[i][1],0,-1,code,op_pos[i][2],3:code=code+1
+        
+        hotspot op_pos[i][1],0,op_pos[i][2]+op_hei[i]/2,code,op_wid[i],1+128:code=code+1
+        hotspot op_pos[i][1]+op_wid[i],0,op_pos[i][2]+op_hei[i]/2,code,op_wid[i],2:code=code+1
+        hotspot op_pos[i][1]-1,0,op_pos[i][2]+op_hei[i]/2,code,op_wid[i],3:code=code+1
+              
+        if op_shape[i]=1 then
+            hotspot op_pos[i][1]+op_wid[i]/2,0,op_pos[i][2],code,op_hei[i],1+128:code=code+1
+            hotspot op_pos[i][1]+op_wid[i]/2,0,op_pos[i][2]+op_hei[i],code,op_hei[i],2:code=code+1
+            hotspot op_pos[i][1]+op_wid[i]/2,0,op_pos[i][2]-1,code,op_hei[i],3:code=code+1
+
+            !窓内法寸法点線
+            op_subline_x=int((op_wid[i]-2*op_subline+0.02)/0.05)
+            op_subline_z=int((op_hei[i]-2*op_subline+0.02)/0.05)
+          
+            add op_pos[i][1]+op_subline,0,op_pos[i][2]+op_subline
+                if op_subline_x>0 then
+                    for n=1 to 2
+                        for j=1 to op_subline_x
+                            lin_ 0,0,0,0.03,0,0
+                        addx 0.05
+                        next j
+                        del op_subline_x
+                    addz op_hei[i]-2*op_subline
+                    next n
+                    del 2
+                endif
+        
+                if op_subline_z>0 then
+                    for n=1 to 2
+                        for j=1 to op_subline_z
+                            lin_ 0,0,0,0,0,0.03
+                        addz 0.05
+                        next j
+                        del op_subline_z
+                    addx op_wid[i]-2*op_subline
+                    next n
+                    del 2
+                endif
+            del 1
+        
+            hotspot op_pos[i][1]+op_subline,0,op_pos[i][2]+op_subline
+            hotspot op_pos[i][1]+op_wid[i]-op_subline,0,op_pos[i][2]+op_subline
+            hotspot op_pos[i][1]+op_subline,0,op_pos[i][2]+op_hei[i]-op_subline
+            hotspot op_pos[i][1]+op_wid[i]-op_subline,0,op_pos[i][2]+op_hei[i]-op_subline
+        endif
+    next i
+endif
+
+del 2
+
+
+!==============================配筋
+!横筋
+if disHor then
+    for i=1 to hor_tot_num
+        !ホットスポット
+        if disPOINT then
+            for j=1 to hor_tot_spnum[i]
+                hotspot hor_tot_coor[i][3*j-2],hor_tot_coor[i][3*j-1],hor_tot_coor[i][3*j]
+            next j
+        endif
+
+        !中心線
+        pen hor_tot_pen[i]
+
+        if disCL then
+            for j=1 to hor_tot_spnum[i]-1
+                lin_ hor_tot_coor[i][3*j-2],hor_tot_coor[i][3*j-1],hor_tot_coor[i][3*j],hor_tot_coor[i][3*j+1],hor_tot_coor[i][3*j+2],hor_tot_coor[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋
+        material hor_tot_mat[i]
+
+        if disSD then
+            !tube断面
+            tube_r=hor_tot_r[i]
+            gosub "tube断面"
+            
+            !tubeパス
+            put 2*hor_tot_coor[i][1]-hor_tot_coor[i][4],2*hor_tot_coor[i][2]-hor_tot_coor[i][5],2*hor_tot_coor[i][3]-hor_tot_coor[i][6],0
+            for j=1 to hor_tot_spnum[i]
+                put hor_tot_coor[i][3*j-2],hor_tot_coor[i][3*j-1],hor_tot_coor[i][3*j],0
+            next j
+            put 2*hor_tot_coor[i][3*hor_tot_spnum[i]-2]-hor_tot_coor[i][3*hor_tot_spnum[i]-5],2*hor_tot_coor[i][3*hor_tot_spnum[i]-1]-\
+                hor_tot_coor[i][3*hor_tot_spnum[i]-4],2*hor_tot_coor[i][3*hor_tot_spnum[i]]-hor_tot_coor[i][3*hor_tot_spnum[i]-3],0
+            
+            tube SDresol+1,hor_tot_spnum[i]+2,1+2+16+32+64,
+                get ((SDresol+1)*3),
+                get ((hor_tot_spnum[i]+2)*4)
+        endif
+    next i
+endif
+
+
+!縦筋
+if disVer then
+    for i=1 to ver_all_num
+        !ホットスポット
+        if disPOINT then
+            for j=1 to ver_all_spnum[i]
+                hotspot ver_all_coor[i][3*j-2],ver_all_coor[i][3*j-1],ver_all_coor[i][3*j]
+            next j
+        endif
+
+        !中心線
+        pen ver_all_pen[i]
+
+        if disCL then
+            for j=1 to ver_all_spnum[i]-1
+                lin_ ver_all_coor[i][3*j-2],ver_all_coor[i][3*j-1],ver_all_coor[i][3*j],ver_all_coor[i][3*j+1],ver_all_coor[i][3*j+2],ver_all_coor[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋
+        material ver_all_mat[i]
+
+        if disSD then
+            !tube断面
+            tube_r=ver_all_r[i]
+            gosub "tube断面"
+            
+            !tubeパス
+            put 2*ver_all_coor[i][1]-ver_all_coor[i][4],2*ver_all_coor[i][2]-ver_all_coor[i][5],2*ver_all_coor[i][3]-ver_all_coor[i][6],0
+            for j=1 to ver_all_spnum[i]
+                put ver_all_coor[i][3*j-2],ver_all_coor[i][3*j-1],ver_all_coor[i][3*j],0
+            next j
+            put 2*ver_all_coor[i][3*ver_all_spnum[i]-2]-ver_all_coor[i][3*ver_all_spnum[i]-5],2*ver_all_coor[i][3*ver_all_spnum[i]-1]-\
+                ver_all_coor[i][3*ver_all_spnum[i]-4],2*ver_all_coor[i][3*ver_all_spnum[i]]-ver_all_coor[i][3*ver_all_spnum[i]-3],0
+            
+            tube SDresol+1,ver_all_spnum[i]+2,1+2+16+32+64,
+                get ((SDresol+1)*3),
+                get ((ver_all_spnum[i]+2)*4)
+        endif
+    next i
+endif
+
+
+!コの字筋
+if disCap then
+    for i=1 to capbar_num
+        !ホットスポット
+        if disPOINT then
+            for j=1 to capbar_spnum[i]
+                hotspot capbar_coor[i][3*j-2],capbar_coor[i][3*j-1],capbar_coor[i][3*j]
+            next j
+        endif
+
+        !中心線
+        pen capbar_pen
+
+        if disCL then
+            for j=1 to capbar_spnum[i]-1
+                lin_ capbar_coor[i][3*j-2],capbar_coor[i][3*j-1],capbar_coor[i][3*j],capbar_coor[i][3*j+1],capbar_coor[i][3*j+2],capbar_coor[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋
+        material capbar_mat
+
+        if disSD then
+            !tube断面
+            tube_r=capbar_r
+            gosub "tube断面"
+            
+            !tubeパス
+            put 2*capbar_coor[i][1]-capbar_coor[i][4],2*capbar_coor[i][2]-capbar_coor[i][5],2*capbar_coor[i][3]-capbar_coor[i][6],0
+            for j=1 to capbar_spnum[i]
+                put capbar_coor[i][3*j-2],capbar_coor[i][3*j-1],capbar_coor[i][3*j],0
+            next j
+            put 2*capbar_coor[i][3*capbar_spnum[i]-2]-capbar_coor[i][3*capbar_spnum[i]-5],2*capbar_coor[i][3*capbar_spnum[i]-1]-\
+                capbar_coor[i][3*capbar_spnum[i]-4],2*capbar_coor[i][3*capbar_spnum[i]]-capbar_coor[i][3*capbar_spnum[i]-3],0
+            
+            tube SDresol+1,capbar_spnum[i]+2,1+2+16+32+64,
+                get ((SDresol+1)*3),
+                get ((capbar_spnum[i]+2)*4)
+        endif
+    next i
+endif
+
+
+!差し筋
+if disExp then
+    for i=1 to expbar_num
+        !ホットスポット
+        if disPOINT then
+            for j=1 to expbar_spnum[i]
+                hotspot expbar_coor[i][3*j-2],expbar_coor[i][3*j-1],expbar_coor[i][3*j]
+            next j
+        endif
+
+        !中心線
+        pen expbar_pen[i]
+
+        if disCL then
+            for j=1 to expbar_spnum[i]-1
+                lin_ expbar_coor[i][3*j-2],expbar_coor[i][3*j-1],expbar_coor[i][3*j],expbar_coor[i][3*j+1],expbar_coor[i][3*j+2],expbar_coor[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋
+        material expbar_mat[i]
+
+        if disSD then
+            !tube断面
+            tube_r=expbar_r[i]
+            gosub "tube断面"
+            
+            !tubeパス
+            put 2*expbar_coor[i][1]-expbar_coor[i][4],2*expbar_coor[i][2]-expbar_coor[i][5],2*expbar_coor[i][3]-expbar_coor[i][6],0
+            for j=1 to expbar_spnum[i]
+                put expbar_coor[i][3*j-2],expbar_coor[i][3*j-1],expbar_coor[i][3*j],0
+            next j
+            put 2*expbar_coor[i][3*expbar_spnum[i]-2]-expbar_coor[i][3*expbar_spnum[i]-5],2*expbar_coor[i][3*expbar_spnum[i]-1]-\
+                expbar_coor[i][3*expbar_spnum[i]-4],2*expbar_coor[i][3*expbar_spnum[i]]-expbar_coor[i][3*expbar_spnum[i]-3],0
+            
+            tube SDresol+1,expbar_spnum[i]+2,1+2+16+32+64,
+                get ((SDresol+1)*3),
+                get ((expbar_spnum[i]+2)*4)
+        endif
+    next i
+endif
+
+
+!開口横補強筋
+if disOphor then
+    for i=1 to ophor_num
+        !ホットスポット
+        if disPOINT then
+            for j=1 to ophor_spnum[i]
+                hotspot ophor_coor[i][3*j-2],ophor_coor[i][3*j-1],ophor_coor[i][3*j]
+            next j
+        endif
+
+        !中心線
+        pen ophor_pen
+
+        if disCL then
+            for j=1 to ophor_spnum[i]-1
+                lin_ ophor_coor[i][3*j-2],ophor_coor[i][3*j-1],ophor_coor[i][3*j],ophor_coor[i][3*j+1],ophor_coor[i][3*j+2],ophor_coor[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋
+        material ophor_mat
+
+        if disSD then
+            !tube断面
+            tube_r=ophor_r
+            gosub "tube断面"
+            
+            !tubeパス
+            put 2*ophor_coor[i][1]-ophor_coor[i][4],2*ophor_coor[i][2]-ophor_coor[i][5],2*ophor_coor[i][3]-ophor_coor[i][6],0
+            for j=1 to ophor_spnum[i]
+                put ophor_coor[i][3*j-2],ophor_coor[i][3*j-1],ophor_coor[i][3*j],0
+            next j
+            put 2*ophor_coor[i][3*ophor_spnum[i]-2]-ophor_coor[i][3*ophor_spnum[i]-5],2*ophor_coor[i][3*ophor_spnum[i]-1]-\
+                ophor_coor[i][3*ophor_spnum[i]-4],2*ophor_coor[i][3*ophor_spnum[i]]-ophor_coor[i][3*ophor_spnum[i]-3],0
+            
+            tube SDresol+1,ophor_spnum[i]+2,1+2+16+32+64,
+                get ((SDresol+1)*3),
+                get ((ophor_spnum[i]+2)*4)
+        endif
+    next i
+endif
+
+
+!開口縦補強筋
+if disOpver then
+    for i=1 to opver_num
+        !ホットスポット
+        if disPOINT then
+            for j=1 to opver_spnum[i]
+                hotspot opver_coor[i][3*j-2],opver_coor[i][3*j-1],opver_coor[i][3*j]
+            next j
+        endif
+
+        !中心線
+        pen opver_pen
+
+        if disCL then
+            for j=1 to opver_spnum[i]-1
+                lin_ opver_coor[i][3*j-2],opver_coor[i][3*j-1],opver_coor[i][3*j],opver_coor[i][3*j+1],opver_coor[i][3*j+2],opver_coor[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋
+        material opver_mat
+
+        if disSD then
+            !tube断面
+            tube_r=opver_r
+            gosub "tube断面"
+            
+            !tubeパス
+            put 2*opver_coor[i][1]-opver_coor[i][4],2*opver_coor[i][2]-opver_coor[i][5],2*opver_coor[i][3]-opver_coor[i][6],0
+            for j=1 to opver_spnum[i]
+                put opver_coor[i][3*j-2],opver_coor[i][3*j-1],opver_coor[i][3*j],0
+            next j
+            put 2*opver_coor[i][3*opver_spnum[i]-2]-opver_coor[i][3*opver_spnum[i]-5],2*opver_coor[i][3*opver_spnum[i]-1]-\
+                opver_coor[i][3*opver_spnum[i]-4],2*opver_coor[i][3*opver_spnum[i]]-opver_coor[i][3*opver_spnum[i]-3],0
+            
+            tube SDresol+1,opver_spnum[i]+2,1+2+16+32+64,
+                get ((SDresol+1)*3),
+                get ((opver_spnum[i]+2)*4)
+        endif
+    next i
+endif
+
+
+!開口斜め補強筋
+if disOpdia then
+    for i=1 to opdia_num
+        !ホットスポット
+        if disPOINT then
+            for j=1 to opdia_spnum[i]
+                hotspot opdia_coor[i][3*j-2],opdia_coor[i][3*j-1],opdia_coor[i][3*j]
+            next j
+        endif
+
+        !中心線
+        pen opdia_pen
+
+        if disCL then
+            for j=1 to opdia_spnum[i]-1
+                lin_ opdia_coor[i][3*j-2],opdia_coor[i][3*j-1],opdia_coor[i][3*j],opdia_coor[i][3*j+1],opdia_coor[i][3*j+2],opdia_coor[i][3*j+3]
+            next j
+        endif
+
+        !鉄筋
+        material opdia_mat
+
+        if disSD then
+            !tube断面
+            tube_r=opdia_r
+            gosub "tube断面"
+            
+            !tubeパス
+            put 2*opdia_coor[i][1]-opdia_coor[i][4],2*opdia_coor[i][2]-opdia_coor[i][5],2*opdia_coor[i][3]-opdia_coor[i][6],0
+            for j=1 to opdia_spnum[i]
+                put opdia_coor[i][3*j-2],opdia_coor[i][3*j-1],opdia_coor[i][3*j],0
+            next j
+            put 2*opdia_coor[i][3*opdia_spnum[i]-2]-opdia_coor[i][3*opdia_spnum[i]-5],2*opdia_coor[i][3*opdia_spnum[i]-1]-\
+                opdia_coor[i][3*opdia_spnum[i]-4],2*opdia_coor[i][3*opdia_spnum[i]]-opdia_coor[i][3*opdia_spnum[i]-3],0
+            
+            tube SDresol+1,opdia_spnum[i]+2,1+2+16+32+64,
+                get ((SDresol+1)*3),
+                get ((opdia_spnum[i]+2)*4)
+        endif
+    next i
+endif
+
+
+
+end
+
+
+
+
+
+
+"tube断面":
+    for j=1 to SDresol
+        put tube_r*cos((1-j)*360/SDresol),tube_r*sin((1-j)*360/SDresol),0
+    next j
+    put tube_r,0,0
+return

@@ -1,0 +1,163 @@
+!==========================================================RANGE
+!material range_mat
+!
+!!hotspot
+!for i=1 to range_nVtx
+!    hotspot range_Vxyz[i][x], range_Vxyz[i][y], range_Vxyz[i][z]
+!next i
+!
+!!面
+!for i=1 to range_nSrf
+!    for j=1 to 3
+!        put range_Vxyz[range_SrfID[i][j]+1][x]
+!        put range_Vxyz[range_SrfID[i][j]+1][y]        
+!        put range_Vxyz[range_SrfID[i][j]+1][z]
+!    next j
+!    
+!    PLANE 3, get(nsp)
+!next i
+
+
+
+!==========================================================SHAPE
+group "panel"
+    for i=1 to shape_nSrf
+        if shape_kind[i]<>6 and shape_kind[i]<>7 then
+            if nsp>0 then
+                for j=1 to nsp
+                    deleteData=get(1)
+                next j
+            endif
+
+            !hotspot
+            for j=1 to shape_nVtx[i]
+                hotspot shape_Vxyz[i][3*j-2],shape_Vxyz[i][3*j-1],shape_Vxyz[i][3*j]
+            next j
+
+            !面
+            !for j=1 to shape_nVtx[i]
+            !    put shape_Vxyz[i][3*j-2],shape_Vxyz[i][3*j-1],shape_Vxyz[i][3*j]
+            !next j
+            !
+            !material shape_mat[shape_kind[i]]
+            !PLANE shape_nVtx[i], get(nsp)
+
+            for j=1 to shape_nVtx[i]
+                put shape_Vxyz[i][3*j-2],shape_Vxyz[i][3*j-1],shape_Vxyz[i][3*j],1
+            next j
+            
+            for j=1 to shape_nVtx[i]
+                put shape_Vxyz[i][3*j-2]+eps,shape_Vxyz[i][3*j-1]+eps,shape_Vxyz[i][3*j]+eps
+            next j
+            
+            material shape_mat[shape_kind[i]]
+            ruledsegmented shape_nVtx[i], 1+2+4+8+16+32, get(nsp)
+        endif
+    next i
+endgroup
+
+
+group "opening"
+    for i=1 to shape_nSrf
+        if shape_kind[i]=6 or shape_kind[i]=7 then
+            if nsp>0 then
+                for j=1 to nsp
+                    deleteData=get(1)
+                next j
+            endif
+
+            !hotspot
+            for j=1 to shape_nVtx[i]
+                hotspot shape_Vxyz[i][3*j-2],shape_Vxyz[i][3*j-1],shape_Vxyz[i][3*j]
+            next j
+
+            !面
+            for j=1 to shape_nVtx[i]
+                put shape_Vxyz[i][3*j-2],shape_Vxyz[i][3*j-1],shape_Vxyz[i][3*j],1
+            next j
+
+            for j=1 to shape_nVtx[i]
+                put shape_Vxyz[i][3*j-2]+eps,shape_Vxyz[i][3*j-1]+eps,shape_Vxyz[i][3*j]+eps
+            next j
+
+            material shape_mat[shape_kind[i]]
+            ruledsegmented shape_nVtx[i], 1+2+4+8+16+32, get(nsp)
+        endif
+    next i
+endgroup
+
+SHAPE_1=subgroup("panel","opening")
+
+if shape_display then
+    placegroup SHAPE_1
+    placegroup "opening"
+endif
+
+
+!define style "moji" fontType,10,5,0
+!style "moji"
+!
+!for i=1 to shape_nSrf
+!    for j=1 to shape_nVtx[i]
+!        put shape_Vxyz[i][3*j-2]
+!    next j
+!    minx=min(use(nsp))
+!    maxx=max(get(nsp))
+!
+!    for j=1 to shape_nVtx[i]
+!        put shape_Vxyz[i][3*j-1]
+!    next j
+!    miny=min(use(nsp))
+!    maxy=max(get(nsp))
+!
+!    for j=1 to shape_nVtx[i]
+!        put shape_Vxyz[i][3*j]
+!    next j
+!    minz=min(use(nsp))
+!    maxz=max(get(nsp))
+!
+!    add (minx+maxx)/2,(miny+maxy)/2,(minz+maxz)/2
+!        text 0.002,0,i
+!    del 1
+!next i
+
+
+!==========================================================ZONE
+if zone_display then
+    !hotspot
+    for i=1 to zone_nZone
+        for j=1 to zone_nVtx[i]
+            hotspot zone_Vxyz[i][3*j-2],zone_Vxyz[i][3*j-1],zone_Vxyz[i][3*j]
+        next j
+    next i
+
+    !面
+    material zone_mat
+
+    for i=1 to zone_nZone
+        for j=1 to zone_nSrf[i]
+            for n=1 to 3
+                put zone_Vxyz[i][3*(zone_SrfID[i][3*(j-1)+n]+1)-2]
+                put zone_Vxyz[i][3*(zone_SrfID[i][3*(j-1)+n]+1)-1]
+                put zone_Vxyz[i][3*(zone_SrfID[i][3*(j-1)+n]+1)]
+            next n
+
+            PLANE 3, get(nsp)
+        next j
+    next i
+endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

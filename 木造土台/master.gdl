@@ -1,0 +1,130 @@
+
+dim _lx[],_ly[]
+_lx[1]=0
+_ly[1]=0
+
+FOR i=1 TO num
+	_lx[i]=lx[i]
+	_ly[i]=ly[i]
+NEXT i
+
+parameters lx=_lx,ly=_ly
+
+
+list_len=3
+list_len2=3
+dim _jx[][],_jy[][]
+_jx[1][1]=0
+_jx[1][2]=0
+_jy[1][1]=0
+_jy[1][2]=0
+
+for j=1 to list_len
+    FOR i=1 TO num2[j]
+        _jx[i][j]=jx[i][j]
+        _jy[i][j]=jy[i][j]
+    NEXT i
+next j
+
+parameters jx=_jx,jy=_jy
+
+
+dim _mx[][],_my[][],_cz[][]
+_mx[1][1]=0
+_mx[1][2]=0
+_my[1][1]=0
+_my[1][2]=0
+_cz[1][1]=0
+_cz[1][2]=0
+
+for j=1 to list_len2
+    FOR i=1 TO num3[j]
+        _mx[i][j]=mx[i][j]
+        _my[i][j]=my[i][j]
+        _cz[i][j]=cz[i][j]
+    NEXT i
+next j
+
+parameters mx=_mx,my=_my,cz=_cz
+
+
+dim _col_hei_offset[],_col_hei_offset_rep[]
+_col_hei_offset[1]=0
+_col_hei_offset_rep[1]=0
+
+for i=1 to num3[1] 
+    _col_hei_offset[i]=col_hei_offset[i]
+    _col_hei_offset_rep[i]=col_hei_offset_rep[i]
+next i
+
+parameters col_hei_offset=_col_hei_offset,col_hei_offset_rep=_col_hei_offset_rep
+
+
+dim list[]
+list[0+1]=0
+list[1+1]=0.105/2+0.015
+list[2+1]=0
+list[3+1]=0.15+0.015
+list[4+1]=0
+list[5+1]=0
+list[6+1]=0
+list[7+1]=0
+list[8+1]=0
+list[9+1]=0
+list[10+1]=0
+list[11+1]=0
+list[12+1]=0.1
+
+
+dim joint_list[]
+joint_list[1]=1
+joint_list[2]=5
+joint_list[3]=7
+
+
+anchor_dd=10.7/1000
+
+values "ly" range[-0.0525+anchor_dd/2*e2+(0.015-anchor_dd/2)*e4,0.0525-anchor_dd/2*e2-(0.015-anchor_dd/2)*e4]
+values "lx" range[0,len]
+values "jy" range[-0.105/2,0.105/2]
+values "jx" range[0,len]
+values "my" range[0,0]
+values "mx" range[0,len]
+values{2} "left" 	0,"なし",2,"腰掛け蟻継ぎ・オス",3,"腰掛け鎌継ぎ・メス",4,"腰掛け鎌継ぎ・オス",6,"腰掛け半蟻落し継ぎ・オス",8,"大入れ掛け・オス",12,"金物工法"
+values{2} "right" 	0,"なし",2,"腰掛け蟻継ぎ・オス",3,"腰掛け鎌継ぎ・メス",4,"腰掛け鎌継ぎ・オス",6,"腰掛け半蟻落し継ぎ・オス",8,"大入れ掛け・オス",12,"金物工法"
+values{2} "joint"	0,"なし",1,"1.腰掛け蟻継ぎ仕口",5,"2.腰掛け半蟻落し継ぎ仕口",7,"3.大入れ仕口",99,"カスタム設定"
+values{2} "mortise"	0,"なし",1,"1.間柱欠き",2,"2.柱ほぞ",3,"3.管柱ほぞ",99,"カスタム設定"
+values{2} "pro_2d"	1,"輪郭",3,"カラー"
+
+if E=0 then parameters left=0,right=0,joint=0
+if joint=0 then hideparameter "num2","jx","jy"
+if mortise=0 then hideparameter "num3","mx","my"
+
+
+!金物寸法
+hardwareX=0.1
+hardwareWid=0.04
+hardwareGap=0.03
+hardwareThi=0.002
+cornerRad=0.0067
+driftPinRad1=0.0065
+driftPinRad2=0.0064
+hardwareZ=0.0985
+ditchDep=0.104
+
+!金物数
+hardwareNum=0
+if left=12 then hardwareNum=hardwareNum+1
+if right=12 then hardwareNum=hardwareNum+1
+parameters hardwareNum=hardwareNum
+lock "hardwareNum"
+
+!金物品番
+hardwareTypeNum="TH-10"
+parameters hardwareTypeNum=hardwareTypeNum
+lock "hardwareTypeNum"
+
+!ドリフトピン数
+driftPinNum=hardwareNum*2
+parameters driftPinNum=driftPinNum
+lock "driftPinNum"

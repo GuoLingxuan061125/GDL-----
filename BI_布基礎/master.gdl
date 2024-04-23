@@ -1,0 +1,2564 @@
+code=1
+eps=1e-5
+x=1
+y=2
+z=3
+
+if disUnitBar then
+    disBaseMbar=0
+    disBaseTopMbar=0
+    disBaseDbar=0
+    disBaseTopDbar=0
+    disBaseSideDbar=0
+    disStp=0
+    disTopbar=0
+    disDownbar=0
+    disSidebar=0
+    disSprbar=0
+    disVerRef=0
+    disHorRef=0
+    disDiaRef=0
+    disStpRef=0
+    disSupportbar=0
+endif
+
+!====================================================================布基礎設定
+values{2} "startCorner" 1,"コーナー",2,"T形交差部",3,"十字交差部",4,"端部",5,"段差"
+values{2} "endCorner" 1,"コーナー",2,"T形交差部",3,"十字交差部",4,"端部",5,"段差"
+
+if startCorner=4 then
+    startBaseWid=baseWid
+    startFootingWid=footingWid
+endif
+
+if endCorner=4 then
+    endBaseWid=baseWid
+    endFootingWid=footingWid
+endif
+
+if switchStartUnit=0 then
+    hideparameter "startUnitLen"
+endif
+
+if switchEndUnit=0 then
+    hideparameter "endUnitLen"
+endif
+
+
+!長さ
+vertexLen=sqr((vertexPos[2][x]-vertexPos[1][x])^2+(vertexPos[2][y]-vertexPos[1][y])^2)
+
+
+!回転角
+vertexRtz=0
+
+if vertexPos[2][y]>vertexPos[1][y]+eps then
+    vertexRtz=acs((vertexPos[2][x]-vertexPos[1][x])/vertexLen)
+endif
+
+if vertexPos[2][y]<=vertexPos[1][y]+eps and vertexPos[2][y]>=vertexPos[1][y]-eps then
+    if vertexPos[2][x]>=vertexPos[1][x] then
+        vertexRtz=0
+    else
+        vertexRtz=180
+    endif
+endif
+
+if vertexPos[2][y]<vertexPos[1][y]-eps then
+    vertexRtz=360-acs((vertexPos[2][x]-vertexPos[1][x])/vertexLen)
+endif
+
+
+!基礎部始点・終点
+dim _basePos[][]
+_basePos[1][x]=vertexPos[1][x]-cos(vertexRtz)*startBaseWid/2
+_basePos[1][y]=vertexPos[1][y]-sin(vertexRtz)*startBaseWid/2
+_basePos[2][x]=vertexPos[2][x]+cos(vertexRtz)*endBaseWid/2
+_basePos[2][y]=vertexPos[2][y]+sin(vertexRtz)*endBaseWid/2
+baseLen=sqr((_basePos[2][x]-_basePos[1][x])^2+(_basePos[2][y]-_basePos[1][y])^2)
+
+
+!立上り部始点・終点
+dim _footingPos[][]
+_footingPos[1][x]=vertexPos[1][x]-cos(vertexRtz)*startFootingWid/2
+_footingPos[1][y]=vertexPos[1][y]-sin(vertexRtz)*startFootingWid/2
+_footingPos[2][x]=vertexPos[2][x]+cos(vertexRtz)*endFootingWid/2
+_footingPos[2][y]=vertexPos[2][y]+sin(vertexRtz)*endFootingWid/2
+footingLen=sqr((_footingPos[2][x]-_footingPos[1][x])^2+(_footingPos[2][y]-_footingPos[1][y])^2)
+
+
+!====================================================================開口設定
+!開口
+values "opNum" range[0,]
+
+dim _opShape[],_opSize[][],_opPos[][]
+_opShape[1]=1
+_opSize[1][1]=0.5
+_opSize[1][2]=0.5
+_opPos[1][1]=1.5
+_opPos[1][2]=0.9
+
+for i=1 to opNum
+    _opShape[i]=opShape[i]
+    _opSize[i][1]=opSize[i][1]
+    if _opShape[i]=1 then
+        _opSize[i][2]=opSize[i][2]
+    else
+        _opSize[i][2]=opSize[i][1]
+    endif
+    _opPos[i][1]=opPos[i][1]
+    _opPos[i][2]=opPos[i][2]
+next i
+
+parameters \
+opShape=_opShape,
+opSize=_opSize,
+opPos=_opPos
+
+values{2} "opShape" 1,"□",2,"○"
+
+
+!開口順番
+for i=1 to opNum-1
+    for j=1 to opNum-i
+        if opPos[j][1]>opPos[j+1][1] then
+            tempShape=opShape[j]
+            tempSize1=opSize[j][1]
+            tempSize2=opSize[j][2]
+            tempPos1=opPos[j][1]
+            tempPos2=opPos[j][2]
+
+            opShape[j]=opShape[j+1]
+            opSize[j][1]=opSize[j+1][1]
+            opSize[j][2]=opSize[j+1][2]
+            opPos[j][1]=opPos[j+1][1]
+            opPos[j][2]=opPos[j+1][2]
+
+            opShape[j+1]=tempShape
+            opSize[j+1][1]=tempSize1
+            opSize[j+1][2]=tempSize2
+            opPos[j+1][1]=tempPos1
+            opPos[j+1][2]=tempPos2
+        endif
+    next j
+next i
+
+
+
+!==========================================================================参照リスト==========================================================================
+!=======================================継ぎ手定着長さL1
+dim L1_list[][]
+L1_list[1][18]=45
+L1_list[1][21]=40
+L1_list[1][24]=35
+L1_list[1][27]=35
+L1_list[1][30]=35
+L1_list[1][33]=35
+L1_list[1][36]=35
+L1_list[1][39]=30
+L1_list[1][42]=30
+L1_list[1][45]=30
+L1_list[1][48]=30
+L1_list[1][51]=30
+L1_list[1][54]=30
+L1_list[1][57]=30
+L1_list[1][60]=30
+L1_list[2][18]=50
+L1_list[2][21]=45
+L1_list[2][24]=40
+L1_list[2][27]=40
+L1_list[2][30]=35
+L1_list[2][33]=35
+L1_list[2][36]=35
+L1_list[2][39]=35
+L1_list[2][42]=35
+L1_list[2][45]=35
+L1_list[2][48]=30
+L1_list[2][51]=30
+L1_list[2][54]=30
+L1_list[2][57]=30
+L1_list[2][60]=30
+L1_list[3][18]=0
+L1_list[3][21]=50
+L1_list[3][24]=45
+L1_list[3][27]=45
+L1_list[3][30]=40
+L1_list[3][33]=40
+L1_list[3][36]=40
+L1_list[3][39]=40
+L1_list[3][42]=40
+L1_list[3][45]=40
+L1_list[3][48]=35
+L1_list[3][51]=35
+L1_list[3][54]=35
+L1_list[3][57]=35
+L1_list[3][60]=35
+L1_list[4][18]=0
+L1_list[4][21]=0
+L1_list[4][24]=55
+L1_list[4][27]=55
+L1_list[4][30]=50
+L1_list[4][33]=50
+L1_list[4][36]=50
+L1_list[4][39]=45
+L1_list[4][42]=45
+L1_list[4][45]=45
+L1_list[4][48]=40
+L1_list[4][51]=40
+L1_list[4][54]=40
+L1_list[4][57]=40
+L1_list[4][60]=40
+
+!=======================================定着長さL2
+dim L2_list[][]
+L2_list[1][18]=40
+L2_list[1][21]=35
+L2_list[1][24]=30
+L2_list[1][27]=30
+L2_list[1][30]=30
+L2_list[1][33]=30
+L2_list[1][36]=30
+L2_list[1][39]=25
+L2_list[1][42]=25
+L2_list[1][45]=25
+L2_list[1][48]=25
+L2_list[1][51]=25
+L2_list[1][54]=25
+L2_list[1][57]=25
+L2_list[1][60]=25
+L2_list[2][18]=40
+L2_list[2][21]=35
+L2_list[2][24]=35
+L2_list[2][27]=35
+L2_list[2][30]=30
+L2_list[2][33]=30
+L2_list[2][36]=30
+L2_list[2][39]=30
+L2_list[2][42]=30
+L2_list[2][45]=30
+L2_list[2][48]=25
+L2_list[2][51]=25
+L2_list[2][54]=25
+L2_list[2][57]=25
+L2_list[2][60]=25
+L2_list[3][18]=0
+L2_list[3][21]=40
+L2_list[3][24]=40
+L2_list[3][27]=40
+L2_list[3][30]=35
+L2_list[3][33]=35
+L2_list[3][36]=35
+L2_list[3][39]=35
+L2_list[3][42]=35
+L2_list[3][45]=35
+L2_list[3][48]=30
+L2_list[3][51]=30
+L2_list[3][54]=30
+L2_list[3][57]=30
+L2_list[3][60]=30
+L2_list[4][18]=0
+L2_list[4][21]=0
+L2_list[4][24]=45
+L2_list[4][27]=45
+L2_list[4][30]=40
+L2_list[4][33]=40
+L2_list[4][36]=40
+L2_list[4][39]=40
+L2_list[4][42]=40
+L2_list[4][45]=40
+L2_list[4][48]=35
+L2_list[4][51]=35
+L2_list[4][54]=35
+L2_list[4][57]=35
+L2_list[4][60]=35
+
+!=======================================材質・線色コードリスト
+dim scode_list[]
+scode_list[10]=1
+scode_list[13]=2
+scode_list[16]=3
+scode_list[19]=4
+scode_list[22]=5
+scode_list[25]=6
+scode_list[29]=7
+scode_list[32]=8
+scode_list[35]=9
+scode_list[38]=10
+scode_list[41]=11
+
+!=======================================外径リスト
+dim od_list[]
+od_list[10]=0.011 !d10
+od_list[13]=0.014 !d13
+od_list[16]=0.018 !d16
+od_list[19]=0.021 !d19
+od_list[22]=0.025 !d22
+od_list[25]=0.028 !d25
+od_list[29]=0.033 !d29
+od_list[32]=0.036 !d32
+od_list[35]=0.040 !d35
+od_list[38]=0.043 !d38
+od_list[41]=0.046 !d41
+
+!=======================================定着金物
+dim hardware_od[]
+hardware_od[10]=40/1000
+hardware_od[13]=40/1000
+hardware_od[16]=45/1000
+hardware_od[19]=50/1000
+hardware_od[22]=55/1000
+hardware_od[25]=65/1000
+hardware_od[29]=65/1000
+hardware_od[32]=65/1000
+hardware_od[35]=65/1000
+hardware_od[38]=65/1000
+hardware_od[41]=65/1000
+
+dim hardware_thi[]
+hardware_thi[10]=10/1000
+hardware_thi[13]=10/1000
+hardware_thi[16]=13/1000
+hardware_thi[19]=16/1000
+hardware_thi[22]=19/1000
+hardware_thi[25]=22/1000
+hardware_thi[29]=25/1000
+hardware_thi[32]=29/1000
+hardware_thi[35]=32/1000
+hardware_thi[38]=35/1000
+hardware_thi[41]=38/1000
+
+!====================================================================配筋設定
+values "SDresol" range[3,]
+
+values{2} "conFc" 18,"18 N/㎟",21,"21 N/㎟",24,"24 N/㎟",27,"27 N/㎟",30,"30 N/㎟",33,"33 N/㎟",36,"36 N/㎟",39,"39 N/㎟",42,"42 N/㎟",45,"45 N/㎟",\
+				  48,"48 N/㎟",51,"51 N/㎟",54,"54 N/㎟",57,"57 N/㎟",60,"60 N/㎟"
+
+if conFc=18 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345"
+if conFc=21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390"
+if conFc>21 then values{2} "sdType" 1,"SD295A/SD295B",2,"SD345",3,"SD390",4,"SD490"
+
+values "L1Plus" range[0,]
+values "L2Plus" range[0,]
+values{2} "baseBarPattern" 1,"シングル",2,"ダブル"
+values{2} "stpShape" 1,"溶接",2,"一般"
+values "connectLen" range[5,]
+
+
+!====================================================================呼び径・ピッチ設定
+values{2} "baseMbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "baseDbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "baseTopMbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "baseTopDbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "stpNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "topbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "downbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "sidebarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "sprbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "horbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "verbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "verRefNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "horRefNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "diaRefNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "stpRefNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+values{2} "supportbarNd" 10,"D10",13,"D13",16,"D16",19,"D19",22,"D22",25,"D25",29,"D29",32,"D32",35,"D35",38,"D38",41,"D41"
+
+values "baseMbarPitch" range[0.1,]
+values "stpPitch" range[0.1,]
+values "sprbarPitch" range[0.1,]
+values "horbarPitch" range[0.1,]
+values "stpRefPitch" range[0.1,]
+
+values "baseDbarNum" 2,4,6,8,10,12,14,16,18
+values "baseTopDbarSideNum" range[0,]
+values "supportbarNum" range[2,]
+values "topbarNum" 2,3,4
+values "downbarNum" 2,3,4
+values "sidebarNum" range[0,]
+sidebarNum=ceil(sidebarNum/2)*2
+parameters sidebarNum=sidebarNum
+values "supportbarConnectLen" range[0,]
+
+
+!====================================================================鉄筋座標
+baseDownCover=baseDownCover+switchSupportbar*od_list[supportbarNd]
+downLevel=footingLevel-footingHei-baseHei
+
+
+!初期化用リスト
+dim _tempPoint[],_tempPos[][],_transPos[][]
+_tempPoint[1]=0
+_tempPos[1][1]=0
+_tempPos[1][2]=0
+_transPos[1][1]=0
+_transPos[1][2]=0
+
+dim _resetList[][]
+_resetList[1][1]=0
+_resetList[1][2]=0
+
+
+!==================================ベース配力筋
+baseDbarOd=od_list[baseDbarNd]
+baseMbarOd=od_list[baseMbarNd]
+baseDbarPen=SDpen[scode_list[baseDbarNd]]
+baseDbarMat=SDmat[scode_list[baseDbarNd]]
+
+baseDbarTotnum=0
+dim _baseDbarPoint[],_baseDbarPos[][]
+_baseDbarPoint[1]=0
+_baseDbarPos[1][1]=0
+_baseDbarPos[1][2]=0
+
+!ベース上端配力筋
+baseTopDbarOd=od_list[baseTopDbarNd]
+baseMbarOd=od_list[baseMbarNd]
+baseTopDbarPen=SDpen[scode_list[baseTopDbarNd]]
+baseTopDbarMat=SDmat[scode_list[baseTopDbarNd]]
+
+baseTopDbarTotnum=0
+dim _baseTopDbarPoint[],_baseTopDbarPos[][]
+_baseTopDbarPoint[1]=0
+_baseTopDbarPos[1][1]=0
+_baseTopDbarPos[1][2]=0
+
+baseDbarConnectNum=ceil((vertexLen+abs(startBaseWid)/2+abs(endBaseWid)/2-2*baseSideCover)/connectLen)
+baseDbarConnectNum=ceil((vertexLen+abs(startBaseWid)/2+abs(endBaseWid)/2-2*baseSideCover+(baseDbarConnectNum-1)*(L1_list[sdType[scode_list[baseDbarNd]]][conFc]+L1Plus)*baseDbarNd/1000)/connectLen)
+baseDbarConnectUnitLen=(vertexLen+abs(startBaseWid)/2+abs(endBaseWid)/2-2*baseSideCover)/baseDbarConnectNum
+
+baseDbarPitch=((baseWid-footingWid)/2-baseSideCover-baseDbarOd)/max(baseDbarNum/2-1,1) !ベース配力筋のピッチ
+
+if switchBaseBar then
+    for i=1 to baseDbarNum
+        for j=1 to baseDbarConnectNum
+            !xpos
+            if j=1 then
+                if startCorner<4 then
+                    xpos1=abs(startBaseWid)/2-(L2_list[scode_list[baseDbarNd]][conFc]+L2Plus)*baseDbarNd/1000
+                endif
+                if startCorner=4 then
+                    xpos1=-abs(startBaseWid)/2+baseSideCover
+                endif
+                if startCorner=5 then
+                    xpos1=-abs(startFootingWid)/4
+                endif
+            else
+                xpos1=-abs(startBaseWid)/2+baseSideCover+(j-1)*baseDbarConnectUnitLen-(L1_list[sdType[scode_list[baseDbarNd]]][conFc]+L1Plus)/2*baseDbarNd/1000
+            endif
+
+            if j=baseDbarConnectNum then
+                if endCorner<4 then
+                    xpos2=vertexLen-abs(endBaseWid)/2+(L2_list[scode_list[baseDbarNd]][conFc]+L2Plus)*baseDbarNd/1000
+                endif
+                if endCorner=4 then
+                    xpos2=vertexLen+abs(endBaseWid)/2-baseSideCover
+                endif
+                if endCorner=5 then
+                    xpos2=vertexLen+abs(endFootingWid)/4
+                endif
+            else
+                xpos2=-abs(startBaseWid)/2+baseSideCover+j*baseDbarConnectUnitLen+(L1_list[sdType[scode_list[baseDbarNd]]][conFc]+L1Plus)/2*baseDbarNd/1000
+            endif
+
+            !ypos
+            if i<=baseDbarNum/2 then
+                ypos=-(baseWid/2-baseSideCover-baseDbarOd/2)+(i-1)*baseDbarPitch+(1-j%2)*baseDbarOd
+            else
+                ypos=(baseWid/2-baseSideCover-baseDbarOd/2)-(i-baseDbarNum/2-1)*baseDbarPitch-(1-j%2)*baseDbarOd
+            endif
+
+            if disBaseDbar then
+                baseDbarTotnum=baseDbarTotnum+1
+                _baseDbarPoint[baseDbarTotnum]=2
+
+                put xpos1
+                put ypos
+                put downLevel+baseDownCover+baseMbarOd+baseDbarOd/2
+
+                put xpos2
+                put ypos
+                put downLevel+baseDownCover+baseMbarOd+baseDbarOd/2
+
+                for n=1 to 3*_baseDbarPoint[baseDbarTotnum]
+                    _baseDbarPos[baseDbarTotnum][n]=get(1)
+                next n
+            endif
+
+            !ベース上端配力筋
+            if baseBarPattern=2 then
+                !xpos
+                if j=1 then
+                    if startCorner<4 then
+                        xpos1=abs(startBaseWid)/2-(L2_list[scode_list[baseTopDbarNd]][conFc]+L2Plus)*baseTopDbarNd/1000
+                    endif
+                    if startCorner=4 then
+                        xpos1=-abs(startBaseWid)/2+baseSideCover
+                    endif
+                    if startCorner=5 then
+                        xpos1=abs(startFootingWid)/2-(L2_list[scode_list[baseTopDbarNd]][conFc]+L2Plus)*baseTopDbarNd/1000
+                    endif
+                else
+                    xpos1=-abs(startBaseWid)/2+baseSideCover+(j-1)*baseDbarConnectUnitLen-(L1_list[sdType[scode_list[baseTopDbarNd]]][conFc]+L1Plus)/2*baseTopDbarNd/1000
+                endif
+
+                if j=baseDbarConnectNum then
+                    if endCorner<4 then
+                        xpos2=vertexLen-abs(endBaseWid)/2+(L2_list[scode_list[baseTopDbarNd]][conFc]+L2Plus)*baseTopDbarNd/1000
+                    endif
+                    if endCorner=4 then
+                        xpos2=vertexLen+abs(endBaseWid)/2-baseSideCover
+                    endif
+                    if endCorner=5 then
+                        xpos2=vertexLen-abs(endFootingWid)/2+(L2_list[scode_list[baseTopDbarNd]][conFc]+L2Plus)*baseTopDbarNd/1000
+                    endif
+                else
+                    xpos2=-abs(startBaseWid)/2+baseSideCover+j*baseDbarConnectUnitLen+(L1_list[sdType[scode_list[baseTopDbarNd]]][conFc]+L1Plus)/2*baseTopDbarNd/1000
+                endif
+
+                !ypos
+                if i=1 then ypos=-(baseWid/2-baseSideCover-((elbowRad+0.5)*baseTopMbarOd*sqr(2)-(elbowRad-0.5)*baseTopMbarOd+baseTopDbarOd/2)/sqr(2))+(1-j%2)*baseDbarOd
+                if i>1 and i<baseDbarNum/2+1 then ypos=ypos+baseDbarOd/2+baseTopDbarOd/2
+                if i=baseDbarNum/2+1 then ypos=(baseWid/2-baseSideCover-((elbowRad+0.5)*baseTopMbarOd*sqr(2)-(elbowRad-0.5)*baseTopMbarOd+baseTopDbarOd/2)/sqr(2))-(1-j%2)*baseDbarOd
+                if i>baseDbarNum/2+1 then ypos=ypos-baseDbarOd/2-baseTopDbarOd/2
+
+                !zpos
+                zpos=downLevel+baseHei-baseTopCover-baseTopMbarOd-baseTopDbarOd/2
+                if i=1 then zpos=downLevel+baseHei-baseTopCover-((elbowRad+0.5)*baseTopMbarOd*sqr(2)-(elbowRad-0.5)*baseTopMbarOd+baseTopDbarOd/2)/sqr(2)
+                if i=baseDbarNum/2+1 then zpos=downLevel+baseHei-baseTopCover-((elbowRad+0.5)*baseTopMbarOd*sqr(2)-(elbowRad-0.5)*baseTopMbarOd+baseTopDbarOd/2)/sqr(2)
+
+                if disBaseTopDbar then
+                    baseTopDbarTotnum=baseTopDbarTotnum+1
+                    _baseTopDbarPoint[baseTopDbarTotnum]=2
+
+                    if j=1 and startCorner=4 then !始点コーナーは端部の場合
+                        xpos1=xpos1+baseDbarOd/2
+                        _baseTopDbarPoint[baseTopDbarTotnum]=_baseTopDbarPoint[baseTopDbarTotnum]+2
+
+                        put xpos1+(elbowRad*baseTopDbarOd+15*baseTopDbarNd/1000)
+                        put ypos
+                        put downLevel+baseDownCover+baseMbarOd+baseTopDbarOd/2
+
+                        put xpos1
+                        put ypos
+                        put downLevel+baseDownCover+baseMbarOd+baseTopDbarOd/2
+                    endif
+
+                    put xpos1
+                    put ypos
+                    put zpos
+
+                    if j=baseDbarConnectNum and endCorner=4 then
+                        xpos2=xpos2-baseDbarOd/2
+                    endif
+
+                    put xpos2
+                    put ypos
+                    put zpos
+
+                    if j=baseDbarConnectNum and endCorner=4 then !終点コーナーは端部の場合
+                        _baseTopDbarPoint[baseTopDbarTotnum]=_baseTopDbarPoint[baseTopDbarTotnum]+2
+
+                        put xpos2
+                        put ypos
+                        put downLevel+baseDownCover+baseMbarOd+baseTopDbarOd/2
+
+                        put xpos2-(elbowRad*baseTopDbarOd+15*baseTopDbarNd/1000)
+                        put ypos
+                        put downLevel+baseDownCover+baseMbarOd+baseTopDbarOd/2
+                    endif
+
+                    for n=1 to 3*_baseTopDbarPoint[baseTopDbarTotnum]
+                        _baseTopDbarPos[baseTopDbarTotnum][n]=get(1)
+                    next n
+                endif
+            endif
+        next j
+    next i
+
+    !側面ベース上端配力筋
+    if baseBarPattern=2 and baseTopDbarSideNum>0 then
+        for i=1 to baseTopDbarSideNum
+            for j=1 to baseDbarConnectNum
+                !xpos
+                if j=1 then
+                    if startCorner<4 then
+                        xpos1=abs(startBaseWid)/2-(L2_list[scode_list[baseTopDbarNd]][conFc]+L2Plus)*baseTopDbarNd/1000
+                    endif
+                    if startCorner=4 then
+                        xpos1=-abs(startBaseWid)/2+baseSideCover+baseTopDbarOd
+                    endif
+                    if startCorner=5 then
+                        xpos1=abs(startFootingWid)/2-(L2_list[scode_list[baseTopDbarNd]][conFc]+L2Plus)*baseTopDbarNd/1000
+                    endif
+                else
+                    xpos1=-abs(startBaseWid)/2+baseSideCover+(j-1)*baseDbarConnectUnitLen-(L1_list[sdType[scode_list[baseTopDbarNd]]][conFc]+L1Plus)/2*baseTopDbarNd/1000
+                endif
+
+                if j=baseDbarConnectNum then
+                    if endCorner<4 then
+                        xpos2=vertexLen-abs(endBaseWid)/2+(L2_list[scode_list[baseTopDbarNd]][conFc]+L2Plus)*baseTopDbarNd/1000
+                    endif
+                    if endCorner=4 then
+                        xpos2=vertexLen+abs(endBaseWid)/2-baseSideCover-baseTopDbarOd
+                    endif
+                    if endCorner=5 then
+                        xpos2=vertexLen-abs(endFootingWid)/2+(L2_list[scode_list[baseTopDbarNd]][conFc]+L2Plus)*baseTopDbarNd/1000
+                    endif
+                else
+                    xpos2=-abs(startBaseWid)/2+baseSideCover+j*baseDbarConnectUnitLen+(L1_list[sdType[scode_list[baseTopDbarNd]]][conFc]+L1Plus)/2*baseTopDbarNd/1000
+                endif
+
+                !ypos
+                ypos1=-(baseWid/2-baseSideCover-baseTopMbarOd-baseTopDbarOd/2)
+                ypos2=(baseWid/2-baseSideCover-baseTopMbarOd-baseTopDbarOd/2)
+
+                !zpos
+                baseTopDbarPitch=(baseHei-baseTopCover-baseDownCover-baseMbarOd-baseTopMbarOd-baseTopDbarOd)/(baseTopDbarSideNum+1)
+                zpos=downLevel+baseHei-baseTopCover-baseTopMbarOd-baseTopDbarOd/2-i*baseTopDbarPitch
+
+                if disBaseSideDbar then
+                    baseTopDbarTotnum=baseTopDbarTotnum+1
+                    _baseTopDbarPoint[baseTopDbarTotnum]=2
+
+                    put xpos1
+                    put ypos1
+                    put zpos
+
+                    put xpos2
+                    put ypos1
+                    put zpos
+
+                    for n=1 to 3*_baseTopDbarPoint[baseTopDbarTotnum]
+                        _baseTopDbarPos[baseTopDbarTotnum][n]=get(1)
+                    next n
+
+                    baseTopDbarTotnum=baseTopDbarTotnum+1
+                    _baseTopDbarPoint[baseTopDbarTotnum]=2
+
+                    put xpos1
+                    put ypos2
+                    put zpos
+
+                    put xpos2
+                    put ypos2
+                    put zpos
+
+                    for n=1 to 3*_baseTopDbarPoint[baseTopDbarTotnum]
+                        _baseTopDbarPos[baseTopDbarTotnum][n]=get(1)
+                    next n
+                endif
+
+                !端部コの字筋
+                if disBaseSideDbar then
+                    if j=1 and startCorner=4 then
+                        baseTopDbarTotnum=baseTopDbarTotnum+1
+                        _baseTopDbarPoint[baseTopDbarTotnum]=4
+
+                        put xpos1+baseTopDbarOd/2+(elbowRad*baseTopDbarOd+(L1_list[scode_list[baseTopDbarNd]][conFc]+L1Plus)*baseTopDbarNd/1000)
+                        put ypos1
+                        put zpos+baseTopDbarOd
+
+                        put xpos1+baseTopDbarOd/2
+                        put ypos1
+                        put zpos+baseTopDbarOd
+
+                        put xpos1+baseTopDbarOd/2
+                        put ypos2
+                        put zpos+baseTopDbarOd
+
+                        put xpos1+baseTopDbarOd/2+(elbowRad*baseTopDbarOd+(L1_list[scode_list[baseTopDbarNd]][conFc]+L1Plus)*baseTopDbarNd/1000)
+                        put ypos2
+                        put zpos+baseTopDbarOd
+
+                        for n=1 to 3*_baseTopDbarPoint[baseTopDbarTotnum]
+                            _baseTopDbarPos[baseTopDbarTotnum][n]=get(1)
+                        next n
+                    endif
+
+                    if j=baseDbarConnectNum and endCorner=4 then
+                        baseTopDbarTotnum=baseTopDbarTotnum+1
+                        _baseTopDbarPoint[baseTopDbarTotnum]=4
+
+                        put xpos2-baseTopDbarOd/2-(elbowRad*baseTopDbarOd+(L1_list[scode_list[baseTopDbarNd]][conFc]+L1Plus)*baseTopDbarNd/1000)
+                        put ypos1
+                        put zpos+baseTopDbarOd
+
+                        put xpos2-baseTopDbarOd/2
+                        put ypos1
+                        put zpos+baseTopDbarOd
+
+                        put xpos2-baseTopDbarOd/2
+                        put ypos2
+                        put zpos+baseTopDbarOd
+
+                        put xpos2-baseTopDbarOd/2-(elbowRad*baseTopDbarOd+(L1_list[scode_list[baseTopDbarNd]][conFc]+L1Plus)*baseTopDbarNd/1000)
+                        put ypos2
+                        put zpos+baseTopDbarOd
+
+                        for n=1 to 3*_baseTopDbarPoint[baseTopDbarTotnum]
+                            _baseTopDbarPos[baseTopDbarTotnum][n]=get(1)
+                        next n
+                    endif
+                endif
+            next j
+        next i
+    endif
+endif
+
+tempNum=baseDbarTotnum
+_tempPoint=_baseDbarPoint
+_tempPos=_baseDbarPos
+gosub "pos_translation"
+
+parameters \
+baseDbarTotnum=baseDbarTotnum,
+baseDbarOd=baseDbarOd,
+baseDbarPen=baseDbarPen,
+baseDbarMat=baseDbarMat,
+baseDbarPoint=_baseDbarPoint,
+baseDbarPos=_transPos
+
+
+tempNum=baseTopDbarTotnum
+_tempPoint=_baseTopDbarPoint
+_tempPos=_baseTopDbarPos
+gosub "pos_translation"
+
+parameters \
+baseTopDbarTotnum=baseTopDbarTotnum,
+baseTopDbarOd=baseTopDbarOd,
+baseTopDbarPen=baseTopDbarPen,
+baseTopDbarMat=baseTopDbarMat,
+baseTopDbarPoint=_baseTopDbarPoint,
+baseTopDbarPos=_transPos
+
+
+!==================================ベース主筋
+baseMbarOd=od_list[baseMbarNd]
+baseMbarPen=SDpen[scode_list[baseMbarNd]]
+baseMbarMat=SDmat[scode_list[baseMbarNd]]
+
+baseMbarTotnum=0
+dim _baseMbarPoint[],_baseMbarPos[][]
+_baseMbarPoint[1]=0
+_baseMbarPos[1][1]=0
+_baseMbarPos[1][2]=0
+
+!ベース上端主筋
+baseTopMbarOd=od_list[baseTopMbarNd]
+baseTopMbarPen=SDpen[scode_list[baseTopMbarNd]]
+baseTopMbarMat=SDmat[scode_list[baseTopMbarNd]]
+
+baseTopMbarTotnum=0
+dim _baseTopMbarPoint[],_baseTopMbarPos[][]
+_baseTopMbarPoint[1]=0
+_baseTopMbarPos[1][1]=0
+_baseTopMbarPos[1][2]=0
+
+if startCorner=1 then
+    baseMbarStartOffset=-(abs(startBaseWid)/2-baseSideCover-baseMbarOd/2)
+endif
+if startCorner=2 or startCorner=3 then
+    baseMbarStartOffset=abs(startBaseWid)/2
+endif
+if startCorner=4 then
+    baseMbarStartOffset=-(abs(startBaseWid)/2-baseMbarPitch/2)
+endif
+if startCorner=5 then
+    baseMbarStartOffset=abs(startFootingWid)/2+baseMbarOd/2
+endif
+
+if endCorner=1 then
+    baseMbarEndOffset=-(abs(endBaseWid)/2-baseSideCover-baseMbarOd/2)
+endif
+if endCorner=2 or endCorner=3 then
+    baseMbarEndOffset=abs(endBaseWid)/2
+endif
+if endCorner=4 then
+    baseMbarEndOffset=-(abs(endBaseWid)/2-baseMbarPitch/2)
+endif
+if endCorner=5 then
+    baseMbarEndOffset=abs(endFootingWid)/2+baseMbarOd/2
+endif
+
+baseMbarTotnum1=ceil((vertexLen-baseMbarStartOffset-baseMbarEndOffset)/baseMbarPitch)+1
+baseMbarPitch1=(vertexLen-baseMbarStartOffset-baseMbarEndOffset)/(baseMbarTotnum1-1)
+
+if switchBaseBar then
+    for i=1 to baseMbarTotnum1
+        xpos=baseMbarStartOffset+(i-1)*baseMbarPitch1
+
+        if disBaseMbar then
+            baseMbarTotnum=baseMbarTotnum+1
+            _baseMbarPoint[baseMbarTotnum]=2
+
+            put xpos
+            put -baseWid/2+baseSideCover
+            put downLevel+baseDownCover+baseMbarOd/2
+
+            put xpos
+            put baseWid/2-baseSideCover
+            put downLevel+baseDownCover+baseMbarOd/2
+
+            for j=1 to 3*_baseMbarPoint[baseMbarTotnum]
+                _baseMbarPos[baseMbarTotnum][j]=get(1)
+            next j
+        endif
+
+        !ベース上端主筋
+        if baseBarPattern=2 then
+            baseTopMbarFlag=1
+
+            if startCorner<>4 and xpos<abs(startBaseWid)/2 then
+                baseTopMbarFlag=0
+            endif
+
+            if endCorner<>4 and xpos>vertexLen-abs(endBaseWid)/2 then
+                baseTopMbarFlag=0
+            endif
+
+            if disBaseTopMbar and baseTopMbarFlag=1 then
+                baseTopMbarTotnum=baseTopMbarTotnum+1
+                _baseTopMbarPoint[baseTopMbarTotnum]=6
+
+                put xpos
+                put -(baseWid/2-baseSideCover-baseTopMbarOd/2-elbowRad*baseTopMbarOd-15*baseTopMbarNd/1000)
+                put downLevel+baseDownCover+baseMbarOd+baseDbarOd+baseTopMbarOd/2
+
+                put xpos
+                put -(baseWid/2-baseSideCover-baseTopMbarOd/2)
+                put downLevel+baseDownCover+baseMbarOd+baseDbarOd+baseTopMbarOd/2
+
+                put xpos
+                put -(baseWid/2-baseSideCover-baseTopMbarOd/2)
+                put downLevel+baseHei-baseTopCover-baseTopMbarOd/2
+
+                put xpos
+                put (baseWid/2-baseSideCover-baseTopMbarOd/2)
+                put downLevel+baseHei-baseTopCover-baseTopMbarOd/2
+
+                put xpos
+                put (baseWid/2-baseSideCover-baseTopMbarOd/2)
+                put downLevel+baseDownCover+baseMbarOd+baseDbarOd+baseTopMbarOd/2
+
+                put xpos
+                put (baseWid/2-baseSideCover-baseTopMbarOd/2-elbowRad*baseTopMbarOd-15*baseTopMbarNd/1000)
+                put downLevel+baseDownCover+baseMbarOd+baseDbarOd+baseTopMbarOd/2
+
+                for j=1 to 3*_baseTopMbarPoint[baseTopMbarTotnum]
+                    _baseTopMbarPos[baseTopMbarTotnum][j]=get(1)
+                next j
+            endif
+        endif
+    next i
+endif
+
+tempNum=baseMbarTotnum
+_tempPoint=_baseMbarPoint
+_tempPos=_baseMbarPos
+gosub "pos_translation"
+
+parameters \
+baseMbarTotnum=baseMbarTotnum,
+baseMbarOd=baseMbarOd,
+baseMbarPen=baseMbarPen,
+baseMbarMat=baseMbarMat,
+baseMbarPoint=_baseMbarPoint,
+baseMbarPos=_transPos
+
+
+tempNum=baseTopMbarTotnum
+_tempPoint=_baseTopMbarPoint
+_tempPos=_baseTopMbarPos
+gosub "pos_translation"
+
+parameters \
+baseTopMbarTotnum=baseTopMbarTotnum,
+baseTopMbarOd=baseTopMbarOd,
+baseTopMbarPen=baseTopMbarPen,
+baseTopMbarMat=baseTopMbarMat,
+baseTopMbarPoint=_baseTopMbarPoint,
+baseTopMbarPos=_transPos
+
+
+!==================================段取り筋
+supportbarOd=od_list[supportbarNd]
+supportbarPen=SDpen[scode_list[supportbarNd]]
+supportbarMat=SDmat[scode_list[supportbarNd]]
+
+supportbarTotnum=0
+dim _supportbarPoint[],_supportbarPos[][]
+_supportbarPoint[1]=0
+_supportbarPos[1][1]=0
+_supportbarPos[1][2]=0
+
+supportbarPitch=(baseWid-2*baseSideCover-supportbarOd)/(supportbarNum-1)
+
+if startCorner=1 then
+    supportbarStartOffset=-(abs(startBaseWid)/2-baseSideCover)
+endif
+if startCorner=2 or startCorner=3 then
+    supportbarStartOffset=abs(startBaseWid)/2
+endif
+if startCorner=4 then
+    supportbarStartOffset=-(abs(startBaseWid)/2-baseSideCover)
+endif
+if startCorner=5 then
+    supportbarStartOffset=abs(startFootingWid)/2
+endif
+
+if endCorner=1 then
+    supportbarEndOffset=-(abs(endBaseWid)/2-baseSideCover)
+endif
+if endCorner=2 or endCorner=3 then
+    supportbarEndOffset=abs(endBaseWid)/2
+endif
+if endCorner=4 or endCorner=5 then
+    supportbarEndOffset=-(abs(endBaseWid)/2-baseSideCover)
+endif
+if endCorner=5 then
+    supportbarEndOffset=abs(endFootingWid)/2
+endif
+
+supportbarConnectNum=ceil((vertexLen-supportbarStartOffset-supportbarEndOffset)/connectLen)
+supportbarConnectNum=ceil((vertexLen-supportbarStartOffset-supportbarEndOffset+(supportbarConnectNum-1)*supportbarConnectLen)/connectLen)
+supportbarConnectUnitLen=(vertexLen+abs(startBaseWid)/2+abs(endBaseWid)/2-2*baseSideCover)/supportbarConnectNum
+
+if switchBaseBar and switchSupportbar then
+    !zpos
+    zpos=downLevel+baseDownCover-supportbarOd/2
+
+    for i=1 to supportbarNum
+        for j=1 to supportbarConnectNum
+            !xpos
+            if j=1 then
+                xpos1=supportbarStartOffset
+            else
+                xpos1=supportbarStartOffset+(j-1)*supportbarConnectUnitLen-supportbarConnectLen/2
+            endif
+
+            if j=supportbarConnectNum then
+                xpos2=vertexLen-supportbarEndOffset
+            else
+                xpos2=supportbarStartOffset+j*supportbarConnectUnitLen+supportbarConnectLen/2
+            endif
+
+            !ypos
+            if i=1 then
+                ypos=-(baseWid/2-baseSideCover-supportbarOd/2)+(1-2*fra(j/2))*supportbarOd
+            endif
+
+            if i>1 then
+                ypos=-(baseWid/2-baseSideCover-supportbarOd/2)+(i-1)*supportbarPitch-(1-2*fra(j/2))*supportbarOd
+            endif
+
+            if disSupportbar then
+                supportbarTotnum=supportbarTotnum+1
+                _supportbarPoint[supportbarTotnum]=2
+
+                put xpos1
+                put ypos
+                put zpos
+
+                put xpos2
+                put ypos
+                put zpos
+
+                for n=1 to 3*_supportbarPoint[supportbarTotnum]
+                    _supportbarPos[supportbarTotnum][n]=get(1)
+                next n
+            endif
+        next j
+    next i
+endif
+
+tempNum=supportbarTotnum
+_tempPoint=_supportbarPoint
+_tempPos=_supportbarPos
+gosub "pos_translation"
+
+parameters \
+supportbarTotnum=supportbarTotnum,
+supportbarOd=supportbarOd,
+supportbarPen=supportbarPen,
+supportbarMat=supportbarMat,
+supportbarPoint=_supportbarPoint,
+supportbarPos=_transPos
+
+
+!==================================stp
+stpOd=od_list[stpNd]
+stpPen=SDpen[scode_list[stpNd]]
+stpMat=SDmat[scode_list[stpNd]]
+
+stpTotnum=0
+dim _stpPoint[],_stpPos[][]
+_stpPoint[1]=0
+_stpPos[1][1]=0
+_stpPos[1][2]=0
+
+if switchStartUnit=1 then stpStartOffset=startUnitLen-abs(startFootingWid)/2+stpOd/2
+if switchEndUnit=1 then stpEndOffset=endUnitLen-abs(endFootingWid)/2+stpOd/2
+
+stpTotnum1=ceil((vertexLen-stpStartOffset-stpEndOffset)/stpPitch)+1
+stpPitch1=(vertexLen-stpStartOffset-stpEndOffset)/(stpTotnum1-1)
+
+if switchFootingBar then
+    for i=1 to stpTotnum1
+        !xpos
+        xpos=stpStartOffset+(i-1)*stpPitch1
+
+        !zpos
+        exisFlag=1
+        zpos1=footingLevel-footingTopCover-stpOd/2
+        zpos2=downLevel+baseDownCover+baseMbarOd+stpOd/2
+
+        if opNum>0 then
+            for j=1 to opNum
+                if xpos+stpOd/2>opPos[j][1]-opRefRange/2 and xpos-stpOd/2<opPos[j][1]+opRefRange/2 then
+                    exisFlag=0
+                endif
+            next j
+        endif
+
+        if disStp and exisFlag=1 then
+            !溶接
+            if stpShape=1 then
+                stpTotnum=stpTotnum+1
+                _stpPoint[stpTotnum]=6
+
+                put xpos
+                put -(footingWid/2-footingSideCover-stpOd/2)
+                put (zpos1+zpos2)/2
+
+                put xpos
+                put -(footingWid/2-footingSideCover-stpOd/2)
+                put zpos1
+
+                put xpos
+                put (footingWid/2-footingSideCover-stpOd/2)
+                put zpos1
+
+                put xpos
+                put (footingWid/2-footingSideCover-stpOd/2)
+                put zpos2
+
+                put xpos
+                put -(footingWid/2-footingSideCover-stpOd/2)
+                put zpos2
+
+                put xpos
+                put -(footingWid/2-footingSideCover-stpOd/2)
+                put (zpos1+zpos2)/2
+
+                for j=1 to 3*_stpPoint[stpTotnum]
+                    _stpPos[stpTotnum][j]=get(1)
+                next j
+            endif
+
+            !上部フック(両側)
+            if stpShape=2 then
+                stpTotnum=stpTotnum+1 
+                _stpPoint[stpTotnum]=7
+
+                put xpos
+                put -(footingWid/2-footingSideCover-stpOd/2)+(elbowRad*stpOd+6*stpNd/1000)/sqr(2)
+                put zpos1+elbowRad*stpOd-(elbowRad*stpOd+6*stpNd/1000)/sqr(2)
+
+                put xpos
+                put -(footingWid/2-footingSideCover-stpOd/2)
+                put zpos1+elbowRad*stpOd
+
+                put xpos
+                put -(footingWid/2-footingSideCover-stpOd/2)
+                put zpos2
+
+                put xpos
+                put (footingWid/2-footingSideCover-stpOd/2)
+                put zpos2
+
+                put xpos
+                put (footingWid/2-footingSideCover-stpOd/2)
+                put zpos1
+
+                put xpos
+                put -(footingWid/2-footingSideCover+stpOd/2)-elbowRad*stpOd
+                put zpos1
+
+                put xpos
+                put -(footingWid/2-footingSideCover+stpOd/2)-elbowRad*stpOd+(elbowRad*stpOd+6*stpNd/1000)/sqr(2)
+                put zpos1-(elbowRad*stpOd+6*stpNd/1000)/sqr(2)
+
+                for j=1 to 3*_stpPoint[stpTotnum]
+                    _stpPos[stpTotnum][j]=get(1)
+                next j
+            endif
+        endif
+    next i
+endif
+
+tempNum=stpTotnum
+_tempPoint=_stpPoint
+_tempPos=_stpPos
+gosub "pos_translation"
+
+parameters \
+stpTotnum=stpTotnum,
+stpOd=stpOd,
+stpPen=stpPen,
+stpMat=stpMat,
+stpPoint=_stpPoint,
+stpPos=_transPos
+
+
+!==================================上端筋
+topbarOd=od_list[topbarNd]
+topbarPen=SDpen[scode_list[topbarNd]]
+topbarMat=SDmat[scode_list[topbarNd]]
+
+topbarTotnum=0
+dim _topbarPoint[],_topbarPos[][]
+_topbarPoint[1]=0
+_topbarPos[1][1]=0
+_topbarPos[1][2]=0
+
+if switchStartUnit=0 then
+    if startCorner=3 then
+        topbarStartOffset=-(L1_list[sdType[scode_list[topbarNd]]][conFc]+L1Plus)/2*topbarNd/1000
+    else
+        topbarStartOffset=-abs(startFootingWid)/4
+    endif
+else
+    if (vertexRtz>=45 and vertexRtz<135) or (vertexRtz>=225 and vertexRtz<315) then
+        !張間方向
+        topbarStartOffset=abs(startFootingWid)/2
+    else
+        !桁行方向
+        topbarStartOffset=0
+    endif
+endif
+
+if switchEndUnit=0 then
+    if endCorner=3 then
+        topbarEndOffset=-(L1_list[sdType[scode_list[topbarNd]]][conFc]+L1Plus)/2*topbarNd/1000
+    else
+        topbarEndOffset=-abs(endFootingWid)/4
+    endif
+else
+    if (vertexRtz>=45 and vertexRtz<135) or (vertexRtz>=225 and vertexRtz<315) then
+        !張間方向
+        topbarEndOffset=abs(endFootingWid)/2
+    else
+        !桁行方向
+        topbarEndOffset=0
+    endif
+endif
+
+topbarConnectNum=ceil((vertexLen-topbarStartOffset-topbarEndOffset)/connectLen)
+topbarConnectNum=ceil((vertexLen-topbarStartOffset-topbarEndOffset+(topbarConnectNum-1)*(L1_list[sdType[scode_list[sidebarNd]]][conFc]+L1Plus)*sidebarNd/1000)/connectLen)
+topbarConnectUnitLen=(vertexLen-topbarStartOffset-topbarEndOffset)/topbarConnectNum
+
+if switchFootingBar then
+    for i=1 to topbarNum
+        for j=1 to topbarConnectNum
+            !xpos
+            if j=1 then
+                if switchStartUnit=0 then
+                    if i<=2 then
+                        xpos1=topbarStartOffset-topbarOd/2
+                    else
+                        xpos1=topbarStartOffset+topbarOd/2
+                    endif
+                else
+                    xpos1=topbarStartOffset
+                endif
+            else
+                xpos1=topbarStartOffset+(j-1)*topbarConnectUnitLen-(L1_list[sdType[scode_list[topbarNd]]][conFc]+L1Plus)/2*topbarNd/1000
+            endif
+
+            if j=topbarConnectNum then
+                if switchEndUnit=0 then
+                    if i<=2 then
+                        xpos2=vertexLen-topbarEndOffset+topbarOd/2
+                    else
+                        xpos2=vertexLen-topbarEndOffset-topbarOd/2
+                    endif
+                else
+                    xpos2=vertexLen-topbarEndOffset
+                endif
+            else
+                xpos2=topbarStartOffset+j*topbarConnectUnitLen+(L1_list[sdType[scode_list[topbarNd]]][conFc]+L1Plus)/2*topbarNd/1000
+            endif
+
+            !ypos
+            if i%2=1 then
+                ypos=(footingWid/2-footingSideCover-stpOd-topbarOd/2)
+            else
+                ypos=-(footingWid/2-footingSideCover-stpOd-topbarOd/2)
+            endif
+
+            !zpos
+            if i<=2 then
+                zpos=footingLevel-footingTopCover-stpOd/2-elbowRad*stpOd-(1-j%2)*topbarOd
+            else
+                zpos=footingLevel-footingTopCover-stpOd/2-elbowRad*stpOd-2*topbarOd-(1-j%2)*topbarOd
+            endif
+
+            if disTopbar then
+                topbarTotnum=topbarTotnum+1
+                _topbarPoint[topbarTotnum]=2
+
+                if j=1 and switchStartUnit=0 and startCorner<>3 then !始点側下アンカー
+                    startAnchorFra=max((L2_list[sdType[scode_list[topbarNd]]][conFc]+L2Plus)*topbarNd/1000-abs(startFootingWid)*3/4,8*topbarNd/1000) !余長
+
+                    _topbarPoint[topbarTotnum]=_topbarPoint[topbarTotnum]+1
+                    put xpos1
+                    put ypos
+                    put zpos-elbowRad*topbarOd-startAnchorFra
+                endif
+
+                put xpos1
+                put ypos
+                put zpos
+
+                put xpos2
+                put ypos
+                put zpos
+
+                if j=topbarConnectNum and switchEndUnit=0 and endCorner<>3 then !終点側下アンカー
+                    endAnchorFra=max((L2_list[sdType[scode_list[topbarNd]]][conFc]+L2Plus)*topbarNd/1000-abs(endFootingWid)*3/4,8*topbarNd/1000) !余長
+
+                    _topbarPoint[topbarTotnum]=_topbarPoint[topbarTotnum]+1
+                    put xpos2
+                    put ypos
+                    put zpos-elbowRad*topbarOd-endAnchorFra
+                endif
+
+                for n=1 to 3*_topbarPoint[topbarTotnum]
+                    _topbarPos[topbarTotnum][n]=get(1)
+                next n
+            endif
+        next j
+    next i
+endif
+
+tempNum=topbarTotnum
+_tempPoint=_topbarPoint
+_tempPos=_topbarPos
+gosub "pos_translation"
+
+parameters \
+topbarTotnum=topbarTotnum,
+topbarOd=topbarOd,
+topbarPen=topbarPen,
+topbarMat=topbarMat,
+topbarPoint=_topbarPoint,
+topbarPos=_transPos
+
+
+!==================================下端筋
+downbarOd=od_list[downbarNd]
+downbarPen=SDpen[scode_list[downbarNd]]
+downbarMat=SDmat[scode_list[downbarNd]]
+
+downbarTotnum=0
+dim _downbarPoint[],_downbarPos[][]
+_downbarPoint[1]=0
+_downbarPos[1][1]=0
+_downbarPos[1][2]=0
+
+!下端主筋(第一鉄筋)
+if switchStartUnit=0 then 
+    if startCorner<3 then downbarStartOffset=-abs(startBaseWid)/3
+    if startCorner=3 then downbarStartOffset=-(L1_list[sdType[scode_list[downbarNd]]][conFc]+L1Plus)/2*downbarNd/1000
+    if startCorner=4 or startCorner=5 then downbarStartOffset=-abs(startBaseWid)/2+baseSideCover
+else
+    if (vertexRtz>=45 and vertexRtz<135) or (vertexRtz>=225 and vertexRtz<315) then 
+        !張間方向
+        downbarStartOffset=abs(startFootingWid)/2
+    else
+        !桁行方向
+        downbarStartOffset=0
+    endif
+endif
+
+if switchEndUnit=0 then
+    if endCorner<3 then downbarEndOffset=-abs(endBaseWid)/3
+    if endCorner=3 then downbarEndOffset=-(L1_list[sdType[scode_list[downbarNd]]][conFc]+L1Plus)/2*downbarNd/1000
+    if endCorner=4 or endCorner=5 then downbarEndOffset=-abs(endBaseWid)/2+baseSideCover
+else
+    if (vertexRtz>=45 and vertexRtz<135) or (vertexRtz>=225 and vertexRtz<315) then
+        !張間方向
+        downbarEndOffset=abs(endFootingWid)/2
+    else
+        !桁行方向
+        downbarEndOffset=0
+    endif
+endif
+
+downbarConnectNum=ceil((vertexLen-downbarStartOffset-downbarEndOffset)/connectLen)
+downbarConnectNum=ceil((vertexLen-downbarStartOffset-downbarEndOffset+(downbarConnectNum-1)*(L1_list[sdType[scode_list[sidebarNd]]][conFc]+L1Plus)*sidebarNd/1000)/connectLen)
+downbarConnectUnitLen=(vertexLen-downbarStartOffset-downbarEndOffset)/downbarConnectNum
+
+if switchFootingBar then
+    for i=1 to 2
+        for j=1 to downbarConnectNum
+            !xpos
+            if j=1 then
+                xpos1=downbarStartOffset
+            else
+                xpos1=downbarStartOffset+(j-1)*downbarConnectUnitLen-(L2_list[sdType[scode_list[downbarNd]]][conFc]+L1Plus)/2*downbarNd/1000
+            endif
+
+            if j=downbarConnectNum then
+                xpos2=vertexLen-downbarEndOffset
+            else
+                xpos2=downbarStartOffset+j*downbarConnectUnitLen+(L2_list[sdType[scode_list[downbarNd]]][conFc]+L1Plus)/2*downbarNd/1000
+            endif
+
+            !ypos
+            if i=1 then ypos=-(footingWid/2-footingSideCover-stpOd-downbarOd/2)
+            if i=2 then ypos=(footingWid/2-footingSideCover-stpOd-downbarOd/2)
+
+            !zpos
+            zpos=downLevel+baseDownCover+baseMbarOd+stpOd/2+elbowRad*stpOd+(1-j%2)*downbarOd
+
+            if disDownbar then
+                downbarTotnum=downbarTotnum+1
+                _downbarPoint[downbarTotnum]=2
+
+                if j=1 and switchStartUnit=0 and startCorner<>3 and startCorner<>4 then !始点側横アンカー
+                    !余長
+                    if i=1 then startAnchorFra=-(max((L2_list[sdType[scode_list[downbarNd]]][conFc]+L2Plus)*downbarNd/1000-abs(startBaseWid)*5/6,8*downbarNd/1000)+elbowRad*downbarOd)
+                    if i=2 then startAnchorFra=(max((L2_list[sdType[scode_list[downbarNd]]][conFc]+L2Plus)*downbarNd/1000-abs(startBaseWid)*5/6,8*downbarNd/1000)+elbowRad*downbarOd)
+
+                    _downbarPoint[downbarTotnum]=_downbarPoint[downbarTotnum]+1
+                    put xpos1
+                    put ypos+startAnchorFra
+                    put zpos
+                endif
+
+                put xpos1
+                put ypos
+                put zpos
+
+                put xpos2
+                put ypos
+                put zpos
+
+                if j=downbarConnectNum and switchEndUnit=0 and endCorner<>3 and endCorner<>4 then !始点側横アンカー
+                    !余長
+                    if i=1 then endAnchorFra=-(max((L2_list[sdType[scode_list[downbarNd]]][conFc]+L2Plus)*downbarNd/1000-abs(endBaseWid)*5/6,8*downbarNd/1000)+elbowRad*downbarOd)
+                    if i=2 then endAnchorFra=(max((L2_list[sdType[scode_list[downbarNd]]][conFc]+L2Plus)*downbarNd/1000-abs(endBaseWid)*5/6,8*downbarNd/1000)+elbowRad*downbarOd)
+
+                    _downbarPoint[downbarTotnum]=_downbarPoint[downbarTotnum]+1
+                    put xpos2
+                    put ypos+endAnchorFra
+                    put zpos
+                endif
+
+                for n=1 to 3*_downbarPoint[downbarTotnum]
+                    _downbarPos[downbarTotnum][n]=get(1)
+                next n
+            endif
+        next j
+    next i
+
+    !下端主筋(第二鉄筋)
+    if downbarNum>2 then
+        if switchStartUnit=0 then
+            if startCorner=3 then
+                downbarStartOffset=-(L1_list[sdType[scode_list[downbarNd]]][conFc]+L1Plus)/2*downbarNd/1000
+            else
+                downbarStartOffset=-abs(startFootingWid)/4
+            endif
+        else
+            if (vertexRtz>=45 and vertexRtz<135) or (vertexRtz>=225 and vertexRtz<315) then
+                !張間方向
+                downbarStartOffset=abs(startFootingWid)/2
+            else
+                !桁行方向
+                downbarStartOffset=0
+            endif
+        endif
+
+        if switchEndUnit=0 then
+            if endCorner=3 then
+                downbarEndOffset=-(L1_list[sdType[scode_list[downbarNd]]][conFc]+L1Plus)/2*downbarNd/1000
+            else
+                downbarEndOffset=-abs(endFootingWid)/4
+            endif
+        else
+            if (vertexRtz>=45 and vertexRtz<135) or (vertexRtz>=225 and vertexRtz<315) then
+                !張間方向
+                downbarEndOffset=abs(endFootingWid)/2
+            else
+                !桁行方向
+                downbarEndOffset=0
+            endif
+        endif
+
+        downbarConnectNum=ceil((vertexLen-downbarStartOffset-downbarEndOffset)/connectLen)
+        downbarConnectNum=ceil((vertexLen-downbarStartOffset-downbarEndOffset+(downbarConnectNum-1)*(L1_list[sdType[scode_list[sidebarNd]]][conFc]+L1Plus)*sidebarNd/1000)/connectLen)
+        downbarConnectUnitLen=(vertexLen-downbarStartOffset-downbarEndOffset)/downbarConnectNum
+
+        for i=1 to downbarNum-2
+            for j=1 to downbarConnectNum
+                !xpos
+                if j=1 then
+                    xpos1=downbarStartOffset
+                else
+                    xpos1=downbarStartOffset+(j-1)*downbarConnectUnitLen-(L2_list[sdType[scode_list[downbarNd]]][conFc]+L1Plus)/2*downbarNd/1000
+                endif
+
+                if j=downbarConnectNum then
+                    xpos2=vertexLen-downbarEndOffset
+                else
+                    xpos2=downbarStartOffset+j*downbarConnectUnitLen+(L2_list[sdType[scode_list[downbarNd]]][conFc]+L1Plus)/2*downbarNd/1000
+                endif
+
+                !ypos
+                if i=1 then ypos=-(footingWid/2-footingSideCover-stpOd-downbarOd/2)
+                if i=2 then ypos=(footingWid/2-footingSideCover-stpOd-downbarOd/2)
+
+                !zpos
+                zpos=downLevel+baseDownCover+baseMbarOd+stpOd/2+elbowRad*stpOd+2*downbarOd+(1-j%2)*downbarOd
+
+                if disDownbar then
+                    downbarTotnum=downbarTotnum+1
+                    _downbarPoint[downbarTotnum]=2
+
+                    if j=1 and switchStartUnit=0 and startCorner<>3 then !始点側上アンカー
+                        _downbarPoint[downbarTotnum]=_downbarPoint[downbarTotnum]+1
+                        put xpos1
+                        put ypos
+                        put zpos+elbowRad*downbarOd+(L2_list[sdType[scode_list[downbarNd]]][conFc]+L2Plus)*downbarNd/1000
+                    endif
+
+                    put xpos1
+                    put ypos
+                    put zpos
+
+                    put xpos2
+                    put ypos
+                    put zpos
+
+                    if j=downbarConnectNum and switchEndUnit=0 and endCorner<>3 then !終点側下アンカー
+                        _downbarPoint[downbarTotnum]=_downbarPoint[downbarTotnum]+1
+                        put xpos2
+                        put ypos
+                        put zpos+elbowRad*downbarOd+(L2_list[sdType[scode_list[downbarNd]]][conFc]+L2Plus)*downbarNd/1000
+                    endif
+
+                    for n=1 to 3*_downbarPoint[downbarTotnum]
+                        _downbarPos[downbarTotnum][n]=get(1)
+                    next n
+                endif
+            next j
+        next i
+    endif
+endif
+
+tempNum=downbarTotnum
+_tempPoint=_downbarPoint
+_tempPos=_downbarPos
+gosub "pos_translation"
+
+parameters \
+downbarTotnum=downbarTotnum,
+downbarOd=downbarOd,
+downbarPen=downbarPen,
+downbarMat=downbarMat,
+downbarPoint=_downbarPoint,
+downbarPos=_transPos
+
+
+!==================================腹筋
+sidebarOd=od_list[sidebarNd]
+sidebarPen=SDpen[scode_list[sidebarNd]]
+sidebarMat=SDmat[scode_list[sidebarNd]]
+
+sidebarTotnum=0
+dim _sidebarPoint[],_sidebarPos[][]
+_sidebarPoint[1]=0
+_sidebarPos[1][1]=0
+_sidebarPos[1][2]=0
+
+if startCorner=3 then
+    sidebarStartOffset=-(L1_list[sdType[scode_list[sidebarNd]]][conFc]+L1Plus)/2*sidebarNd/1000
+else
+    sidebarStartOffset=abs(startFootingWid)/2
+endif
+
+if endCorner=3 then
+    sidebarEndOffset=-(L1_list[sdType[scode_list[sidebarNd]]][conFc]+L1Plus)/2*sidebarNd/1000
+else
+    sidebarEndOffset=abs(endFootingWid)/2
+endif
+
+sidebarPitch=((footingLevel-footingTopCover-stpOd/2-elbowRad*stpOd)-(downLevel+baseDownCover+baseMbarOd+stpOd/2+elbowRad*stpOd))/(sidebarNum/2+1)
+
+if switchFootingBar then
+    for i=1 to sidebarNum/2
+        !zpos
+        zpos=(downLevel+baseDownCover+baseMbarOd+stpOd/2+elbowRad*stpOd)+i*sidebarPitch
+
+        unitNum=1
+        dim _unitEdgePos[][]
+
+        put sidebarStartOffset
+        if opNum>0 then
+            for j=1 to opNum
+                if zpos+sidebarOd/2>downLevel+opPos[j][2]-opSize[j][2]/2-opCover-(elbowRad+0.5)*stpOd and zpos-sidebarOd/2<downLevel+opPos[j][2]+opSize[j][2]/2+opCover+(elbowRad+0.5)*stpOd then
+                    unitNum=unitNum+1
+                    put opPos[j][1]-opSize[j][1]/2-opCover
+                    put opPos[j][1]+opSize[j][1]/2+opCover
+                endif
+            next j
+        endif
+        put vertexLen-sidebarEndOffset
+
+        for m=1 to unitNum
+            _unitEdgePos[m][1]=get(1)
+            _unitEdgePos[m][2]=get(1)
+        next m
+
+        for m=1 to unitNum
+            sidebarConnectNum=ceil((_unitEdgePos[m][2]-_unitEdgePos[m][1])/connectLen)
+            sidebarConnectNum=ceil((_unitEdgePos[m][2]-_unitEdgePos[m][1]+(sidebarConnectNum-1)*(L1_list[sdType[scode_list[sidebarNd]]][conFc]+L1Plus)*sidebarNd/1000)/connectLen)
+            sidebarConnectUnitLen=(_unitEdgePos[m][2]-_unitEdgePos[m][1])/sidebarConnectNum
+
+            for j=1 to sidebarConnectNum
+                !xpos
+                if j=1 then
+                    xpos1=_unitEdgePos[m][1]
+                else
+                    xpos1=_unitEdgePos[m][1]+(j-1)*sidebarConnectUnitLen-(L1_list[sdType[scode_list[sidebarNd]]][conFc]+L1Plus)/2*sidebarNd/1000
+                endif
+
+                if j=sidebarConnectNum then
+                    xpos2=_unitEdgePos[m][2]
+                else
+                    xpos2=_unitEdgePos[m][1]+j*sidebarConnectUnitLen+(L1_list[sdType[scode_list[sidebarNd]]][conFc]+L1Plus)/2*sidebarNd/1000
+                endif
+
+                if disSidebar then
+                    sidebarTotnum=sidebarTotnum+1
+                    _sidebarPoint[sidebarTotnum]=2
+
+                    put xpos1
+                    put -(footingWid/2-footingSideCover-stpOd-sidebarOd/2)
+                    put zpos-(1-j%2)*sidebarOd
+
+                    put xpos2
+                    put -(footingWid/2-footingSideCover-stpOd-sidebarOd/2)
+                    put zpos-(1-j%2)*sidebarOd
+
+                    for n=1 to 3*_sidebarPoint[sidebarTotnum]
+                        _sidebarPos[sidebarTotnum][n]=get(1)
+                    next n
+
+                    sidebarTotnum=sidebarTotnum+1
+                    _sidebarPoint[sidebarTotnum]=2
+
+                    put xpos1
+                    put (footingWid/2-footingSideCover-stpOd-sidebarOd/2)
+                    put zpos-(1-j%2)*sidebarOd
+
+                    put xpos2
+                    put (footingWid/2-footingSideCover-stpOd-sidebarOd/2)
+                    put zpos-(1-j%2)*sidebarOd
+
+                    for n=1 to 3*_sidebarPoint[sidebarTotnum]
+                        _sidebarPos[sidebarTotnum][n]=get(1)
+                    next n
+                endif
+            next j        
+        next m
+    next i
+endif
+
+tempNum=sidebarTotnum
+_tempPoint=_sidebarPoint
+_tempPos=_sidebarPos
+gosub "pos_translation"
+
+parameters \
+sidebarTotnum=sidebarTotnum,
+sidebarOd=sidebarOd,
+sidebarPen=sidebarPen,
+sidebarMat=sidebarMat,
+sidebarPoint=_sidebarPoint,
+sidebarPos=_transPos
+
+
+!==================================幅止め筋
+sprbarOd=od_list[sprbarNd]
+sprbarPen=SDpen[scode_list[sprbarNd]]
+sprbarMat=SDmat[scode_list[sprbarNd]]
+
+sprbarTotnum=0
+dim _sprbarPoint[],_sprbarPos[][]
+_sprbarPoint[1]=0
+_sprbarPos[1][1]=0
+_sprbarPos[1][2]=0
+
+sprbarTotnum1=ceil((vertexLen-stpStartOffset-stpEndOffset)/sprbarPitch)+1
+sprbarPitch1=(vertexLen-stpStartOffset-stpEndOffset)/(sprbarTotnum1-1)
+
+if switchFootingBar then
+    for j=1 to sprbarTotnum1
+        !xpos
+        xpos=stpStartOffset+(j-1)*sprbarPitch1+stpOd/2+sprbarOd/2
+
+        for i=1 to sidebarNum/2
+            !zpos
+            zpos=(downLevel+baseDownCover+baseMbarOd+stpOd/2+elbowRad*stpOd)+i*sidebarPitch-sidebarOd/2+elbowRad*sprbarOd
+
+            exisFlag=1
+
+            if opNum>0 then
+                for n=1 to opNum
+                    if xpos+sprbarOd/2>opPos[n][1]-opSize[n][1]/2-opCover and xpos-sprbarOd/2<opPos[n][1]+opSize[n][1]/2+opCover then
+                        exisFlag=0
+                    endif
+                next n
+            endif
+
+            if disSprbar and exisFlag=1 then
+                sprbarTotnum=sprbarTotnum+1
+                _sprbarPoint[sprbarTotnum]=4
+
+                put xpos
+                put -(footingWid/2-footingSideCover-stpOd+sprbarOd/2)
+                put zpos-elbowRad*sprbarOd-4*sprbarNd/1000
+
+                put xpos
+                put -(footingWid/2-footingSideCover-stpOd+sprbarOd/2)
+                put zpos
+
+                put xpos
+                put footingWid/2-footingSideCover-stpOd-sidebarOd/2+(elbowRad*sprbarOd)/tan(22.5)-stpOd
+                put zpos
+
+                put xpos
+                put footingWid/2-footingSideCover-stpOd-sidebarOd/2+(elbowRad*sprbarOd)/tan(22.5)-stpOd-((elbowRad*sprbarOd)/tan(22.5)+4*sprbarNd/1000)/sqr(2)
+                put zpos-((elbowRad*sprbarOd)/tan(22.5)+4*sprbarNd/1000)/sqr(2)
+
+                for n=1 to 3*_sprbarPoint[sprbarTotnum]
+                _sprbarPos[sprbarTotnum][n]=get(1)
+                next n
+            endif
+        next i
+    next j
+endif
+
+tempNum=sprbarTotnum
+_tempPoint=_sprbarPoint
+_tempPos=_sprbarPos
+gosub "pos_translation"
+
+parameters \
+sprbarTotnum=sprbarTotnum,
+sprbarOd=sprbarOd,
+sprbarPen=sprbarPen,
+sprbarMat=sprbarMat,
+sprbarPoint=_sprbarPoint,
+sprbarPos=_transPos
+
+
+!==================================ユニット横補強筋
+horbarOd=od_list[horbarNd]
+horbarPen=SDpen[scode_list[horbarNd]]
+horbarMat=SDmat[scode_list[horbarNd]]
+
+horbarTotnum=0
+dim _horbarPoint[],_horbarPos[][]
+_horbarPoint[1]=0
+_horbarPos[1][1]=0
+_horbarPos[1][2]=0
+
+horbarTopRange=footingLevel-footingTopCover-stpOd/2-elbowRad*stpOd+topbarOd/2+horbarOd/2
+horbarDownRange=downLevel+baseDownCover+baseMbarOd+baseDbarOd+od_list[verbarNd]/2+elbowRad*od_list[verbarNd]
+horbarNum=ceil((horbarTopRange-horbarDownRange)/horbarPitch)+1
+horbarEdgeOffset=((horbarTopRange-horbarDownRange)-(horbarNum-3)*horbarPitch)/2
+
+if switchFootingBar then
+    for i=1 to horbarNum
+        !zpos
+        if (vertexRtz>=45 and vertexRtz<135) or (vertexRtz>=225 and vertexRtz<315) then
+            !張間方向
+            horbarZposOffset=0
+        else
+            !桁行方向
+            horbarZposOffset=horbarOd
+        endif
+        if i=1 then zpos=horbarDownRange+horbarZposOffset
+        if i>1 and i<horbarNum then zpos=horbarDownRange+horbarEdgeOffset+(i-2)*horbarPitch+horbarZposOffset
+        if i=horbarNum then zpos=horbarTopRange+horbarZposOffset
+
+        !始点コーナーユニットあり
+        if switchStartUnit and disHorbar then
+            horbarTotnum=horbarTotnum+1
+            _horbarPoint[horbarTotnum]=6
+
+            put startUnitLen-abs(startFootingWid)/2-unitSideCover-horbarOd/2
+            put 0
+            put zpos
+
+            put startUnitLen-abs(startFootingWid)/2-unitSideCover-horbarOd/2
+            put (footingWid/2-unitSideCover-horbarOd/2)
+            put zpos
+
+            put -abs(startFootingWid)/2+unitSideCover+horbarOd/2
+            put (footingWid/2-unitSideCover-horbarOd/2)
+            put zpos
+
+            put -abs(startFootingWid)/2+unitSideCover+horbarOd/2
+            put -(footingWid/2-unitSideCover-horbarOd/2)
+            put zpos
+
+            put startUnitLen-abs(startFootingWid)/2-unitSideCover-horbarOd/2
+            put -(footingWid/2-unitSideCover-horbarOd/2)
+            put zpos
+
+            put startUnitLen-abs(startFootingWid)/2-unitSideCover-horbarOd/2
+            put 0
+            put zpos
+
+            for j=1 to 3*_horbarPoint[horbarTotnum]
+                _horbarPos[horbarTotnum][j]=get(1)
+            next j
+        endif
+
+        !終点コーナーユニットあり
+        if switchEndUnit and disHorbar then
+            horbarTotnum=horbarTotnum+1
+            _horbarPoint[horbarTotnum]=6
+
+            put vertexLen-(endUnitLen-abs(endFootingWid)/2)+unitSideCover+horbarOd/2
+            put 0
+            put zpos
+
+            put vertexLen-(endUnitLen-abs(endFootingWid)/2)+unitSideCover+horbarOd/2
+            put (footingWid/2-unitSideCover-horbarOd/2)
+            put zpos
+
+            put vertexLen+abs(endFootingWid)/2-unitSideCover-horbarOd/2
+            put (footingWid/2-unitSideCover-horbarOd/2)
+            put zpos
+
+            put vertexLen+abs(endFootingWid)/2-unitSideCover-horbarOd/2
+            put -(footingWid/2-unitSideCover-horbarOd/2)
+            put zpos
+
+            put vertexLen-(endUnitLen-abs(endFootingWid)/2)+unitSideCover+horbarOd/2
+            put -(footingWid/2-unitSideCover-horbarOd/2)
+            put zpos
+
+            put vertexLen-(endUnitLen-abs(endFootingWid)/2)+unitSideCover+horbarOd/2
+            put 0
+            put zpos
+
+            for j=1 to 3*_horbarPoint[horbarTotnum]
+                _horbarPos[horbarTotnum][j]=get(1)
+            next j
+        endif
+    next i
+endif
+
+tempNum=horbarTotnum
+_tempPoint=_horbarPoint
+_tempPos=_horbarPos
+gosub "pos_translation"
+
+parameters \
+horbarTotnum=horbarTotnum,
+horbarOd=horbarOd,
+horbarPen=horbarPen,
+horbarMat=horbarMat,
+horbarPoint=_horbarPoint,
+horbarPos=_transPos
+
+
+!==================================ユニット縦補強筋
+verbarOd=od_list[verbarNd]
+verbarPen=SDpen[scode_list[verbarNd]]
+verbarMat=SDmat[scode_list[verbarNd]]
+
+verbarTotnum=0
+dim _verbarPoint[],_verbarPos[][]
+_verbarPoint[1]=0
+_verbarPos[1][1]=0
+_verbarPos[1][2]=0
+
+!zpos
+zpos1=footingLevel-footingTopCover
+zpos2=downLevel+baseDownCover+baseMbarOd+baseDbarOd+verbarOd/2
+
+if switchFootingBar then
+    !始点コーナーユニットあり
+    if switchStartUnit and disVerbar then
+        verbarTotnum=verbarTotnum+1
+        _verbarPoint[verbarTotnum]=3
+
+        put startUnitLen-abs(startFootingWid)/2-unitSideCover-horbarOd/2-elbowRad*horbarOd
+        put (footingWid/2-unitSideCover-horbarOd-verbarOd/2)
+        put zpos1
+
+        put startUnitLen-abs(startFootingWid)/2-unitSideCover-horbarOd/2-elbowRad*horbarOd
+        put (footingWid/2-unitSideCover-horbarOd-verbarOd/2)
+        put zpos2
+
+        put startUnitLen-abs(startFootingWid)/2-unitSideCover-horbarOd/2-elbowRad*horbarOd+(elbowRad*verbarOd+8*verbarNd/1000)/sqr(2)
+        put (footingWid/2-unitSideCover-horbarOd-verbarOd/2)+(elbowRad*verbarOd+8*verbarNd/1000)/sqr(2)
+        put zpos2
+
+        for j=1 to 3*_verbarPoint[verbarTotnum]
+            _verbarPos[verbarTotnum][j]=get(1)
+        next j
+
+        verbarTotnum=verbarTotnum+1
+        _verbarPoint[verbarTotnum]=3
+
+        put startUnitLen-abs(startFootingWid)/2-unitSideCover-horbarOd/2-elbowRad*horbarOd
+        put -(footingWid/2-unitSideCover-horbarOd-verbarOd/2)
+        put zpos1
+
+        put startUnitLen-abs(startFootingWid)/2-unitSideCover-horbarOd/2-elbowRad*horbarOd
+        put -(footingWid/2-unitSideCover-horbarOd-verbarOd/2)
+        put zpos2
+
+        put startUnitLen-abs(startFootingWid)/2-unitSideCover-horbarOd/2-elbowRad*horbarOd+(elbowRad*verbarOd+8*verbarNd/1000)/sqr(2)
+        put -(footingWid/2-unitSideCover-horbarOd-verbarOd/2)-(elbowRad*verbarOd+8*verbarNd/1000)/sqr(2)
+        put zpos2
+
+        for j=1 to 3*_verbarPoint[verbarTotnum]
+            _verbarPos[verbarTotnum][j]=get(1)
+        next j
+
+        !張間方向
+        if (vertexRtz>=45 and vertexRtz<135) or (vertexRtz>=225 and vertexRtz<315) then
+            verbarTotnum=verbarTotnum+1
+            _verbarPoint[verbarTotnum]=3
+
+            put -abs(startFootingWid)/2+unitSideCover+horbarOd/2+elbowRad*horbarOd
+            put (footingWid/2-unitSideCover-horbarOd-verbarOd/2)
+            put zpos1
+
+            put -abs(startFootingWid)/2+unitSideCover+horbarOd/2+elbowRad*horbarOd
+            put (footingWid/2-unitSideCover-horbarOd-verbarOd/2)
+            put zpos2
+
+            put -abs(startFootingWid)/2+unitSideCover+horbarOd/2+elbowRad*horbarOd-(elbowRad*verbarOd+8*verbarNd/1000)/sqr(2)
+            put (footingWid/2-unitSideCover-horbarOd-verbarOd/2)+(elbowRad*verbarOd+8*verbarNd/1000)/sqr(2)
+            put zpos2
+
+            for j=1 to 3*_verbarPoint[verbarTotnum]
+                _verbarPos[verbarTotnum][j]=get(1)
+            next j
+
+            verbarTotnum=verbarTotnum+1
+            _verbarPoint[verbarTotnum]=3
+
+            put -abs(startFootingWid)/2+unitSideCover+horbarOd/2+elbowRad*horbarOd
+            put -(footingWid/2-unitSideCover-horbarOd-verbarOd/2)
+            put zpos1
+
+            put -abs(startFootingWid)/2+unitSideCover+horbarOd/2+elbowRad*horbarOd
+            put -(footingWid/2-unitSideCover-horbarOd-verbarOd/2)
+            put zpos2
+
+            put -abs(startFootingWid)/2+unitSideCover+horbarOd/2+elbowRad*horbarOd-(elbowRad*verbarOd+8*verbarNd/1000)/sqr(2)
+            put -(footingWid/2-unitSideCover-horbarOd-verbarOd/2)-(elbowRad*verbarOd+8*verbarNd/1000)/sqr(2)
+            put zpos2
+
+            for j=1 to 3*_verbarPoint[verbarTotnum]
+                _verbarPos[verbarTotnum][j]=get(1)
+            next j
+        endif
+    endif
+
+    !終点コーナーユニットあり
+    if switchEndUnit and disVerbar then
+        verbarTotnum=verbarTotnum+1
+        _verbarPoint[verbarTotnum]=3
+
+        put vertexLen-(endUnitLen-abs(endFootingWid)/2)+unitSideCover+horbarOd/2+elbowRad*horbarOd
+        put (footingWid/2-unitSideCover-horbarOd-verbarOd/2)
+        put zpos1
+
+        put vertexLen-(endUnitLen-abs(endFootingWid)/2)+unitSideCover+horbarOd/2+elbowRad*horbarOd
+        put (footingWid/2-unitSideCover-horbarOd-verbarOd/2)
+        put zpos2
+
+        put vertexLen-(endUnitLen-abs(endFootingWid)/2)+unitSideCover+horbarOd/2+elbowRad*horbarOd-(elbowRad*verbarOd+8*verbarNd/1000)/sqr(2)
+        put (footingWid/2-unitSideCover-horbarOd-verbarOd/2)+(elbowRad*verbarOd+8*verbarNd/1000)/sqr(2)
+        put zpos2
+
+        for j=1 to 3*_verbarPoint[verbarTotnum]
+            _verbarPos[verbarTotnum][j]=get(1)
+        next j
+
+        verbarTotnum=verbarTotnum+1
+        _verbarPoint[verbarTotnum]=3
+
+        put vertexLen-(endUnitLen-abs(endFootingWid)/2)+unitSideCover+horbarOd/2+elbowRad*horbarOd
+        put -(footingWid/2-unitSideCover-horbarOd-verbarOd/2)
+        put zpos1
+
+        put vertexLen-(endUnitLen-abs(endFootingWid)/2)+unitSideCover+horbarOd/2+elbowRad*horbarOd
+        put -(footingWid/2-unitSideCover-horbarOd-verbarOd/2)
+        put zpos2
+
+        put vertexLen-(endUnitLen-abs(endFootingWid)/2)+unitSideCover+horbarOd/2+elbowRad*horbarOd-(elbowRad*verbarOd+8*verbarNd/1000)/sqr(2)
+        put -(footingWid/2-unitSideCover-horbarOd-verbarOd/2)-(elbowRad*verbarOd+8*verbarNd/1000)/sqr(2)
+        put zpos2
+
+        for j=1 to 3*_verbarPoint[verbarTotnum]
+            _verbarPos[verbarTotnum][j]=get(1)
+        next j
+
+        !張間方向
+        if (vertexRtz>=45 and vertexRtz<135) or (vertexRtz>=225 and vertexRtz<315) then
+            verbarTotnum=verbarTotnum+1
+            _verbarPoint[verbarTotnum]=3
+
+            put vertexLen+abs(endFootingWid)/2-unitSideCover-horbarOd/2-elbowRad*horbarOd
+            put (footingWid/2-unitSideCover-horbarOd-verbarOd/2)
+            put zpos1
+
+            put vertexLen+abs(endFootingWid)/2-unitSideCover-horbarOd/2-elbowRad*horbarOd
+            put (footingWid/2-unitSideCover-horbarOd-verbarOd/2)
+            put zpos2
+
+            put vertexLen+abs(endFootingWid)/2-unitSideCover-horbarOd/2-elbowRad*horbarOd+(elbowRad*verbarOd+8*verbarNd/1000)/sqr(2)
+            put (footingWid/2-unitSideCover-horbarOd-verbarOd/2)+(elbowRad*verbarOd+8*verbarNd/1000)/sqr(2)
+            put zpos2
+
+            for j=1 to 3*_verbarPoint[verbarTotnum]
+                _verbarPos[verbarTotnum][j]=get(1)
+            next j
+
+            verbarTotnum=verbarTotnum+1
+            _verbarPoint[verbarTotnum]=3
+
+            put vertexLen+abs(endFootingWid)/2-unitSideCover-horbarOd/2-elbowRad*horbarOd
+            put -(footingWid/2-unitSideCover-horbarOd-verbarOd/2)
+            put zpos1
+
+            put vertexLen+abs(endFootingWid)/2-unitSideCover-horbarOd/2-elbowRad*horbarOd
+            put -(footingWid/2-unitSideCover-horbarOd-verbarOd/2)
+            put zpos2
+
+            put vertexLen+abs(endFootingWid)/2-unitSideCover-horbarOd/2-elbowRad*horbarOd+(elbowRad*verbarOd+8*verbarNd/1000)/sqr(2)
+            put -(footingWid/2-unitSideCover-horbarOd-verbarOd/2)-(elbowRad*verbarOd+8*verbarNd/1000)/sqr(2)
+            put zpos2
+
+            for j=1 to 3*_verbarPoint[verbarTotnum]
+                _verbarPos[verbarTotnum][j]=get(1)
+            next j
+        endif
+    endif
+endif
+
+tempNum=verbarTotnum
+_tempPoint=_verbarPoint
+_tempPos=_verbarPos
+gosub "pos_translation"
+
+parameters \
+verbarTotnum=verbarTotnum,
+verbarOd=verbarOd,
+verbarPen=verbarPen,
+verbarMat=verbarMat,
+verbarPoint=_verbarPoint,
+verbarPos=_transPos
+
+
+!==================================開口縦補強筋
+verRefOd=od_list[verRefNd]
+verRefPen=SDpen[scode_list[verRefNd]]
+verRefMat=SDmat[scode_list[verRefNd]]
+
+verRefTotnum=0
+dim _verRefPoint[],_verRefPos[][]
+_verRefPoint[1]=0
+_verRefPos[1][1]=0
+_verRefPos[1][2]=0
+
+if switchFootingBar then
+    if opNum>0 then
+        for i=1 to opNum
+            !xpos
+            xpos1=opPos[i][1]-opSize[i][1]/2-opCover-verRefOd/2
+            xpos2=opPos[i][1]+opSize[i][1]/2+opCover+verRefOd/2
+
+            !ypos
+            ypos1=(footingWid/2-footingSideCover-stpOd+verRefOd/2)
+            ypos2=-(footingWid/2-footingSideCover-stpOd+verRefOd/2)
+
+            !zpos
+            zpos1=footingLevel-footingTopCover
+            zpos2=downLevel+baseDownCover+baseMbarOd
+
+            if disVerRef then
+                verRefTotnum=verRefTotnum+1
+                _verRefPoint[verRefTotnum]=2
+
+                put xpos1
+                put ypos1
+                put zpos1
+
+                put xpos1
+                put ypos1
+                put zpos2
+
+                for j=1 to 3*_verRefPoint[verRefTotnum]
+                    _verRefPos[verRefTotnum][j]=get(1)
+                next j
+
+                verRefTotnum=verRefTotnum+1
+                _verRefPoint[verRefTotnum]=2
+
+                put xpos1
+                put ypos2
+                put zpos1
+
+                put xpos1
+                put ypos2
+                put zpos2
+
+                for j=1 to 3*_verRefPoint[verRefTotnum]
+                    _verRefPos[verRefTotnum][j]=get(1)
+                next j
+
+                verRefTotnum=verRefTotnum+1
+                _verRefPoint[verRefTotnum]=2
+
+                put xpos2
+                put ypos1
+                put zpos1
+
+                put xpos2
+                put ypos1
+                put zpos2
+
+                for j=1 to 3*_verRefPoint[verRefTotnum]
+                    _verRefPos[verRefTotnum][j]=get(1)
+                next j
+
+                verRefTotnum=verRefTotnum+1
+                _verRefPoint[verRefTotnum]=2
+
+                put xpos2
+                put ypos2
+                put zpos1
+
+                put xpos2
+                put ypos2
+                put zpos2
+
+                for j=1 to 3*_verRefPoint[verRefTotnum]
+                    _verRefPos[verRefTotnum][j]=get(1)
+                next j
+            endif
+        next i
+    endif
+endif
+
+tempNum=verRefTotnum
+_tempPoint=_verRefPoint
+_tempPos=_verRefPos
+gosub "pos_translation"
+
+parameters \
+verRefTotnum=verRefTotnum,
+verRefOd=verRefOd,
+verRefPen=verRefPen,
+verRefMat=verRefMat,
+verRefPoint=_verRefPoint,
+verRefPos=_transPos
+
+
+!==================================開口横補強筋
+horRefOd=od_list[horRefNd]
+horRefPen=SDpen[scode_list[horRefNd]]
+horRefMat=SDmat[scode_list[horRefNd]]
+
+horRefTotnum=0
+dim _horRefPoint[],_horRefPos[][]
+_horRefPoint[1]=0
+_horRefPos[1][1]=0
+_horRefPos[1][2]=0
+
+if switchFootingBar then
+    if opNum>0 then
+        for i=1 to opNum
+            !xpos
+            xpos1=opPos[i][1]-opSize[i][1]/2-(L1_list[scode_list[horRefNd]][conFc]+L1Plus)*horRefNd/1000
+            xpos2=opPos[i][1]+opSize[i][1]/2+(L1_list[scode_list[horRefNd]][conFc]+L1Plus)*horRefNd/1000
+
+            !ypos
+            ypos1=-(footingWid/2-footingSideCover-((elbowRad+0.5)*stpRefOd*sqr(2)-(elbowRad-0.5)*stpRefOd+horRefOd/2)/sqr(2))
+            ypos2=(footingWid/2-footingSideCover-((elbowRad+0.5)*stpRefOd*sqr(2)-(elbowRad-0.5)*stpRefOd+horRefOd/2)/sqr(2))
+
+            !zpos
+            zpos1=downLevel+opPos[i][2]+opSize[i][2]/2+opCover+((elbowRad+0.5)*stpRefOd*sqr(2)-(elbowRad-0.5)*stpRefOd+horRefOd/2)/sqr(2)
+            zpos2=downLevel+opPos[i][2]-opSize[i][2]/2-opCover-((elbowRad+0.5)*stpRefOd*sqr(2)-(elbowRad-0.5)*stpRefOd+horRefOd/2)/sqr(2)
+
+            if disHorRef then
+                horRefTotnum=horRefTotnum+1
+                _horRefPoint[horRefTotnum]=2
+
+                put xpos1
+                put ypos1
+                put zpos1
+
+                put xpos2
+                put ypos1
+                put zpos1
+
+                for j=1 to 3*_horRefPoint[horRefTotnum]
+                    _horRefPos[horRefTotnum][j]=get(1)
+                next j
+
+                horRefTotnum=horRefTotnum+1
+                _horRefPoint[horRefTotnum]=2
+
+                put xpos1
+                put ypos2
+                put zpos1
+
+                put xpos2
+                put ypos2
+                put zpos1
+
+                for j=1 to 3*_horRefPoint[horRefTotnum]
+                    _horRefPos[horRefTotnum][j]=get(1)
+                next j
+
+                horRefTotnum=horRefTotnum+1
+                _horRefPoint[horRefTotnum]=2
+
+                put xpos1
+                put ypos1
+                put zpos2
+
+                put xpos2
+                put ypos1
+                put zpos2
+
+                for j=1 to 3*_horRefPoint[horRefTotnum]
+                    _horRefPos[horRefTotnum][j]=get(1)
+                next j
+
+                horRefTotnum=horRefTotnum+1
+                _horRefPoint[horRefTotnum]=2
+
+                put xpos1
+                put ypos2
+                put zpos2
+
+                put xpos2
+                put ypos2
+                put zpos2
+
+                for j=1 to 3*_horRefPoint[horRefTotnum]
+                    _horRefPos[horRefTotnum][j]=get(1)
+                next j
+            endif
+        next i
+    endif
+endif
+
+tempNum=horRefTotnum
+_tempPoint=_horRefPoint
+_tempPos=_horRefPos
+gosub "pos_translation"
+
+parameters \
+horRefTotnum=horRefTotnum,
+horRefOd=horRefOd,
+horRefPen=horRefPen,
+horRefMat=horRefMat,
+horRefPoint=_horRefPoint,
+horRefPos=_transPos
+
+
+!==================================開口斜め補強筋
+diaRefOd=od_list[diaRefNd]
+diaRefPen=SDpen[scode_list[diaRefNd]]
+diaRefMat=SDmat[scode_list[diaRefNd]]
+
+diaRefTotnum=0
+dim _diaRefPoint[],_diaRefPos[][]
+_diaRefPoint[1]=0
+_diaRefPos[1][1]=0
+_diaRefPos[1][2]=0
+
+if switchFootingBar then
+    if opNum>0 then
+        for i=1 to opNum
+            !ypos
+            ypos1=-(footingWid/2-footingSideCover-((elbowRad+0.5)*stpRefOd*sqr(2)-(elbowRad-0.5)*stpRefOd+horRefOd/2)/sqr(2)-horRefOd/2-diaRefOd/2)
+            ypos2=-(footingWid/2-footingSideCover-((elbowRad+0.5)*stpRefOd*sqr(2)-(elbowRad-0.5)*stpRefOd+horRefOd/2)/sqr(2)-horRefOd/2-diaRefOd*3/2)
+            ypos3=(footingWid/2-footingSideCover-((elbowRad+0.5)*stpRefOd*sqr(2)-(elbowRad-0.5)*stpRefOd+horRefOd/2)/sqr(2)-horRefOd/2-diaRefOd/2)
+            ypos4=(footingWid/2-footingSideCover-((elbowRad+0.5)*stpRefOd*sqr(2)-(elbowRad-0.5)*stpRefOd+horRefOd/2)/sqr(2)-horRefOd/2-diaRefOd*3/2)
+
+            !zpos
+            zpos1=(downLevel+opPos[i][2]+opSize[i][2]/2+(opCover+diaRefOd/2)/sqr(2))-(L1_list[scode_list[diaRefNd]][conFc]+L1Plus)*diaRefNd/1000/sqr(2)
+            tempZpos2=(downLevel+opPos[i][2]+opSize[i][2]/2+(opCover+diaRefOd/2)/sqr(2))+(L1_list[scode_list[diaRefNd]][conFc]+L1Plus)*diaRefNd/1000/sqr(2)
+            zpos2=min(tempZpos2,footingLevel-footingTopCover-stpOd/2-elbowRad*stpOd)
+
+            zpos3=(downLevel+opPos[i][2]-opSize[i][2]/2-(opCover+diaRefOd/2)/sqr(2))+(L1_list[scode_list[diaRefNd]][conFc]+L1Plus)*diaRefNd/1000/sqr(2)
+            tempZpos4=(downLevel+opPos[i][2]-opSize[i][2]/2-(opCover+diaRefOd/2)/sqr(2))-(L1_list[scode_list[diaRefNd]][conFc]+L1Plus)*diaRefNd/1000/sqr(2)
+            zpos4=max(tempZpos4,downLevel+baseDownCover+baseMbarOd+stpOd/2+elbowRad*stpOd)
+
+            if disDiaRef then
+                !左上
+                !xpos
+                xpos1=(opPos[i][1]-opSize[i][1]/2-(opCover+diaRefOd/2)/sqr(2))-(L1_list[scode_list[diaRefNd]][conFc]+L1Plus)*diaRefNd/1000/sqr(2)
+                xpos2=xpos1+(zpos2-zpos1)
+
+                diaRefTotnum=diaRefTotnum+1
+                _diaRefPoint[diaRefTotnum]=2
+
+                put xpos1
+                put ypos1
+                put zpos1
+
+                put xpos2
+                put ypos1
+                put zpos2
+
+                if tempZpos2>zpos2 then
+                    _diaRefPoint[diaRefTotnum]=_diaRefPoint[diaRefTotnum]+1
+                    diaRefFra=max(elbowRad*diaRefOd+8*diaRefNd/1000,(tempZpos2-zpos2)*sqr(2))
+
+                    put xpos2+diaRefFra
+                    put ypos1
+                    put zpos2
+                endif
+
+                for j=1 to 3*_diaRefPoint[diaRefTotnum]
+                    _diaRefPos[diaRefTotnum][j]=get(1)
+                next j
+
+                !右上
+                !xpos
+                xpos1=(opPos[i][1]+opSize[i][1]/2+(opCover+diaRefOd/2)/sqr(2))+(L1_list[scode_list[diaRefNd]][conFc]+L1Plus)*diaRefNd/1000/sqr(2)
+                xpos2=xpos1-(zpos2-zpos1)
+
+                diaRefTotnum=diaRefTotnum+1
+                _diaRefPoint[diaRefTotnum]=2
+
+                put xpos1
+                put ypos2
+                put zpos1
+
+                put xpos2
+                put ypos2
+                put zpos2
+
+                if tempZpos2>zpos2 then
+                    _diaRefPoint[diaRefTotnum]=_diaRefPoint[diaRefTotnum]+1
+                    diaRefFra=max(elbowRad*diaRefOd+8*diaRefNd/1000,(tempZpos2-zpos2)*sqr(2))
+
+                    put xpos2-diaRefFra
+                    put ypos1
+                    put zpos2
+                endif
+
+                for j=1 to 3*_diaRefPoint[diaRefTotnum]
+                    _diaRefPos[diaRefTotnum][j]=get(1)
+                next j
+
+                !右下
+                !xpos
+                xpos1=(opPos[i][1]+opSize[i][1]/2+(opCover+diaRefOd/2)/sqr(2))+(L1_list[scode_list[diaRefNd]][conFc]+L1Plus)*diaRefNd/1000/sqr(2)
+                xpos2=xpos1-(zpos3-zpos4)
+
+                diaRefTotnum=diaRefTotnum+1
+                _diaRefPoint[diaRefTotnum]=2
+
+                put xpos1
+                put ypos1
+                put zpos3
+
+                put xpos2
+                put ypos1
+                put zpos4
+
+                if tempZpos4<zpos4 then
+                    _diaRefPoint[diaRefTotnum]=_diaRefPoint[diaRefTotnum]+1
+                    diaRefFra=max(elbowRad*diaRefOd+8*diaRefNd/1000,(zpos4-tempZpos4)*sqr(2))
+
+                    put xpos2-diaRefFra
+                    put ypos1
+                    put zpos4
+                endif
+
+                for j=1 to 3*_diaRefPoint[diaRefTotnum]
+                    _diaRefPos[diaRefTotnum][j]=get(1)
+                next j
+
+                !左下
+                !xpos
+                xpos1=(opPos[i][1]-opSize[i][1]/2-(opCover+diaRefOd/2)/sqr(2))-(L1_list[scode_list[diaRefNd]][conFc]+L1Plus)*diaRefNd/1000/sqr(2)
+                xpos2=xpos1+(zpos3-zpos4)
+
+                diaRefTotnum=diaRefTotnum+1
+                _diaRefPoint[diaRefTotnum]=2
+
+                put xpos1
+                put ypos2
+                put zpos3
+
+                put xpos2
+                put ypos2
+                put zpos4
+
+                if tempZpos4<zpos4 then
+                    _diaRefPoint[diaRefTotnum]=_diaRefPoint[diaRefTotnum]+1
+                    diaRefFra=max(elbowRad*diaRefOd+8*diaRefNd/1000,(zpos4-tempZpos4)*sqr(2))
+
+                    put xpos2+diaRefFra
+                    put ypos2
+                    put zpos4
+                endif
+
+                for j=1 to 3*_diaRefPoint[diaRefTotnum]
+                    _diaRefPos[diaRefTotnum][j]=get(1)
+                next j
+            endif
+        next i
+    endif
+endif
+
+tempNum=diaRefTotnum
+_tempPoint=_diaRefPoint
+_tempPos=_diaRefPos
+gosub "pos_translation"
+
+parameters \
+diaRefTotnum=diaRefTotnum,
+diaRefOd=diaRefOd,
+diaRefPen=diaRefPen,
+diaRefMat=diaRefMat,
+diaRefPoint=_diaRefPoint,
+diaRefPos=_transPos
+
+
+!==================================開口補強STP
+stpRefOd=od_list[stpRefNd]
+stpRefPen=SDpen[scode_list[stpRefNd]]
+stpRefMat=SDmat[scode_list[stpRefNd]]
+
+stpRefTotnum=0
+dim _stpRefPoint[],_stpRefPos[][]
+_stpRefPoint[1]=0
+_stpRefPos[1][1]=0
+_stpRefPos[1][2]=0
+
+if switchFootingBar then
+    if opNum>0 then
+        for i=1 to opNum
+            !ypos
+            ypos1=-(footingWid/2-footingSideCover-stpOd+stpRefOd/2)
+            ypos2=(footingWid/2-footingSideCover-stpOd+stpRefOd/2)
+
+            !zpos
+            zpos1=footingLevel-footingTopCover-stpRefOd/2
+            zpos2=downLevel+opPos[i][2]+opSize[i][2]/2+opCover+stpRefOd/2
+            zpos3=downLevel+opPos[i][2]-opSize[i][2]/2-opCover-stpRefOd/2
+            zpos4=downLevel+baseDownCover+baseMbarOd+stpRefOd/2
+
+            if zpos1-zpos2>=2*elbowRad*stpRefOd then
+                upperStpFlag=1
+            else
+                upperStpFlag=0
+            endif
+
+            if zpos3-zpos4>=2*elbowRad*stpRefOd then
+                lowerStpFlag=1
+            else
+                lowerStpFlag=0
+            endif
+
+            !中間部
+            centerNum=ceil((opSize[i][1]+2*opCover+verRefOd)/stpRefPitch)-1
+            centerPitch=(opSize[i][1]+2*opCover+verRefOd)/(centerNum+1)
+
+            for j=1 to centerNum
+                !xpos
+                xpos=(opPos[i][1]-opSize[i][1]/2-opCover-verRefOd/2)+j*centerPitch
+
+                if disStpRef and upperStpFlag=1 then
+                    stpRefTotnum=stpRefTotnum+1
+                    _stpRefPoint[stpRefTotnum]=6
+
+                    put xpos
+                    put ypos1
+                    put (zpos1+zpos2)/2
+
+                    put xpos
+                    put ypos1
+                    put zpos1
+
+                    put xpos
+                    put ypos2
+                    put zpos1
+
+                    put xpos
+                    put ypos2
+                    put zpos2
+
+                    put xpos
+                    put ypos1
+                    put zpos2
+
+                    put xpos
+                    put ypos1
+                    put (zpos1+zpos2)/2
+
+                    for n=1 to 3*_stpRefPoint[stpRefTotnum]
+                        _stpRefPos[stpRefTotnum][n]=get(1)
+                    next n
+                endif
+
+                if disStpRef and lowerStpFlag=1 then
+                    stpRefTotnum=stpRefTotnum+1
+                    _stpRefPoint[stpRefTotnum]=6
+
+                    put xpos
+                    put ypos1
+                    put (zpos3+zpos4)/2
+
+                    put xpos
+                    put ypos1
+                    put zpos3
+
+                    put xpos
+                    put ypos2
+                    put zpos3
+
+                    put xpos
+                    put ypos2
+                    put zpos4
+
+                    put xpos
+                    put ypos1
+                    put zpos4
+
+                    put xpos
+                    put ypos1
+                    put (zpos3+zpos4)/2
+
+                    for n=1 to 3*_stpRefPoint[stpRefTotnum]
+                        _stpRefPos[stpRefTotnum][n]=get(1)
+                    next n
+                endif
+            next j
+
+            !両側
+            edgeNum=ceil((opRefRange/2-opSize[i][1]/2-opCover-verRefOd/2)/stpRefPitch)
+            edgePitch=(opRefRange/2-opSize[i][1]/2-opCover-verRefOd/2)/edgeNum
+
+            for j=1 to 2*edgeNum
+                !xpos
+                if j<=edgeNum then
+                    xpos=opPos[i][1]-(opSize[i][1]/2+opCover+verRefOd/2+j*edgePitch)
+                else
+                    xpos=opPos[i][1]+(opSize[i][1]/2+opCover+verRefOd/2+(j-edgeNum)*edgePitch)
+                endif
+
+                if disStpRef then
+                    stpRefTotnum=stpRefTotnum+1
+                    _stpRefPoint[stpRefTotnum]=6
+
+                    put xpos
+                    put ypos1
+                    put (zpos1+zpos4)/2
+
+                    put xpos
+                    put ypos1
+                    put zpos1
+
+                    put xpos
+                    put ypos2
+                    put zpos1
+
+                    put xpos
+                    put ypos2
+                    put zpos4
+
+                    put xpos
+                    put ypos1
+                    put zpos4
+
+                    put xpos
+                    put ypos1
+                    put (zpos1+zpos4)/2
+
+                    for n=1 to 3*_stpRefPoint[stpRefTotnum]
+                        _stpRefPos[stpRefTotnum][n]=get(1)
+                    next n
+                endif
+            next j
+        next i
+    endif
+endif
+
+tempNum=stpRefTotnum
+_tempPoint=_stpRefPoint
+_tempPos=_stpRefPos
+gosub "pos_translation"
+
+parameters \
+stpRefTotnum=stpRefTotnum,
+stpRefOd=stpRefOd,
+stpRefPen=stpRefPen,
+stpRefMat=stpRefMat,
+stpRefPoint=_stpRefPoint,
+stpRefPos=_transPos
+
+
+
+goto "master_end"
+
+end
+
+
+
+
+"pos_translation":
+    !output用リスト初期化
+    _transPos=_resetList
+
+    for p=1 to tempNum
+        for q=1 to _tempPoint[p]
+            tempX1=_tempPos[p][3*q-2]
+            tempY1=_tempPos[p][3*q-1]
+            tempZ1=_tempPos[p][3*q]
+
+            !rotz vertexRtz
+            tempX2=tempX1*cos(vertexRtz)-tempY1*sin(vertexRtz)
+            tempY2=tempX1*sin(vertexRtz)+tempY1*cos(vertexRtz)
+            tempZ2=tempZ1
+
+            !add vertexPos[1][x],vertexPos[1][y],0
+            transX=vertexPos[1][x]+tempX2
+            tramsY=vertexPos[1][y]+tempY2
+            transZ=tempZ2
+
+            _transPos[p][3*q-2]=transX
+            _transPos[p][3*q-1]=tramsY
+            _transPos[p][3*q]=transZ
+        next q
+    next p
+return
+
+
+
+
+"master_end":
